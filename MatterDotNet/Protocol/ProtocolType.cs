@@ -10,13 +10,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace ExampleConsole
+namespace MatterDotNet.Protocol
 {
-    internal class Program
+    internal enum ProtocolType
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Coming Soon");
-        }
+        SecureChannel = 0x0,
+        InteractionModel = 0x1,
+        BDX = 0x2,
+        UserDirectedCommissioning = 0x3,
+        Testing = 0x4,
     }
 }

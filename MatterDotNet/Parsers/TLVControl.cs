@@ -10,13 +10,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace ExampleConsole
+namespace MatterDotNet.Parsers
 {
-    internal class Program
+    internal enum TLVControl
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Coming Soon");
-        }
+        /// <summary>
+        /// 0 Byte Length
+        /// </summary>
+        Anonymous = 0,
+        /// <summary>
+        /// 1 Byte Length
+        /// </summary>
+        ContextSpecific = 1,
+        CommonProfileShort = 2,
+        CommonProfileInt = 3,
+        ImplicitProfileShort = 4,
+        ImplicitProfileInt = 5,
+        FullyQualifiedShort = 6,
+        FullyQualifiedInt = 7
     }
 }

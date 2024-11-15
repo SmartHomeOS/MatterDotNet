@@ -10,13 +10,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace ExampleConsole
+namespace MatterDotNet.Protocol
 {
-    internal class Program
+    [Flags]
+    internal enum SecurityFlags : byte
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Coming Soon");
-        }
+        UnicastSession = 0x0,
+        GroupSession = 0x1,
+        SessionMask = 0x3,
+        MessageExtensions = 0x20,
+        ControlMessage = 0x40,
+        Privacy = 0x80,
     }
 }

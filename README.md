@@ -1,8 +1,9 @@
+[![Build](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml)
 # MatterDotNet
 **Coming Soon** - New implementation in progress
 
 #### What's Working
-* Nothing Yet
+* Some Crypto functions, message framing and QR/PIN parsing
 
 #### Coming Soon
 * Matter 1.3 Standard Implementation

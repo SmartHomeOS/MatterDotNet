@@ -15,8 +15,20 @@ using System.Text;
 
 namespace MatterDotNet.Security
 {
-    internal static class MemoryUtil
+    internal static class SpanUtil
     {
+        public static byte[] Combine(params byte[][] arrays)
+        {
+            byte[] rv = new byte[arrays.Sum(a => a.Length)];
+            int offset = 0;
+            foreach (byte[] array in arrays)
+            {
+                System.Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                offset += array.Length;
+            }
+            return rv;
+        }
+
         public static Memory<byte> Fill(byte val, int count)
         {
             Memory<byte> ret = new byte[count];
@@ -25,38 +37,38 @@ namespace MatterDotNet.Security
             return ret;
         }
 
-        public static Memory<byte> PadZeros(Memory<byte> val, int count)
+        public static Span<byte> PadZeros(Span<byte> val, int count)
         {
             if (count <= 0)
                 return val;
             Memory<byte> ret = new byte[val.Length + count];
             if (val.Length > 0)
-                val.CopyTo(ret);
-            return ret;
+                val.CopyTo(ret.Span);
+            return ret.Span;
         }
 
-        public static Memory<byte> LeftShift1(Memory<byte> array)
+        public static Span<byte> LeftShift1(Span<byte> array)
         {
             Memory<byte> ret = new byte[array.Length];
             for (int i = 0; i < ret.Length - 1; i++)
-                ret.Span[i] = (byte)(array.Span[i] << 1 | (array.Span[i + 1] >> 7));
-            ret.Span[ret.Length - 1] = (byte)(array.Span[array.Length - 1] << 1);
-            return ret;
+                ret.Span[i] = (byte)(array[i] << 1 | (array[i + 1] >> 7));
+            ret.Span[ret.Length - 1] = (byte)(array[array.Length - 1] << 1);
+            return ret.Span;
         }
 
-        public static Memory<byte> XOR(Memory<byte> a, Memory<byte> b)
+        public static Span<byte> XOR(Span<byte> a, Span<byte> b)
         {
             if (a.Length != b.Length)
                 throw new ArgumentException("Invalid Byte Array Sizes");
             Memory<byte> ret = new byte[a.Length];
             for (int i = 0; i < a.Length; i++)
-                ret.Span[i] = (byte)(a.Span[i] ^ b.Span[i]);
-            return ret;
+                ret.Span[i] = (byte)(a[i] ^ b[i]);
+            return ret.Span;
         }
 
-        public static byte XOR(Memory<byte> a, byte start)
+        public static byte XOR(Span<byte> a, byte start)
         {
-            foreach (byte b in a.Span)
+            foreach (byte b in a)
                 start ^= b;
             return start;
         }
@@ -71,11 +83,6 @@ namespace MatterDotNet.Security
             }
         }
 
-        public static string Print(Memory<byte> mem)
-        {
-            return Print(mem.Span);
-        }
-
         public static string Print(ReadOnlySpan<byte> span)
         {
             StringBuilder ret = new StringBuilder(span.Length * 3);
@@ -88,7 +95,7 @@ namespace MatterDotNet.Security
             return ret.ToString();
         }
 
-        public static Memory<byte> From(string hexString)
+        public static Span<byte> From(string hexString)
         {
             if (hexString.Length % 2 != 0)
                 throw new ArgumentException("Not a hex string");
@@ -97,7 +104,7 @@ namespace MatterDotNet.Security
             for (int index = 0; index < data.Length; index++)
                 data.Span[index] = byte.Parse(hexString.AsSpan(index * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
-            return data;
+            return data.Span;
         }
     }
 }

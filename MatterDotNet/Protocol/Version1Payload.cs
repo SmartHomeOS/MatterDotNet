@@ -14,10 +14,10 @@ using System.Buffers.Binary;
 
 namespace MatterDotNet.Protocol
 {
-    internal class Version1Payload
+    internal class Version1Payload : IPayload
     {
         public ExchangeFlags Flags { get; init; }
-        public byte OpCode { get; init; }
+        public byte OpCode { get; init; } //Depends on Protocol
         public ushort ExchangeID { get; init; }
         public ushort VendorID { get; init; }
         public ProtocolType Protocol { get; init; }
@@ -46,6 +46,11 @@ namespace MatterDotNet.Protocol
                 payload = payload.Slice(2 + len);
             }
             Payload = payload.Slice(6).ToArray();
+        }
+
+        public bool Serialize(PayloadWriter stream)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -16,8 +16,14 @@ using System.Security.Cryptography;
 
 namespace MatterDotNet.Security
 {
-    internal static class Crypto
+    public static class Crypto
     {
+        public const int SYMMETRIC_KEY_LENGTH_BITS = 128;
+        public const int SYMMETRIC_KEY_LENGTH_BYTES = SYMMETRIC_KEY_LENGTH_BITS / 8;
+        public const int CRYPTO_AEAD_MIC_LENGTH_BITS = 128;
+        public const int AEAD_MIC_LENGTH_BYTES = CRYPTO_AEAD_MIC_LENGTH_BITS / 8;
+        public const int NONCE_LENGTH_BYTES = 13;
+
         /// <summary>
         /// Encrypts the data and returns the MIC (tag)
         /// </summary>
@@ -26,7 +32,7 @@ namespace MatterDotNet.Security
         /// <param name="additionalData"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public static ReadOnlySpan<byte> Crypto_AEAD_GenerateEncrypt(byte[] key, Span<byte> payload, ReadOnlySpan<byte> additionalData, byte[] nonce)
+        public static ReadOnlySpan<byte> AEAD_GenerateEncrypt(byte[] key, Span<byte> payload, ReadOnlySpan<byte> additionalData, Span<byte> nonce)
         {
             Span<byte> tag = new byte[16];
             AesCcm aes = new AesCcm(key);
@@ -43,7 +49,7 @@ namespace MatterDotNet.Security
         /// <param name="additionalData"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public static bool Crypto_AEAD_DecryptVerify(byte[] key, Span<byte> payload, ReadOnlySpan<byte> mic, ReadOnlySpan<byte> additionalData, byte[] nonce)
+        public static bool AEAD_DecryptVerify(byte[] key, Span<byte> payload, ReadOnlySpan<byte> mic, ReadOnlySpan<byte> additionalData, ReadOnlySpan<byte> nonce)
         {
             try
             {
@@ -64,7 +70,7 @@ namespace MatterDotNet.Security
         /// <param name="message"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public static Span<byte> Crypto_Privacy_Decrypt(byte[] key, Span<byte> message, byte[] nonce)
+        public static Span<byte> Privacy_Decrypt(byte[] key, Span<byte> message, byte[] nonce)
         {
             AesCtr ctr = new AesCtr(key, nonce);
             return ctr.EncryptDecrypt(message);
@@ -77,7 +83,7 @@ namespace MatterDotNet.Security
         /// <param name="message"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public static Span<byte> Crypto_Privacy_Encrypt(byte[] key, Span<byte> message, byte[] nonce)
+        public static Span<byte> Privacy_Encrypt(byte[] key, Span<byte> message, byte[] nonce)
         {
             AesCtr ctr = new AesCtr(key, nonce);
             return ctr.EncryptDecrypt(message);
@@ -89,30 +95,11 @@ namespace MatterDotNet.Security
         /// <param name="inputKey"></param>
         /// <param name="salt"></param>
         /// <param name="info"></param>
-        /// <param name="len"></param>
+        /// <param name="len">Length in bits</param>
         /// <returns></returns>
-        public static Span<byte> Crypto_KDF(byte[] inputKey, byte[] salt, byte[] info, int len)
+        public static byte[] KDF(byte[] inputKey, byte[] salt, byte[] info, int len)
         {
-            if (len > 256)
-                throw new ArgumentException("This wasn't designed for multiple blocks");
-            int L = len / 8;
-            const int HashLen = 32;
-            byte N = (byte)Math.Ceiling((double)(L / HashLen));
-            byte[] PRK = HKDF_Extract(salt, inputKey);
-            return HMAC_Hash(N, PRK, info);
-        }
-
-        private static byte[] HMAC_Hash(byte T, byte[] PRK, byte[] info)
-        {
-            if (T == 0)
-                return [];
-            byte[] bytes = SpanUtil.Combine(HMAC_Hash((byte)(T - 1), PRK, info), info, [T]);
-            return HMACSHA256.HashData(PRK, bytes);
-        }
-
-        public static byte[] HKDF_Extract(byte[] salt, byte[] IKM)
-        {
-            return HMACSHA256.HashData(salt, IKM);
+            return HKDF.Expand(HashAlgorithmName.SHA256, HKDF.Extract(HashAlgorithmName.SHA256, inputKey, salt), len / 8, info);
         }
 
         /// <summary>
@@ -124,7 +111,7 @@ namespace MatterDotNet.Security
         /// <param name="len">Length in bits</param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static byte[] Crypto_PBKDF(byte[] input, byte[] salt, int iterations, int len)
+        public static byte[] PBKDF(byte[] input, byte[] salt, int iterations, int len)
         {
             if (iterations < 1000 || iterations > 100000)
                 throw new ArgumentOutOfRangeException(nameof(iterations));

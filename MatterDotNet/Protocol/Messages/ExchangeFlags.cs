@@ -10,23 +10,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Parsers
+namespace MatterDotNet.Protocol.Messages
 {
-    internal enum TLVControl
+    [Flags]
+    internal enum ExchangeFlags : byte
     {
-        /// <summary>
-        /// 0 Byte Length
-        /// </summary>
-        Anonymous = 0,
-        /// <summary>
-        /// 1 Byte Length
-        /// </summary>
-        ContextSpecific = 1,
-        CommonProfileShort = 2,
-        CommonProfileInt = 3,
-        ImplicitProfileShort = 4,
-        ImplicitProfileInt = 5,
-        FullyQualifiedShort = 6,
-        FullyQualifiedInt = 7
+        Initiator = 0x1,
+        Acknowledgement = 0x2,
+        Reliability = 0x4,
+        SecuredExtensions = 0x8,
+        VendorPresent = 0x10,
     }
 }

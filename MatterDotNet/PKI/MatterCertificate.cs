@@ -72,7 +72,23 @@ namespace MatterDotNet.PKI
                     }
                 }
             }
-        }
+            string[] issuerOIDs = this.cert.Issuer.Split(',', StringSplitOptions.TrimEntries);
+            foreach (string kvp in issuerOIDs)
+            {
+                string[] parts = kvp.Split('=', 2);
+                if (parts.Length == 2)
+                {
+                    switch (parts[0].ToUpper())
+                    {
+                        case "CN":
+                            IssuerName = parts[1];
+                            break;
+                    }
+                }
+            }
+                    }
+
+        public string IssuerName { get; set; } = string.Empty;
 
         public string CommonName { get; set; } = string.Empty;
 

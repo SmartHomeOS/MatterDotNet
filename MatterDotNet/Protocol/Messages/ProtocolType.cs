@@ -10,15 +10,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol
+namespace MatterDotNet.Protocol.Messages
 {
-    [Flags]
-    internal enum MessageFlags : byte
+    internal enum ProtocolType
     {
-        Version1 = 0x00,
-        VersionMask = 0xF0,
-        DestinationNodeID = 0x01,
-        DestinationGroupID = 0x02,
-        SourceNodeID = 0x04,
+        SecureChannel = 0x0,
+        InteractionModel = 0x1,
+        BDX = 0x2,
+        UserDirectedCommissioning = 0x3,
+        Testing = 0x4,
     }
 }

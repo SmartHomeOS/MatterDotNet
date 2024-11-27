@@ -12,7 +12,7 @@
 
 using System.Buffers.Binary;
 
-namespace MatterDotNet.Protocol
+namespace MatterDotNet.Protocol.Messages
 {
     internal class Version1Payload : IPayload
     {

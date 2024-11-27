@@ -13,7 +13,7 @@
 using System.Buffers.Binary;
 using System.Text;
 
-namespace MatterDotNet.Parsers
+namespace MatterDotNet.Protocol.Parsers
 {
     internal class TLVParser
     {
@@ -45,7 +45,7 @@ namespace MatterDotNet.Parsers
                 case ElementType.Null:
                     return null;
                 case ElementType.UnsignedByte:
-                    return (byte)buffer[offset++];
+                    return buffer[offset++];
                 case ElementType.UnsignedShort:
                     o = BinaryPrimitives.ReadUInt16LittleEndian(buffer.Slice(offset, 2));
                     offset += 2;

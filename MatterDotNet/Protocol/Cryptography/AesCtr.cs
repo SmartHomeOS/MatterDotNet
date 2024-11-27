@@ -12,7 +12,7 @@
 
 using System.Security.Cryptography;
 
-namespace MatterDotNet.Security
+namespace MatterDotNet.Protocol.Cryptography
 {
     internal class AesCtr : IDisposable
     {
@@ -24,16 +24,16 @@ namespace MatterDotNet.Security
 
         public AesCtr(byte[] key, byte[] initialCounter)
         {
-            this.isDisposed = false;
+            isDisposed = false;
 
             SymmetricAlgorithm aes = Aes.Create();
             aes.Mode = CipherMode.ECB;
             aes.Padding = PaddingMode.None;
 
-            Buffer.BlockCopy(initialCounter, 0, this.counter, 0, BLOCK_SIZE);
+            Buffer.BlockCopy(initialCounter, 0, counter, 0, BLOCK_SIZE);
 
             var zeroIv = new byte[BLOCK_SIZE];
-            this.counterEncryptor = aes.CreateEncryptor(key, zeroIv);
+            counterEncryptor = aes.CreateEncryptor(key, zeroIv);
         }
 
         public Span<byte> EncryptDecrypt(Span<byte> input)
@@ -47,7 +47,7 @@ namespace MatterDotNet.Security
 
             while (numBytes > 0)
             {
-                this.counterEncryptor.TransformBlock(counter, 0, BLOCK_SIZE, block, 0);
+                counterEncryptor.TransformBlock(counter, 0, BLOCK_SIZE, block, 0);
 
                 for (int i = 0; i < BLOCK_SIZE; i++)
                 {
@@ -74,7 +74,7 @@ namespace MatterDotNet.Security
         public void Dispose()
         {
             if (!isDisposed)
-                this.counterEncryptor?.Dispose();
+                counterEncryptor?.Dispose();
 
             isDisposed = true;
             GC.SuppressFinalize(this);

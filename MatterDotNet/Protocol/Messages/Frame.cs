@@ -10,12 +10,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Security;
+using MatterDotNet.Protocol.Cryptography;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Text;
 
-namespace MatterDotNet.Protocol
+namespace MatterDotNet.Protocol.Messages
 {
     internal class Frame : IPayload
     {
@@ -58,7 +58,7 @@ namespace MatterDotNet.Protocol
                 if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
                     BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
                 //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
-                
+
                 ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(key, secureStream.GetPayload(), stream.GetPayload(), nonce);
                 stream.Write(secureStream);
                 stream.Write(mic);
@@ -84,7 +84,7 @@ namespace MatterDotNet.Protocol
             Flags = (MessageFlags)payload[0];
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
-            
+
             //TODO - Get Encryption Key
             byte[] key = new byte[1];
 
@@ -127,10 +127,10 @@ namespace MatterDotNet.Protocol
                 BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
             //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
 
-            Crypto.AEAD_DecryptVerify(key, 
-                                      slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES), 
-                                      slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES), 
-                                      payload.Slice(0, payload.Length - slice.Length), 
+            Crypto.AEAD_DecryptVerify(key,
+                                      slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES),
+                                      slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
+                                      payload.Slice(0, payload.Length - slice.Length),
                                       nonce);
             Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
         }

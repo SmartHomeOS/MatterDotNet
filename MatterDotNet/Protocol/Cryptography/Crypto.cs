@@ -10,11 +10,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+using MatterDotNet.Security;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 
-namespace MatterDotNet.Security
+namespace MatterDotNet.Protocol.Cryptography
 {
     public static class Crypto
     {
@@ -57,7 +57,7 @@ namespace MatterDotNet.Security
                 aes.Decrypt(nonce, payload, mic, payload, additionalData);
                 return true;
             }
-            catch(AuthenticationTagMismatchException)
+            catch (AuthenticationTagMismatchException)
             {
                 return false;
             }
@@ -108,27 +108,31 @@ namespace MatterDotNet.Security
         /// <param name="input"></param>
         /// <param name="salt"></param>
         /// <param name="iterations"></param>
-        /// <param name="len">Length in bits</param>
+        /// <param name="klen">Length in bits</param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static byte[] PBKDF(byte[] input, byte[] salt, int iterations, int len)
+        public static byte[] PBKDF(byte[] input, byte[] salt, int iterations, int klen)
         {
-            if (iterations < 1000 || iterations > 100000)
-                throw new ArgumentOutOfRangeException(nameof(iterations));
-            int numBlocks = (int)Math.Ceiling((double)(len / 256));
-            byte[] ret = new byte[len / 8];
-            for (int i = 0; i < numBlocks; i++)
+            //Is this a hard requirement?
+            //if (iterations < 1000 || iterations > 100000)
+            //    throw new ArgumentOutOfRangeException(nameof(iterations));
+
+            int numBlocks = (int)Math.Ceiling((double)klen / 256);
+            byte[] ret = new byte[klen / 8];
+            for (int i = 1; i <= numBlocks; i++)
             {
                 byte[] IntI = new byte[4];
                 BinaryPrimitives.WriteUInt32BigEndian(IntI, (uint)i);
                 Span<byte> T = new byte[32];
                 byte[] U = SpanUtil.Combine(salt, IntI);
-                for (int j = 1; j < iterations; j++)
+                for (int j = 1; j <= iterations; j++)
                 {
                     U = HMACSHA256.HashData(input, U);
                     T = SpanUtil.XOR(T, U);
                 }
-                T.CopyTo(ret.AsSpan(i * 32, 32));
+                int pos = (i - 1) * 32;
+                int useableBytes = Math.Min(32, ret.Length - pos);
+                T.Slice(0, useableBytes).CopyTo(ret.AsSpan(pos, useableBytes));
             }
             return ret;
         }

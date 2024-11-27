@@ -2,7 +2,7 @@ using MatterDotNet;
 
 namespace Test
 {
-    public class PayloadParsing
+    public class PayloadParsingTests
     {
 
         [Test]

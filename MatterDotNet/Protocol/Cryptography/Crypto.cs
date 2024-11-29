@@ -13,6 +13,7 @@
 using MatterDotNet.Security;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
@@ -20,9 +21,14 @@ namespace MatterDotNet.Protocol.Cryptography
     {
         public const int SYMMETRIC_KEY_LENGTH_BITS = 128;
         public const int SYMMETRIC_KEY_LENGTH_BYTES = SYMMETRIC_KEY_LENGTH_BITS / 8;
-        public const int CRYPTO_AEAD_MIC_LENGTH_BITS = 128;
-        public const int AEAD_MIC_LENGTH_BYTES = CRYPTO_AEAD_MIC_LENGTH_BITS / 8;
+        public const int AEAD_MIC_LENGTH_BITS = 128;
+        public const int AEAD_MIC_LENGTH_BYTES = AEAD_MIC_LENGTH_BITS / 8;
         public const int NONCE_LENGTH_BYTES = 13;
+        public const int HASH_LEN_BYTES = SHA256.HashSizeInBytes;
+        public const int HASH_LEN_BITS = SHA256.HashSizeInBits;
+        public const int GROUP_SIZE_BYTES = 32;
+        public const int GROUP_SIZE_BITS = GROUP_SIZE_BYTES * 8;
+        public const int PUBLIC_KEY_SIZE_BYTES = (2 * GROUP_SIZE_BYTES) + 1;
 
         /// <summary>
         /// Encrypts the data and returns the MIC (tag)
@@ -97,9 +103,13 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <param name="info"></param>
         /// <param name="len">Length in bits</param>
         /// <returns></returns>
-        public static byte[] KDF(byte[] inputKey, byte[] salt, byte[] info, int len)
+        public static byte[] KDF(Span<byte> inputKey, Span<byte> salt, Span<byte> info, int len)
         {
-            return HKDF.Expand(HashAlgorithmName.SHA256, HKDF.Extract(HashAlgorithmName.SHA256, inputKey, salt), len / 8, info);
+            Span<byte> tmp = stackalloc byte[32];
+            HKDF.Extract(HashAlgorithmName.SHA256, inputKey, salt, tmp);
+            byte[] result = new byte[len / 8];
+            HKDF.Expand(HashAlgorithmName.SHA256, tmp, result, info);
+            return result;
         }
 
         /// <summary>
@@ -123,18 +133,79 @@ namespace MatterDotNet.Protocol.Cryptography
             {
                 byte[] IntI = new byte[4];
                 BinaryPrimitives.WriteUInt32BigEndian(IntI, (uint)i);
-                Span<byte> T = new byte[32];
+                Span<byte> T = new byte[HASH_LEN_BYTES];
                 byte[] U = SpanUtil.Combine(salt, IntI);
                 for (int j = 1; j <= iterations; j++)
                 {
                     U = HMACSHA256.HashData(input, U);
                     T = SpanUtil.XOR(T, U);
                 }
-                int pos = (i - 1) * 32;
-                int useableBytes = Math.Min(32, ret.Length - pos);
+                int pos = (i - 1) * HASH_LEN_BYTES;
+                int useableBytes = Math.Min(HASH_LEN_BYTES, ret.Length - pos);
                 T.Slice(0, useableBytes).CopyTo(ret.AsSpan(pos, useableBytes));
             }
             return ret;
+        }
+
+        public static byte[] Hash(ReadOnlySpan<byte> data)
+        {
+            return SHA256.HashData(data);
+        }
+
+        public static byte[] HMAC(ReadOnlySpan<byte> key, ReadOnlySpan<byte> text)
+        {
+            return HMACSHA256.HashData(key, text);
+        }
+
+        public static (byte[] Public, byte[] Private) GenerateKeypair()
+        {
+            ECDsa ecc = ECDsa.Create();
+            ecc.GenerateKey(ECCurve.NamedCurves.nistP256);
+            var p = ecc.ExportParameters(true);
+            byte[] pub = new byte[PUBLIC_KEY_SIZE_BYTES];
+            pub[0] = 0x4;
+            p.Q.X!.CopyTo(pub, 1);
+            p.Q.Y!.CopyTo(pub, GROUP_SIZE_BYTES + 1);
+            return (pub, p.D!);
+        }
+
+        public static byte[] Sign(byte[] privateKey, byte[] message)
+        {
+            ECParameters ecp = new ECParameters();
+            ecp.Curve = ECCurve.NamedCurves.nistP256;
+            ecp.D = privateKey;
+            ECDsa ec = ECDsa.Create(ecp);
+            return ec.SignData(message, HashAlgorithmName.SHA256);
+        }
+
+        public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
+        {
+            ECParameters ecp = new ECParameters();
+            ecp.Curve = ECCurve.NamedCurves.nistP256;
+            ecp.Q = new BigIntegerPoint(publicKey).ToECPoint();
+            ecp.Validate();
+            ECDsa ec = ECDsa.Create(ecp);
+            return ec.VerifyData(message, signature, HashAlgorithmName.SHA256);
+        }
+
+        public static byte[] ECDH(byte[] myPrivateKey, byte[] theirPublicKey)
+        {
+            //WTF .net
+
+            ECParameters ec = new ECParameters();
+            ec.Curve = ECCurve.NamedCurves.nistP256;
+            ec.D = myPrivateKey;
+            ECDiffieHellman ecdh = ECDiffieHellman.Create(ec);
+            return ecdh.DeriveRawSecretAgreement(GetKey(theirPublicKey));
+        }
+
+        public static ECDiffieHellmanPublicKey GetKey(byte[] key)
+        {
+            //I hate how clunky this is
+            ECParameters ec = new ECParameters();
+            ec.Curve = ECCurve.NamedCurves.nistP256;
+            ec.Q = new BigIntegerPoint(key).ToECPoint();
+            return ECDiffieHellman.Create(ec).PublicKey;
         }
     }
 }

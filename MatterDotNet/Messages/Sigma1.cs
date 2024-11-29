@@ -10,10 +10,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol.Messages
+namespace MatterDotNet.Messages
 {
-    internal interface IPayload
+    public class Sigma1
     {
-        public bool Serialize(PayloadWriter stream);
+        public byte[] initiatorRandom {  get; set; }
+        public ushort initiatorSessionId { get; set; }
+        public ulong destinationId { get; set; }
+        public byte[] initiatorEphPubKey { get; set; }
+        public byte[] resumptionID { get; set; }
+        public byte[] initiatorResumeMIC { get; set; }
     }
 }

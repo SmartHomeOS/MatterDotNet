@@ -107,5 +107,19 @@ namespace MatterDotNet.PKI
         public uint VendorID { get; set; }
 
         public uint ProductID { get; set; }
+
+        public bool ValidateChain() {
+            bool valid;
+            X509ChainStatus[] status;
+            using (X509Chain chain = new X509Chain())
+            {
+                chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority; //TODO - Remove when valid root
+                valid = chain.Build(cert);
+                status = chain.ChainStatus;
+            }
+            return valid;
+        }
     }
 }

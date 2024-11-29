@@ -10,16 +10,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol.Messages
+namespace MatterDotNet.Protocol.Payloads
 {
-    [Flags]
-    internal enum SecurityFlags : byte
+    internal interface IPayload
     {
-        UnicastSession = 0x0,
-        GroupSession = 0x1,
-        SessionMask = 0x3,
-        MessageExtensions = 0x20,
-        ControlMessage = 0x40,
-        Privacy = 0x80,
+        public bool Serialize(PayloadWriter stream);
     }
 }

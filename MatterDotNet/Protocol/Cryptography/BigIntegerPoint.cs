@@ -12,10 +12,11 @@
 
 using MatterDotNet.Security;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
-    public struct BigIntegerPoint
+    public struct BigIntegerPoint : IEquatable<BigIntegerPoint>
     {
         private static readonly BigInteger SIGN_BIT = 1 << 256;
         public BigIntegerPoint() { }
@@ -39,7 +40,7 @@ namespace MatterDotNet.Protocol.Cryptography
                     X = new BigInteger(point.AsSpan(1), true, true);
                     Y = BigIntUtil.ModSqrt((BigInteger.ModPow(X, 3, SecP256.p) + (SecP256.a * X) % SecP256.p + SecP256.b) % SecP256.p, SecP256.p);
                     if (point[0] == 0x3)
-                        Y &= ~SIGN_BIT;
+                        Y |= SIGN_BIT;
                     break;
                 case 4:
                     int len = (point.Length - 1) / 2;
@@ -71,6 +72,28 @@ namespace MatterDotNet.Protocol.Cryptography
                 Y.TryWriteBytes(ret.Slice(33), out _, true, true);
                 return ret;
             }
+        }
+
+        public ECPoint ToECPoint()
+        {
+            ECPoint p = new ECPoint();
+            byte[] x = new byte[32];
+            X.TryWriteBytes(x, out _, true, true);
+            p.X = x;
+            byte[] y = new byte[32];
+            Y.TryWriteBytes(y, out _, true, true);
+            p.Y = y;
+            return p;
+        }
+
+        public void Negate()
+        {
+            Y ^= SIGN_BIT;
+        }
+
+        public bool Equals(BigIntegerPoint other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y);
         }
     }
 }

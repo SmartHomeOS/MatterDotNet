@@ -10,15 +10,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol.Messages
+namespace MatterDotNet.Protocol.Payloads
 {
-    [Flags]
-    internal enum MessageFlags : byte
+    public enum SecureOpCodes
     {
-        Version1 = 0x00,
-        VersionMask = 0xF0,
-        DestinationNodeID = 0x01,
-        DestinationGroupID = 0x02,
-        SourceNodeID = 0x04,
+        MsgCounterSyncReq = 0x00,
+        MsgCounterSyncRsp = 0x01,
+        MRPStandaloneAcknowledgement = 0x10,
+        PBKDFParamRequest = 0x20,
+        PBKDFParamResponse = 0x21,
+        PASEPake1 = 0x22,
+        PASEPake2 = 0x23,
+        PASEPake3 = 0x24,
+        CASESigma1 = 0x30,
+        CASESigma2 = 0x31,
+        CASESigma3 = 0x32,
+        CASESigma2_Resume = 0x33,
+        StatusReport = 0x40,
+        ICDCheckInMessage = 0x50
     }
 }

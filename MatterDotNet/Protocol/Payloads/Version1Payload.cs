@@ -12,17 +12,22 @@
 
 using System.Buffers.Binary;
 
-namespace MatterDotNet.Protocol.Messages
+namespace MatterDotNet.Protocol.Payloads
 {
     internal class Version1Payload : IPayload
     {
-        public ExchangeFlags Flags { get; init; }
-        public byte OpCode { get; init; } //Depends on Protocol
-        public ushort ExchangeID { get; init; }
-        public ushort VendorID { get; init; }
-        public ProtocolType Protocol { get; init; }
-        public uint AckCounter { get; init; }
-        public object Payload { get; init; }
+        public ExchangeFlags Flags { get; set; }
+        public byte OpCode { get; set; } //Depends on Protocol
+        public ushort ExchangeID { get; set; }
+        public ushort VendorID { get; set; }
+        public ProtocolType Protocol { get; set; }
+        public uint AckCounter { get; set; }
+        public object Payload { get; set; }
+
+        public Version1Payload(object payload)
+        {
+            this.Payload = payload;
+        }
 
         public Version1Payload(ReadOnlySpan<byte> payload)
         {
@@ -50,7 +55,17 @@ namespace MatterDotNet.Protocol.Messages
 
         public bool Serialize(PayloadWriter stream)
         {
-            throw new NotImplementedException();
+            stream.Write((byte)Flags);
+            stream.Write(OpCode);
+            stream.Write(ExchangeID);
+            if ((Flags & ExchangeFlags.VendorPresent) == ExchangeFlags.VendorPresent)
+                stream.Write(VendorID);
+            stream.Write((ushort)Protocol);
+            if ((Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
+                stream.Write(AckCounter);
+            //TODO
+            //stream.Write(Payload);
+            return true;
         }
     }
 }

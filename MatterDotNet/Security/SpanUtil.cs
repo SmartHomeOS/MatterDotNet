@@ -10,12 +10,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Globalization;
 using System.Text;
 
 namespace MatterDotNet.Security
 {
-    internal static class SpanUtil
+    public static class SpanUtil
     {
         public static byte[] Combine(params byte[][] arrays)
         {
@@ -29,11 +28,11 @@ namespace MatterDotNet.Security
             return rv;
         }
 
-        public static Memory<byte> Fill(byte val, int count)
+        public static Span<byte> Fill(byte val, int count)
         {
-            Memory<byte> ret = new byte[count];
+            Span<byte> ret = new byte[count];
             if (val != 0x0)
-                ret.Span.Fill(val);
+                ret.Fill(val);
             return ret;
         }
 
@@ -56,7 +55,16 @@ namespace MatterDotNet.Security
             return ret.Span;
         }
 
-        public static Span<byte> XOR(Span<byte> a, Span<byte> b)
+        public static Span<byte> Leftmost(ReadOnlySpan<byte> data, int length)
+        {
+            Span<byte> ret = new byte[(length + 7) >> 3];
+            int bytes = length >> 3;
+            data.Slice(0, bytes).CopyTo(ret);
+            ret[bytes] = (byte)(data[bytes] & (0xFF00 >> (length % 8)));
+            return ret;
+        }
+
+        public static Span<byte> XOR(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
         {
             if (a.Length != b.Length)
                 throw new ArgumentException("Invalid Byte Array Sizes");
@@ -66,7 +74,7 @@ namespace MatterDotNet.Security
             return ret.Span;
         }
 
-        public static byte XOR(Span<byte> a, byte start)
+        public static byte XOR(ReadOnlySpan<byte> a, byte start)
         {
             foreach (byte b in a)
                 start ^= b;
@@ -93,18 +101,6 @@ namespace MatterDotNet.Security
                 ret.Append(b.ToString("X2"));
             }
             return ret.ToString();
-        }
-
-        public static Span<byte> From(string hexString)
-        {
-            if (hexString.Length % 2 != 0)
-                throw new ArgumentException("Not a hex string");
-
-            Memory<byte> data = new byte[hexString.Length / 2];
-            for (int index = 0; index < data.Length; index++)
-                data.Span[index] = byte.Parse(hexString.AsSpan(index * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-
-            return data.Span;
         }
     }
 }

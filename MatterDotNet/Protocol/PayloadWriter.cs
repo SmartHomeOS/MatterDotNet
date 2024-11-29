@@ -36,6 +36,12 @@ namespace MatterDotNet.Protocol
             data.Span[pos++] = value;
         }
 
+        public void Write(byte[] bytes)
+        {
+            bytes.CopyTo(data.Slice(pos).Span);
+            pos += bytes.Length;
+        }
+
         public void Write(ReadOnlySpan<byte> bytes)
         {
             bytes.CopyTo(data.Slice(pos).Span);
@@ -91,9 +97,9 @@ namespace MatterDotNet.Protocol
 
         public int Length { get { return pos; } }
 
-        public Span<byte> GetPayload()
+        public Memory<byte> GetPayload()
         {
-            return data.Slice(0, pos).Span;
+            return data.Slice(0, pos);
         }
 
         private void CopyTo(Memory<byte> slice)

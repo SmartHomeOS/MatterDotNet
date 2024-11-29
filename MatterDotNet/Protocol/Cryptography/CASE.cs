@@ -12,6 +12,7 @@
 
 using MatterDotNet.Messages;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Sessions;
 using System.Security.Cryptography;
 
@@ -19,20 +20,22 @@ namespace MatterDotNet.Protocol.Cryptography
 {
     internal class CASE
     {
-        private static readonly byte[] TBEData1_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x53, 0x31]; /* "NCASE_SigmaS1" */
+        private static readonly byte[] Resume1MIC_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x53, 0x31]; /* "NCASE_SigmaS1" */
         private static readonly byte[] TBEData2_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32, 0x4e]; /* "NCASE_Sigma2N" */
         private static readonly byte[] TBEData3_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33, 0x4e]; /* "NCASE_Sigma3N" */
-        private static readonly byte[] Resume1MIC_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x53, 0x31]; /* "NCASE_SigmaR1" */
+        private static readonly byte[] Resume2MIC_Nonce = [0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x53, 0x32]; /* "NCASE_SigmaS2" */
 
-        public static Frame GenerateSigma1(ulong destination)
+        public static Frame GenerateSigma1(byte[] destination)
         {
             var keypair = Crypto.GenerateKeypair();
 
-            Sigma1 sigma1 = new Sigma1();
-            sigma1.initiatorRandom = RandomNumberGenerator.GetBytes(32);
-            sigma1.initiatorSessionId = SessionManager.GetAvailableSessionID();
-            sigma1.destinationId = destination;
-            sigma1.initiatorEphPubKey = keypair.Public;
+            Sigma1 sigma1 = new Sigma1()
+            {
+                InitiatorRandom = RandomNumberGenerator.GetBytes(32),
+                InitiatorSessionId = SessionManager.GetAvailableSessionID(),
+                DestinationId = destination,
+                InitiatorEphPubKey = keypair.Public
+            };
 
             Frame frame = new Frame(sigma1);
             frame.Message.Flags |= ExchangeFlags.Initiator;

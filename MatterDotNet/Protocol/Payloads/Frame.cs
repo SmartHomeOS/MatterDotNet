@@ -80,7 +80,7 @@ namespace MatterDotNet.Protocol.Payloads
             }
         }
 
-        public Frame(object payload)
+        public Frame(IPayload payload)
         {
             Message = new Version1Payload(payload);
         }
@@ -91,10 +91,12 @@ namespace MatterDotNet.Protocol.Payloads
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
 
-            SecureSession session = SessionManager.GetSession(SessionID); //TODO: Actually implement sessions
+            SecureSession? session = SessionManager.GetSession(SessionID, (Security & SecurityFlags.GroupSession) != 0); //TODO: Actually implement sessions
 
             if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
             {
+                if (session == null)
+                    throw new InvalidDataException("Privacy requested in unsecured session");
                 // Remove Privacy Encryption
                 byte[] privacyKey = Crypto.KDF(session.Initiator ? session.R2IKey : session.I2RKey, [], PRIVACY_INFO, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
                 byte[] privacyNonce = new byte[Crypto.NONCE_LENGTH_BYTES];
@@ -124,20 +126,26 @@ namespace MatterDotNet.Protocol.Payloads
                 ushort len = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(8, 2));
                 slice = slice.Slice(2 + len);
             }
+            if (session == null)
+            {
+                Message = new Version1Payload(slice);
+            }
+            else
+            {
+                Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
+                nonce[0] = (byte)Security;
+                BinaryPrimitives.WriteUInt32LittleEndian(nonce.Slice(1, 4), Counter);
+                if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
+                    BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
+                //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
 
-            Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
-            nonce[0] = (byte)Security;
-            BinaryPrimitives.WriteUInt32LittleEndian(nonce.Slice(1, 4), Counter);
-            if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
-                BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
-            //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
-
-            Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
-                                      slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES),
-                                      slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
-                                      payload.Slice(0, payload.Length - slice.Length),
-                                      nonce);
-            Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
+                Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
+                                          slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES),
+                                          slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
+                                          payload.Slice(0, payload.Length - slice.Length),
+                                          nonce);
+                Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
+            }
         }
 
         private int PrivacyBlockSize()

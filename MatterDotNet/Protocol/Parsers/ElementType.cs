@@ -14,14 +14,14 @@ namespace MatterDotNet.Protocol.Parsers
 {
     internal enum ElementType
     {
-        SignedByte = 0,
-        SignedShort = 1,
-        SignedInt = 2,
-        SignedLong = 3,
-        UnsignedByte = 4,
-        UnsignedShort = 5,
-        UnsignedInt = 6,
-        UnsignedLong = 7,
+        SByte = 0,
+        Short = 1,
+        Int = 2,
+        Long = 3,
+        Byte = 4,
+        UShort = 5,
+        UInt = 6,
+        ULong = 7,
         True = 8,
         False = 9,
         Float = 10,
@@ -29,35 +29,35 @@ namespace MatterDotNet.Protocol.Parsers
         /// <summary>
         /// 1 Byte Length UTF-8 String
         /// </summary>
-        ByteString = 12,
+        String8 = 12,
         /// <summary>
         /// 2 Byte Length UTF-8 String
         /// </summary>
-        ShortString = 13,
+        String16 = 13,
         /// <summary>
         /// 4 Byte Length UTF-8 String
         /// </summary>
-        IntString = 14,
+        String32 = 14,
         /// <summary>
         /// 8 Byte Length UTF-8 String
         /// </summary>
-        LongString = 15,
+        String64 = 15,
         /// <summary>
         /// 1 Byte Length Octet String
         /// </summary>
-        ByteBytes = 16,
+        Bytes8 = 16,
         /// <summary>
         /// 2 Byte Length Octet String
         /// </summary>
-        ShortBytes = 17,
+        Bytes16 = 17,
         /// <summary>
         /// 4 Byte Length Octet String
         /// </summary>
-        IntBytes = 18,
+        Bytes32 = 18,
         /// <summary>
         /// 8 Byte Length Octet String
         /// </summary>
-        LongBytes = 19,
+        Bytes64 = 19,
         Null = 20,
         Structure = 21,
         Array = 22,

@@ -18,52 +18,42 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages
 {
-    public class Sigma1 : TLVPayload
+    public class PBKDFParamResp : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma1() {}
+        public PBKDFParamResp() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(Memory<byte> data) : this(new TLVReader(data)) {}
+        public PBKDFParamResp(Memory<byte> data) : this(new TLVReader(data)) {}
 
         public required byte[] InitiatorRandom { get; set; } 
-        public required ushort InitiatorSessionId { get; set; } 
-        public required byte[] DestinationId { get; set; } 
-        public required byte[] InitiatorEphPubKey { get; set; } 
-        public SessionParameter? InitiatorSessionParams { get; set; } 
-        public byte[]? ResumptionID { get; set; } 
-        public byte[]? InitiatorResumeMIC { get; set; } 
+        public required byte[] ResponderRandom { get; set; } 
+        public required ushort ResponderSessionId { get; set; } 
+        public required Crypto_PBKDFParameterSet Pbkdf_parameters { get; set; } 
+        public SessionParameter? ResponderSessionParams { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(TLVReader reader) {
+        public PBKDFParamResp(TLVReader reader) {
             reader.StartStructure();
             InitiatorRandom = reader.GetBytes(1)!;
-            InitiatorSessionId = reader.GetUShort(2).Value;
-            DestinationId = reader.GetBytes(3)!;
-            InitiatorEphPubKey = reader.GetBytes(4)!;
+            ResponderRandom = reader.GetBytes(2)!;
+            ResponderSessionId = reader.GetUShort(3).Value;
+            Pbkdf_parameters = new Crypto_PBKDFParameterSet(reader);
             if (reader.IsTag(5))
-                InitiatorSessionParams = new SessionParameter(reader);
-            if (reader.IsTag(6))
-                ResumptionID = reader.GetBytes(6);
-            if (reader.IsTag(7))
-                InitiatorResumeMIC = reader.GetBytes(7);
+                ResponderSessionParams = new SessionParameter(reader);
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer) {
             writer.StartStructure();
             writer.WriteBytes(1, InitiatorRandom, 0);
-            writer.WriteUShort(2, InitiatorSessionId);
-            writer.WriteBytes(3, DestinationId, 0);
-            writer.WriteBytes(4, InitiatorEphPubKey, 0);
-            if (InitiatorSessionParams != null)
-                InitiatorSessionParams.Serialize(writer);
-            if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID, 0);
-            if (InitiatorResumeMIC != null)
-                writer.WriteBytes(7, InitiatorResumeMIC, 1);
+            writer.WriteBytes(2, ResponderRandom, 0);
+            writer.WriteUShort(3, ResponderSessionId);
+            Pbkdf_parameters.Serialize(writer);
+            if (ResponderSessionParams != null)
+                ResponderSessionParams.Serialize(writer);
             writer.EndContainer();
         }
     }

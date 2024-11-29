@@ -18,37 +18,31 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages
 {
-    public class Sigma1 : TLVPayload
+    public class PBKDFParamReq : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma1() {}
+        public PBKDFParamReq() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(Memory<byte> data) : this(new TLVReader(data)) {}
+        public PBKDFParamReq(Memory<byte> data) : this(new TLVReader(data)) {}
 
         public required byte[] InitiatorRandom { get; set; } 
         public required ushort InitiatorSessionId { get; set; } 
-        public required byte[] DestinationId { get; set; } 
-        public required byte[] InitiatorEphPubKey { get; set; } 
+        public required ushort PasscodeId { get; set; } 
+        public required bool HasPBKDFParameters { get; set; } 
         public SessionParameter? InitiatorSessionParams { get; set; } 
-        public byte[]? ResumptionID { get; set; } 
-        public byte[]? InitiatorResumeMIC { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(TLVReader reader) {
+        public PBKDFParamReq(TLVReader reader) {
             reader.StartStructure();
             InitiatorRandom = reader.GetBytes(1)!;
             InitiatorSessionId = reader.GetUShort(2).Value;
-            DestinationId = reader.GetBytes(3)!;
-            InitiatorEphPubKey = reader.GetBytes(4)!;
+            PasscodeId = reader.GetUShort(3).Value;
+            HasPBKDFParameters = reader.GetBool(4).Value;
             if (reader.IsTag(5))
                 InitiatorSessionParams = new SessionParameter(reader);
-            if (reader.IsTag(6))
-                ResumptionID = reader.GetBytes(6);
-            if (reader.IsTag(7))
-                InitiatorResumeMIC = reader.GetBytes(7);
         }
 
         /// <inheritdoc />
@@ -56,14 +50,10 @@ namespace MatterDotNet.Messages
             writer.StartStructure();
             writer.WriteBytes(1, InitiatorRandom, 0);
             writer.WriteUShort(2, InitiatorSessionId);
-            writer.WriteBytes(3, DestinationId, 0);
-            writer.WriteBytes(4, InitiatorEphPubKey, 0);
+            writer.WriteUShort(3, PasscodeId);
+            writer.WriteBool(4, HasPBKDFParameters);
             if (InitiatorSessionParams != null)
                 InitiatorSessionParams.Serialize(writer);
-            if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID, 0);
-            if (InitiatorResumeMIC != null)
-                writer.WriteBytes(7, InitiatorResumeMIC, 1);
             writer.EndContainer();
         }
     }

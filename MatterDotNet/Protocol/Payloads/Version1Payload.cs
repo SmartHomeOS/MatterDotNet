@@ -10,6 +10,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.Messages;
+using MatterDotNet.Protocol.Payloads.OpCodes;
 using System.Buffers.Binary;
 
 namespace MatterDotNet.Protocol.Payloads
@@ -22,9 +24,9 @@ namespace MatterDotNet.Protocol.Payloads
         public ushort VendorID { get; set; }
         public ProtocolType Protocol { get; set; }
         public uint AckCounter { get; set; }
-        public object Payload { get; set; }
+        public IPayload Payload { get; set; }
 
-        public Version1Payload(object payload)
+        public Version1Payload(IPayload payload)
         {
             this.Payload = payload;
         }
@@ -50,7 +52,48 @@ namespace MatterDotNet.Protocol.Payloads
                 ushort len = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(6, 2));
                 payload = payload.Slice(2 + len);
             }
-            Payload = payload.Slice(6).ToArray();
+            Payload = CreatePayload(payload.Slice(6).ToArray());
+        }
+
+        private IPayload? CreatePayload(byte[] bytes)
+        {
+            switch (Protocol)
+            {
+                case ProtocolType.SecureChannel:
+                    switch ((SecureOpCodes)OpCode)
+                    {
+                        case SecureOpCodes.MsgCounterSyncReq:
+                            break;
+                        case SecureOpCodes.MsgCounterSyncRsp:
+                            break;
+                        case SecureOpCodes.MRPStandaloneAcknowledgement:
+                            return null;
+                        case SecureOpCodes.PBKDFParamRequest:
+                            return new PBKDFParamReq(bytes);
+                        case SecureOpCodes.PBKDFParamResponse:
+                            return new PBKDFParamResp(bytes);
+                        case SecureOpCodes.PASEPake1:
+                            return new Pake1(bytes);
+                        case SecureOpCodes.PASEPake2:
+                            return new Pake2(bytes);
+                        case SecureOpCodes.PASEPake3:
+                            return new Pake3(bytes);
+                        case SecureOpCodes.CASESigma1:
+                            return new Sigma1(bytes);
+                        case SecureOpCodes.CASESigma2:
+                            return new Sigma2(bytes);
+                        case SecureOpCodes.CASESigma3:
+                            return new Sigma3(bytes);
+                        case SecureOpCodes.CASESigma2_Resume:
+                            return new Sigma2Resume(bytes);
+                        case SecureOpCodes.StatusReport:
+                            return new StatusPayload(bytes);
+                        case SecureOpCodes.ICDCheckInMessage:
+                            break;
+                    }
+                    break;
+            }
+            throw new NotImplementedException();
         }
 
         public bool Serialize(PayloadWriter stream)
@@ -63,8 +106,7 @@ namespace MatterDotNet.Protocol.Payloads
             stream.Write((ushort)Protocol);
             if ((Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
                 stream.Write(AckCounter);
-            //TODO
-            //stream.Write(Payload);
+            Payload.Serialize(stream);
             return true;
         }
     }

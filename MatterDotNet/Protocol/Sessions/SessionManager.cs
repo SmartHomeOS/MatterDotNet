@@ -16,8 +16,10 @@ namespace MatterDotNet.Protocol.Sessions
             globalCtr = BinaryPrimitives.ReadUInt32LittleEndian(rnd) + 1;
         }
 
-        public static SecureSession GetSession(ushort sessionId)
+        public static SecureSession? GetSession(ushort sessionId, bool group)
         {
+            if (group == false && sessionId == 0)
+                return null; //Unsecured session
             return new SecureSession(false, false, sessionId, sessionId, [], [], []);
         }
 

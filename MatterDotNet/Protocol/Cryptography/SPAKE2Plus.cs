@@ -1,4 +1,5 @@
-﻿using System.Buffers.Binary;
+﻿using MatterDotNet.Protocol.Payloads;
+using System.Buffers.Binary;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;

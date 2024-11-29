@@ -11,10 +11,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Buffers.Binary;
+using System.Text;
 
-namespace MatterDotNet.Protocol
+namespace MatterDotNet.Protocol.Payloads
 {
-    internal class PayloadWriter
+    public class PayloadWriter
     {
         private readonly Memory<byte> data;
         private int pos;
@@ -27,7 +28,7 @@ namespace MatterDotNet.Protocol
 
         public PayloadWriter(int capacity)
         {
-            this.data = new byte[capacity];
+            data = new byte[capacity];
             pos = 0;
         }
 
@@ -72,6 +73,12 @@ namespace MatterDotNet.Protocol
             pos += 4;
         }
 
+        public void Write(long value)
+        {
+            BinaryPrimitives.WriteInt64LittleEndian(data.Span.Slice(pos, 8), value);
+            pos += 8;
+        }
+
         public void Write(ulong value)
         {
             BinaryPrimitives.WriteUInt64LittleEndian(data.Span.Slice(pos, 8), value);
@@ -88,6 +95,23 @@ namespace MatterDotNet.Protocol
         {
             BinaryPrimitives.WriteUInt16LittleEndian(data.Span.Slice(pos, 2), value);
             pos += 2;
+        }
+
+        public void Write(float value)
+        {
+            BinaryPrimitives.WriteSingleLittleEndian(data.Span.Slice(pos, 4), value);
+            pos += 2;
+        }
+
+        public void Write(double value)
+        {
+            BinaryPrimitives.WriteDoubleLittleEndian(data.Span.Slice(pos, 8), value);
+            pos += 2;
+        }
+
+        public void Write(string value)
+        {
+            pos += Encoding.UTF8.GetBytes(value, data.Span.Slice(pos));
         }
 
         public void Seek(int offset)

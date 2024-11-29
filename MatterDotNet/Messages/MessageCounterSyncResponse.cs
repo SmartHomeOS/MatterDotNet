@@ -10,23 +10,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol.Payloads
+using MatterDotNet.Protocol.Payloads;
+using System.Buffers.Binary;
+
+namespace MatterDotNet.Messages
 {
-    public enum SecureOpCodes
+    public class MessageCounterSyncResponse : IPayload
     {
-        MsgCounterSyncReq = 0x00,
-        MsgCounterSyncRsp = 0x01,
-        MRPStandaloneAcknowledgement = 0x10,
-        PBKDFParamRequest = 0x20,
-        PBKDFParamResponse = 0x21,
-        PASEPake1 = 0x22,
-        PASEPake2 = 0x23,
-        PASEPake3 = 0x24,
-        CASESigma1 = 0x30,
-        CASESigma2 = 0x31,
-        CASESigma3 = 0x32,
-        CASESigma2_Resume = 0x33,
-        StatusReport = 0x40,
-        ICDCheckInMessage = 0x50
+        uint SynchronizedCounter { get; set; }
+        ulong Response {  get; set; }
+
+        public MessageCounterSyncResponse(Memory<byte> payload)
+        {
+            SynchronizedCounter = BinaryPrimitives.ReadUInt32LittleEndian(payload.Span);
+            Response = BinaryPrimitives.ReadUInt64LittleEndian(payload.Span.Slice(4, 8));
+        }
+        public bool Serialize(PayloadWriter stream)
+        {
+            stream.Write(SynchronizedCounter);
+            stream.Write(Response);
+            return true;
+        }
     }
 }

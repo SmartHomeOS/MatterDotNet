@@ -44,31 +44,31 @@ namespace MatterDotNet.Protocol.Parsers
                     return false;
                 case ElementType.Null:
                     return null;
-                case ElementType.UnsignedByte:
+                case ElementType.Byte:
                     return buffer[offset++];
-                case ElementType.UnsignedShort:
+                case ElementType.UShort:
                     o = BinaryPrimitives.ReadUInt16LittleEndian(buffer.Slice(offset, 2));
                     offset += 2;
                     return o;
-                case ElementType.UnsignedInt:
+                case ElementType.UInt:
                     o = BinaryPrimitives.ReadUInt32LittleEndian(buffer.Slice(offset, 4));
                     offset += 4;
                     return o;
-                case ElementType.UnsignedLong:
+                case ElementType.ULong:
                     o = BinaryPrimitives.ReadUInt64LittleEndian(buffer.Slice(offset, 8));
                     offset += 8;
                     return o;
-                case ElementType.SignedByte:
+                case ElementType.SByte:
                     return (sbyte)buffer[offset++];
-                case ElementType.SignedShort:
+                case ElementType.Short:
                     o = BinaryPrimitives.ReadInt16LittleEndian(buffer.Slice(offset, 2));
                     offset += 2;
                     return o;
-                case ElementType.SignedInt:
+                case ElementType.Int:
                     o = BinaryPrimitives.ReadInt32LittleEndian(buffer.Slice(offset, 4));
                     offset += 4;
                     return o;
-                case ElementType.SignedLong:
+                case ElementType.Long:
                     o = BinaryPrimitives.ReadInt64LittleEndian(buffer.Slice(offset, 8));
                     offset += 8;
                     return o;
@@ -80,18 +80,18 @@ namespace MatterDotNet.Protocol.Parsers
                     o = BinaryPrimitives.ReadDoubleLittleEndian(buffer.Slice(offset, 8));
                     offset += 8;
                     return o;
-                case ElementType.ByteBytes:
-                case ElementType.ShortBytes:
-                case ElementType.IntBytes:
-                case ElementType.LongBytes:
+                case ElementType.Bytes8:
+                case ElementType.Bytes16:
+                case ElementType.Bytes32:
+                case ElementType.Bytes64:
                     len = ReadLength(buffer, type, ref offset);
                     o = buffer.Slice(offset, len).ToArray();
                     offset += len;
                     return o;
-                case ElementType.ByteString:
-                case ElementType.ShortString:
-                case ElementType.IntString:
-                case ElementType.LongString:
+                case ElementType.String8:
+                case ElementType.String16:
+                case ElementType.String32:
+                case ElementType.String64:
                     len = ReadLength(buffer, type, ref offset);
                     o = Encoding.UTF8.GetString(buffer.Slice(offset, len));
                     offset += len;

@@ -2,8 +2,21 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0; net9.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Version>0.1.0</Version>
+	  <Authors>jdomnitz</Authors>
+	  <Company>SmartHomeOS and Contributors</Company>
+	  <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+	  <Title>MatterDotNet</Title>
+	  <Description>A C# implementation of the Matter 1.3 Standard (Formally known as project chip)</Description>
+	  <Copyright>Copyright MatterDotNet Contributors</Copyright>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/SmartHomeOS/MatterDotNet/</RepositoryUrl>
+	  <PackageTags>matter; matter-controller; smarthome; project-chip; dotnet;</PackageTags>
+	  <PackageReleaseNotes>Library is not yet functional. See README for details.</PackageReleaseNotes>
+	  <PackageIcon>logo.png</PackageIcon>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>

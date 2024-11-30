@@ -37,10 +37,10 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(TLVReader reader) {
-            reader.StartStructure();
+        public Sigma1(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             InitiatorRandom = reader.GetBytes(1)!;
-            InitiatorSessionId = reader.GetUShort(2).Value;
+            InitiatorSessionId = reader.GetUShort(2)!.Value;
             DestinationId = reader.GetBytes(3)!;
             InitiatorEphPubKey = reader.GetBytes(4)!;
             if (reader.IsTag(5))
@@ -49,19 +49,20 @@ namespace MatterDotNet.Messages
                 ResumptionID = reader.GetBytes(6);
             if (reader.IsTag(7))
                 InitiatorResumeMIC = reader.GetBytes(7);
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
-            writer.WriteBytes(1, InitiatorRandom, 0);
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
+            writer.WriteBytes(1, InitiatorRandom, 1);
             writer.WriteUShort(2, InitiatorSessionId);
-            writer.WriteBytes(3, DestinationId, 0);
-            writer.WriteBytes(4, InitiatorEphPubKey, 0);
+            writer.WriteBytes(3, DestinationId, 1);
+            writer.WriteBytes(4, InitiatorEphPubKey, 1);
             if (InitiatorSessionParams != null)
-                InitiatorSessionParams.Serialize(writer);
+                InitiatorSessionParams.Serialize(writer, 5);
             if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID, 0);
+                writer.WriteBytes(6, ResumptionID, 1);
             if (InitiatorResumeMIC != null)
                 writer.WriteBytes(7, InitiatorResumeMIC, 1);
             writer.EndContainer();

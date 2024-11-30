@@ -13,7 +13,7 @@
 namespace MatterDotNet.Protocol.Payloads
 {
     [Flags]
-    internal enum MessageFlags : byte
+    public enum MessageFlags : byte
     {
         Version1 = 0x00,
         VersionMask = 0xF0,

@@ -30,11 +30,24 @@ namespace MatterDotNet.Protocol.Parsers
             return this.tagNumber == tagNumber;
         }
 
-        public void StartStructure()
+        public void StartStructure(uint structureNumber = 0)
         {
             if (type != ElementType.Structure)
-                throw new InvalidDataException("Expected type structure but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type structure but received {type}");
+            if (structureNumber != 0 && !IsTag(structureNumber))
+                throw new InvalidDataException("Tag " + structureNumber + " not present");
             ReadTag();
+        }
+
+        public void EndContainer()
+        {
+            bool iterating = true;
+            while (iterating && type != ElementType.EndOfContainer)
+                iterating = ReadTag();
+            if (iterating == true)
+                ReadTag();
+            else
+                throw new InvalidDataException("End structure was not found");
         }
 
         public byte? GetByte(uint tagNumber, bool nullable = false)
@@ -44,9 +57,10 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Byte)
-                throw new InvalidDataException("Expected type byte but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type byte but received {type}");
+            byte val = data.Span[offset++];
             ReadTag();
-            return data.Span[offset++];
+            return val;
         }
         public sbyte? GetSByte(uint tagNumber, bool nullable = false)
         {
@@ -55,9 +69,10 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.SByte)
-                throw new InvalidDataException("Expected type sbyte but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type sbyte but received {type}");
+            sbyte val = (sbyte)data.Span[offset++];
             ReadTag();
-            return (sbyte)data.Span[offset++];
+            return val;
         }
         public bool? GetBool(uint tagNumber, bool nullable = false)
         {
@@ -66,8 +81,8 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.True && type != ElementType.False)
-                throw new InvalidDataException("Expected type byte but received " + type);
-            bool val = type == ElementType.True;
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type bool but received {type}");
+            bool val = (type == ElementType.True);
             ReadTag();
             return val;
         }
@@ -77,8 +92,10 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.SByte)
+                return GetSByte(tagNumber, nullable);
             if (type != ElementType.Short)
-                throw new InvalidDataException("Expected type short but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type short but received {type}");
             short val = BinaryPrimitives.ReadInt16LittleEndian(data.Slice(offset, 2).Span);
             offset += 2;
             ReadTag();
@@ -91,8 +108,10 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.Byte)
+                return GetByte(tagNumber, nullable);
             if (type != ElementType.UShort)
-                throw new InvalidDataException("Expected type ushort but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type ushort but received {type}");
             ushort val = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(offset, 2).Span);
             offset += 2;
             ReadTag();
@@ -105,8 +124,12 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.SByte)
+                return GetSByte(tagNumber, nullable);
+            if (type == ElementType.Short)
+                return GetShort(tagNumber, nullable);
             if (type != ElementType.Int)
-                throw new InvalidDataException("Expected type int but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type int but received {type}");
             int val = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4).Span);
             offset += 4;
             ReadTag();
@@ -119,8 +142,12 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.Byte)
+                return GetByte(tagNumber, nullable);
+            if (type == ElementType.UShort)
+                return GetUShort(tagNumber, nullable);
             if (type != ElementType.UInt)
-                throw new InvalidDataException("Expected type uint but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type uint but received {type}");
             uint val = BinaryPrimitives.ReadUInt32LittleEndian(data.Slice(offset, 4).Span);
             offset += 4;
             ReadTag();
@@ -133,8 +160,14 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.SByte)
+                return GetSByte(tagNumber, nullable);
+            if (type == ElementType.Short)
+                return GetShort(tagNumber, nullable);
+            if (type == ElementType.Int)
+                return GetInt(tagNumber, nullable);
             if (type != ElementType.Long)
-                throw new InvalidDataException("Expected type long but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type long but received {type}");
             long val = BinaryPrimitives.ReadInt64LittleEndian(data.Slice(offset, 8).Span);
             offset += 8;
             ReadTag();
@@ -147,8 +180,14 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
+            if (type == ElementType.Byte)
+                return GetByte(tagNumber, nullable);
+            if (type == ElementType.UShort)
+                return GetUShort(tagNumber, nullable);
+            if (type == ElementType.UInt)
+                return GetUInt(tagNumber, nullable);
             if (type != ElementType.ULong)
-                throw new InvalidDataException("Expected type ulong but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type ulong but received {type}");
             ulong val = BinaryPrimitives.ReadUInt64LittleEndian(data.Slice(offset, 8).Span);
             offset += 8;
             ReadTag();
@@ -162,7 +201,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Float)
-                throw new InvalidDataException("Expected type float but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type float but received {type}");
             float val = BinaryPrimitives.ReadSingleLittleEndian(data.Slice(offset, 4).Span);
             offset += 4;
             ReadTag();
@@ -176,7 +215,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Double)
-                throw new InvalidDataException("Expected type double but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type double but received {type}");
             double val = BinaryPrimitives.ReadDoubleLittleEndian(data.Slice(offset, 4).Span);
             offset += 4;
             ReadTag();
@@ -190,7 +229,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.String8 && type != ElementType.String16 && type != ElementType.String32)
-                throw new InvalidDataException("Expected type string but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
             string val = Encoding.UTF8.GetString(data.Slice(offset, length).Span);
             offset += length;
             ReadTag();
@@ -204,7 +243,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32)
-                throw new InvalidDataException("Expected type string but received " + type);
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
             byte[] val = data.Slice(offset, length).ToArray();
             offset += length;
             ReadTag();
@@ -215,8 +254,8 @@ namespace MatterDotNet.Protocol.Parsers
         {
             if (offset == data.Length)
                 return false;
-            TLVControl control = (TLVControl)(data.Span[offset] >> 5);
-            ElementType type = (ElementType)(0x1F & data.Span[offset++]);
+            control = (TLVControl)(data.Span[offset] >> 5);
+            type = (ElementType)(0x1F & data.Span[offset++]);
             switch (control)
             {
                 case TLVControl.ContextSpecific:

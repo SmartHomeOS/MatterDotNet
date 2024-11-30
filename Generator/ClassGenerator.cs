@@ -46,8 +46,8 @@ namespace Generator
                     writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
             }
             if (tag.Parent == null) {
-                writer.WriteLine($"\n{indent}    /// <inheritdoc />\n{indent}    [SetsRequiredMembers]\n{indent}    public {tag.Name}(TLVReader reader) {{");
-                writer.WriteLine($"{indent}        reader.StartStructure();");
+                writer.WriteLine($"\n{indent}    /// <inheritdoc />\n{indent}    [SetsRequiredMembers]\n{indent}    public {tag.Name}(TLVReader reader, uint structNumber = 0) {{");
+                writer.WriteLine($"{indent}        reader.StartStructure(structNumber);");
                 foreach (Tag child in tag.Children)
                 {
                     string totalIndent = $"{indent}        ";
@@ -59,33 +59,33 @@ namespace Generator
                     switch (child.Type)
                     {
                         case DataType.Boolean:
-                            writer.WriteLine($"{totalIndent}{child.Name} = reader.GetBool({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                            writer.WriteLine($"{totalIndent}{child.Name} = reader.GetBool({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             break;
                         case DataType.Integer:
                             if (child.LengthBytes == 1)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetSByte({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetSByte({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else if (child.LengthBytes == 2)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetShort({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetShort({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else if (child.LengthBytes == 4)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetInt({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetInt({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetLong({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetLong({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             break;
                         case DataType.UnsignedInteger:
                             if (child.LengthBytes == 1)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetByte({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetByte({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else if (child.LengthBytes == 2)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetUShort({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetUShort({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else if (child.LengthBytes == 4)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetUInt({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetUInt({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetULong({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetULong({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             break;
                         case DataType.FloatingPoint:
                             if (child.LengthBytes == 4)
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetFloat({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetFloat({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             else
-                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetDouble({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? ".Value;" : ";")}");
+                                writer.WriteLine($"{totalIndent}{child.Name} = reader.GetDouble({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                             break;
                         case DataType.Bytes:
                             writer.WriteLine($"{totalIndent}{child.Name} = reader.GetBytes({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!;" : ";")}");
@@ -99,8 +99,9 @@ namespace Generator
 
                     }
                 }
-                writer.WriteLine($"{indent}    }}\n\n{indent}    /// <inheritdoc />\n{indent}    public override void Serialize(TLVWriter writer) {{");
-                writer.WriteLine($"{indent}        writer.StartStructure();");
+                writer.WriteLine($"{indent}        reader.EndContainer();");
+                writer.WriteLine($"{indent}    }}\n\n{indent}    /// <inheritdoc />\n{indent}    public override void Serialize(TLVWriter writer, uint structNumber = 0) {{");
+                writer.WriteLine($"{indent}        writer.StartStructure(structNumber);");
                 foreach (Tag child in tag.Children)
                 {
                     string totalIndent = $"{indent}        ";
@@ -147,7 +148,7 @@ namespace Generator
                             writer.WriteLine($"{totalIndent}writer.WriteString({child.TagNumber}, {child.Name}, {child.LengthBytes});");
                             break;
                         case DataType.Reference:
-                            writer.WriteLine($"{totalIndent}{child.Name}.Serialize(writer);");
+                            writer.WriteLine($"{totalIndent}{child.Name}.Serialize(writer, {child.TagNumber});");
                             break;
 
                     }

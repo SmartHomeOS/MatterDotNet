@@ -34,23 +34,24 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Resume(TLVReader reader) {
-            reader.StartStructure();
+        public Sigma2Resume(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             ResumptionID = reader.GetBytes(1)!;
             Sigma2ResumeMIC = reader.GetBytes(2)!;
-            ResponderSessionID = reader.GetUShort(3).Value;
+            ResponderSessionID = reader.GetUShort(3)!.Value;
             if (reader.IsTag(4))
                 ResponderSessionParams = new SessionParameter(reader);
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
-            writer.WriteBytes(1, ResumptionID, 0);
-            writer.WriteBytes(2, Sigma2ResumeMIC, 0);
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
+            writer.WriteBytes(1, ResumptionID, 1);
+            writer.WriteBytes(2, Sigma2ResumeMIC, 1);
             writer.WriteUShort(3, ResponderSessionID);
             if (ResponderSessionParams != null)
-                ResponderSessionParams.Serialize(writer);
+                ResponderSessionParams.Serialize(writer, 4);
             writer.EndContainer();
         }
     }

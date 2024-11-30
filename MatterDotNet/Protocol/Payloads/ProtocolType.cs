@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    internal enum ProtocolType
+    public enum ProtocolType
     {
         SecureChannel = 0x0,
         InteractionModel = 0x1,

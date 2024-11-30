@@ -178,7 +178,7 @@ namespace Generator
                             if (int.TryParse(rangeParts[1], out int max))
                                 tag.Max = max;
                         }
-                        else if (int.TryParse(constraint, out int count))
+                        else if (int.TryParse(constraint.Substring(7), out int count))
                         {
                             tag.Min = count;
                             tag.Max = count;

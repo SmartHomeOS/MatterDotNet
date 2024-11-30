@@ -36,8 +36,8 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public CommissionerDeclaration(TLVReader reader) {
-            reader.StartStructure();
+        public CommissionerDeclaration(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 ErrorCode = reader.GetUShort(1);
             if (reader.IsTag(2))
@@ -50,11 +50,12 @@ namespace MatterDotNet.Messages
                 CommissionerPasscode = reader.GetBool(5);
             if (reader.IsTag(6))
                 QRCodeDisplayed = reader.GetBool(6);
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
             if (ErrorCode != null)
                 writer.WriteUShort(1, ErrorCode);
             if (NeedsPasscode != null)

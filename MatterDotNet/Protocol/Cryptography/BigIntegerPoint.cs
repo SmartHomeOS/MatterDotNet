@@ -55,21 +55,21 @@ namespace MatterDotNet.Protocol.Cryptography
         public BigInteger X { get; set; }
         public BigInteger Y { get; set; }
 
-        public ReadOnlySpan<byte> ToBytes(bool compressed)
+        public byte[] ToBytes(bool compressed)
         {
             if (compressed)
             {
-                Span<byte> ret = new byte[33];
+                byte[] ret = new byte[33];
                 ret[0] = ((Y & SIGN_BIT) == SIGN_BIT) ? (byte)0x3 : (byte)0x2;
-                X.TryWriteBytes(ret.Slice(1), out _, true, true);
+                X.TryWriteBytes(ret.AsSpan(1), out _, true, true);
                 return ret;
             }
             else
             {
-                Span<byte> ret = new byte[65];
+                byte[] ret = new byte[65];
                 ret[0] = 0x4;
-                X.TryWriteBytes(ret.Slice(1), out _, true, true);
-                Y.TryWriteBytes(ret.Slice(33), out _, true, true);
+                X.TryWriteBytes(ret.AsSpan(1), out _, true, true);
+                Y.TryWriteBytes(ret.AsSpan(33), out _, true, true);
                 return ret;
             }
         }

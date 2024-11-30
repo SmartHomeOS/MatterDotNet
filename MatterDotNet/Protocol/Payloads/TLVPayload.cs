@@ -33,13 +33,15 @@ namespace MatterDotNet.Protocol.Payloads
         /// Parse the TLVs from a frame into this message
         /// </summary>
         /// <param name="reader"></param>
-        public TLVPayload(TLVReader reader) { }
+        /// <param name="structureNumber"></param>
+        public TLVPayload(TLVReader reader, uint structureNumber = 0) { }
 
         /// <summary>
         /// Write the TLVs to an application payload
         /// </summary>
         /// <param name="writer"></param>
-        public abstract void Serialize(TLVWriter writer);
+        /// <param name="structureNumber"></param>
+        public abstract void Serialize(TLVWriter writer, uint structureNumber = 0);
 
         /// <summary>
         /// Write the TLVs to an application payload

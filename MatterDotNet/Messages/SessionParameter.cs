@@ -30,40 +30,49 @@ namespace MatterDotNet.Messages
         public uint? SESSION_IDLE_INTERVAL { get; set; } 
         public uint? SESSION_ACTIVE_INTERVAL { get; set; } 
         public ushort? SESSION_ACTIVE_THRESHOLD { get; set; } 
-        public required ushort DATA_MODEL_REVISION { get; set; } 
-        public required ushort INTERACTION_MODEL_REVISION { get; set; } 
-        public required uint SPECIFICATION_VERSION { get; set; } 
-        public required ushort MAX_PATHS_PER_INVOKE { get; set; } 
+        public ushort? DATA_MODEL_REVISION { get; set; } 
+        public ushort? INTERACTION_MODEL_REVISION { get; set; } 
+        public uint? SPECIFICATION_VERSION { get; set; } 
+        public ushort? MAX_PATHS_PER_INVOKE { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public SessionParameter(TLVReader reader) {
-            reader.StartStructure();
+        public SessionParameter(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 SESSION_IDLE_INTERVAL = reader.GetUInt(1);
             if (reader.IsTag(2))
                 SESSION_ACTIVE_INTERVAL = reader.GetUInt(2);
             if (reader.IsTag(3))
                 SESSION_ACTIVE_THRESHOLD = reader.GetUShort(3);
-            DATA_MODEL_REVISION = reader.GetUShort(4).Value;
-            INTERACTION_MODEL_REVISION = reader.GetUShort(5).Value;
-            SPECIFICATION_VERSION = reader.GetUInt(6).Value;
-            MAX_PATHS_PER_INVOKE = reader.GetUShort(7).Value;
+            if (reader.IsTag(4))
+                DATA_MODEL_REVISION = reader.GetUShort(4);
+            if (reader.IsTag(5))
+                INTERACTION_MODEL_REVISION = reader.GetUShort(5);
+            if (reader.IsTag(6))
+                SPECIFICATION_VERSION = reader.GetUInt(6);
+            if (reader.IsTag(7))
+                MAX_PATHS_PER_INVOKE = reader.GetUShort(7);
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
             if (SESSION_IDLE_INTERVAL != null)
                 writer.WriteUInt(1, SESSION_IDLE_INTERVAL);
             if (SESSION_ACTIVE_INTERVAL != null)
                 writer.WriteUInt(2, SESSION_ACTIVE_INTERVAL);
             if (SESSION_ACTIVE_THRESHOLD != null)
                 writer.WriteUShort(3, SESSION_ACTIVE_THRESHOLD);
-            writer.WriteUShort(4, DATA_MODEL_REVISION);
-            writer.WriteUShort(5, INTERACTION_MODEL_REVISION);
-            writer.WriteUInt(6, SPECIFICATION_VERSION);
-            writer.WriteUShort(7, MAX_PATHS_PER_INVOKE);
+            if (DATA_MODEL_REVISION != null)
+                writer.WriteUShort(4, DATA_MODEL_REVISION);
+            if (INTERACTION_MODEL_REVISION != null)
+                writer.WriteUShort(5, INTERACTION_MODEL_REVISION);
+            if (SPECIFICATION_VERSION != null)
+                writer.WriteUInt(6, SPECIFICATION_VERSION);
+            if (MAX_PATHS_PER_INVOKE != null)
+                writer.WriteUShort(7, MAX_PATHS_PER_INVOKE);
             writer.EndContainer();
         }
     }

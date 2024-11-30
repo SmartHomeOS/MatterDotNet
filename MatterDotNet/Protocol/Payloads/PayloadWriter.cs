@@ -37,6 +37,11 @@ namespace MatterDotNet.Protocol.Payloads
             data.Span[pos++] = value;
         }
 
+        public void Write(sbyte value)
+        {
+            data.Span[pos++] = (byte)value;
+        }
+
         public void Write(byte[] bytes)
         {
             bytes.CopyTo(data.Slice(pos).Span);

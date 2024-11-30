@@ -18,7 +18,7 @@ using System.Text;
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    internal class Frame : IPayload
+    public class Frame : IPayload
     {
         internal const int MAX_SIZE = 1280;
         internal static readonly byte[] PRIVACY_INFO = Encoding.UTF8.GetBytes("PrivacyKey");
@@ -31,6 +31,11 @@ namespace MatterDotNet.Protocol.Payloads
         public ulong DestinationNodeID { get; set; }
         public Version1Payload Message { get; set; }
         public bool Valid { get; set; }
+
+        public override string ToString()
+        {
+            return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Message: {Message}";
+        }
 
         public bool Serialize(PayloadWriter stream)
         {
@@ -46,38 +51,46 @@ namespace MatterDotNet.Protocol.Payloads
                 stream.Write(DestinationNodeID);
 
             //Extensions not supported
-            byte[] temp = ArrayPool<byte>.Shared.Rent(MAX_SIZE);
-            try
+            if (SessionID == 0)
             {
-                PayloadWriter secureStream = new PayloadWriter(temp);
-                if (!Message.Serialize(secureStream))
+                if (!Message.Serialize(stream))
                     return false;
-                //TODO - Fetch Encryption key
-                byte[] key = new byte[1];
-                Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
-                stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
-                if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
-                    BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
-                //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
-
-                ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(key, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
-                stream.Write(secureStream);
-                stream.Write(mic);
-                if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
-                {
-                    byte[] privacyKey = Crypto.KDF(key, [], PRIVACY_INFO, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
-                    Span<byte> ptr = stream.GetPayload().Span;
-                    byte[] privacyNonce = new byte[Crypto.NONCE_LENGTH_BYTES];
-                    BinaryPrimitives.WriteUInt16BigEndian(privacyNonce, SessionID);
-                    mic.Slice(5, Crypto.AEAD_MIC_LENGTH_BYTES - 5).CopyTo(privacyNonce.AsSpan().Slice(2));
-                    Crypto.Privacy_Encrypt(privacyKey, ptr.Slice(4, PrivacyBlockSize()), privacyNonce);
-                }
-                return true;
             }
-            finally
+            else
             {
-                ArrayPool<byte>.Shared.Return(temp);
+                byte[] temp = ArrayPool<byte>.Shared.Rent(MAX_SIZE);
+                try
+                {
+                    PayloadWriter secureStream = new PayloadWriter(temp);
+                    if (!Message.Serialize(secureStream))
+                        return false;
+                    SecureSession? session = SessionManager.GetSession(SessionID, false);
+                    Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
+                    stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
+                    if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
+                        BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
+                    //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
+
+                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(session.Initiator ? session.I2RKey : session.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
+                    stream.Write(secureStream);
+                    stream.Write(mic);
+                    if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
+                    {
+                        byte[] privacyKey = Crypto.KDF(session.Initiator ? session.I2RKey : session.R2IKey, [], PRIVACY_INFO, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+                        Span<byte> ptr = stream.GetPayload().Span;
+                        byte[] privacyNonce = new byte[Crypto.NONCE_LENGTH_BYTES];
+                        BinaryPrimitives.WriteUInt16BigEndian(privacyNonce, SessionID);
+                        mic.Slice(5, Crypto.AEAD_MIC_LENGTH_BYTES - 5).CopyTo(privacyNonce.AsSpan().Slice(2));
+                        Crypto.Privacy_Encrypt(privacyKey, ptr.Slice(4, PrivacyBlockSize()), privacyNonce);
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(temp);
+                }
             }
+            return true;
+            
         }
 
         public Frame(IPayload payload)
@@ -105,25 +118,25 @@ namespace MatterDotNet.Protocol.Payloads
                 Crypto.Privacy_Decrypt(privacyKey, payload.Slice(4, PrivacyBlockSize()), privacyNonce).CopyTo(payload.Slice(4, PrivacyBlockSize()));
             }
             Counter = BinaryPrimitives.ReadUInt32LittleEndian(payload.Slice(4, 4));
-            Span<byte> slice = payload.Slice(0);
+            Span<byte> slice = payload.Slice(8);
             if ((Flags & MessageFlags.SourceNodeID) == MessageFlags.SourceNodeID)
             {
-                SourceNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(8, 8));
+                SourceNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
                 slice = slice.Slice(8);
             }
             if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationNodeID)
             {
-                DestinationNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(8, 8));
+                DestinationNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
                 slice = slice.Slice(8);
             }
             else if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationGroupID)
             {
-                DestinationNodeID = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(8, 2));
+                DestinationNodeID = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(0, 2));
                 slice = slice.Slice(2);
             }
             if ((Security & SecurityFlags.MessageExtensions) == SecurityFlags.MessageExtensions)
             {
-                ushort len = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(8, 2));
+                ushort len = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(0, 2));
                 slice = slice.Slice(2 + len);
             }
             if (session == null)

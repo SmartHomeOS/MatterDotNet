@@ -19,12 +19,12 @@ namespace MatterDotNet.Protocol.Parsers
 
         private void WriteTag(TLVControl control, ElementType type)
         {
-            writer.Write(((byte)control << 5) | (byte)type);
+            writer.Write((byte)(((byte)control << 5) | (byte)type));
         }
 
         private void WriteTag(uint tagNumber, ElementType type)
         {
-            writer.Write(((byte)TLVControl.ContextSpecific << 5) | (byte)type);
+            writer.Write((byte)(((byte)TLVControl.ContextSpecific << 5) | (byte)type));
             writer.Write((byte)tagNumber);
         }
 
@@ -35,7 +35,10 @@ namespace MatterDotNet.Protocol.Parsers
 
         public void StartStructure(uint tagNumber)
         {
-            WriteTag(tagNumber, ElementType.Structure);
+            if (tagNumber == 0)
+                WriteTag(TLVControl.Anonymous, ElementType.Structure);
+            else
+                WriteTag(tagNumber, ElementType.Structure);
         }
 
         public void EndContainer()
@@ -69,6 +72,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < sbyte.MaxValue && value > sbyte.MinValue)
+                {
+                    WriteSByte(tagNumber, (sbyte)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.Short);
                 writer.Write(value.Value);
             }
@@ -79,6 +87,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < byte.MaxValue)
+                {
+                    WriteByte(tagNumber, (byte)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.UShort);
                 writer.Write(value.Value);
             }
@@ -89,6 +102,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < short.MaxValue && value > short.MinValue)
+                {
+                    WriteShort(tagNumber, (short)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.Int);
                 writer.Write(value.Value);
             }
@@ -99,6 +117,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < ushort.MaxValue)
+                {
+                    WriteUShort(tagNumber, (ushort)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.UInt);
                 writer.Write(value.Value);
             }
@@ -109,6 +132,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < int.MaxValue && value > int.MinValue)
+                {
+                    WriteInt(tagNumber, (int)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.Long);
                 writer.Write(value.Value);
             }
@@ -119,6 +147,11 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value < uint.MaxValue)
+                {
+                    WriteUInt(tagNumber, (uint)value);
+                    return;
+                }
                 WriteTag(tagNumber, ElementType.ULong);
                 writer.Write(value.Value);
             }
@@ -160,18 +193,22 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                WriteTag(tagNumber, ElementType.Double);
                 switch (size)
                 {
                     case 1:
+                        WriteTag(tagNumber, ElementType.String8);
                         writer.Write((byte)Encoding.UTF8.GetByteCount(value));
                         break;
                     case 2:
+                        WriteTag(tagNumber, ElementType.String16);
                         writer.Write((ushort)Encoding.UTF8.GetByteCount(value));
                         break;
                     case 4:
+                        WriteTag(tagNumber, ElementType.String32);
                         writer.Write((uint)Encoding.UTF8.GetByteCount(value));
                         break;
+                    default:
+                        throw new InvalidOperationException("String Length was " + size);
                 }
                 writer.Write(value);
             }
@@ -183,18 +220,22 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                WriteTag(tagNumber, ElementType.Double);
                 switch (size)
                 {
                     case 1:
+                        WriteTag(tagNumber, ElementType.Bytes8);
                         writer.Write((byte)value.Length);
                         break;
                     case 2:
+                        WriteTag(tagNumber, ElementType.Bytes16);
                         writer.Write((ushort)value.Length);
                         break;
                     case 4:
+                        WriteTag(tagNumber, ElementType.Bytes32);
                         writer.Write((uint)value.Length);
                         break;
+                    default:
+                        throw new InvalidOperationException("Byte Length was " + size);
                 }
                 writer.Write(value);
             }

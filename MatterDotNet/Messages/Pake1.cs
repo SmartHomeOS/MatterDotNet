@@ -31,14 +31,15 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake1(TLVReader reader) {
-            reader.StartStructure();
+        public Pake1(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             PA = reader.GetBytes(1)!;
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
             writer.WriteBytes(1, PA, 1);
             writer.EndContainer();
         }

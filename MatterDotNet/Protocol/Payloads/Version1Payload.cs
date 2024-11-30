@@ -16,7 +16,7 @@ using System.Buffers.Binary;
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    internal class Version1Payload : IPayload
+    public class Version1Payload : IPayload
     {
         public ExchangeFlags Flags { get; set; }
         public byte OpCode { get; set; } //Depends on Protocol
@@ -24,9 +24,14 @@ namespace MatterDotNet.Protocol.Payloads
         public ushort VendorID { get; set; }
         public ProtocolType Protocol { get; set; }
         public uint AckCounter { get; set; }
-        public IPayload Payload { get; set; }
+        public IPayload? Payload { get; set; }
 
-        public Version1Payload(IPayload payload)
+        public override string ToString()
+        {
+            return $"[Op: {OpCode}, Exchange: {ExchangeID}, Content: {Payload}]";
+        }
+
+        public Version1Payload(IPayload? payload)
         {
             this.Payload = payload;
         }
@@ -63,9 +68,9 @@ namespace MatterDotNet.Protocol.Payloads
                     switch ((SecureOpCodes)OpCode)
                     {
                         case SecureOpCodes.MsgCounterSyncReq:
-                            break;
+                            return new MessageCounterSyncRequest(bytes);
                         case SecureOpCodes.MsgCounterSyncRsp:
-                            break;
+                            return new MessageCounterSyncResponse(bytes);
                         case SecureOpCodes.MRPStandaloneAcknowledgement:
                             return null;
                         case SecureOpCodes.PBKDFParamRequest:
@@ -89,11 +94,11 @@ namespace MatterDotNet.Protocol.Payloads
                         case SecureOpCodes.StatusReport:
                             return new StatusPayload(bytes);
                         case SecureOpCodes.ICDCheckInMessage:
-                            break;
+                            break; //TODO - Return ActiveModeThreshold when clusters are implemented
                     }
                     break;
             }
-            throw new NotImplementedException();
+            throw new NotImplementedException("Protocol: " + Protocol + ", OpCode: " + OpCode);
         }
 
         public bool Serialize(PayloadWriter stream)
@@ -106,7 +111,8 @@ namespace MatterDotNet.Protocol.Payloads
             stream.Write((ushort)Protocol);
             if ((Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
                 stream.Write(AckCounter);
-            Payload.Serialize(stream);
+            if (Payload != null)
+                return Payload.Serialize(stream);
             return true;
         }
     }

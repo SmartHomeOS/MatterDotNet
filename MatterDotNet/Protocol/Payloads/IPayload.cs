@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    internal interface IPayload
+    public interface IPayload
     {
         public bool Serialize(PayloadWriter stream);
     }

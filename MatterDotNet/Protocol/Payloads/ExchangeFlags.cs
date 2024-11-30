@@ -13,7 +13,7 @@
 namespace MatterDotNet.Protocol.Payloads
 {
     [Flags]
-    internal enum ExchangeFlags : byte
+    public enum ExchangeFlags : byte
     {
         Initiator = 0x1,
         Acknowledgement = 0x2,

@@ -32,15 +32,16 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Crypto_PBKDFParameterSet(TLVReader reader) {
-            reader.StartStructure();
-            Iterations = reader.GetUInt(1).Value;
+        public Crypto_PBKDFParameterSet(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
+            Iterations = reader.GetUInt(1)!.Value;
             Salt = reader.GetBytes(2)!;
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
             writer.WriteUInt(1, Iterations);
             writer.WriteBytes(2, Salt, 1);
             writer.EndContainer();

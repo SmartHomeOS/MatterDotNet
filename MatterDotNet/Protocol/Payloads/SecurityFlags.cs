@@ -13,7 +13,7 @@
 namespace MatterDotNet.Protocol.Payloads
 {
     [Flags]
-    internal enum SecurityFlags : byte
+    public enum SecurityFlags : byte
     {
         UnicastSession = 0x0,
         GroupSession = 0x1,

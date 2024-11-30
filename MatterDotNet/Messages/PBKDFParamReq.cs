@@ -35,25 +35,26 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamReq(TLVReader reader) {
-            reader.StartStructure();
+        public PBKDFParamReq(TLVReader reader, uint structNumber = 0) {
+            reader.StartStructure(structNumber);
             InitiatorRandom = reader.GetBytes(1)!;
-            InitiatorSessionId = reader.GetUShort(2).Value;
-            PasscodeId = reader.GetUShort(3).Value;
-            HasPBKDFParameters = reader.GetBool(4).Value;
+            InitiatorSessionId = reader.GetUShort(2)!.Value;
+            PasscodeId = reader.GetUShort(3)!.Value;
+            HasPBKDFParameters = reader.GetBool(4)!.Value;
             if (reader.IsTag(5))
                 InitiatorSessionParams = new SessionParameter(reader);
+            reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer) {
-            writer.StartStructure();
-            writer.WriteBytes(1, InitiatorRandom, 0);
+        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            writer.StartStructure(structNumber);
+            writer.WriteBytes(1, InitiatorRandom, 1);
             writer.WriteUShort(2, InitiatorSessionId);
             writer.WriteUShort(3, PasscodeId);
             writer.WriteBool(4, HasPBKDFParameters);
             if (InitiatorSessionParams != null)
-                InitiatorSessionParams.Serialize(writer);
+                InitiatorSessionParams.Serialize(writer, 5);
             writer.EndContainer();
         }
     }

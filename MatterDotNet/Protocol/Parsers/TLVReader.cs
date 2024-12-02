@@ -243,7 +243,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32)
-                throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type bytes but received {type}");
             byte[] val = data.Slice(offset, length).ToArray();
             offset += length;
             ReadTag();
@@ -317,7 +317,6 @@ namespace MatterDotNet.Protocol.Parsers
                 case ElementType.Bytes16:
                 case ElementType.Bytes32:
                 case ElementType.Bytes64:
-                    int ret;
                     byte offsetSize = (byte)(1 << ((byte)type & 0x3));
                     if (offsetSize == 1)
                         length = data.Span[offset++];

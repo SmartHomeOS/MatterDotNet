@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages
             Sigma2ResumeMIC = reader.GetBytes(2)!;
             ResponderSessionID = reader.GetUShort(3)!.Value;
             if (reader.IsTag(4))
-                ResponderSessionParams = new SessionParameter(reader);
+                ResponderSessionParams = new SessionParameter(reader, 4);
             reader.EndContainer();
         }
 

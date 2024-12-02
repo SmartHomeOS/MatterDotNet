@@ -94,7 +94,7 @@ namespace Generator
                             writer.WriteLine($"{totalIndent}{child.Name} = reader.GetString({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!;" : ";")}");
                             break;
                         case DataType.Reference:
-                            writer.WriteLine($"{totalIndent}{child.Name} = new {child.ReferenceName}(reader);");
+                            writer.WriteLine($"{totalIndent}{child.Name} = new {child.ReferenceName}(reader, {child.TagNumber});");
                             break;
 
                     }

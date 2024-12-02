@@ -60,7 +60,8 @@ namespace MatterDotNet
             Discriminator = (ushort)readBits(data, 45, DiscriminatorLength);
             Passcode = readBits(data, 57, 27);
             uint padding = readBits(data, 84, 4);
-            bool success = padding == 0;
+            if (padding != 0)
+                throw new ArgumentException("Invalid QR Code");
         }
 
         public static PayloadParser FromQR(string QRCode)

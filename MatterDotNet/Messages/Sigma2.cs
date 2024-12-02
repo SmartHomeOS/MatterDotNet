@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages
             ResponderEphPubKey = reader.GetBytes(3)!;
             Encrypted2 = reader.GetBytes(4)!;
             if (reader.IsTag(5))
-                ResponderSessionParams = new SessionParameter(reader);
+                ResponderSessionParams = new SessionParameter(reader, 5);
             reader.EndContainer();
         }
 

@@ -29,7 +29,7 @@ namespace MatterDotNet.Protocol.Payloads
         public uint Counter { get; set; }
         public ulong SourceNodeID { get; set; }
         public ulong DestinationNodeID { get; set; }
-        public Version1Payload Message { get; set; }
+        public Version1Payload? Message { get; set; }
         public bool Valid { get; set; }
 
         public override string ToString()
@@ -39,13 +39,14 @@ namespace MatterDotNet.Protocol.Payloads
 
         public bool Serialize(PayloadWriter stream)
         {
+            Counter = SessionManager.GlobalUnencryptedCounter; //TODO
             stream.Write((byte)Flags);
             stream.Write(SessionID);
             stream.Write((byte)Security);
             stream.Write(Counter);
             if ((Flags & MessageFlags.SourceNodeID) == MessageFlags.SourceNodeID)
                 stream.Write(SourceNodeID);
-            if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationNodeID)
+            if ((Flags & MessageFlags.DestinationNodeID) == MessageFlags.DestinationNodeID)
                 stream.Write(DestinationNodeID);
             else if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationGroupID)
                 stream.Write(DestinationNodeID);
@@ -100,6 +101,7 @@ namespace MatterDotNet.Protocol.Payloads
 
         public Frame(Span<byte> payload)
         {
+            Valid = true;
             Flags = (MessageFlags)payload[0];
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
@@ -124,7 +126,7 @@ namespace MatterDotNet.Protocol.Payloads
                 SourceNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
                 slice = slice.Slice(8);
             }
-            if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationNodeID)
+            if ((Flags & MessageFlags.DestinationNodeID) == MessageFlags.DestinationNodeID)
             {
                 DestinationNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
                 slice = slice.Slice(8);
@@ -152,12 +154,14 @@ namespace MatterDotNet.Protocol.Payloads
                     BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
                 //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
 
-                Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
+                if (Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
                                           slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES),
                                           slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
                                           payload.Slice(0, payload.Length - slice.Length),
-                                          nonce);
-                Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
+                                          nonce))
+                    Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
+                else
+                    Valid = false;
             }
         }
 
@@ -166,7 +170,7 @@ namespace MatterDotNet.Protocol.Payloads
             int ret = 4;
             if ((Flags & MessageFlags.SourceNodeID) == MessageFlags.SourceNodeID)
                 ret += 8;
-            if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationNodeID)
+            if ((Flags & MessageFlags.DestinationNodeID) == MessageFlags.DestinationNodeID)
                 ret += 8;
             else if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationGroupID)
                 ret += 2;

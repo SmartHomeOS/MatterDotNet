@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages
             PasscodeId = reader.GetUShort(3)!.Value;
             HasPBKDFParameters = reader.GetBool(4)!.Value;
             if (reader.IsTag(5))
-                InitiatorSessionParams = new SessionParameter(reader);
+                InitiatorSessionParams = new SessionParameter(reader, 5);
             reader.EndContainer();
         }
 

@@ -44,7 +44,7 @@ namespace MatterDotNet.Messages
             DestinationId = reader.GetBytes(3)!;
             InitiatorEphPubKey = reader.GetBytes(4)!;
             if (reader.IsTag(5))
-                InitiatorSessionParams = new SessionParameter(reader);
+                InitiatorSessionParams = new SessionParameter(reader, 5);
             if (reader.IsTag(6))
                 ResumptionID = reader.GetBytes(6);
             if (reader.IsTag(7))

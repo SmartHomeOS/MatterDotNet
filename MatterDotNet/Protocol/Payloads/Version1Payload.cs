@@ -28,7 +28,7 @@ namespace MatterDotNet.Protocol.Payloads
 
         public override string ToString()
         {
-            return $"[Op: {OpCode}, Exchange: {ExchangeID}, Content: {Payload}]";
+            return $"[Flags: {Flags}, Op: {OpCode}, Exchange: {ExchangeID}, Content: {Payload}]";
         }
 
         public Version1Payload(IPayload? payload)
@@ -49,8 +49,8 @@ namespace MatterDotNet.Protocol.Payloads
             Protocol = (ProtocolType)BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(4, 2));
             if ((Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
             {
-                AckCounter = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(6, 2));
-                payload = payload.Slice(2);
+                AckCounter = BinaryPrimitives.ReadUInt32LittleEndian(payload.Slice(6, 4));
+                payload = payload.Slice(4);
             }
             if ((Flags & ExchangeFlags.SecuredExtensions) == ExchangeFlags.SecuredExtensions)
             {
@@ -98,7 +98,7 @@ namespace MatterDotNet.Protocol.Payloads
                     }
                     break;
             }
-            throw new NotImplementedException("Protocol: " + Protocol + ", OpCode: " + OpCode);
+            throw new NotImplementedException($"Protocol: {Protocol}, OpCode: {OpCode}");
         }
 
         public bool Serialize(PayloadWriter stream)

@@ -17,7 +17,7 @@ namespace MatterDotNet.Messages
 {
     public class MessageCounterSyncRequest : IPayload
     {
-        ulong Challenge {  get; set; }
+        public ulong Challenge {  get; set; }
 
         public MessageCounterSyncRequest(Memory<byte> payload)
         {

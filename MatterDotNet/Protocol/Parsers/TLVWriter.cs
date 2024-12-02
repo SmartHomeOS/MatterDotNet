@@ -48,7 +48,7 @@ namespace MatterDotNet.Protocol.Parsers
 
         public void WriteByte(uint tagNumber, byte? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
@@ -58,7 +58,7 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteSByte(uint tagNumber, sbyte? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
@@ -68,13 +68,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteShort(uint tagNumber, short? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < sbyte.MaxValue && value > sbyte.MinValue)
+                if (value.Value < sbyte.MaxValue && value.Value > sbyte.MinValue)
                 {
-                    WriteSByte(tagNumber, (sbyte)value);
+                    WriteSByte(tagNumber, (sbyte)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.Short);
@@ -83,13 +83,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteUShort(uint tagNumber, ushort? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < byte.MaxValue)
+                if (value.Value < byte.MaxValue)
                 {
-                    WriteByte(tagNumber, (byte)value);
+                    WriteByte(tagNumber, (byte)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.UShort);
@@ -98,13 +98,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteInt(uint tagNumber, int? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < short.MaxValue && value > short.MinValue)
+                if (value.Value < short.MaxValue && value.Value > short.MinValue)
                 {
-                    WriteShort(tagNumber, (short)value);
+                    WriteShort(tagNumber, (short)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.Int);
@@ -113,13 +113,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteUInt(uint tagNumber, uint? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < ushort.MaxValue)
+                if (value.Value < ushort.MaxValue)
                 {
-                    WriteUShort(tagNumber, (ushort)value);
+                    WriteUShort(tagNumber, (ushort)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.UInt);
@@ -128,13 +128,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteLong(uint tagNumber, long? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < int.MaxValue && value > int.MinValue)
+                if (value.Value < int.MaxValue && value.Value > int.MinValue)
                 {
-                    WriteInt(tagNumber, (int)value);
+                    WriteInt(tagNumber, (int)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.Long);
@@ -143,13 +143,13 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteULong(uint tagNumber, ulong? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                if (value < uint.MaxValue)
+                if (value.Value < uint.MaxValue)
                 {
-                    WriteUInt(tagNumber, (uint)value);
+                    WriteUInt(tagNumber, (uint)value.Value);
                     return;
                 }
                 WriteTag(tagNumber, ElementType.ULong);
@@ -158,7 +158,7 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteFloat(uint tagNumber, float? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
@@ -168,7 +168,7 @@ namespace MatterDotNet.Protocol.Parsers
         }
         public void WriteDouble(uint tagNumber, double? value)
         {
-            if (value == null)
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
@@ -179,12 +179,12 @@ namespace MatterDotNet.Protocol.Parsers
 
         public void WriteBool(uint tagNumber, bool? value)
         {
-            if (value == true)
-                WriteTag(tagNumber, ElementType.True);
-            else if (value == false)
-                WriteTag(tagNumber, ElementType.False);
-            else
+            if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
+            else if (value.Value == true)
+                WriteTag(tagNumber, ElementType.True);
+            else
+                WriteTag(tagNumber, ElementType.False);
         }
 
         public void WriteString(uint tagNumber, string? value, byte size)

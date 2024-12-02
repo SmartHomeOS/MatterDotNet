@@ -17,8 +17,14 @@ namespace MatterDotNet.Messages
 {
     public class MessageCounterSyncResponse : IPayload
     {
-        uint SynchronizedCounter { get; set; }
-        ulong Response {  get; set; }
+        public uint SynchronizedCounter { get; set; }
+        public ulong Response {  get; set; }
+
+        public MessageCounterSyncResponse(uint synchronizedCounter, ulong response)
+        {
+            SynchronizedCounter = synchronizedCounter;
+            Response = response;
+        }
 
         public MessageCounterSyncResponse(Memory<byte> payload)
         {

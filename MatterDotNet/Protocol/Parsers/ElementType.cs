@@ -22,8 +22,8 @@ namespace MatterDotNet.Protocol.Parsers
         UShort = 5,
         UInt = 6,
         ULong = 7,
-        True = 8,
-        False = 9,
+        False = 8,
+        True = 9,
         Float = 10,
         Double = 11,
         /// <summary>

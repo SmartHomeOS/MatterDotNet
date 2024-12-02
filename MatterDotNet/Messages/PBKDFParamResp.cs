@@ -30,7 +30,7 @@ namespace MatterDotNet.Messages
         public required byte[] InitiatorRandom { get; set; } 
         public required byte[] ResponderRandom { get; set; } 
         public required ushort ResponderSessionId { get; set; } 
-        public required Crypto_PBKDFParameterSet Pbkdf_parameters { get; set; } 
+        public Crypto_PBKDFParameterSet? Pbkdf_parameters { get; set; } 
         public SessionParameter? ResponderSessionParams { get; set; } 
 
         /// <inheritdoc />
@@ -40,9 +40,10 @@ namespace MatterDotNet.Messages
             InitiatorRandom = reader.GetBytes(1)!;
             ResponderRandom = reader.GetBytes(2)!;
             ResponderSessionId = reader.GetUShort(3)!.Value;
-            Pbkdf_parameters = new Crypto_PBKDFParameterSet(reader);
+            if (reader.IsTag(4))
+                Pbkdf_parameters = new Crypto_PBKDFParameterSet(reader, 4);
             if (reader.IsTag(5))
-                ResponderSessionParams = new SessionParameter(reader);
+                ResponderSessionParams = new SessionParameter(reader, 5);
             reader.EndContainer();
         }
 
@@ -52,7 +53,8 @@ namespace MatterDotNet.Messages
             writer.WriteBytes(1, InitiatorRandom, 1);
             writer.WriteBytes(2, ResponderRandom, 1);
             writer.WriteUShort(3, ResponderSessionId);
-            Pbkdf_parameters.Serialize(writer, 4);
+            if (Pbkdf_parameters != null)
+                Pbkdf_parameters.Serialize(writer, 4);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 5);
             writer.EndContainer();

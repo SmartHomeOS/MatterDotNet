@@ -29,6 +29,8 @@ namespace MatterDotNet.Protocol.Cryptography
         public const int GROUP_SIZE_BYTES = 32;
         public const int GROUP_SIZE_BITS = GROUP_SIZE_BYTES * 8;
         public const int PUBLIC_KEY_SIZE_BYTES = (2 * GROUP_SIZE_BYTES) + 1;
+        public const int W_SIZE_BYTES = GROUP_SIZE_BYTES + 8;
+        public const int W_SIZE_BITS = W_SIZE_BYTES * 8;
 
         /// <summary>
         /// Encrypts the data and returns the MIC (tag)
@@ -63,7 +65,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 aes.Decrypt(nonce, payload, mic, payload, additionalData);
                 return true;
             }
-            catch (AuthenticationTagMismatchException)
+            catch (CryptographicException)
             {
                 return false;
             }

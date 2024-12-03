@@ -20,6 +20,14 @@ namespace Test
         }
 
         [Test]
+        public void TestDecompression()
+        {
+            Assert.That(Convert.ToHexString(SPAKE2Plus.M.ToBytes(false)), Is.EqualTo("04886e2f97ace46e55ba9dd7242579f2993b64e16ef3dcab95afd497333d8fa12f5ff355163e43ce224e0b0e65ff02ac8e5c7be09419c785e0ca547d55a12e2d20".ToUpper()));
+            Assert.That(Convert.ToHexString(SPAKE2Plus.N.ToBytes(false)), Is.EqualTo("04d8bbd6c639c62937b04d997f38c3770719c629d7014d49a24b4f98baa1292b4907d60aa6bfade45008a636337f5168c64d9bd36034808cd564490b1e656edbe7".ToUpper()));
+
+        }
+
+        [Test]
         public void TestSigning()
         {
             byte[] msg = RandomNumberGenerator.GetBytes(32);

@@ -18,7 +18,6 @@ namespace MatterDotNet.Protocol.Cryptography
 {
     public struct BigIntegerPoint : IEquatable<BigIntegerPoint>
     {
-        private static readonly BigInteger SIGN_BIT = 1 << 256;
         public BigIntegerPoint() { }
         public BigIntegerPoint(BigInteger x, BigInteger y)
         {
@@ -38,9 +37,10 @@ namespace MatterDotNet.Protocol.Cryptography
                 case 2:
                 case 3:
                     X = new BigInteger(point.AsSpan(1), true, true);
-                    Y = BigIntUtil.ModSqrt((BigInteger.ModPow(X, 3, SecP256.p) + (SecP256.a * X) % SecP256.p + SecP256.b) % SecP256.p, SecP256.p);
+                    BigInteger Y2 = (((BigInteger.ModPow(X, 3, SecP256.p) + ((SecP256.a * X) % SecP256.p)) % SecP256.p) + SecP256.b) % SecP256.p;
+                    Y = BigIntUtil.ModSqrt(Y2, SecP256.p);
                     if (point[0] == 0x3)
-                        Y |= SIGN_BIT;
+                        Y = SecP256.p - Y;
                     break;
                 case 4:
                     int len = (point.Length - 1) / 2;
@@ -60,16 +60,16 @@ namespace MatterDotNet.Protocol.Cryptography
             if (compressed)
             {
                 byte[] ret = new byte[33];
-                ret[0] = ((Y & SIGN_BIT) == SIGN_BIT) ? (byte)0x3 : (byte)0x2;
-                X.TryWriteBytes(ret.AsSpan(1), out _, true, true);
+                ret[0] = (byte)(0x2 + (Y % SecP256.p) % 2);
+                X.TryWriteBytes(ret.AsSpan(1 + (32 - X.GetByteCount(true))), out _, true, true);
                 return ret;
             }
             else
             {
                 byte[] ret = new byte[65];
                 ret[0] = 0x4;
-                X.TryWriteBytes(ret.AsSpan(1), out _, true, true);
-                Y.TryWriteBytes(ret.AsSpan(33), out _, true, true);
+                X.TryWriteBytes(ret.AsSpan(1 + (32 - X.GetByteCount(true))), out _, true, true);
+                Y.TryWriteBytes(ret.AsSpan(33 + (32 - Y.GetByteCount(true))), out _, true, true);
                 return ret;
             }
         }
@@ -88,12 +88,17 @@ namespace MatterDotNet.Protocol.Cryptography
 
         public void Negate()
         {
-            Y ^= SIGN_BIT;
+            Y *= -1;
         }
 
         public bool Equals(BigIntegerPoint other)
         {
             return X.Equals(other.X) && Y.Equals(other.Y);
+        }
+
+        public override string ToString()
+        {
+            return $"X: {X}, Y: {Y}";
         }
     }
 }

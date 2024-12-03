@@ -1,4 +1,5 @@
-﻿using MatterDotNet.Protocol.Cryptography;
+﻿using MatterDotNet.Messages;
+using MatterDotNet.Protocol.Cryptography;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 
@@ -8,7 +9,7 @@ namespace MatterDotNet.Protocol.Sessions
     {
         public const int MSG_COUNTER_WINDOW_SIZE = 32;
 
-        private uint globalCtr;
+        private static uint globalCtr;
         public SessionManager()
         {
             Span<byte> working_state = CTR_DRBG.Instantiate(RandomNumberGenerator.GetBytes(32), []);
@@ -28,12 +29,25 @@ namespace MatterDotNet.Protocol.Sessions
             return (ushort)Random.Shared.Next(0, ushort.MaxValue);
         }
 
-        public uint GlobalUnencryptedCounter
+        public static uint GlobalUnencryptedCounter
         {
             get
             {
                 return Interlocked.Increment(ref globalCtr);
             }
+        }
+
+        public static SessionParameter GetSessionParams()
+        {
+            SessionParameter param = new SessionParameter();
+            param.SESSION_ACTIVE_THRESHOLD = 4000;
+            param.SESSION_ACTIVE_INTERVAL = 500;
+            param.SESSION_IDLE_INTERVAL = 300;
+            param.MAX_PATHS_PER_INVOKE = 1;
+            param.DATA_MODEL_REVISION = 17;
+            param.INTERACTION_MODEL_REVISION = 11;
+            param.SPECIFICATION_VERSION = 0;
+            return param;
         }
     }
 }

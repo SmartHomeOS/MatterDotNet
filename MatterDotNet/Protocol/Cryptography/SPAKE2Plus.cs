@@ -1,4 +1,5 @@
-﻿using MatterDotNet.Protocol.Payloads;
+﻿using MatterDotNet.Messages;
+using MatterDotNet.Protocol.Payloads;
 using System.Buffers.Binary;
 using System.Numerics;
 using System.Security.Cryptography;
@@ -12,101 +13,114 @@ namespace MatterDotNet.Protocol.Cryptography
                                                                  0x6f, 0x6d, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x69, 0x6e, 0x67
                                                                 }; // "CHIP PAKE V1 Commissioning"
         static readonly byte[] SEKeys_Info = new byte[] { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 }; /* "SessionKeys" */
-        static readonly BigIntegerPoint M = new BigIntegerPoint(Convert.FromHexString("02886E2F97ACE46E55BA9DD7242579F2993B64E16EF3DCAB95AFD497333D8FA12F"));
-        static readonly BigIntegerPoint N = new BigIntegerPoint(Convert.FromHexString("03D8BBD6C639C62937B04D997F38C3770719C629D7014D49A24B4F98BAA1292B49"));
+        public static readonly BigIntegerPoint M = new BigIntegerPoint(Convert.FromHexString("02886E2F97ACE46E55BA9DD7242579F2993B64E16EF3DCAB95AFD497333D8FA12F"));
+        public static readonly BigIntegerPoint N = new BigIntegerPoint(Convert.FromHexString("03D8BBD6C639C62937B04D997F38C3770719C629D7014D49A24B4F98BAA1292B49")); //"04d8bbd6c639c62937b04d997f38c3770719c629d7014d49a24b4f98baa1292b4907d60aa6bfade45008a636337f5168c64d9bd36034808cd564490b1e656edbe7"));  
+
+        //Pake Session State
+        private BigInteger w0;
+        private BigIntegerPoint Z;
+        private BigIntegerPoint V;
+        private BigInteger w1;
+        private BigInteger x;
+        private BigInteger y;
+        private BigIntegerPoint L;
 
         //Party A
-        public static (BigInteger w0, BigInteger w1, BigIntegerPoint X, BigInteger x) PAKEValues_Initiator(uint passcode, int iterations, byte[] salt)
+        public BigIntegerPoint PAKEValues_Initiator(uint passcode, int iterations, byte[] salt)
         {
             byte[] pinBytes = new byte[4];
             BinaryPrimitives.WriteUInt32LittleEndian(pinBytes, passcode);
-            byte[] w = Crypto.PBKDF(pinBytes, salt, iterations, 80 * 8);
-            BigInteger w0s = new BigInteger(w.AsSpan().Slice(0, 40), true, true);
-            BigInteger w1s = new BigInteger(w.AsSpan().Slice(40, 40), true, true);
-            BigInteger w0 = w0s % SecP256.n;
-            BigInteger w1 = w1s % SecP256.n;
-            BigInteger x = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES)) % SecP256.p;
+            byte[] w = Crypto.PBKDF(pinBytes, salt, iterations, Crypto.W_SIZE_BITS * 2);
+            BigInteger w0s = new BigInteger(w.AsSpan().Slice(0, Crypto.W_SIZE_BYTES), true, true);
+            BigInteger w1s = new BigInteger(w.AsSpan().Slice(Crypto.W_SIZE_BYTES, Crypto.W_SIZE_BYTES), true, true);
+            w0 = w0s % SecP256.n;
+            w1 = w1s % SecP256.n;
+            x = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES), true, true) % SecP256.p;
             BigIntegerPoint X = SecP256.Add(SecP256.Multiply(x, SecP256.GeneratorP), SecP256.Multiply(w0, M)); //X = pA
-            return (w0, w1, X, x);
+            return X;
         }
 
         // Party B
-        public static (BigInteger w0, BigIntegerPoint L, BigIntegerPoint Y, BigInteger y) PAKEValues_Responder(uint passcode, int iterations, byte[] salt)
+        public BigIntegerPoint PAKEValues_Responder(uint passcode, int iterations, byte[] salt)
         {
             byte[] pinBytes = new byte[4];
             BinaryPrimitives.WriteUInt32LittleEndian(pinBytes, passcode);
-            byte[] w = Crypto.PBKDF(pinBytes, salt, iterations, 80 * 8);
-            BigInteger w0s = new BigInteger(w.AsSpan().Slice(0, 40), true, true);
-            BigInteger w1s = new BigInteger(w.AsSpan().Slice(40, 40), true, true);
-            BigInteger w0 = w0s % SecP256.n;
-            BigInteger w1 = w1s % SecP256.n;
-            BigIntegerPoint L = SecP256.Multiply(w1, SecP256.GeneratorP);
-            BigInteger y = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES)) % SecP256.p;
+            byte[] w = Crypto.PBKDF(pinBytes, salt, iterations, Crypto.W_SIZE_BITS * 2);
+            BigInteger w0s = new BigInteger(w.AsSpan().Slice(0, Crypto.W_SIZE_BYTES), true, true);
+            BigInteger w1s = new BigInteger(w.AsSpan().Slice(Crypto.W_SIZE_BYTES, Crypto.W_SIZE_BYTES), true, true);
+            w0 = w0s % SecP256.n;
+            w1 = w1s % SecP256.n;
+            L = SecP256.Multiply(w1, SecP256.GeneratorP);
+            y = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES), true, true) % SecP256.p;
             BigIntegerPoint Y = SecP256.Add(SecP256.Multiply(y, SecP256.GeneratorP), SecP256.Multiply(w0, N)); //Y = pB
-            return (w0, L, Y, y);
+            return Y;
         }
 
-        public static (BigIntegerPoint Z, BigIntegerPoint V) InitiatorValidate(BigInteger w0, BigInteger w1, BigInteger x, BigIntegerPoint Y)
+        public (BigIntegerPoint Z, BigIntegerPoint V) InitiatorValidate(BigIntegerPoint pB)
         {
+            if (!SecP256.IsOnCurve(pB))
+                throw new ArgumentException("Invalid pB");
             BigIntegerPoint TMP = SecP256.Multiply(w0, N);
             TMP.Negate();
-            TMP = SecP256.Add(Y, TMP);
-            BigIntegerPoint Z = SecP256.Multiply(x, TMP);
-            BigIntegerPoint V = SecP256.Multiply(w1, TMP);
+            TMP = SecP256.Add(pB, TMP);
+            Z = SecP256.Multiply(x, TMP);
+            V = SecP256.Multiply(w1, TMP);
             return (Z, V);
         }
 
-        public static (BigIntegerPoint Z, BigIntegerPoint V) ResponderValidate(BigInteger w0, BigIntegerPoint L, BigInteger y, BigIntegerPoint X)
+        public (BigIntegerPoint Z, BigIntegerPoint V) ResponderValidate(BigIntegerPoint pA)
         {
+            if (!SecP256.IsOnCurve(pA))
+                throw new ArgumentException("Invalid pA");
             BigIntegerPoint TMP = SecP256.Multiply(w0, M);
             TMP.Negate();
-            BigIntegerPoint Z = SecP256.Multiply(y, SecP256.Add(X, TMP));
-            BigIntegerPoint V = SecP256.Multiply(y, L);
+            Z = SecP256.Multiply(y, SecP256.Add(pA, TMP));
+            V = SecP256.Multiply(y, L);
             return (Z, V);
         }
 
-        public static Span<byte> ComputeTranscript(Span<byte> PBKDFParamRequest, Span<byte> PBKDFParamResponse, BigIntegerPoint pA, BigIntegerPoint pB, BigIntegerPoint Z, BigIntegerPoint V, BigInteger w0)
+        public (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) Finish(PBKDFParamReq pbkdfReq, PBKDFParamResp pbkdfResp, Span<byte> pA, Span<byte> pB)
         {
-            Span<byte> context = new byte[ContextPrefixValue.Length +  PBKDFParamRequest.Length + PBKDFParamResponse.Length];
+            PayloadWriter reqBytes = new PayloadWriter(1024);
+            pbkdfReq.Serialize(reqBytes);
+            PayloadWriter respBytes = new PayloadWriter(1024);
+            pbkdfResp.Serialize(respBytes);
+
+            Span<byte> context = new byte[ContextPrefixValue.Length + reqBytes.Length + respBytes.Length];
             ContextPrefixValue.CopyTo(context);
-            PBKDFParamRequest.CopyTo(context.Slice(ContextPrefixValue.Length));
-            PBKDFParamResponse.CopyTo(context.Slice(context.Length - PBKDFParamResponse.Length));
+            reqBytes.GetPayload().Span.CopyTo(context.Slice(ContextPrefixValue.Length));
+            respBytes.GetPayload().Span.CopyTo(context.Slice(context.Length - respBytes.Length));
             context = Crypto.Hash(context);
 
-            PayloadWriter TT = new PayloadWriter(context.Length + 302);
+            PayloadWriter TT = new PayloadWriter(context.Length + 502);
             TT.Write((ulong)context.Length);
             TT.Write(context);
             TT.Seek(16); //Write 2 zeros
-            TT.Write((ulong)33);
-            TT.Write(M.ToBytes(true));
-            TT.Write((ulong)33);
-            TT.Write(N.ToBytes(true));
-            TT.Write((ulong)33);
-            TT.Write(pA.ToBytes(true));
-            TT.Write((ulong)33);
-            TT.Write(pB.ToBytes(true));
-            TT.Write((ulong)33);
-            TT.Write(Z.ToBytes(true));
-            TT.Write((ulong)33);
-            TT.Write(V.ToBytes(true));
-            TT.Write((ulong)32);
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(M.ToBytes(false));
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(N.ToBytes(false));
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(pA);
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(pB);
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(Z.ToBytes(false));
+            TT.Write((ulong)Crypto.PUBLIC_KEY_SIZE_BYTES);
+            TT.Write(V.ToBytes(false));
+            TT.Write((ulong)w0.GetByteCount(true));
             TT.Write(w0.ToByteArray(true, true));
 
-            return TT.GetPayload().Span;
-        }
-
-        public (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) Finish(Span<byte> TT, BigIntegerPoint pA, BigIntegerPoint pB)
-        {
-            Span<byte> KaKe = Crypto.Hash(TT);
+            Span<byte> KaKe = Crypto.Hash(TT.GetPayload().Span);
             Span<byte> kcAkcB = Crypto.KDF([], KaKe.Slice(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES), Encoding.UTF8.GetBytes("ConfirmationKeys"), Crypto.HASH_LEN_BITS);
-            byte[] cA = Crypto.HMAC(kcAkcB.Slice(0, Crypto.HASH_LEN_BYTES / 2), pB.ToBytes(true));
-            byte[] cB = Crypto.HMAC(kcAkcB.Slice(Crypto.HASH_LEN_BYTES / 2), pA.ToBytes(true));
+            byte[] cA = Crypto.HMAC(kcAkcB.Slice(0, Crypto.HASH_LEN_BYTES / 2), pB);
+            byte[] cB = Crypto.HMAC(kcAkcB.Slice(Crypto.HASH_LEN_BYTES / 2, Crypto.HASH_LEN_BYTES / 2), pA);
 
-            Span<byte> pake3 = Crypto.KDF(KaKe.Slice(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES), [], SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
+            Span<byte> sessionKeys = Crypto.KDF(KaKe.Slice(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES), [], SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
             return (cA, cB, 
-                pake3.Slice(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
-                pake3.Slice(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
-                pake3.Slice(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray());
+                sessionKeys.Slice(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
+                sessionKeys.Slice(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
+                sessionKeys.Slice(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray());
         }
     }
 }

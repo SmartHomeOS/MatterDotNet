@@ -17,20 +17,44 @@ using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
-    public static class PASE
+    public class PASE
     {
-        public static Frame GeneratePake1(PBKDFParamResp paramResp)
+        SPAKE2Plus spake = new SPAKE2Plus();
+        (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
+
+        public Frame GeneratePake1(PBKDFParamResp paramResp, uint counter)
         {
+            if (paramResp.Pbkdf_parameters == null)
+                throw new InvalidDataException("Missing PBKDF Parameters");
             ushort session = paramResp.ResponderSessionId;
-            var init = SPAKE2Plus.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters.Iterations, paramResp.Pbkdf_parameters.Salt);
-            Pake1 pk1 = new Pake1() { PA = init.X.ToBytes(true) };
-            Frame frame = new Frame(pk1) { Flags = MessageFlags.SourceNodeID, SourceNodeID = 1, SessionID = paramResp.ResponderSessionId };
-            frame.Message.Flags |= ExchangeFlags.Initiator;
+            Console.WriteLine("Iterations: " + (int)paramResp.Pbkdf_parameters!.Iterations);
+            BigIntegerPoint pA = spake.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
+            Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
+            Console.WriteLine("pA: " + Convert.ToHexString(pk1.PA));
+            Frame frame = new Frame(pk1) { Flags = MessageFlags.SourceNodeID }; // SessionID = paramResp.ResponderSessionId 
+            frame.Message!.Flags |= ExchangeFlags.Initiator | ExchangeFlags.Acknowledgement;
+            frame.Message.AckCounter = counter;
             frame.Message.OpCode = (byte)SecureOpCodes.PASEPake1;
             return frame;
         }
 
-        public static Frame GenerateParamRequest(bool hasOnboardingPayload = false)
+        public Frame GeneratePake3(Pake1 pake1, Pake2 pake2, PBKDFParamReq req, PBKDFParamResp resp, uint counter)
+        {
+            var iv = spake.InitiatorValidate(new BigIntegerPoint(pake2.PB));
+            SessionKeys = spake.Finish(req, resp, pake1.PA, pake2.PB);
+            if (SessionKeys.cB != pake2.CB)
+                throw new CryptographicException("Validators do not match");
+            Pake3 pake3 = new Pake3() {
+                CA = SessionKeys.cA
+            };
+            Frame frame = new Frame(pake3) { Flags = MessageFlags.SourceNodeID }; // SessionID = paramResp.ResponderSessionId 
+            frame.Message!.Flags |= ExchangeFlags.Initiator | ExchangeFlags.Acknowledgement;
+            frame.Message.AckCounter = counter;
+            frame.Message.OpCode = (byte)SecureOpCodes.PASEPake3;
+            return frame;
+        }
+
+        public Frame GenerateParamRequest(bool hasOnboardingPayload = false)
         {
             PBKDFParamReq req = new PBKDFParamReq()
             {
@@ -41,10 +65,9 @@ namespace MatterDotNet.Protocol.Cryptography
             };
 
             Frame frame = new Frame(req);
-            frame.Message.Flags |= ExchangeFlags.Initiator;
+            frame.Message!.Flags |= ExchangeFlags.Initiator;
             frame.Message.OpCode = (byte)SecureOpCodes.PBKDFParamRequest;
             frame.Flags |= MessageFlags.SourceNodeID;
-            frame.SourceNodeID = 1;
             return frame;
         }
     }

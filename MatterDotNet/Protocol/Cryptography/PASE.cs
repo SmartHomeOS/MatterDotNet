@@ -42,7 +42,7 @@ namespace MatterDotNet.Protocol.Cryptography
         {
             var iv = spake.InitiatorValidate(new BigIntegerPoint(pake2.PB));
             SessionKeys = spake.Finish(req, resp, pake1.PA, pake2.PB);
-            if (SessionKeys.cB != pake2.CB)
+            if (!SessionKeys.cB.SequenceEqual(pake2.CB))
                 throw new CryptographicException("Validators do not match");
             Pake3 pake3 = new Pake3() {
                 CA = SessionKeys.cA

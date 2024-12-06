@@ -25,12 +25,6 @@ namespace Test
             Assert.That(Convert.ToHexString(w0.ToByteArray(true, true)), Is.EqualTo("0AFF2FAB0980E98D9D6D33A17AC2F15886CD87F6CDCB34200A072F5F6129F8AD"));
             BigIntegerPoint L = SecP256.Multiply(w1, SecP256.GeneratorP);
             Assert.That(Convert.ToHexString(L.ToBytes(true)), Is.EqualTo("03EAE21D4B206F567BF357E91DF2DA29D1A2B75A9E07519CAB893B97E29A4BF43D"));
-            //w0 = w0s % SecP256.n;
-            //w1 = w1s % SecP256.n;
-            //BigInteger x = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES), true, true) % SecP256.p;
-            //BigIntegerPoint X = SecP256.Add(SecP256.Multiply(x, SecP256.GeneratorP), SecP256.Multiply(w0, SPAKE2Plus.M)); //X = pA
-            //Org.BouncyCastle.Math.EC.ECPoint pt = Org.BouncyCastle.Math.EC.ECCurve.
-            //Assert.That(Convert.ToHexString(X.ToBytes(false)), Is.EqualTo("0457B3413E28C68046145D6F60B20584CF9AB620D266023466533E4AA8436CD92167120F848E8879F656B6449655DA2CCF03D6148F0F8185DED6EB84F986107014"));
         }
 
         [Test]

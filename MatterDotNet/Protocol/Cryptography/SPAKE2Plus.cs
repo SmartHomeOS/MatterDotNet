@@ -112,7 +112,7 @@ namespace MatterDotNet.Protocol.Cryptography
             TT.Write(w0.ToByteArray(true, true));
 
             Span<byte> KaKe = Crypto.Hash(TT.GetPayload().Span);
-            Span<byte> kcAkcB = Crypto.KDF([], KaKe.Slice(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES), Encoding.UTF8.GetBytes("ConfirmationKeys"), Crypto.HASH_LEN_BITS);
+            Span<byte> kcAkcB = Crypto.KDF(KaKe.Slice(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES), [], Encoding.UTF8.GetBytes("ConfirmationKeys"), Crypto.HASH_LEN_BITS);
             byte[] cA = Crypto.HMAC(kcAkcB.Slice(0, Crypto.HASH_LEN_BYTES / 2), pB);
             byte[] cB = Crypto.HMAC(kcAkcB.Slice(Crypto.HASH_LEN_BYTES / 2, Crypto.HASH_LEN_BYTES / 2), pA);
 

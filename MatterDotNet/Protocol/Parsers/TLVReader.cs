@@ -30,6 +30,11 @@ namespace MatterDotNet.Protocol.Parsers
             return this.tagNumber == tagNumber;
         }
 
+        public bool IsTag(uint tagNumber, ushort vendorID, ushort profileNumber)
+        {
+            return this.tagNumber == tagNumber && this.vendorID == vendorID && this.profileNumber == profileNumber;
+        }
+
         public void StartStructure(uint structureNumber = 0)
         {
             if (type != ElementType.Structure)

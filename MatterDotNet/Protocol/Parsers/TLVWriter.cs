@@ -6,11 +6,6 @@ namespace MatterDotNet.Protocol.Parsers
     public class TLVWriter
     {
         PayloadWriter writer;
-        TLVControl control;
-        ElementType type;
-        int offset;
-        uint tagNumber;
-        int length = 0;
 
         public TLVWriter(PayloadWriter writer)
         {

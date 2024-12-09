@@ -10,10 +10,31 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.Protocol.Connection;
+
 namespace MatterDotNet.Protocol.Sessions
 {
-    public record SecureSession(bool PASE, bool Initiator, ushort LocalSessionID, ushort RemoteSessionID, byte[] I2RKey, byte[] R2IKey, byte[] SharedSecret)
+    public class SecureSession : SessionContext
     {
+        public ushort LocalSessionID { get; init; }
+        public ushort RemoteSessionID { get; init; }
+        public byte[] I2RKey { get; init; }
+        public byte[] R2IKey { get; init; }
+        public byte[] SharedSecret { get; init; }
+        public uint LocalMessageCtr { get; init; }
+        public uint RemoteMessageCtr { get; set; }
+
+        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, uint remoteMessageCounter, ulong peerNodeId) : base(connection, initiator, peerNodeId, localSessionID)
+        {
+            LocalSessionID = localSessionID;
+            RemoteSessionID = remoteSessionID;
+            I2RKey = i2rKey;
+            R2IKey = r2iKey;
+            SharedSecret = sharedSecret;
+            LocalMessageCtr = localMessageCounter;
+            RemoteMessageCtr = remoteMessageCounter;
+        }
+
         /*
          * Local Message Counter: Secure Session Message Counter for outbound messages.
             ◦ At successful session establishment, the Local Message Counter SHALL be initialized per Section

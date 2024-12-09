@@ -22,7 +22,7 @@ namespace MatterDotNet.Protocol.Cryptography
         SPAKE2Plus spake = new SPAKE2Plus();
         (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
 
-        public Frame GeneratePake1(PBKDFParamResp paramResp, uint counter)
+        public Frame GeneratePake1(PBKDFParamResp paramResp)
         {
             if (paramResp.Pbkdf_parameters == null)
                 throw new InvalidDataException("Missing PBKDF Parameters");
@@ -30,15 +30,12 @@ namespace MatterDotNet.Protocol.Cryptography
             Console.WriteLine("Iterations: " + (int)paramResp.Pbkdf_parameters!.Iterations);
             BigIntegerPoint pA = spake.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
             Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
-            Console.WriteLine("pA: " + Convert.ToHexString(pk1.PA));
-            Frame frame = new Frame(pk1) { Flags = MessageFlags.SourceNodeID }; // SessionID = paramResp.ResponderSessionId 
-            frame.Message!.Flags |= ExchangeFlags.Initiator | ExchangeFlags.Acknowledgement;
-            frame.Message.AckCounter = counter;
+            Frame frame = new Frame(pk1) { Flags = MessageFlags.SourceNodeID };
             frame.Message.OpCode = (byte)SecureOpCodes.PASEPake1;
             return frame;
         }
 
-        public Frame GeneratePake3(Pake1 pake1, Pake2 pake2, PBKDFParamReq req, PBKDFParamResp resp, uint counter)
+        public Frame GeneratePake3(Pake1 pake1, Pake2 pake2, PBKDFParamReq req, PBKDFParamResp resp)
         {
             var iv = spake.InitiatorValidate(new BigIntegerPoint(pake2.PB));
             SessionKeys = spake.Finish(req, resp, pake1.PA, pake2.PB);
@@ -47,9 +44,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Pake3 pake3 = new Pake3() {
                 CA = SessionKeys.cA
             };
-            Frame frame = new Frame(pake3) { Flags = MessageFlags.SourceNodeID }; // SessionID = paramResp.ResponderSessionId 
-            frame.Message!.Flags |= ExchangeFlags.Initiator | ExchangeFlags.Acknowledgement;
-            frame.Message.AckCounter = counter;
+            Frame frame = new Frame(pake3) { Flags = MessageFlags.SourceNodeID };
             frame.Message.OpCode = (byte)SecureOpCodes.PASEPake3;
             return frame;
         }
@@ -65,10 +60,14 @@ namespace MatterDotNet.Protocol.Cryptography
             };
 
             Frame frame = new Frame(req);
-            frame.Message!.Flags |= ExchangeFlags.Initiator;
             frame.Message.OpCode = (byte)SecureOpCodes.PBKDFParamRequest;
             frame.Flags |= MessageFlags.SourceNodeID;
             return frame;
+        }
+
+        public (byte[] I2RKey, byte[] R2IKey) GetKeys()
+        {
+            return (SessionKeys.I2RKey, SessionKeys.R2IKey);
         }
     }
 }

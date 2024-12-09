@@ -10,7 +10,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace MatterDotNet.Protocol.Sessions
+using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Sessions;
+
+namespace MatterDotNet.Protocol.Connection
 {
-    public record UnsecuredSession(bool Initiator, ulong InitiatorNodeID, ushort LocalSessionID, uint MessageReceptionCtr){ }
+    public interface IConnection : IDisposable
+    {
+        Task<Frame> Read();
+        Task SendFrame(Exchange exchange, Frame frame);
+    }
 }

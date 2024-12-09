@@ -3,7 +3,14 @@
 **Coming Soon** - New implementation in progress
 
 #### What's Working
-* Some Crypto functions, message framing and QR/PIN parsing
+* Automatic Code Generator (based on the specification)
+* Cryptography
+* Framing & TLV Parsing / Generation 
+* Sessions & Exchanges
+* QR Code / MDNS Payload Parsing
+
+#### What's In Progress:
+* Device Commissioning
 
 #### Coming Soon
 * Matter 1.3 Standard Implementation

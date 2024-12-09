@@ -29,17 +29,16 @@ namespace MatterDotNet.Protocol.Payloads
         public uint Counter { get; set; }
         public ulong SourceNodeID { get; set; }
         public ulong DestinationNodeID { get; set; }
-        public Version1Payload? Message { get; set; }
+        public Version1Payload Message { get; set; }
         public bool Valid { get; set; }
 
         public override string ToString()
         {
-            return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Message: {Message}";
+            return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Ctr: {Counter}, Message: {Message}";
         }
 
         public bool Serialize(PayloadWriter stream)
         {
-            Counter = SessionManager.GlobalUnencryptedCounter; //TODO
             stream.Write((byte)Flags);
             stream.Write(SessionID);
             stream.Write((byte)Security);
@@ -65,7 +64,7 @@ namespace MatterDotNet.Protocol.Payloads
                     PayloadWriter secureStream = new PayloadWriter(temp);
                     if (!Message.Serialize(secureStream))
                         return false;
-                    SecureSession? session = SessionManager.GetSession(SessionID, false);
+                    SecureSession? session = SessionManager.GetSession(SessionID, false) as SecureSession;
                     Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
                     stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
                     if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
@@ -94,7 +93,7 @@ namespace MatterDotNet.Protocol.Payloads
             
         }
 
-        public Frame(IPayload payload)
+        public Frame(IPayload? payload)
         {
             Message = new Version1Payload(payload);
         }
@@ -106,7 +105,7 @@ namespace MatterDotNet.Protocol.Payloads
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
 
-            SecureSession? session = SessionManager.GetSession(SessionID, (Security & SecurityFlags.GroupSession) != 0); //TODO: Actually implement sessions
+            SecureSession? session = SessionManager.GetSession(SessionID, (Security & SecurityFlags.GroupSession) != 0) as SecureSession; //TODO: Actually implement sessions
 
             if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
             {

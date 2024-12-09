@@ -28,7 +28,7 @@ namespace MatterDotNet.Protocol.Payloads
 
         public override string ToString()
         {
-            return $"[Flags: {Flags}, Op: {OpCode}, Exchange: {ExchangeID}, Content: {Payload}]";
+            return $"[Flags: {Flags}, Op: {OpCode}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
         }
 
         public Version1Payload(IPayload? payload)

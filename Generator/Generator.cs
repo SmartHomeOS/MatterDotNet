@@ -28,9 +28,13 @@ namespace Generator
                     Console.WriteLine("Read Structure Successfully: \n******************************************************\n" + string.Join('\n', (object[])structs) + "\n*************************************");
                 foreach (Tag tag in structs)
                 {
-                    if (File.Exists("outputs\\" + tag.Name + ".cs"))
-                        File.Delete("outputs\\" + tag.Name + ".cs");
-                    using (FileStream outstream = File.OpenWrite("outputs\\" + tag.Name + ".cs"))
+                    if (tag.Namespace != null && !Directory.Exists($"outputs\\{tag.Namespace}\\"))
+                            Directory.CreateDirectory($"outputs\\{tag.Namespace}\\");
+
+                    string path = $"outputs\\{((tag.Namespace != null) ? tag.Namespace + "\\" : "")}" + tag.Name + ".cs";
+                    if (File.Exists(path))
+                        File.Delete(path);
+                    using (FileStream outstream = File.OpenWrite(path))
                     {
                         if (ClassGenerator.Emit(outstream, tag))
                             Console.WriteLine(tag.Name + " Written Successfully!");

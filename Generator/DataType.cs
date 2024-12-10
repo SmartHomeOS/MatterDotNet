@@ -14,9 +14,11 @@ namespace Generator
 {
     public enum DataType
     {
+        Any,
         Array,
         Boolean,
         Bytes,
+        Choice,
         FloatingPoint,
         Integer,
         List,

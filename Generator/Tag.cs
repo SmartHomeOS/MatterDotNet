@@ -22,6 +22,7 @@ namespace Generator
         public Tag? Parent { get; set; }
         public int TagNumber { get; set; }
         public string? ReferenceName { get; set; }
+        public string? Namespace { get; set; }
 
         public override string ToString()
         {

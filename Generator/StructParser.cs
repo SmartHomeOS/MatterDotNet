@@ -19,6 +19,7 @@ namespace Generator
     {
         public static Tag[] ParseStruct(Stream stream)
         {
+            string? ns = null;
             List<Tag> tags = new List<Tag>();
             Tag? root = null;
             using (StreamReader sr = new StreamReader(stream))
@@ -37,22 +38,33 @@ namespace Generator
                     else if (line == "}" || line == "},") {
                         if (parent != null)
                             parent = parent.Parent;
-                        if (parent == null)
+                        if (parent == null && root != null)
                         {
                             tags.Add(root);
                             root = null;
                             lastTag = null;
                         }
+                        else if (root == null)
+                        {
+                            ns = null;
+                        }
+                    }
+                    else if (line.StartsWith("namespace"))
+                    {
+                        ns = line.Substring(10);
+                        sr.ReadLine();
                     }
                     else if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("//"))
                     {
                         lastTag = parseLine(line, parent);
+                        if (lastTag != null)
+                            lastTag.Namespace = ns;
                         if (root == null)
                         {
                             root = lastTag;
                             parent = lastTag;
                         }
-                        else
+                        else if (lastTag != null)
                         {
                             parent!.Children.Add(lastTag);
                         }
@@ -97,11 +109,17 @@ namespace Generator
                 case "UNSIGNED INTEGER":
                     tag.Type = DataType.UnsignedInteger;
                     break;
+                case "ANY":
+                    tag.Type = DataType.Any;
+                    break;
                 case "BOOLEAN":
                     tag.Type = DataType.Boolean;
                     break;
                 case "STRUCTURE":
                     tag.Type = DataType.Structure;
+                    break;
+                case "CHOICE OF":
+                    tag.Type = DataType.Choice;
                     break;
                 case "SIGNED INTEGER":
                     tag.Type = DataType.Integer;
@@ -185,6 +203,10 @@ namespace Generator
                         }
                     }
                 }
+                if (typeParts.Length > 2 && typeParts[2].StartsWith("OF", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    tag.ReferenceName = ParseType(typeParts[2].Substring(3));
+                }
             }
             if (tag.LengthBytes == 0 && tag.Max != 0)
             {
@@ -211,7 +233,37 @@ namespace Generator
                         tag.LengthBytes = 8;
                 }
             }
+            if (tag.Parent?.Type == DataType.Choice)
+                tag.Optional = true;
             return tag;
+        }
+
+        private static string ParseType(string type)
+        {
+            switch (type)
+            {
+                case "UNSIGNED INTEGER":
+                    return "uint";
+                case "BOOLEAN":
+                    return "bool";
+                case "SIGNED INTEGER":
+                    return "int";
+                case "OCTET STRING":
+                    return "byte[]";
+                case "STRING":
+                    return "string";
+                case "ARRAY":
+                case "ARRAY OF":
+                case "LIST":
+                case "LIST OF":
+                    throw new NotSupportedException("nested arrays");
+                case "FLOAT32":
+                    return "float";
+                case "FLOAT64":
+                    return "double";
+                default:
+                    return SanitizeName(type);
+            }
         }
 
         private static string SanitizeName(string name)

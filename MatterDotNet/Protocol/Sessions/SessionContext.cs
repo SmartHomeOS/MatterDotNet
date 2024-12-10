@@ -15,21 +15,30 @@ using System.Collections.Concurrent;
 
 namespace MatterDotNet.Protocol.Sessions
 {
-    public class SessionContext
+    public class SessionContext : IDisposable
     {
         public bool Initiator { get; init; }
         public ulong InitiatorNodeID { get; init; }
         public ushort LocalSessionID { get; init; }
+        public ushort RemoteSessionID { get; init; }
+        public MessageState PeerMessageCtr { get; set; }
         internal IConnection Connection { get; init; }
 
         private ConcurrentDictionary<ushort, Exchange> exchanges = new ConcurrentDictionary<ushort, Exchange>();
 
-        internal SessionContext(IConnection connection, bool initiator, ulong initiatorNodeId, ushort localSessionId)
+        internal SessionContext(IConnection connection, bool initiator, ulong initiatorNodeId, ushort localSessionId, ushort remoteSessionId, MessageState remoteCtr)
         {
             Connection = connection;
             Initiator = initiator;
             InitiatorNodeID = initiatorNodeId;
             LocalSessionID = localSessionId;
+            RemoteSessionID = remoteSessionId;
+            PeerMessageCtr = remoteCtr;
+        }
+
+        internal virtual uint GetSessionCounter()
+        {
+            return SessionManager.GlobalUnencryptedCounter;
         }
 
         public Exchange CreateExchange()
@@ -45,9 +54,20 @@ namespace MatterDotNet.Protocol.Sessions
             return new Exchange(this, exchangeId);
         }
 
-        internal void DeleteExchange(Exchange exchange)
+        internal async Task DeleteExchange(Exchange exchange)
         {
+            await Connection.Close(exchange);
             exchanges.TryRemove(exchange.ID, out _);
+        }
+
+        public void Dispose()
+        {
+            SessionManager.RemoveSession(LocalSessionID);
+            Console.WriteLine("Closing Session " + LocalSessionID);
+            var keys = exchanges.Keys;
+            foreach (var key in keys)
+                exchanges[key].Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

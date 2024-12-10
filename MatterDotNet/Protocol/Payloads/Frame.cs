@@ -18,7 +18,7 @@ using System.Text;
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    public class Frame : IPayload
+    public class Frame
     {
         internal const int MAX_SIZE = 1280;
         internal static readonly byte[] PRIVACY_INFO = Encoding.UTF8.GetBytes("PrivacyKey");
@@ -34,10 +34,12 @@ namespace MatterDotNet.Protocol.Payloads
 
         public override string ToString()
         {
+            if (!Valid)
+                return $"Invalid Frame: [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Ctr: {Counter}]";
             return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Ctr: {Counter}, Message: {Message}";
         }
 
-        public bool Serialize(PayloadWriter stream)
+        public void Serialize(PayloadWriter stream, SessionContext session)
         {
             stream.Write((byte)Flags);
             stream.Write(SessionID);
@@ -53,8 +55,7 @@ namespace MatterDotNet.Protocol.Payloads
             //Extensions not supported
             if (SessionID == 0)
             {
-                if (!Message.Serialize(stream))
-                    return false;
+                Message.Serialize(stream);
             }
             else
             {
@@ -62,21 +63,20 @@ namespace MatterDotNet.Protocol.Payloads
                 try
                 {
                     PayloadWriter secureStream = new PayloadWriter(temp);
-                    if (!Message.Serialize(secureStream))
-                        return false;
-                    SecureSession? session = SessionManager.GetSession(SessionID, false) as SecureSession;
+                    Message.Serialize(secureStream);
+                    SecureSession? secureContext = session as SecureSession;
                     Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
                     stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
                     if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
                         BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
                     //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
 
-                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(session.Initiator ? session.I2RKey : session.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
+                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(secureContext.Initiator ? secureContext.I2RKey : secureContext.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
                     stream.Write(secureStream);
                     stream.Write(mic);
                     if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
                     {
-                        byte[] privacyKey = Crypto.KDF(session.Initiator ? session.I2RKey : session.R2IKey, [], PRIVACY_INFO, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+                        byte[] privacyKey = Crypto.KDF(secureContext.Initiator ? secureContext.I2RKey : secureContext.R2IKey, [], PRIVACY_INFO, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
                         Span<byte> ptr = stream.GetPayload().Span;
                         byte[] privacyNonce = new byte[Crypto.NONCE_LENGTH_BYTES];
                         BinaryPrimitives.WriteUInt16BigEndian(privacyNonce, SessionID);
@@ -89,12 +89,11 @@ namespace MatterDotNet.Protocol.Payloads
                     ArrayPool<byte>.Shared.Return(temp);
                 }
             }
-            return true;
-            
         }
 
         public Frame(IPayload? payload)
         {
+            Valid = true;
             Message = new Version1Payload(payload);
         }
 
@@ -105,7 +104,7 @@ namespace MatterDotNet.Protocol.Payloads
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
 
-            SecureSession? session = SessionManager.GetSession(SessionID, (Security & SecurityFlags.GroupSession) != 0) as SecureSession; //TODO: Actually implement sessions
+            SecureSession? session = SessionManager.GetSession(SessionID) as SecureSession;
 
             if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
             {
@@ -158,7 +157,7 @@ namespace MatterDotNet.Protocol.Payloads
                                           slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
                                           payload.Slice(0, payload.Length - slice.Length),
                                           nonce))
-                    Message = new Version1Payload(payload.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
+                    Message = new Version1Payload(slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
                 else
                     Valid = false;
             }

@@ -54,14 +54,14 @@ namespace MatterDotNet.Protocol.Connection
                 frame.Message.AckCounter = ackCtr;
             }
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
-            frame.Serialize(writer);
+            frame.Serialize(writer, exchange.Session);
             Retransmission? rt = null;
             while (rt == null)
             {
                 rt = new Retransmission(exchange, frame.Counter, writer);
-                if (!Retransmissions.TryAdd((frame.SessionID, frame.Message.ExchangeID), rt))
+                if (!Retransmissions.TryAdd((exchange.Session.LocalSessionID, frame.Message.ExchangeID), rt))
                 {
-                    if (!Retransmissions.TryGetValue((frame.SessionID, frame.Message.ExchangeID), out rt))
+                    if (!Retransmissions.TryGetValue((exchange.Session.LocalSessionID, frame.Message.ExchangeID), out rt))
                         continue;
                     rt.Ack.Wait();
                     rt = null;
@@ -80,9 +80,16 @@ namespace MatterDotNet.Protocol.Connection
                         throw new IOException("Message retransmission timed out");
                     }
                     double mrpBackoffTime = (RetryInterval * MRP_BACKOFF_MARGIN) * Math.Pow(MRP_BACKOFF_BASE, (Math.Max(0, rt.SendCount - MRP_BACKOFF_THRESHOLD))) * (1.0 + Random.Shared.NextDouble() * MRP_BACKOFF_JITTER);
-                    await rt.Ack.WaitAsync((int)mrpBackoffTime);
-                    Console.WriteLine("RT success");
-                    return;
+                    if (await rt.Ack.WaitAsync((int)mrpBackoffTime))
+                    {
+                        Console.WriteLine("RT success");
+                        return;
+                    }
+                    else
+                    {
+                        await client.SendAsync(rt.data.GetPayload());
+                        Console.WriteLine("RT #" + rt.SendCount);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -92,10 +99,10 @@ namespace MatterDotNet.Protocol.Connection
             }
         }
 
-        public async Task SendAck(ushort sessionID, ushort exchange, uint counter, bool initiator)
+        public async Task SendAck(SessionContext? session, ushort exchange, uint counter, bool initiator)
         {
             Frame ack = new Frame((IPayload?)null);
-            ack.SessionID = sessionID;
+            ack.SessionID = session.RemoteSessionID;
             ack.Counter = SessionManager.GlobalUnencryptedCounter;
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
@@ -105,7 +112,7 @@ namespace MatterDotNet.Protocol.Connection
             ack.Message.Protocol = Payloads.ProtocolType.SecureChannel;
             ack.Message.OpCode = (byte)SecureOpCodes.MRPStandaloneAcknowledgement;
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
-            ack.Serialize(writer);
+            ack.Serialize(writer, session);
             if (AckTable.TryGetValue(exchange, out uint ctr) && ctr == counter)
                 AckTable.TryRemove(exchange, out _);
             Console.WriteLine("Sent standalone ack: " + ack.ToString());
@@ -119,27 +126,43 @@ namespace MatterDotNet.Protocol.Connection
 
         public async Task Run()
         {
-            while (!cts.IsCancellationRequested)
+            try
             {
-                UdpReceiveResult result = await client.ReceiveAsync();
-                Frame frame = new Frame(result.Buffer);
-                if ((frame.Message.Flags & ExchangeFlags.Reliability) == ExchangeFlags.Reliability)
+                while (!cts.IsCancellationRequested)
                 {
-                    if (!AckTable.TryAdd(frame.Message.ExchangeID, frame.Counter))
-                        await SendAck(frame.SessionID, frame.Message.ExchangeID, frame.Counter, (frame.Message.Flags & ExchangeFlags.Initiator) == 0);
-                }
-                if ((frame.Message.Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
-                {
-                    if (Retransmissions.TryGetValue((frame.SessionID, frame.Message.ExchangeID), out Retransmission? transmission) && transmission.Counter == frame.Message.AckCounter)
+                    UdpReceiveResult result = await client.ReceiveAsync();
+                    Frame frame = new Frame(result.Buffer);
+                    if ((frame.Message.Flags & ExchangeFlags.Reliability) == ExchangeFlags.Reliability)
                     {
-                        Retransmissions.TryRemove((frame.SessionID, frame.Message.ExchangeID), out _);
-                        transmission.Ack.Release();
+                        if (!AckTable.TryAdd(frame.Message.ExchangeID, frame.Counter))
+                            await SendAck(SessionManager.GetSession(frame.SessionID), frame.Message.ExchangeID, frame.Counter, (frame.Message.Flags & ExchangeFlags.Initiator) == 0);
                     }
+                    if ((frame.Message.Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
+                    {
+                        if (Retransmissions.TryGetValue((frame.SessionID, frame.Message.ExchangeID), out Retransmission? transmission) && transmission.Counter == frame.Message.AckCounter)
+                        {
+                            Retransmissions.TryRemove((frame.SessionID, frame.Message.ExchangeID), out _);
+                            transmission.Ack.Release();
+                        }
+                    }
+                    Console.WriteLine("Received: " + frame.ToString());
+                    channel.Writer.TryWrite(frame);
                 }
-                Console.WriteLine("Received: " + frame.ToString());
-                channel.Writer.TryWrite(frame);
             }
-            channel.Writer.Complete();
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            finally
+            {
+                channel.Writer.Complete();
+            }
+        }
+
+        public async Task Close(Exchange exchange)
+        {
+            if (AckTable.TryGetValue(exchange.ID, out uint ctr))
+                await SendAck(exchange.Session, exchange.ID, ctr, exchange.Session.Initiator);
         }
 
         /// <inheritdoc />

@@ -16,6 +16,8 @@ namespace MatterDotNet.Protocol.Sessions
 {
     public class Exchange : IDisposable
     {
+        private const int MSG_COUNTER_WINDOW_SIZE = 32;
+
         public ushort ID { get; init; }
         public SessionContext Session {get; init;}
         
@@ -27,9 +29,9 @@ namespace MatterDotNet.Protocol.Sessions
 
         public async Task SendFrame(Frame frame)
         {
-            frame.SessionID = Session.LocalSessionID;
+            frame.SessionID = Session.RemoteSessionID;
             if (Session.Initiator)
-                frame.Message.Flags = ExchangeFlags.Initiator;
+                frame.Message.Flags |= ExchangeFlags.Initiator;
             frame.Message.ExchangeID = ID;
             frame.Counter = SessionManager.GlobalUnencryptedCounter;
             await Session.Connection.SendFrame(this, frame);
@@ -37,12 +39,62 @@ namespace MatterDotNet.Protocol.Sessions
 
         public async Task<Frame> Read()
         {
-            return await Session.Connection.Read();
+            Frame? frame = null;
+            while (frame == null)
+            {
+                frame = await Session.Connection.Read();
+                MessageState state = Session.PeerMessageCtr;
+                if (frame.Counter > state.MaxMessageCounter)
+                {
+                    int offset = (int)Math.Min(frame.Counter - state.MaxMessageCounter, MSG_COUNTER_WINDOW_SIZE);
+                    state.MaxMessageCounter = frame.Counter;
+                    state.CounterWindow <<= offset;
+                    if (offset < MSG_COUNTER_WINDOW_SIZE)
+                        state.CounterWindow |= (uint)(1 << (int)offset - 1);
+                }
+                else if (frame.Counter == state.MaxMessageCounter)
+                {
+                    Console.WriteLine("DROPPED DUPLICATE: " + frame);
+                    frame = null;
+                }
+                else
+                {
+                    uint offset = (state.MaxMessageCounter - frame.Counter);
+                    if (offset > MSG_COUNTER_WINDOW_SIZE)
+                    {
+                        if (Session is SecureSession)
+                        {
+                            Console.WriteLine("DROPPED DUPLICATE: " + frame);
+                            frame = null;
+                        }
+                        else
+                        {
+                            state.MaxMessageCounter = frame.Counter;
+                            state.CounterWindow = uint.MaxValue;
+                        }
+                    }
+                    else
+                    {
+                        if ((state.CounterWindow & (uint)(1 << (int)offset - 1)) != 0x0)
+                        {
+                            Console.WriteLine("DROPPED DUPLICATE: " + frame);
+                            frame = null;
+                        }
+                        else
+                            state.CounterWindow |= (uint)(1 << (int)offset - 1);
+                    }
+                }
+                Session.PeerMessageCtr = state;
+            }
+            return frame;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
-            Session.DeleteExchange(this);
+            Console.WriteLine("Closing Exchange: " + ID);
+            Session.DeleteExchange(this).Wait();
+            GC.SuppressFinalize(this);
         }
     }
 }

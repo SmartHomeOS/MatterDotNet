@@ -37,7 +37,7 @@ namespace MatterDotNet.Protocol.Connection
         {
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             writer.Seek(4);
-            frame.Serialize(writer);
+            frame.Serialize(writer, exchange.Session);
             BinaryPrimitives.WriteUInt32LittleEndian(writer.GetPayload().Slice(0, 4).Span, (uint)writer.Length);
             await stream.WriteAsync(writer.GetPayload());
         }
@@ -68,6 +68,12 @@ namespace MatterDotNet.Protocol.Connection
             cts.Cancel();
             cts.Dispose();
             client.Dispose();
+        }
+
+        public Task Close(Exchange exchange)
+        {
+            //Do Nothing
+            return Task.CompletedTask;
         }
     }
 }

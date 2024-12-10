@@ -16,23 +16,22 @@ namespace MatterDotNet.Protocol.Sessions
 {
     public class SecureSession : SessionContext
     {
-        public ushort LocalSessionID { get; init; }
-        public ushort RemoteSessionID { get; init; }
         public byte[] I2RKey { get; init; }
         public byte[] R2IKey { get; init; }
         public byte[] SharedSecret { get; init; }
         public uint LocalMessageCtr { get; init; }
-        public uint RemoteMessageCtr { get; set; }
 
-        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, uint remoteMessageCounter, ulong peerNodeId) : base(connection, initiator, peerNodeId, localSessionID)
+        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong peerNodeId) : base(connection, initiator, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
         {
-            LocalSessionID = localSessionID;
-            RemoteSessionID = remoteSessionID;
             I2RKey = i2rKey;
             R2IKey = r2iKey;
             SharedSecret = sharedSecret;
             LocalMessageCtr = localMessageCounter;
-            RemoteMessageCtr = remoteMessageCounter;
+        }
+
+        internal override uint GetSessionCounter()
+        {
+            return LocalMessageCtr;
         }
 
         /*

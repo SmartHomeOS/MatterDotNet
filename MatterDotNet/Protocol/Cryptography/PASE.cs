@@ -10,19 +10,50 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Messages;
+using MatterDotNet.Messages.PASE;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.OpCodes;
+using MatterDotNet.Protocol.Payloads.Status;
+using MatterDotNet.Protocol.Sessions;
 using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
-    public class PASE
+    public class PASE(SessionContext unsecureSession)
     {
         SPAKE2Plus spake = new SPAKE2Plus();
         (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
 
-        public Frame GeneratePake1(PBKDFParamResp paramResp)
+        public async Task<ushort> EstablishSecureSession()
+        {
+            Frame? resp = null;
+            Exchange exchange = unsecureSession.CreateExchange();
+            Frame paramReq = GenerateParamRequest();
+            await exchange.SendFrame(paramReq);
+            resp = await exchange.Read();
+            if (resp.Message.Payload is StatusPayload error)
+            {
+                throw new IOException("Failed to establish PASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
+            }
+            PBKDFParamResp paramResp = (PBKDFParamResp)resp.Message.Payload!;
+            Frame pake1 = GeneratePake1(paramResp);
+            await exchange.SendFrame(pake1);
+            resp = await exchange.Read();
+            Pake2 pake2 = (Pake2)resp.Message.Payload!;
+            Frame pake3 = GeneratePake3((Pake1)pake1.Message.Payload!, pake2, (PBKDFParamReq)paramReq.Message.Payload!, paramResp);
+            await exchange.SendFrame(pake3);
+            resp = await exchange.Read();
+            StatusPayload status = (StatusPayload)resp.Message.Payload!;
+            if (status.GeneralCode != GeneralCode.SUCCESS)
+                throw new IOException("PASE failed with status: " + (SecureStatusCodes)status.ProtocolCode);
+            ushort localSessionID = ((PBKDFParamReq)paramReq.Message.Payload!).InitiatorSessionId;
+
+            SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false);
+            unsecureSession.Dispose();
+            return localSessionID;
+        }
+
+        private Frame GeneratePake1(PBKDFParamResp paramResp)
         {
             if (paramResp.Pbkdf_parameters == null)
                 throw new InvalidDataException("Missing PBKDF Parameters");
@@ -35,7 +66,7 @@ namespace MatterDotNet.Protocol.Cryptography
             return frame;
         }
 
-        public Frame GeneratePake3(Pake1 pake1, Pake2 pake2, PBKDFParamReq req, PBKDFParamResp resp)
+        private Frame GeneratePake3(Pake1 pake1, Pake2 pake2, PBKDFParamReq req, PBKDFParamResp resp)
         {
             var iv = spake.InitiatorValidate(new BigIntegerPoint(pake2.PB));
             SessionKeys = spake.Finish(req, resp, pake1.PA, pake2.PB);
@@ -49,7 +80,7 @@ namespace MatterDotNet.Protocol.Cryptography
             return frame;
         }
 
-        public Frame GenerateParamRequest(bool hasOnboardingPayload = false)
+        private Frame GenerateParamRequest(bool hasOnboardingPayload = false)
         {
             PBKDFParamReq req = new PBKDFParamReq()
             {
@@ -63,11 +94,6 @@ namespace MatterDotNet.Protocol.Cryptography
             frame.Message.OpCode = (byte)SecureOpCodes.PBKDFParamRequest;
             frame.Flags |= MessageFlags.SourceNodeID;
             return frame;
-        }
-
-        public (byte[] I2RKey, byte[] R2IKey) GetKeys()
-        {
-            return (SessionKeys.I2RKey, SessionKeys.R2IKey);
         }
     }
 }

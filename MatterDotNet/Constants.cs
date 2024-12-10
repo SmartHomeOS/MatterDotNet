@@ -10,15 +10,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Protocol.Payloads;
-using MatterDotNet.Protocol.Sessions;
-
-namespace MatterDotNet.Protocol.Connection
+namespace MatterDotNet
 {
-    public interface IConnection : IDisposable
+    public class Constants
     {
-        Task<Frame> Read();
-        Task SendFrame(Exchange exchange, Frame frame);
-        Task Close(Exchange exchange);
+        public const int MATTER_10_REVISION = 10;
+        public const int MATTER_12_REVISION = 11;
+        public const int MATTER_13_REVISION = 12;
     }
 }

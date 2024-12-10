@@ -35,6 +35,11 @@ namespace MatterDotNet.Protocol.Parsers
             return this.tagNumber == tagNumber && this.vendorID == vendorID && this.profileNumber == profileNumber;
         }
 
+        public bool IsEndContainer()
+        {
+            return this.type == ElementType.EndOfContainer;
+        }
+
         public void StartStructure(uint structureNumber = 0)
         {
             if (type != ElementType.Structure)
@@ -44,11 +49,29 @@ namespace MatterDotNet.Protocol.Parsers
             ReadTag();
         }
 
+        public void StartArray(uint arrayNumber = 0)
+        {
+            if (type != ElementType.Array)
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type array but received {type}");
+            if (arrayNumber != 0 && !IsTag(arrayNumber))
+                throw new InvalidDataException("Tag " + arrayNumber + " not present");
+            ReadTag();
+        }
+
+        public void StartList(uint listNumber = 0)
+        {
+            if (type != ElementType.List)
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type list but received {type}");
+            if (listNumber != 0 && !IsTag(listNumber))
+                throw new InvalidDataException("Tag " + listNumber + " not present");
+            ReadTag();
+        }
+
         public void EndContainer()
         {
             bool iterating = true;
             while (iterating && type != ElementType.EndOfContainer)
-                iterating = ReadTag();
+                iterating = ReadTag(); //TODO: This doesn't actually iterate
             if (iterating == true)
                 ReadTag();
             else
@@ -292,6 +315,9 @@ namespace MatterDotNet.Protocol.Parsers
                         tagNumber = BinaryPrimitives.ReadUInt32LittleEndian(data.Slice(offset, 4).Span);
                         offset += 4;
                     }
+                    break;
+                case TLVControl.Anonymous:
+                    tagNumber = 0;
                     break;
             }
             switch (type)

@@ -16,7 +16,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.CASE
 {
     public class Sigma3 : TLVPayload
     {

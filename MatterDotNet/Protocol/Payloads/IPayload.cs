@@ -14,6 +14,6 @@ namespace MatterDotNet.Protocol.Payloads
 {
     public interface IPayload
     {
-        public bool Serialize(PayloadWriter stream);
+        public void Serialize(PayloadWriter stream);
     }
 }

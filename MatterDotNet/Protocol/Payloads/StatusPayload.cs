@@ -19,14 +19,14 @@ namespace MatterDotNet.Protocol.Payloads
         /// <summary>
         /// General status codes conveyed in the GeneralCode field are uniform codes that convey both success and failures.
         /// </summary>
-        public ushort GeneralCode { get; set; }
+        public GeneralCode GeneralCode { get; set; }
         public ushort ProtocolVendor { get; set; }
         public ushort ProtocolID { get; set; }
         public ushort ProtocolCode { get; set; }
 
         public StatusPayload(Memory<byte> data)
         {
-            GeneralCode = BinaryPrimitives.ReadUInt16LittleEndian(data.Span);
+            GeneralCode = (GeneralCode)BinaryPrimitives.ReadUInt16LittleEndian(data.Span);
             ProtocolVendor = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(2, 2).Span);
             ProtocolID = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(4, 2).Span);
             ProtocolCode = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(6, 2).Span);
@@ -40,13 +40,12 @@ namespace MatterDotNet.Protocol.Payloads
                 return $"General Code: {GeneralCode}, Vendor: {ProtocolVendor:X2}, Protocol: {ProtocolID:X2}, Protocol Code: {ProtocolCode}";
         }
 
-        public bool Serialize(PayloadWriter stream)
+        public void Serialize(PayloadWriter stream)
         {
-            stream.Write(GeneralCode);
+            stream.Write((byte)GeneralCode);
             stream.Write(ProtocolVendor);
             stream.Write(ProtocolID);
             stream.Write(ProtocolCode);
-            return true;
         }
     }
 }

@@ -10,7 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Messages;
+using MatterDotNet.Messages.CASE;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Sessions;

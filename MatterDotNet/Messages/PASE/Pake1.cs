@@ -16,42 +16,31 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.PASE
 {
-    public class Sigma2Resume : TLVPayload
+    public class Pake1 : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma2Resume() {}
+        public Pake1() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Resume(Memory<byte> data) : this(new TLVReader(data)) {}
+        public Pake1(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResumptionID { get; set; } 
-        public required byte[] Sigma2ResumeMIC { get; set; } 
-        public required ushort ResponderSessionID { get; set; } 
-        public SessionParameter? ResponderSessionParams { get; set; } 
+        public required byte[] PA { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Resume(TLVReader reader, uint structNumber = 0) {
+        public Pake1(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            ResumptionID = reader.GetBytes(1)!;
-            Sigma2ResumeMIC = reader.GetBytes(2)!;
-            ResponderSessionID = reader.GetUShort(3)!.Value;
-            if (reader.IsTag(4))
-                ResponderSessionParams = new SessionParameter(reader, 4);
+            PA = reader.GetBytes(1)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResumptionID, 1);
-            writer.WriteBytes(2, Sigma2ResumeMIC, 1);
-            writer.WriteUShort(3, ResponderSessionID);
-            if (ResponderSessionParams != null)
-                ResponderSessionParams.Serialize(writer, 4);
+            writer.WriteBytes(1, PA, 1);
             writer.EndContainer();
         }
     }

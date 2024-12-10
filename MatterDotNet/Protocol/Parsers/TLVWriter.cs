@@ -23,17 +23,28 @@ namespace MatterDotNet.Protocol.Parsers
             writer.Write((byte)tagNumber);
         }
 
-        public void StartStructure()
-        {
-            WriteTag(TLVControl.Anonymous, ElementType.Structure);
-        }
-
         public void StartStructure(uint tagNumber)
         {
             if (tagNumber == 0)
                 WriteTag(TLVControl.Anonymous, ElementType.Structure);
             else
                 WriteTag(tagNumber, ElementType.Structure);
+        }
+
+        public void StartArray(uint tagNumber)
+        {
+            if (tagNumber == 0)
+                WriteTag(TLVControl.Anonymous, ElementType.Array);
+            else
+                WriteTag(tagNumber, ElementType.Array);
+        }
+
+        public void StartList(uint tagNumber)
+        {
+            if (tagNumber == 0)
+                WriteTag(TLVControl.Anonymous, ElementType.List);
+            else
+                WriteTag(tagNumber, ElementType.List);
         }
 
         public void EndContainer()

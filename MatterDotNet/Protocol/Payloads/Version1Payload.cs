@@ -10,7 +10,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Messages;
+using MatterDotNet.Messages.CASE;
+using MatterDotNet.Messages.InteractionModel;
+using MatterDotNet.Messages.MCSP;
+using MatterDotNet.Messages.PASE;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using System.Buffers.Binary;
 
@@ -28,7 +31,7 @@ namespace MatterDotNet.Protocol.Payloads
 
         public override string ToString()
         {
-            return $"[Flags: {Flags}, Op: {OpCode}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
+            return $"[Flags: {Flags}, Proto: {Protocol}, Op: {OpCode}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
         }
 
         public Version1Payload(IPayload? payload)
@@ -97,11 +100,36 @@ namespace MatterDotNet.Protocol.Payloads
                             break; //TODO - Return ActiveModeThreshold when clusters are implemented
                     }
                     break;
+                case ProtocolType.InteractionModel:
+                    switch ((IMOpCodes)OpCode)
+                    {
+                        case IMOpCodes.StatusResponse:
+                            return new StatusResponseMessage(bytes);
+                        case IMOpCodes.ReadRequest:
+                            return new ReadRequestMessage(bytes);
+                        case IMOpCodes.SubscribeRequest:
+                            return new SubscribeRequestMessage(bytes);
+                        case IMOpCodes.SubscribeResponse:
+                            return new SubscribeResponseMessage(bytes);
+                        case IMOpCodes.ReportData:
+                            return new ReportDataMessage(bytes);
+                        case IMOpCodes.WriteRequest:
+                            return new WriteRequestMessage(bytes);
+                        case IMOpCodes.WriteResponse:
+                            return new WriteResponseMessage(bytes);
+                        case IMOpCodes.InvokeRequest:
+                            return new InvokeRequestMessage(bytes);
+                        case IMOpCodes.InvokeResponse:
+                            return new InvokeResponseMessage(bytes);
+                        case IMOpCodes.TimedRequest:
+                            return new TimedRequestMessage(bytes);
+                    }
+                    break;
             }
             throw new NotImplementedException($"Protocol: {Protocol}, OpCode: {OpCode}");
         }
 
-        public bool Serialize(PayloadWriter stream)
+        public void Serialize(PayloadWriter stream)
         {
             stream.Write((byte)Flags);
             stream.Write(OpCode);
@@ -112,8 +140,7 @@ namespace MatterDotNet.Protocol.Payloads
             if ((Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
                 stream.Write(AckCounter);
             if (Payload != null)
-                return Payload.Serialize(stream);
-            return true;
+                Payload.Serialize(stream);
         }
     }
 }

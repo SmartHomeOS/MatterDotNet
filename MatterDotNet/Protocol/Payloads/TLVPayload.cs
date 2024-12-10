@@ -48,10 +48,9 @@ namespace MatterDotNet.Protocol.Payloads
         /// </summary>
         /// <param name="writer"></param>
         /// <returns></returns>
-        public bool Serialize(PayloadWriter writer)
+        public void Serialize(PayloadWriter writer)
         {
             Serialize(new TLVWriter(writer));
-            return true;
         }
     }
 }

@@ -16,42 +16,39 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.InteractionModel
 {
-    public class Sigma2Tbsdata : TLVPayload
+    public class CommandStatusIB : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma2Tbsdata() {}
+        public CommandStatusIB() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Tbsdata(Memory<byte> data) : this(new TLVReader(data)) {}
+        public CommandStatusIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResponderNOC { get; set; } 
-        public byte[]? ResponderICAC { get; set; } 
-        public required byte[] ResponderEphPubKey { get; set; } 
-        public required byte[] InitiatorEphPubKey { get; set; } 
+        public required CommandPathIB CommandPath { get; set; } 
+        public required StatusIB Status { get; set; } 
+        public ushort? CommandRef { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Tbsdata(TLVReader reader, uint structNumber = 0) {
+        public CommandStatusIB(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            ResponderNOC = reader.GetBytes(1)!;
+            CommandPath = new CommandPathIB(reader, 0);
+            Status = new StatusIB(reader, 1);
             if (reader.IsTag(2))
-                ResponderICAC = reader.GetBytes(2);
-            ResponderEphPubKey = reader.GetBytes(3)!;
-            InitiatorEphPubKey = reader.GetBytes(4)!;
+                CommandRef = reader.GetUShort(2);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderNOC, 0);
-            if (ResponderICAC != null)
-                writer.WriteBytes(2, ResponderICAC, 0);
-            writer.WriteBytes(3, ResponderEphPubKey, 1);
-            writer.WriteBytes(4, InitiatorEphPubKey, 1);
+            CommandPath.Serialize(writer, 0);
+            Status.Serialize(writer, 1);
+            if (CommandRef != null)
+                writer.WriteUShort(2, CommandRef);
             writer.EndContainer();
         }
     }

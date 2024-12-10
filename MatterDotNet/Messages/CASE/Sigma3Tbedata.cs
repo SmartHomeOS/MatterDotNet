@@ -16,45 +16,39 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.CASE
 {
-    public class Sigma2 : TLVPayload
+    public class Sigma3Tbedata : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma2() {}
+        public Sigma3Tbedata() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2(Memory<byte> data) : this(new TLVReader(data)) {}
+        public Sigma3Tbedata(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResponderRandom { get; set; } 
-        public required ushort ResponderSessionId { get; set; } 
-        public required byte[] ResponderEphPubKey { get; set; } 
-        public required byte[] Encrypted2 { get; set; } 
-        public SessionParameter? ResponderSessionParams { get; set; } 
+        public required byte[] InitiatorNOC { get; set; } 
+        public byte[]? InitiatorICAC { get; set; } 
+        public required byte[] Signature { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2(TLVReader reader, uint structNumber = 0) {
+        public Sigma3Tbedata(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            ResponderRandom = reader.GetBytes(1)!;
-            ResponderSessionId = reader.GetUShort(2)!.Value;
-            ResponderEphPubKey = reader.GetBytes(3)!;
-            Encrypted2 = reader.GetBytes(4)!;
-            if (reader.IsTag(5))
-                ResponderSessionParams = new SessionParameter(reader, 5);
+            InitiatorNOC = reader.GetBytes(1)!;
+            if (reader.IsTag(2))
+                InitiatorICAC = reader.GetBytes(2);
+            Signature = reader.GetBytes(3)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderRandom, 1);
-            writer.WriteUShort(2, ResponderSessionId);
-            writer.WriteBytes(3, ResponderEphPubKey, 1);
-            writer.WriteBytes(4, Encrypted2, 0);
-            if (ResponderSessionParams != null)
-                ResponderSessionParams.Serialize(writer, 5);
+            writer.WriteBytes(1, InitiatorNOC, 0);
+            if (InitiatorICAC != null)
+                writer.WriteBytes(2, InitiatorICAC, 0);
+            writer.WriteBytes(3, Signature, 1);
             writer.EndContainer();
         }
     }

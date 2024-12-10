@@ -16,31 +16,34 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.PASE
 {
-    public class Pake1 : TLVPayload
+    public class Crypto_PBKDFParameterSet : TLVPayload
     {
         /// <inheritdoc />
-        public Pake1() {}
+        public Crypto_PBKDFParameterSet() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake1(Memory<byte> data) : this(new TLVReader(data)) {}
+        public Crypto_PBKDFParameterSet(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] PA { get; set; } 
+        public required uint Iterations { get; set; } 
+        public required byte[] Salt { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake1(TLVReader reader, uint structNumber = 0) {
+        public Crypto_PBKDFParameterSet(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            PA = reader.GetBytes(1)!;
+            Iterations = reader.GetUInt(1)!.Value;
+            Salt = reader.GetBytes(2)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, PA, 1);
+            writer.WriteUInt(1, Iterations);
+            writer.WriteBytes(2, Salt, 1);
             writer.EndContainer();
         }
     }

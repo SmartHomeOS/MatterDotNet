@@ -133,7 +133,7 @@ namespace MatterDotNet.Protocol.Payloads
 
         private void CopyTo(Memory<byte> slice)
         {
-            data.CopyTo(slice);
+            data.Slice(0, pos).CopyTo(slice);
         }
     }
 }

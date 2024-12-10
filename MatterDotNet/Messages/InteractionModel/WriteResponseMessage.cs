@@ -16,31 +16,47 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.InteractionModel
 {
-    public class Pake3 : TLVPayload
+    public class WriteResponseMessage : TLVPayload
     {
         /// <inheritdoc />
-        public Pake3() {}
+        public WriteResponseMessage() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake3(Memory<byte> data) : this(new TLVReader(data)) {}
+        public WriteResponseMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] CA { get; set; } 
+        public required AttributeStatusIB[] WriteResponses { get; set; } 
+        public required byte InteractionModelRevision { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake3(TLVReader reader, uint structNumber = 0) {
+        public WriteResponseMessage(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            CA = reader.GetBytes(1)!;
+            {
+                reader.StartArray(0);
+                List<AttributeStatusIB> items = new();
+                while (!reader.IsEndContainer()) {
+                    items.Add(new AttributeStatusIB(reader, 0));
+                }
+                WriteResponses = items.ToArray();
+            }
+            InteractionModelRevision = reader.GetByte(255)!.Value;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, CA, 1);
+            {
+                writer.StartArray(0);
+                foreach (var item in WriteResponses) {
+                    item.Serialize(writer, 0);
+                }
+                writer.EndContainer();
+            }
+            writer.WriteByte(255, InteractionModelRevision);
             writer.EndContainer();
         }
     }

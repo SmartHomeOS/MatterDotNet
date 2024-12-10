@@ -16,42 +16,53 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.InteractionModel
 {
-    public class Sigma3Tbsdata : TLVPayload
+    public class EventPathIB : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma3Tbsdata() {}
+        public EventPathIB() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma3Tbsdata(Memory<byte> data) : this(new TLVReader(data)) {}
+        public EventPathIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] InitiatorNOC { get; set; } 
-        public byte[]? InitiatorICAC { get; set; } 
-        public required byte[] InitiatorEphPubKey { get; set; } 
-        public required byte[] ResponderEphPubKey { get; set; } 
+        public ulong? Node { get; set; } 
+        public ushort? Endpoint { get; set; } 
+        public uint? Cluster { get; set; } 
+        public uint? Event { get; set; } 
+        public bool? IsUrgent { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma3Tbsdata(TLVReader reader, uint structNumber = 0) {
+        public EventPathIB(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            InitiatorNOC = reader.GetBytes(1)!;
+            if (reader.IsTag(0))
+                Node = reader.GetULong(0);
+            if (reader.IsTag(1))
+                Endpoint = reader.GetUShort(1);
             if (reader.IsTag(2))
-                InitiatorICAC = reader.GetBytes(2);
-            InitiatorEphPubKey = reader.GetBytes(3)!;
-            ResponderEphPubKey = reader.GetBytes(4)!;
+                Cluster = reader.GetUInt(2);
+            if (reader.IsTag(3))
+                Event = reader.GetUInt(3);
+            if (reader.IsTag(4))
+                IsUrgent = reader.GetBool(4);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorNOC, 0);
-            if (InitiatorICAC != null)
-                writer.WriteBytes(2, InitiatorICAC, 0);
-            writer.WriteBytes(3, InitiatorEphPubKey, 1);
-            writer.WriteBytes(4, ResponderEphPubKey, 1);
+            if (Node != null)
+                writer.WriteULong(0, Node);
+            if (Endpoint != null)
+                writer.WriteUShort(1, Endpoint);
+            if (Cluster != null)
+                writer.WriteUInt(2, Cluster);
+            if (Event != null)
+                writer.WriteUInt(3, Event);
+            if (IsUrgent != null)
+                writer.WriteBool(4, IsUrgent);
             writer.EndContainer();
         }
     }

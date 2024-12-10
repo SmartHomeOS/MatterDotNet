@@ -16,7 +16,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.UserDirectedCommissioning
 {
     public class CommissionerDeclaration : TLVPayload
     {

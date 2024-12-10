@@ -13,29 +13,19 @@
 using MatterDotNet.Protocol.Payloads;
 using System.Buffers.Binary;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.MCSP
 {
-    public class MessageCounterSyncResponse : IPayload
+    public class MessageCounterSyncRequest : IPayload
     {
-        public uint SynchronizedCounter { get; set; }
-        public ulong Response {  get; set; }
+        public ulong Challenge {  get; set; }
 
-        public MessageCounterSyncResponse(uint synchronizedCounter, ulong response)
+        public MessageCounterSyncRequest(Memory<byte> payload)
         {
-            SynchronizedCounter = synchronizedCounter;
-            Response = response;
+            Challenge = BinaryPrimitives.ReadUInt64LittleEndian(payload.Span);
         }
-
-        public MessageCounterSyncResponse(Memory<byte> payload)
+        public void Serialize(PayloadWriter stream)
         {
-            SynchronizedCounter = BinaryPrimitives.ReadUInt32LittleEndian(payload.Span);
-            Response = BinaryPrimitives.ReadUInt64LittleEndian(payload.Span.Slice(4, 8));
-        }
-        public bool Serialize(PayloadWriter stream)
-        {
-            stream.Write(SynchronizedCounter);
-            stream.Write(Response);
-            return true;
+            stream.Write(Challenge);
         }
     }
 }

@@ -12,36 +12,36 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Messages.PASE;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.CASE
 {
-    public class PBKDFParamResp : TLVPayload
+    public class Sigma2 : TLVPayload
     {
         /// <inheritdoc />
-        public PBKDFParamResp() {}
+        public Sigma2() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamResp(Memory<byte> data) : this(new TLVReader(data)) {}
+        public Sigma2(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] InitiatorRandom { get; set; } 
         public required byte[] ResponderRandom { get; set; } 
         public required ushort ResponderSessionId { get; set; } 
-        public Crypto_PBKDFParameterSet? Pbkdf_parameters { get; set; } 
+        public required byte[] ResponderEphPubKey { get; set; } 
+        public required byte[] Encrypted2 { get; set; } 
         public SessionParameter? ResponderSessionParams { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamResp(TLVReader reader, uint structNumber = 0) {
+        public Sigma2(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            InitiatorRandom = reader.GetBytes(1)!;
-            ResponderRandom = reader.GetBytes(2)!;
-            ResponderSessionId = reader.GetUShort(3)!.Value;
-            if (reader.IsTag(4))
-                Pbkdf_parameters = new Crypto_PBKDFParameterSet(reader, 4);
+            ResponderRandom = reader.GetBytes(1)!;
+            ResponderSessionId = reader.GetUShort(2)!.Value;
+            ResponderEphPubKey = reader.GetBytes(3)!;
+            Encrypted2 = reader.GetBytes(4)!;
             if (reader.IsTag(5))
                 ResponderSessionParams = new SessionParameter(reader, 5);
             reader.EndContainer();
@@ -50,11 +50,10 @@ namespace MatterDotNet.Messages
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom, 1);
-            writer.WriteBytes(2, ResponderRandom, 1);
-            writer.WriteUShort(3, ResponderSessionId);
-            if (Pbkdf_parameters != null)
-                Pbkdf_parameters.Serialize(writer, 4);
+            writer.WriteBytes(1, ResponderRandom, 1);
+            writer.WriteUShort(2, ResponderSessionId);
+            writer.WriteBytes(3, ResponderEphPubKey, 1);
+            writer.WriteBytes(4, Encrypted2, 0);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 5);
             writer.EndContainer();

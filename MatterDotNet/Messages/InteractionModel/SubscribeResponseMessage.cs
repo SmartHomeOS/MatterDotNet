@@ -16,42 +16,37 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.InteractionModel
 {
-    public class Sigma2Tbedata : TLVPayload
+    public class SubscribeResponseMessage : TLVPayload
     {
         /// <inheritdoc />
-        public Sigma2Tbedata() {}
+        public SubscribeResponseMessage() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Tbedata(Memory<byte> data) : this(new TLVReader(data)) {}
+        public SubscribeResponseMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResponderNOC { get; set; } 
-        public byte[]? ResponderICAC { get; set; } 
-        public required byte[] Signature { get; set; } 
-        public required byte[] ResumptionID { get; set; } 
+        public required uint SubscriptionID { get; set; } 
+        public required ushort MaxInterval { get; set; } 
+        public required byte InteractionModelRevision { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Tbedata(TLVReader reader, uint structNumber = 0) {
+        public SubscribeResponseMessage(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            ResponderNOC = reader.GetBytes(1)!;
-            if (reader.IsTag(2))
-                ResponderICAC = reader.GetBytes(2);
-            Signature = reader.GetBytes(3)!;
-            ResumptionID = reader.GetBytes(4)!;
+            SubscriptionID = reader.GetUInt(0)!.Value;
+            MaxInterval = reader.GetUShort(2)!.Value;
+            InteractionModelRevision = reader.GetByte(255)!.Value;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderNOC, 0);
-            if (ResponderICAC != null)
-                writer.WriteBytes(2, ResponderICAC, 0);
-            writer.WriteBytes(3, Signature, 1);
-            writer.WriteBytes(4, ResumptionID, 1);
+            writer.WriteUInt(0, SubscriptionID);
+            writer.WriteUShort(2, MaxInterval);
+            writer.WriteByte(255, InteractionModelRevision);
             writer.EndContainer();
         }
     }

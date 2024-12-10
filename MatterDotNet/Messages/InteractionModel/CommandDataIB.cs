@@ -16,34 +16,39 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Messages
+namespace MatterDotNet.Messages.InteractionModel
 {
-    public class Crypto_PBKDFParameterSet : TLVPayload
+    public class CommandDataIB : TLVPayload
     {
         /// <inheritdoc />
-        public Crypto_PBKDFParameterSet() {}
+        public CommandDataIB() {}
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Crypto_PBKDFParameterSet(Memory<byte> data) : this(new TLVReader(data)) {}
+        public CommandDataIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required uint Iterations { get; set; } 
-        public required byte[] Salt { get; set; } 
+        public required CommandPathIB CommandPath { get; set; } 
+        public object? CommandFields { get; set; } 
+        public ushort? CommandRef { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Crypto_PBKDFParameterSet(TLVReader reader, uint structNumber = 0) {
+        public CommandDataIB(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            Iterations = reader.GetUInt(1)!.Value;
-            Salt = reader.GetBytes(2)!;
+            CommandPath = new CommandPathIB(reader, 0);
+            if (reader.IsTag(1))
+            if (reader.IsTag(2))
+                CommandRef = reader.GetUShort(2);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteUInt(1, Iterations);
-            writer.WriteBytes(2, Salt, 1);
+            CommandPath.Serialize(writer, 0);
+            if (CommandFields != null)
+            if (CommandRef != null)
+                writer.WriteUShort(2, CommandRef);
             writer.EndContainer();
         }
     }

@@ -60,7 +60,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    reader.StartArray({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    List<{GetEnumerationType(child)}> items = new();");
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
-                        writer.WriteLine($"{totalIndent}        items.Add({GetReader(GetEnumerationType(child))});");
+                        writer.WriteLine($"{totalIndent}        items.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}    {child.Name} = items.ToArray();");
                         writer.WriteLine($"{totalIndent}}}");
@@ -70,7 +70,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    reader.StartList({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    {child.Name} = new();");
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
-                        writer.WriteLine($"{totalIndent}        {child.Name}.Add({GetReader(GetEnumerationType(child))});");
+                        writer.WriteLine($"{totalIndent}        {child.Name}.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}}}");
                         break;
@@ -133,7 +133,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}{{");
                         writer.WriteLine($"{totalIndent}    writer.StartArray({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    foreach (var item in {child.Name}) {{");
-                        writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child))};");
+                        writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child), GetEnumerationIndex(child))};");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}    writer.EndContainer();");
                         writer.WriteLine($"{totalIndent}}}");
@@ -142,7 +142,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}{{");
                         writer.WriteLine($"{totalIndent}    writer.StartList({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    foreach (var item in {child.Name}) {{");
-                        writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child))};");
+                        writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child), GetEnumerationIndex(child))};");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}    writer.EndContainer();");
                         writer.WriteLine($"{totalIndent}}}");
@@ -192,49 +192,49 @@ namespace Generator
             writer.WriteLine($"{indent}}}");
         }
 
-        private static object GetWriter(string? referenceName)
+        private static object GetWriter(string? referenceName, string tagNumber)
         {
             switch (referenceName)
             {
                 case "bool":
-                    return "writer.WriteBool(0, item)";
+                    return $"writer.WriteBool({tagNumber}, item)";
                 case "byte[]":
-                    return "writer.WriteBytes(0, item)";
+                    return $"writer.WriteBytes({tagNumber}, item)";
                 case "float":
-                    return "writer.WriteFloat(0, item)";
+                    return $"writer.WriteFloat({tagNumber}, item)";
                 case "double":
-                    return "writer.WriteDouble(0, item)";
+                    return $"writer.WriteDouble({tagNumber}, item)";
                 case "int":
-                    return "writer.WriteInt(0, item)";
+                    return $"writer.WriteInt({tagNumber}, item)";
                 case "string":
-                    return "writer.WriteString(0, item)";
+                    return $"writer.WriteString({tagNumber}, item)";
                 case "uint":
-                    return "writer.WriteUInt(0, item)";
+                    return $"writer.WriteUInt({tagNumber}, item)";
                 default:
-                    return $"item.Serialize(writer, 0)";
+                    return $"item.Serialize(writer, {tagNumber})";
             }
         }
 
-        private static object GetReader(string? referenceName)
+        private static object GetReader(string? referenceName, string tagNumber)
         {
             switch (referenceName)
             {
                 case "bool":
-                    return "reader.GetBool(0)";
+                    return $"reader.GetBool({tagNumber})";
                 case "byte[]":
-                    return "reader.GetBytes(0)";
+                    return $"reader.GetBytes({tagNumber})";
                 case "float":
-                    return "reader.GetFloat(0)";
+                    return $"reader.GetFloat({tagNumber})";
                 case "double":
-                    return "reader.GetDouble(0)";
+                    return $"reader.GetDouble({tagNumber})";
                 case "int":
-                    return "reader.GetInt(0)";
+                    return $"reader.GetInt({tagNumber})";
                 case "string":
-                    return "reader.GetString(0)";
+                    return $"reader.GetString({tagNumber})";
                 case "uint":
-                    return "reader.GetUInt(0)";
+                    return $"reader.GetUInt({tagNumber})";
                 default:
-                    return $"new {referenceName}(reader, 0)";
+                    return $"new {referenceName}(reader, {tagNumber})";
             }
         }
 
@@ -306,6 +306,13 @@ namespace Generator
             if (tag.Children.Count == 0)
                 return tag.ReferenceName ?? "object";
             return tag.Children[0].Name!;
+        }
+
+        private static string GetEnumerationIndex(Tag tag)
+        {
+            if (tag.Children.Count == 0)
+                return "0";
+            return tag.Children[0].TagNumber.ToString();
         }
     }
 }

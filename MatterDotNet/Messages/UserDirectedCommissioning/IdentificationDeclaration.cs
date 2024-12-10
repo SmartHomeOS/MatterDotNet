@@ -100,7 +100,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
                 reader.StartArray(9);
                 List<TargetApp> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new TargetApp(reader, 0));
+                    items.Add(new TargetApp(reader, 10));
                 }
                 TargetAppList = items.ToArray();
             }
@@ -140,7 +140,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             {
                 writer.StartArray(9);
                 foreach (var item in TargetAppList) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, 10);
                 }
                 writer.EndContainer();
             }

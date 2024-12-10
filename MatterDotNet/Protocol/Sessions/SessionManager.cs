@@ -88,7 +88,7 @@ namespace MatterDotNet.Protocol.Sessions
         {
             if (connections.TryGetValue(endPoint, out IConnection? connection))
                 return connection;
-            IConnection con = new MRPConnetion(endPoint);
+            IConnection con = new MRPConnection(endPoint);
             connections.TryAdd(endPoint, con);
             return con;
         }

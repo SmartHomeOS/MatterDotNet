@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Flags;
 
 namespace MatterDotNet.Protocol.Sessions
 {

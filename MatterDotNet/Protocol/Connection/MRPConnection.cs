@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Sessions;
 using System.Collections.Concurrent;
@@ -20,7 +21,7 @@ using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
 {
-    public class MRPConnetion : IConnection
+    public class MRPConnection : IConnection
     {
         public int RetryInterval { get; set; } = 500;
 
@@ -38,7 +39,7 @@ namespace MatterDotNet.Protocol.Connection
 
         UdpClient client;
 
-        public MRPConnetion(IPEndPoint ep)
+        public MRPConnection(IPEndPoint ep)
         {
             client = new UdpClient(AddressFamily.InterNetwork);
             client.Connect(ep);

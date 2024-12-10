@@ -14,6 +14,7 @@ using MatterDotNet.Messages.CASE;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Messages.MCSP;
 using MatterDotNet.Messages.PASE;
+using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using System.Buffers.Binary;
 

@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Protocol.Cryptography;
+using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Sessions;
 using System.Buffers;
 using System.Buffers.Binary;

@@ -12,6 +12,7 @@
 
 using MatterDotNet.Messages.PASE;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;

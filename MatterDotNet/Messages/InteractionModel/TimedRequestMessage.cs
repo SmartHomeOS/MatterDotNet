@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class TimedRequestMessage : TLVPayload
+    public record TimedRequestMessage : TLVPayload
     {
         /// <inheritdoc />
         public TimedRequestMessage() {}

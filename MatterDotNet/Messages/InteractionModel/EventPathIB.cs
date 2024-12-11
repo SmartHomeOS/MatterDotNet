@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class EventPathIB : TLVPayload
+    public record EventPathIB : TLVPayload
     {
         /// <inheritdoc />
         public EventPathIB() {}
@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.InteractionModel
         /// <inheritdoc />
         [SetsRequiredMembers]
         public EventPathIB(TLVReader reader, uint structNumber = 0) {
-            reader.StartStructure(structNumber);
+            reader.StartList();
             if (reader.IsTag(0))
                 Node = reader.GetULong(0);
             if (reader.IsTag(1))
@@ -52,7 +52,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
-            writer.StartStructure(structNumber);
+            writer.StartList();
             if (Node != null)
                 writer.WriteULong(0, Node);
             if (Endpoint != null)

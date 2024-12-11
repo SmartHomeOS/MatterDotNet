@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class AttributePathIB : TLVPayload
+    public record AttributePathIB : TLVPayload
     {
         /// <inheritdoc />
         public AttributePathIB() {}
@@ -38,7 +38,7 @@ namespace MatterDotNet.Messages.InteractionModel
         /// <inheritdoc />
         [SetsRequiredMembers]
         public AttributePathIB(TLVReader reader, uint structNumber = 0) {
-            reader.StartStructure(structNumber);
+            reader.StartList();
             if (reader.IsTag(0))
                 EnableTagCompression = reader.GetBool(0);
             if (reader.IsTag(1))
@@ -58,7 +58,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
-            writer.StartStructure(structNumber);
+            writer.StartList();
             if (EnableTagCompression != null)
                 writer.WriteBool(0, EnableTagCompression);
             if (Node != null)

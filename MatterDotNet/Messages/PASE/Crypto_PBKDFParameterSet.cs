@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.PASE
 {
-    public class Crypto_PBKDFParameterSet : TLVPayload
+    public record Crypto_PBKDFParameterSet : TLVPayload
     {
         /// <inheritdoc />
         public Crypto_PBKDFParameterSet() {}

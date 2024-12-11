@@ -30,7 +30,7 @@ namespace Generator
 
         private static void WriteTag(string indent, Tag tag, StreamWriter writer)
         {
-            writer.Write($"{indent}public class {tag.Name}");
+            writer.Write($"{indent}public record {tag.Name}");
             writer.WriteLine($" : TLVPayload\n{indent}{{\n{indent}    /// <inheritdoc />\n{indent}    public {tag.Name}() {{}}\n\n{indent}    /// <inheritdoc />\n{indent}    [SetsRequiredMembers]\n{indent}    public {tag.Name}(Memory<byte> data) : this(new TLVReader(data)) {{}}\n");
             foreach (Tag child in tag.Children)
             {
@@ -43,7 +43,10 @@ namespace Generator
                     writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
             }
             writer.WriteLine($"\n{indent}    /// <inheritdoc />\n{indent}    [SetsRequiredMembers]\n{indent}    public {tag.Name}(TLVReader reader, uint structNumber = 0) {{");
-            writer.WriteLine($"{indent}        reader.StartStructure(structNumber);");
+            if (tag.Type == DataType.List)
+                writer.WriteLine($"{indent}        reader.StartList();");
+            else
+                writer.WriteLine($"{indent}        reader.StartStructure(structNumber);");
             foreach (Tag child in tag.Children)
             {
                 string totalIndent = $"{indent}        ";
@@ -62,6 +65,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
                         writer.WriteLine($"{totalIndent}        items.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
+                        writer.WriteLine($"{totalIndent}    reader.EndContainer();");
                         writer.WriteLine($"{totalIndent}    {child.Name} = items.ToArray();");
                         writer.WriteLine($"{totalIndent}}}");
                         break;
@@ -72,6 +76,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
                         writer.WriteLine($"{totalIndent}        {child.Name}.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
+                        writer.WriteLine($"{totalIndent}    reader.EndContainer();");
                         writer.WriteLine($"{totalIndent}}}");
                         break;
                     case DataType.Boolean:
@@ -117,7 +122,10 @@ namespace Generator
             }
             writer.WriteLine($"{indent}        reader.EndContainer();");
             writer.WriteLine($"{indent}    }}\n\n{indent}    /// <inheritdoc />\n{indent}    public override void Serialize(TLVWriter writer, uint structNumber = 0) {{");
-            writer.WriteLine($"{indent}        writer.StartStructure(structNumber);");
+            if (tag.Type == DataType.List)
+                writer.WriteLine($"{indent}        writer.StartList();");
+            else
+                writer.WriteLine($"{indent}        writer.StartStructure(structNumber);");
             foreach (Tag child in tag.Children)
             {
                 string totalIndent = $"{indent}        ";

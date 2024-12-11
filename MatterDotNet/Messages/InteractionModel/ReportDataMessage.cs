@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class ReportDataMessage : TLVPayload
+    public record ReportDataMessage : TLVPayload
     {
         /// <inheritdoc />
         public ReportDataMessage() {}
@@ -30,7 +30,7 @@ namespace MatterDotNet.Messages.InteractionModel
         public ulong? SubscriptionID { get; set; } 
         public AttributeReportIB[]? AttributeReports { get; set; } 
         public EventReportIB[]? EventReports { get; set; } 
-        public required bool MoreChunkedMessages { get; set; } 
+        public bool? MoreChunkedMessages { get; set; } 
         public bool? SuppressResponse { get; set; } 
         public required byte InteractionModelRevision { get; set; } 
 
@@ -47,6 +47,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new AttributeReportIB(reader, 0));
                 }
+                reader.EndContainer();
                 AttributeReports = items.ToArray();
             }
             if (reader.IsTag(2))
@@ -56,9 +57,11 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new EventReportIB(reader, 0));
                 }
+                reader.EndContainer();
                 EventReports = items.ToArray();
             }
-            MoreChunkedMessages = reader.GetBool(3)!.Value;
+            if (reader.IsTag(3))
+                MoreChunkedMessages = reader.GetBool(3);
             if (reader.IsTag(4))
                 SuppressResponse = reader.GetBool(4);
             InteractionModelRevision = reader.GetByte(255)!.Value;
@@ -86,7 +89,8 @@ namespace MatterDotNet.Messages.InteractionModel
                 }
                 writer.EndContainer();
             }
-            writer.WriteBool(3, MoreChunkedMessages);
+            if (MoreChunkedMessages != null)
+                writer.WriteBool(3, MoreChunkedMessages);
             if (SuppressResponse != null)
                 writer.WriteBool(4, SuppressResponse);
             writer.WriteByte(255, InteractionModelRevision);

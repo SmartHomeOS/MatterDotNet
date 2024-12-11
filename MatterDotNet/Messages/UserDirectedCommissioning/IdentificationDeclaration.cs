@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.UserDirectedCommissioning
 {
-    public class IdentificationDeclaration : TLVPayload
+    public record IdentificationDeclaration : TLVPayload
     {
         /// <inheritdoc />
         public IdentificationDeclaration() {}
@@ -27,7 +27,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         [SetsRequiredMembers]
         public IdentificationDeclaration(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public class TargetApp : TLVPayload
+        public record TargetApp : TLVPayload
         {
             /// <inheritdoc />
             public TargetApp() {}

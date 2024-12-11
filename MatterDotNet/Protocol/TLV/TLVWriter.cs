@@ -33,18 +33,17 @@ namespace MatterDotNet.Protocol.Parsers
 
         public void StartArray(uint tagNumber)
         {
-            if (tagNumber == 0)
-                WriteTag(TLVControl.Anonymous, ElementType.Array);
-            else
-                WriteTag(tagNumber, ElementType.Array);
+            WriteTag(tagNumber, ElementType.Array);
+        }
+
+        public void StartList()
+        {
+            WriteTag(TLVControl.Anonymous, ElementType.List);
         }
 
         public void StartList(uint tagNumber)
         {
-            if (tagNumber == 0)
-                WriteTag(TLVControl.Anonymous, ElementType.List);
-            else
-                WriteTag(tagNumber, ElementType.List);
+            WriteTag(tagNumber, ElementType.List);
         }
 
         public void EndContainer()

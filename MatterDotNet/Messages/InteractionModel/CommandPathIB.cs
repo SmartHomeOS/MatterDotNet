@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class CommandPathIB : TLVPayload
+    public record CommandPathIB : TLVPayload
     {
         /// <inheritdoc />
         public CommandPathIB() {}
@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.InteractionModel
         /// <inheritdoc />
         [SetsRequiredMembers]
         public CommandPathIB(TLVReader reader, uint structNumber = 0) {
-            reader.StartStructure(structNumber);
+            reader.StartList();
             Endpoint = reader.GetUShort(0)!.Value;
             Cluster = reader.GetUInt(1)!.Value;
             Command = reader.GetUInt(2)!.Value;
@@ -43,7 +43,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
-            writer.StartStructure(structNumber);
+            writer.StartList();
             writer.WriteUShort(0, Endpoint);
             writer.WriteUInt(1, Cluster);
             writer.WriteUInt(2, Command);

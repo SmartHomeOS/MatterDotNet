@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class DataVersionFilterIB : TLVPayload
+    public record DataVersionFilterIB : TLVPayload
     {
         /// <inheritdoc />
         public DataVersionFilterIB() {}

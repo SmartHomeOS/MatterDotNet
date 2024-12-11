@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class WriteRequestMessage : TLVPayload
+    public record WriteRequestMessage : TLVPayload
     {
         /// <inheritdoc />
         public WriteRequestMessage() {}
@@ -46,6 +46,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new AttributeDataIB(reader, 0));
                 }
+                reader.EndContainer();
                 WriteRequests = items.ToArray();
             }
             if (reader.IsTag(3))

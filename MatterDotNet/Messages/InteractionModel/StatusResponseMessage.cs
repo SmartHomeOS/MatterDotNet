@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class StatusResponseMessage : TLVPayload
+    public record StatusResponseMessage : TLVPayload
     {
         /// <inheritdoc />
         public StatusResponseMessage() {}
@@ -45,11 +45,6 @@ namespace MatterDotNet.Messages.InteractionModel
             writer.WriteByte(0, Status);
             writer.WriteByte(255, InteractionModelRevision);
             writer.EndContainer();
-        }
-
-        public override string ToString()
-        {
-            return "Interaction Status: " + Status;
         }
     }
 }

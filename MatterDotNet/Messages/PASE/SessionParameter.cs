@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.PASE
 {
-    public class SessionParameter : TLVPayload
+    public record SessionParameter : TLVPayload
     {
         /// <inheritdoc />
         public SessionParameter() {}

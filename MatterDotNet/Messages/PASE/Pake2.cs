@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.PASE
 {
-    public class Pake2 : TLVPayload
+    public record Pake2 : TLVPayload
     {
         /// <inheritdoc />
         public Pake2() {}

@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class WriteResponseMessage : TLVPayload
+    public record WriteResponseMessage : TLVPayload
     {
         /// <inheritdoc />
         public WriteResponseMessage() {}
@@ -40,6 +40,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new AttributeStatusIB(reader, 0));
                 }
+                reader.EndContainer();
                 WriteResponses = items.ToArray();
             }
             InteractionModelRevision = reader.GetByte(255)!.Value;

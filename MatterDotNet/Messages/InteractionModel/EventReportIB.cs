@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class EventReportIB : TLVPayload
+    public record EventReportIB : TLVPayload
     {
         /// <inheritdoc />
         public EventReportIB() {}

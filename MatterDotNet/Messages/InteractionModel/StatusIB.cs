@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class StatusIB : TLVPayload
+    public record StatusIB : TLVPayload
     {
         /// <inheritdoc />
         public StatusIB() {}
@@ -28,14 +28,15 @@ namespace MatterDotNet.Messages.InteractionModel
         public StatusIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
         public required byte Status { get; set; } 
-        public required byte ClusterStatus { get; set; } 
+        public byte? ClusterStatus { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
         public StatusIB(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
             Status = reader.GetByte(0)!.Value;
-            ClusterStatus = reader.GetByte(1)!.Value;
+            if (reader.IsTag(1))
+                ClusterStatus = reader.GetByte(1);
             reader.EndContainer();
         }
 
@@ -43,7 +44,8 @@ namespace MatterDotNet.Messages.InteractionModel
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
             writer.WriteByte(0, Status);
-            writer.WriteByte(1, ClusterStatus);
+            if (ClusterStatus != null)
+                writer.WriteByte(1, ClusterStatus);
             writer.EndContainer();
         }
     }

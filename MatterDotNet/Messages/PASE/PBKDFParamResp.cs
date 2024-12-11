@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.PASE
 {
-    public class PBKDFParamResp : TLVPayload
+    public record PBKDFParamResp : TLVPayload
     {
         /// <inheritdoc />
         public PBKDFParamResp() {}

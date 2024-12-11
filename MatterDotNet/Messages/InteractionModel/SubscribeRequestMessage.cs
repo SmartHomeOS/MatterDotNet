@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class SubscribeRequestMessage : TLVPayload
+    public record SubscribeRequestMessage : TLVPayload
     {
         /// <inheritdoc />
         public SubscribeRequestMessage() {}
@@ -51,6 +51,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new AttributePathIB(reader, 0));
                 }
+                reader.EndContainer();
                 AttributeRequests = items.ToArray();
             }
             if (reader.IsTag(4))
@@ -60,6 +61,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new EventPathIB(reader, 0));
                 }
+                reader.EndContainer();
                 EventRequests = items.ToArray();
             }
             if (reader.IsTag(5))
@@ -69,6 +71,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new EventFilterIB(reader, 0));
                 }
+                reader.EndContainer();
                 EventFilters = items.ToArray();
             }
             FabricFiltered = reader.GetBool(7)!.Value;
@@ -78,6 +81,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new DataVersionFilterIB(reader, 0));
                 }
+                reader.EndContainer();
                 DataVersionFilters = items.ToArray();
             }
             InteractionModelRevision = reader.GetByte(255)!.Value;

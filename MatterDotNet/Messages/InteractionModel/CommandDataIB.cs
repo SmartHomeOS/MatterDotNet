@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class CommandDataIB : TLVPayload
+    public record CommandDataIB : TLVPayload
     {
         /// <inheritdoc />
         public CommandDataIB() {}

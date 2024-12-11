@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class ClusterPathIB : TLVPayload
+    public record ClusterPathIB : TLVPayload
     {
         /// <inheritdoc />
         public ClusterPathIB() {}
@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.InteractionModel
         /// <inheritdoc />
         [SetsRequiredMembers]
         public ClusterPathIB(TLVReader reader, uint structNumber = 0) {
-            reader.StartStructure(structNumber);
+            reader.StartList();
             if (reader.IsTag(0))
                 Node = reader.GetULong(0);
             if (reader.IsTag(1))
@@ -46,7 +46,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
-            writer.StartStructure(structNumber);
+            writer.StartList();
             if (Node != null)
                 writer.WriteULong(0, Node);
             if (Endpoint != null)

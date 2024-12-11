@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class InvokeResponseMessage : TLVPayload
+    public record InvokeResponseMessage : TLVPayload
     {
         /// <inheritdoc />
         public InvokeResponseMessage() {}
@@ -29,7 +29,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         public required bool SuppressResponse { get; set; } 
         public required InvokeResponseIB[] InvokeResponses { get; set; } 
-        public required bool MoreChunkedMessages { get; set; } 
+        public bool? MoreChunkedMessages { get; set; } 
         public required byte InteractionModelRevision { get; set; } 
 
         /// <inheritdoc />
@@ -43,9 +43,11 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new InvokeResponseIB(reader, 0));
                 }
+                reader.EndContainer();
                 InvokeResponses = items.ToArray();
             }
-            MoreChunkedMessages = reader.GetBool(2)!.Value;
+            if (reader.IsTag(2))
+                MoreChunkedMessages = reader.GetBool(2);
             InteractionModelRevision = reader.GetByte(255)!.Value;
             reader.EndContainer();
         }
@@ -61,7 +63,8 @@ namespace MatterDotNet.Messages.InteractionModel
                 }
                 writer.EndContainer();
             }
-            writer.WriteBool(2, MoreChunkedMessages);
+            if (MoreChunkedMessages != null)
+                writer.WriteBool(2, MoreChunkedMessages);
             writer.WriteByte(255, InteractionModelRevision);
             writer.EndContainer();
         }

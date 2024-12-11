@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class SubscribeResponseMessage : TLVPayload
+    public record SubscribeResponseMessage : TLVPayload
     {
         /// <inheritdoc />
         public SubscribeResponseMessage() {}

@@ -17,7 +17,7 @@ namespace MatterDotNet.Protocol.Payloads
     /// <summary>
     /// An application payload
     /// </summary>
-    public abstract class TLVPayload : IPayload
+    public abstract record TLVPayload : IPayload
     {
         /// <summary>
         /// An empty application payload

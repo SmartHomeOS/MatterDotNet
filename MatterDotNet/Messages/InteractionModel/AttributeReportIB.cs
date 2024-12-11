@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class AttributeReportIB : TLVPayload
+    public record AttributeReportIB : TLVPayload
     {
         /// <inheritdoc />
         public AttributeReportIB() {}
@@ -27,23 +27,27 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public AttributeReportIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required AttributeStatusIB AttributeStatus { get; set; } 
-        public required AttributeDataIB AttributeData { get; set; } 
+        public AttributeStatusIB? AttributeStatus { get; set; } 
+        public AttributeDataIB? AttributeData { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
         public AttributeReportIB(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
-            AttributeStatus = new AttributeStatusIB(reader, 0);
-            AttributeData = new AttributeDataIB(reader, 1);
+            if (reader.IsTag(0))
+                AttributeStatus = new AttributeStatusIB(reader, 0);
+            if (reader.IsTag(1))
+                AttributeData = new AttributeDataIB(reader, 1);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            AttributeStatus.Serialize(writer, 0);
-            AttributeData.Serialize(writer, 1);
+            if (AttributeStatus != null)
+                AttributeStatus.Serialize(writer, 0);
+            if (AttributeData != null)
+                AttributeData.Serialize(writer, 1);
             writer.EndContainer();
         }
     }

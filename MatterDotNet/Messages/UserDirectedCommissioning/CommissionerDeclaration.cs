@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.UserDirectedCommissioning
 {
-    public class CommissionerDeclaration : TLVPayload
+    public record CommissionerDeclaration : TLVPayload
     {
         /// <inheritdoc />
         public CommissionerDeclaration() {}

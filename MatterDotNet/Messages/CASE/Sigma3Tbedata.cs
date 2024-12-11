@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.CASE
 {
-    public class Sigma3Tbedata : TLVPayload
+    public record Sigma3Tbedata : TLVPayload
     {
         /// <inheritdoc />
         public Sigma3Tbedata() {}

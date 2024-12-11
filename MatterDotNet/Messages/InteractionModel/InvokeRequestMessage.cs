@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
-    public class InvokeRequestMessage : TLVPayload
+    public record InvokeRequestMessage : TLVPayload
     {
         /// <inheritdoc />
         public InvokeRequestMessage() {}
@@ -44,6 +44,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 while (!reader.IsEndContainer()) {
                     items.Add(new CommandDataIB(reader, 0));
                 }
+                reader.EndContainer();
                 InvokeRequests = items.ToArray();
             }
             InteractionModelRevision = reader.GetByte(255)!.Value;

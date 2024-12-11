@@ -55,7 +55,7 @@ namespace MatterDotNet.Protocol.Sessions
 
         public static SessionContext? GetSession(ushort sessionId)
         {
-            if (sessions.TryGetValue(sessionId, out SessionContext ctx))
+            if (sessions.TryGetValue(sessionId, out SessionContext? ctx))
                 return ctx;
             return null;
         }

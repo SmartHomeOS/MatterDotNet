@@ -62,11 +62,11 @@ namespace MatterDotNet.Protocol.Sessions
 
         public void Dispose()
         {
-            SessionManager.RemoveSession(LocalSessionID);
             Console.WriteLine("Closing Session " + LocalSessionID);
             var keys = exchanges.Keys;
             foreach (var key in keys)
                 exchanges[key].Dispose();
+            SessionManager.RemoveSession(LocalSessionID);
             GC.SuppressFinalize(this);
         }
     }

@@ -63,7 +63,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    reader.StartArray({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    List<{GetEnumerationType(child)}> items = new();");
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
-                        writer.WriteLine($"{totalIndent}        items.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
+                        writer.WriteLine($"{totalIndent}        items.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child), GetEnumerationNullable(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}    reader.EndContainer();");
                         writer.WriteLine($"{totalIndent}    {child.Name} = items.ToArray();");
@@ -74,7 +74,7 @@ namespace Generator
                         writer.WriteLine($"{totalIndent}    reader.StartList({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    {child.Name} = new();");
                         writer.WriteLine($"{totalIndent}    while (!reader.IsEndContainer()) {{");
-                        writer.WriteLine($"{totalIndent}        {child.Name}.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child))});");
+                        writer.WriteLine($"{totalIndent}        {child.Name}.Add({GetReader(GetEnumerationType(child), GetEnumerationIndex(child), GetEnumerationNullable(child))});");
                         writer.WriteLine($"{totalIndent}    }}");
                         writer.WriteLine($"{totalIndent}    reader.EndContainer();");
                         writer.WriteLine($"{totalIndent}}}");
@@ -232,24 +232,24 @@ namespace Generator
             }
         }
 
-        private static object GetReader(string? referenceName, string tagNumber)
+        private static object GetReader(string? referenceName, string tagNumber, bool nullAllowed)
         {
             switch (referenceName)
             {
                 case "bool":
-                    return $"reader.GetBool({tagNumber})";
+                    return $"reader.GetBool({tagNumber}){(nullAllowed ? "" : "!.Value")}";
                 case "byte[]":
-                    return $"reader.GetBytes({tagNumber})";
+                    return $"reader.GetBytes({tagNumber}){(nullAllowed ? "" : "!")}";
                 case "float":
-                    return $"reader.GetFloat({tagNumber})";
+                    return $"reader.GetFloat({tagNumber}){(nullAllowed ? "" : "!.Value")}";
                 case "double":
-                    return $"reader.GetDouble({tagNumber})";
+                    return $"reader.GetDouble({tagNumber}){(nullAllowed ? "" : "!.Value")}";
                 case "int":
-                    return $"reader.GetInt({tagNumber})";
+                    return $"reader.GetInt({tagNumber}){(nullAllowed ? "" : "!.Value")}";
                 case "string":
-                    return $"reader.GetString({tagNumber})";
+                    return $"reader.GetString({tagNumber}){(nullAllowed ? "" : "!")}";
                 case "uint":
-                    return $"reader.GetUInt({tagNumber})";
+                    return $"reader.GetUInt({tagNumber}){(nullAllowed ? "" : "!.Value")}";
                 default:
                     return $"new {referenceName}(reader, {tagNumber})";
             }
@@ -316,6 +316,13 @@ namespace Generator
                 default:
                     throw new InvalidDataException("Unsupported type " + tag.Type);
             }
+        }
+
+        private static bool GetEnumerationNullable(Tag tag)
+        {
+            if (tag.Children.Count == 0)
+                return tag.Nullable;
+            return tag.Children[0].Nullable!;
         }
 
         private static string GetEnumerationType(Tag tag)

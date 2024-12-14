@@ -56,7 +56,10 @@ namespace MatterDotNet.Protocol.Sessions
                 exchangeId = (ushort)Random.Shared.Next(1, ushort.MaxValue);
             }
             while (exchanges.ContainsKey(exchangeId));
-            return new Exchange(this, exchangeId);
+            Exchange ret = new Exchange(this, exchangeId);
+            if (!exchanges.TryAdd(exchangeId, ret))
+                return CreateExchange(); //Handle rare race condition
+            return ret;
         }
 
         internal async Task DeleteExchange(Exchange exchange)
@@ -68,8 +71,8 @@ namespace MatterDotNet.Protocol.Sessions
         public void Dispose()
         {
             Console.WriteLine("Closing Session " + LocalSessionID);
-            if (this is SecureSession secure && exchanges.Count > 0)
-                exchanges.First().Value.SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.CLOSE_SESSION), (byte)SecureOpCodes.StatusReport), false).Wait();
+            if (this is SecureSession secure)
+                CreateExchange().SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.CLOSE_SESSION), (byte)SecureOpCodes.StatusReport), false).Wait();
             var keys = exchanges.Keys;
             foreach (var key in keys)
                 exchanges[key].Dispose();

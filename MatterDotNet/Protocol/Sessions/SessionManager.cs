@@ -96,13 +96,13 @@ namespace MatterDotNet.Protocol.Sessions
         public static SessionParameter GetDefaultSessionParams()
         {
             SessionParameter param = new SessionParameter();
-            param.SESSION_ACTIVE_THRESHOLD = 4000;
+            param.SessionActiveThreshold = 4000;
             param.SessionActiveInterval = 500;
             param.SessionIdleInterval = 300;
-            param.MAX_PATHS_PER_INVOKE = 1;
-            param.DATA_MODEL_REVISION = 17;
-            param.INTERACTION_MODEL_REVISION = 11;
-            param.SPECIFICATION_VERSION = 0;
+            param.MaxPathsPerInvoke = 1;
+            param.DataModelRevision = 17;
+            param.InteractionModelRevision = 11;
+            param.SpecificationVersion = 0;
             return param;
         }
     }

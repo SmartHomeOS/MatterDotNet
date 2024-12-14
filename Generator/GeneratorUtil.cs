@@ -19,7 +19,7 @@ namespace Generator
         public static string SanitizeName(string name)
         {
             if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
-                return name.Substring(0, name.Length - 6);
+                name = name.Substring(0, name.Length - 6);
             bool cap = true;
             StringBuilder ret = new StringBuilder(name.Length);
             foreach (char c in name)

@@ -51,9 +51,9 @@ namespace MatterDotNet.Protocol.Payloads
 
         public void Serialize(PayloadWriter stream)
         {
-            stream.Write((byte)GeneralCode);
+            stream.Write((ushort)GeneralCode);
             stream.Write(ProtocolVendor);
-            stream.Write((byte)ProtocolID);
+            stream.Write((ushort)ProtocolID);
             stream.Write(ProtocolCode);
         }
     }

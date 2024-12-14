@@ -29,11 +29,11 @@ namespace MatterDotNet.Messages.PASE
 
         public uint? SessionIdleInterval { get; set; } 
         public uint? SessionActiveInterval { get; set; } 
-        public ushort? SESSION_ACTIVE_THRESHOLD { get; set; } 
-        public ushort? DATA_MODEL_REVISION { get; set; } 
-        public ushort? INTERACTION_MODEL_REVISION { get; set; } 
-        public uint? SPECIFICATION_VERSION { get; set; } 
-        public ushort? MAX_PATHS_PER_INVOKE { get; set; } 
+        public ushort? SessionActiveThreshold { get; set; } 
+        public ushort? DataModelRevision { get; set; } 
+        public ushort? InteractionModelRevision { get; set; } 
+        public uint? SpecificationVersion { get; set; } 
+        public ushort? MaxPathsPerInvoke { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
@@ -44,15 +44,15 @@ namespace MatterDotNet.Messages.PASE
             if (reader.IsTag(2))
                 SessionActiveInterval = reader.GetUInt(2);
             if (reader.IsTag(3))
-                SESSION_ACTIVE_THRESHOLD = reader.GetUShort(3);
+                SessionActiveThreshold = reader.GetUShort(3);
             if (reader.IsTag(4))
-                DATA_MODEL_REVISION = reader.GetUShort(4);
+                DataModelRevision = reader.GetUShort(4);
             if (reader.IsTag(5))
-                INTERACTION_MODEL_REVISION = reader.GetUShort(5);
+                InteractionModelRevision = reader.GetUShort(5);
             if (reader.IsTag(6))
-                SPECIFICATION_VERSION = reader.GetUInt(6);
+                SpecificationVersion = reader.GetUInt(6);
             if (reader.IsTag(7))
-                MAX_PATHS_PER_INVOKE = reader.GetUShort(7);
+                MaxPathsPerInvoke = reader.GetUShort(7);
             reader.EndContainer();
         }
 
@@ -63,16 +63,16 @@ namespace MatterDotNet.Messages.PASE
                 writer.WriteUInt(1, SessionIdleInterval);
             if (SessionActiveInterval != null)
                 writer.WriteUInt(2, SessionActiveInterval);
-            if (SESSION_ACTIVE_THRESHOLD != null)
-                writer.WriteUShort(3, SESSION_ACTIVE_THRESHOLD);
-            if (DATA_MODEL_REVISION != null)
-                writer.WriteUShort(4, DATA_MODEL_REVISION);
-            if (INTERACTION_MODEL_REVISION != null)
-                writer.WriteUShort(5, INTERACTION_MODEL_REVISION);
-            if (SPECIFICATION_VERSION != null)
-                writer.WriteUInt(6, SPECIFICATION_VERSION);
-            if (MAX_PATHS_PER_INVOKE != null)
-                writer.WriteUShort(7, MAX_PATHS_PER_INVOKE);
+            if (SessionActiveThreshold != null)
+                writer.WriteUShort(3, SessionActiveThreshold);
+            if (DataModelRevision != null)
+                writer.WriteUShort(4, DataModelRevision);
+            if (InteractionModelRevision != null)
+                writer.WriteUShort(5, InteractionModelRevision);
+            if (SpecificationVersion != null)
+                writer.WriteUInt(6, SpecificationVersion);
+            if (MaxPathsPerInvoke != null)
+                writer.WriteUShort(7, MaxPathsPerInvoke);
             writer.EndContainer();
         }
     }

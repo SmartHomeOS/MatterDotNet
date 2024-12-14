@@ -140,12 +140,14 @@ namespace MatterDotNet.Protocol.Payloads
                 ushort len = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(0, 2));
                 slice = slice.Slice(2 + len);
             }
-            if (session == null)
+            if (SessionID == 0)
             {
                 Message = new Version1Payload(slice);
             }
             else
             {
+                if (session == null)
+                    throw new InvalidDataException("Security context missing for session " + SessionID);
                 Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
                 nonce[0] = (byte)Security;
                 BinaryPrimitives.WriteUInt32LittleEndian(nonce.Slice(1, 4), Counter);

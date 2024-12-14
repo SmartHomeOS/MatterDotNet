@@ -86,10 +86,7 @@ namespace MatterDotNet.Protocol.Connection
                     }
                     double mrpBackoffTime = (RetryInterval * MRP_BACKOFF_MARGIN) * Math.Pow(MRP_BACKOFF_BASE, (Math.Max(0, rt.SendCount - MRP_BACKOFF_THRESHOLD))) * (1.0 + Random.Shared.NextDouble() * MRP_BACKOFF_JITTER);
                     if (await rt.Ack.WaitAsync((int)mrpBackoffTime))
-                    {
-                        Console.WriteLine("RT success");
                         return;
-                    }
                     else
                     {
                         await client.SendAsync(rt.data.GetPayload());
@@ -107,7 +104,7 @@ namespace MatterDotNet.Protocol.Connection
         public async Task SendAck(SessionContext? session, ushort exchange, uint counter, bool initiator)
         {
             Frame ack = new Frame(null, (byte)SecureOpCodes.MRPStandaloneAcknowledgement);
-            ack.SessionID = session.RemoteSessionID;
+            ack.SessionID = session?.RemoteSessionID ?? 0;
             ack.Counter = SessionManager.GlobalUnencryptedCounter;
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
@@ -116,7 +113,7 @@ namespace MatterDotNet.Protocol.Connection
             ack.Message.AckCounter = counter;
             ack.Message.Protocol = Payloads.ProtocolType.SecureChannel;
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
-            ack.Serialize(writer, session);
+            ack.Serialize(writer, session!);
             if (AckTable.TryGetValue(exchange, out uint ctr) && ctr == counter)
                 AckTable.TryRemove(exchange, out _);
             Console.WriteLine("Sent standalone ack: " + ack.ToString());

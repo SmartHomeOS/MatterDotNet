@@ -82,7 +82,7 @@ namespace Generator
             Tag tag = new Tag();
             tag.Parent = parent;
             string[] nameParts = parts[0].Split([" [", "]"], StringSplitOptions.TrimEntries);
-            tag.Name = SanitizeName(nameParts[0]);
+            tag.Name = GeneratorUtil.SanitizeName(nameParts[0]);
             if (nameParts.Length > 1)
             {
                 string[] constraints = nameParts[1].Split(',', StringSplitOptions.TrimEntries);
@@ -148,7 +148,7 @@ namespace Generator
                     break;
                 default:
                     tag.Type = DataType.Reference;
-                    tag.ReferenceName = SanitizeName(typeParts[0]);
+                    tag.ReferenceName = GeneratorUtil.SanitizeName(typeParts[0]);
                     break;
             }
             if (typeParts.Length > 1)
@@ -262,28 +262,8 @@ namespace Generator
                 case "FLOAT64":
                     return "double";
                 default:
-                    return SanitizeName(type);
+                    return GeneratorUtil.SanitizeName(type);
             }
-        }
-
-        private static string SanitizeName(string name)
-        {
-            name = name.Replace("-struct", "");
-            bool cap = true;
-            StringBuilder ret = new StringBuilder(name.Length);
-            foreach (char c in name)
-            {
-                if (c == ' ' || c == '-')
-                    cap = true;
-                else if (cap)
-                { 
-                    ret.Append(char.ToUpper(c));
-                    cap = false;
-                }
-                else
-                    ret.Append(c);
-            }
-            return ret.ToString();
         }
     }
 }

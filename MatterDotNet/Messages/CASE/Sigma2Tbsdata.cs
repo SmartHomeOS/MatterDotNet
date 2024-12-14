@@ -47,11 +47,11 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderNOC, 0);
+            writer.WriteBytes(1, ResponderNOC);
             if (ResponderICAC != null)
-                writer.WriteBytes(2, ResponderICAC, 0);
-            writer.WriteBytes(3, ResponderEphPubKey, 1);
-            writer.WriteBytes(4, InitiatorEphPubKey, 1);
+                writer.WriteBytes(2, ResponderICAC);
+            writer.WriteBytes(3, ResponderEphPubKey);
+            writer.WriteBytes(4, InitiatorEphPubKey);
             writer.EndContainer();
         }
     }

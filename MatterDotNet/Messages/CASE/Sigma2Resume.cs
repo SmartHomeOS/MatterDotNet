@@ -48,8 +48,8 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResumptionID, 1);
-            writer.WriteBytes(2, Sigma2ResumeMIC, 1);
+            writer.WriteBytes(1, ResumptionID);
+            writer.WriteBytes(2, Sigma2ResumeMIC);
             writer.WriteUShort(3, ResponderSessionID);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 4);

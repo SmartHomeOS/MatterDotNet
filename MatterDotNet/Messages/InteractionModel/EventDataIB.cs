@@ -47,6 +47,7 @@ namespace MatterDotNet.Messages.InteractionModel
             SystemTimestamp = reader.GetULong(4)!.Value;
             DeltaEpochTimestamp = reader.GetULong(5)!.Value;
             DeltaSystemTimestamp = reader.GetULong(6)!.Value;
+            Data = reader.GetAny(7)!;
             reader.EndContainer();
         }
 
@@ -60,6 +61,7 @@ namespace MatterDotNet.Messages.InteractionModel
             writer.WriteULong(4, SystemTimestamp);
             writer.WriteULong(5, DeltaEpochTimestamp);
             writer.WriteULong(6, DeltaSystemTimestamp);
+            writer.WriteAny(7, Data);
             writer.EndContainer();
         }
     }

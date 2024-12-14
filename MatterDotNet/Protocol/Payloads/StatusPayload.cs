@@ -22,21 +22,29 @@ namespace MatterDotNet.Protocol.Payloads
         /// </summary>
         public GeneralCode GeneralCode { get; set; }
         public ushort ProtocolVendor { get; set; }
-        public ushort ProtocolID { get; set; }
+        public ProtocolType ProtocolID { get; set; }
         public ushort ProtocolCode { get; set; }
 
         public StatusPayload(Memory<byte> data)
         {
             GeneralCode = (GeneralCode)BinaryPrimitives.ReadUInt16LittleEndian(data.Span);
             ProtocolVendor = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(2, 2).Span);
-            ProtocolID = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(4, 2).Span);
+            ProtocolID = (ProtocolType)BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(4, 2).Span);
             ProtocolCode = BinaryPrimitives.ReadUInt16LittleEndian(data.Slice(6, 2).Span);
+        }
+
+        public StatusPayload(GeneralCode generalCode, ushort protocolVendor, ProtocolType protocolID, ushort protocolCode)
+        {
+            GeneralCode = generalCode;
+            ProtocolVendor = protocolVendor;
+            ProtocolID = protocolID;
+            ProtocolCode = protocolCode;
         }
 
         public override string ToString()
         {
             if (ProtocolVendor == 0)
-                return $"General Code: {GeneralCode}, Protocol: {(ProtocolType)ProtocolID}, Protocol Code: {ProtocolCode}";
+                return $"General Code: {GeneralCode}, Protocol: {ProtocolID}, Protocol Code: {ProtocolCode}";
             else
                 return $"General Code: {GeneralCode}, Vendor: {ProtocolVendor:X2}, Protocol: {ProtocolID:X2}, Protocol Code: {ProtocolCode}";
         }
@@ -45,7 +53,7 @@ namespace MatterDotNet.Protocol.Payloads
         {
             stream.Write((byte)GeneralCode);
             stream.Write(ProtocolVendor);
-            stream.Write(ProtocolID);
+            stream.Write((byte)ProtocolID);
             stream.Write(ProtocolCode);
         }
     }

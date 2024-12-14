@@ -102,6 +102,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
                 while (!reader.IsEndContainer()) {
                     items.Add(new TargetApp(reader, 10));
                 }
+                reader.EndContainer();
                 TargetAppList = items.ToArray();
             }
             if (reader.IsTag(13))
@@ -125,15 +126,15 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             if (ProductId != null)
                 writer.WriteUShort(2, ProductId);
             if (DeviceName != null)
-                writer.WriteString(3, DeviceName, 1);
+                writer.WriteString(3, DeviceName);
             if (DeviceType != null)
                 writer.WriteUInt(4, DeviceType);
             if (PairingInstruction != null)
-                writer.WriteString(5, PairingInstruction, 1);
+                writer.WriteString(5, PairingInstruction);
             if (PairingHint != null)
                 writer.WriteUInt(6, PairingHint);
             if (RotatingDeviceId != null)
-                writer.WriteString(7, RotatingDeviceId, 1);
+                writer.WriteString(7, RotatingDeviceId);
             if (Port != null)
                 writer.WriteUShort(8, Port);
             if (TargetAppList != null)

@@ -45,10 +45,10 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorNOC, 0);
+            writer.WriteBytes(1, InitiatorNOC);
             if (InitiatorICAC != null)
-                writer.WriteBytes(2, InitiatorICAC, 0);
-            writer.WriteBytes(3, Signature, 1);
+                writer.WriteBytes(2, InitiatorICAC);
+            writer.WriteBytes(3, Signature);
             writer.EndContainer();
         }
     }

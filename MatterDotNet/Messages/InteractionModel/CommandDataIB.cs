@@ -37,6 +37,7 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.StartStructure(structNumber);
             CommandPath = new CommandPathIB(reader, 0);
             if (reader.IsTag(1))
+                CommandFields = reader.GetAny(1);
             if (reader.IsTag(2))
                 CommandRef = reader.GetUShort(2);
             reader.EndContainer();
@@ -47,6 +48,7 @@ namespace MatterDotNet.Messages.InteractionModel
             writer.StartStructure(structNumber);
             CommandPath.Serialize(writer, 0);
             if (CommandFields != null)
+                writer.WriteAny(1, CommandFields);
             if (CommandRef != null)
                 writer.WriteUShort(2, CommandRef);
             writer.EndContainer();

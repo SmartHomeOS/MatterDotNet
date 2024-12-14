@@ -69,13 +69,11 @@ namespace MatterDotNet.Protocol.Parsers
 
         public void EndContainer()
         {
-            bool iterating = true;
-            while (iterating && type != ElementType.EndOfContainer)
-                iterating = ReadTag(); //TODO: This doesn't actually iterate
-            if (iterating == true)
-                ReadTag();
-            else
+            while (type != ElementType.EndOfContainer && type != ElementType.None)
+                GetAny(tagNumber);
+            if (type != ElementType.EndOfContainer)
                 throw new InvalidDataException("End structure was not found");
+            ReadTag();
         }
 
         public byte? GetByte(uint tagNumber, bool nullable = false)
@@ -278,10 +276,70 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
+        public object? GetAny(uint tagNumber, bool nullable = false)
+        {
+            if (!IsTag(tagNumber))
+                throw new InvalidDataException("Tag " + tagNumber + " not present");
+            if (type == ElementType.Null)
+            {
+                if (nullable)
+                    return null;
+                else
+                    throw new InvalidDataException($"Tag {tagNumber}: Expected not null but received {type}");
+            }
+            switch (type)
+            {
+                case ElementType.SByte:
+                    return GetSByte(tagNumber, nullable);
+                case ElementType.Short:
+                    return GetShort(tagNumber, nullable);
+                case ElementType.Int:
+                    return GetInt(tagNumber, nullable);
+                case ElementType.Long:
+                    return GetLong(tagNumber, nullable);
+                case ElementType.Byte:
+                    return GetByte(tagNumber, nullable);
+                case ElementType.UShort:
+                    return GetUShort(tagNumber, nullable);
+                case ElementType.UInt:
+                    return GetUInt(tagNumber, nullable);
+                case ElementType.ULong:
+                    return GetULong(tagNumber, nullable);
+                case ElementType.Float:
+                    return GetFloat(tagNumber, nullable);
+                case ElementType.Double:
+                    return GetDouble(tagNumber, nullable);
+                case ElementType.Bytes8:
+                case ElementType.Bytes16:
+                case ElementType.Bytes32:
+                case ElementType.Bytes64:
+                    return GetBytes(tagNumber, nullable);
+                case ElementType.String8:
+                case ElementType.String16:
+                case ElementType.String32:
+                case ElementType.String64:
+                    return GetString(tagNumber, nullable);
+                case ElementType.Array:
+                    List<object> array = new List<object>();
+                    StartArray(tagNumber);
+                    while (!IsEndContainer())
+                        array.Add(GetAny(0)!);
+                    EndContainer();
+                    return array.ToArray();
+                default:
+                    return GetBytes(tagNumber, nullable);
+            }
+        }
+
         private bool ReadTag()
         {
             if (offset == data.Length)
+            {
+                tagNumber = 0;
+                type = ElementType.None;
+                control = TLVControl.Anonymous;
                 return false;
+            }
             control = (TLVControl)(data.Span[offset] >> 5);
             type = (ElementType)(0x1F & data.Span[offset++]);
             switch (control)

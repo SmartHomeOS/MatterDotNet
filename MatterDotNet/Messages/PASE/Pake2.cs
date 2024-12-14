@@ -42,8 +42,8 @@ namespace MatterDotNet.Messages.PASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, PB, 1);
-            writer.WriteBytes(2, CB, 1);
+            writer.WriteBytes(1, PB);
+            writer.WriteBytes(2, CB);
             writer.EndContainer();
         }
     }

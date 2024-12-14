@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.PASE
         [SetsRequiredMembers]
         public SessionParameter(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public uint? SESSION_IDLE_INTERVAL { get; set; } 
-        public uint? SESSION_ACTIVE_INTERVAL { get; set; } 
+        public uint? SessionIdleInterval { get; set; } 
+        public uint? SessionActiveInterval { get; set; } 
         public ushort? SESSION_ACTIVE_THRESHOLD { get; set; } 
         public ushort? DATA_MODEL_REVISION { get; set; } 
         public ushort? INTERACTION_MODEL_REVISION { get; set; } 
@@ -40,9 +40,9 @@ namespace MatterDotNet.Messages.PASE
         public SessionParameter(TLVReader reader, uint structNumber = 0) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(1))
-                SESSION_IDLE_INTERVAL = reader.GetUInt(1);
+                SessionIdleInterval = reader.GetUInt(1);
             if (reader.IsTag(2))
-                SESSION_ACTIVE_INTERVAL = reader.GetUInt(2);
+                SessionActiveInterval = reader.GetUInt(2);
             if (reader.IsTag(3))
                 SESSION_ACTIVE_THRESHOLD = reader.GetUShort(3);
             if (reader.IsTag(4))
@@ -59,10 +59,10 @@ namespace MatterDotNet.Messages.PASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            if (SESSION_IDLE_INTERVAL != null)
-                writer.WriteUInt(1, SESSION_IDLE_INTERVAL);
-            if (SESSION_ACTIVE_INTERVAL != null)
-                writer.WriteUInt(2, SESSION_ACTIVE_INTERVAL);
+            if (SessionIdleInterval != null)
+                writer.WriteUInt(1, SessionIdleInterval);
+            if (SessionActiveInterval != null)
+                writer.WriteUInt(2, SessionActiveInterval);
             if (SESSION_ACTIVE_THRESHOLD != null)
                 writer.WriteUShort(3, SESSION_ACTIVE_THRESHOLD);
             if (DATA_MODEL_REVISION != null)

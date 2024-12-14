@@ -192,58 +192,75 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.False);
         }
 
-        public void WriteString(uint tagNumber, string? value, byte size)
+        public void WriteString(uint tagNumber, string? value)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                switch (size)
+                if (value.Length <= byte.MaxValue)
                 {
-                    case 1:
-                        WriteTag(tagNumber, ElementType.String8);
-                        writer.Write((byte)Encoding.UTF8.GetByteCount(value));
-                        break;
-                    case 2:
-                        WriteTag(tagNumber, ElementType.String16);
-                        writer.Write((ushort)Encoding.UTF8.GetByteCount(value));
-                        break;
-                    case 4:
-                        WriteTag(tagNumber, ElementType.String32);
-                        writer.Write((uint)Encoding.UTF8.GetByteCount(value));
-                        break;
-                    default:
-                        throw new InvalidOperationException("String Length was " + size);
+                    WriteTag(tagNumber, ElementType.String8);
+                    writer.Write((byte)Encoding.UTF8.GetByteCount(value));
+                }
+                else if (value.Length <= ushort.MaxValue)
+                {
+                    WriteTag(tagNumber, ElementType.String16);
+                    writer.Write((ushort)Encoding.UTF8.GetByteCount(value));
+                }
+                else
+                {
+                    WriteTag(tagNumber, ElementType.String32);
+                    writer.Write((uint)Encoding.UTF8.GetByteCount(value));
                 }
                 writer.Write(value);
             }
         }
 
-        public void WriteBytes(uint tagNumber, byte[]? value, byte size)
+        public void WriteBytes(uint tagNumber, byte[]? value, byte length = 0)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
-                switch (size)
+                if (value.Length <= byte.MaxValue)
                 {
-                    case 1:
-                        WriteTag(tagNumber, ElementType.Bytes8);
-                        writer.Write((byte)value.Length);
-                        break;
-                    case 2:
-                        WriteTag(tagNumber, ElementType.Bytes16);
-                        writer.Write((ushort)value.Length);
-                        break;
-                    case 4:
-                        WriteTag(tagNumber, ElementType.Bytes32);
-                        writer.Write((uint)value.Length);
-                        break;
-                    default:
-                        throw new InvalidOperationException("Byte Length was " + size);
+                    WriteTag(tagNumber, ElementType.Bytes8);
+                    writer.Write((byte)value.Length);
+                }
+                else if (value.Length <= ushort.MaxValue)
+                {
+                    WriteTag(tagNumber, ElementType.Bytes16);
+                    writer.Write((ushort)value.Length);
+                }
+                else
+                {
+                    WriteTag(tagNumber, ElementType.Bytes32);
+                    writer.Write((uint)value.Length);
                 }
                 writer.Write(value);
             }
+        }
+
+        public void WriteAny(uint tagNumber, object? any)
+        {
+            if (any is TLVPayload payload)
+                payload.Serialize(this, tagNumber);
+            else if (any is Array array)
+            {
+                StartArray(tagNumber);
+                foreach (object item in array)
+                    WriteAny(0, item);
+                EndContainer();
+            }
+            else if (any == null)
+                WriteTag(tagNumber, ElementType.Null);
+            else if (any is bool)
+                WriteBool(tagNumber, (bool)any);
+            else if (any is uint || any is ulong || any is ushort || any is byte)
+                WriteULong(tagNumber, (ulong)any);
+            else if (any is byte[])
+                WriteBytes(tagNumber, (byte[])any, 4);
         }
     }
 }

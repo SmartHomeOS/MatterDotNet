@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.PASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, PA, 1);
+            writer.WriteBytes(1, PA);
             writer.EndContainer();
         }
     }

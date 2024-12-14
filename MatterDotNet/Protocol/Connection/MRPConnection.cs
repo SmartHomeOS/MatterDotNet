@@ -46,9 +46,10 @@ namespace MatterDotNet.Protocol.Connection
             Task.Factory.StartNew(Run);
         }
 
-        public async Task SendFrame(Exchange exchange, Frame frame)
+        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable)
         {
-            frame.Message!.Flags |= ExchangeFlags.Reliability;
+            if (reliable)
+                frame.Message!.Flags |= ExchangeFlags.Reliability;
             if (AckTable.TryRemove(frame.Message.ExchangeID, out uint ackCtr))
             {
                 frame.Message.Flags |= ExchangeFlags.Acknowledgement;
@@ -57,24 +58,27 @@ namespace MatterDotNet.Protocol.Connection
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             frame.Serialize(writer, exchange.Session);
             Retransmission? rt = null;
-            while (rt == null)
+            if (reliable)
             {
-                rt = new Retransmission(exchange, frame.Counter, writer);
-                if (!Retransmissions.TryAdd((exchange.Session.LocalSessionID, frame.Message.ExchangeID), rt))
+                while (rt == null)
                 {
-                    if (!Retransmissions.TryGetValue((exchange.Session.LocalSessionID, frame.Message.ExchangeID), out rt))
-                        continue;
-                    rt.Ack.Wait();
-                    rt = null;
+                    rt = new Retransmission(exchange, frame.Counter, writer);
+                    if (!Retransmissions.TryAdd((exchange.Session.LocalSessionID, frame.Message.ExchangeID), rt))
+                    {
+                        if (!Retransmissions.TryGetValue((exchange.Session.LocalSessionID, frame.Message.ExchangeID), out rt))
+                            continue;
+                        rt.Ack.Wait();
+                        rt = null;
+                    }
                 }
             }
             Console.WriteLine("SENT: " + frame.ToString());
             await client.SendAsync(writer.GetPayload());
-            while (true)
+            while (reliable)
             {
                 try
                 {
-                    rt.SendCount++;
+                    rt!.SendCount++;
                     if (rt.SendCount == MRP_MAX_TRANSMISSIONS)
                     {
                         rt.Ack.Release();
@@ -102,7 +106,7 @@ namespace MatterDotNet.Protocol.Connection
 
         public async Task SendAck(SessionContext? session, ushort exchange, uint counter, bool initiator)
         {
-            Frame ack = new Frame((IPayload?)null);
+            Frame ack = new Frame(null, (byte)SecureOpCodes.MRPStandaloneAcknowledgement);
             ack.SessionID = session.RemoteSessionID;
             ack.Counter = SessionManager.GlobalUnencryptedCounter;
             ack.Message.ExchangeID = exchange;
@@ -111,7 +115,6 @@ namespace MatterDotNet.Protocol.Connection
                 ack.Message.Flags |= ExchangeFlags.Initiator;
             ack.Message.AckCounter = counter;
             ack.Message.Protocol = Payloads.ProtocolType.SecureChannel;
-            ack.Message.OpCode = (byte)SecureOpCodes.MRPStandaloneAcknowledgement;
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             ack.Serialize(writer, session);
             if (AckTable.TryGetValue(exchange, out uint ctr) && ctr == counter)

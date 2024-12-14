@@ -35,9 +35,10 @@ namespace MatterDotNet.Protocol.Payloads
             return $"[Flags: {Flags}, Proto: {Protocol}, Op: {OpCode}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
         }
 
-        public Version1Payload(IPayload? payload)
+        public Version1Payload(IPayload? payload, byte opCode)
         {
             this.Payload = payload;
+            this.OpCode = opCode;
         }
 
         public Version1Payload(ReadOnlySpan<byte> payload)

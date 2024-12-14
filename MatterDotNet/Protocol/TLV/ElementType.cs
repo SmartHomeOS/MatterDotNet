@@ -63,5 +63,6 @@ namespace MatterDotNet.Protocol.Parsers
         Array = 22,
         List = 23,
         EndOfContainer = 24,
+        None = 0xFF
     }
 }

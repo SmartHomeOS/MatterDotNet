@@ -43,7 +43,7 @@ namespace MatterDotNet.Messages.PASE
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
             writer.WriteUInt(1, Iterations);
-            writer.WriteBytes(2, Salt, 1);
+            writer.WriteBytes(2, Salt);
             writer.EndContainer();
         }
     }

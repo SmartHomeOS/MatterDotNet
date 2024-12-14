@@ -26,14 +26,14 @@ namespace MatterDotNet.Protocol.Sessions
         private static ConcurrentDictionary<IPEndPoint, IConnection> connections = new ConcurrentDictionary<IPEndPoint, IConnection>();
         private static ConcurrentDictionary<ushort, SessionContext> sessions = new ConcurrentDictionary<ushort, SessionContext>();
 
-        public static SessionContext GetUnsecureSession(IPEndPoint ep, bool initiator, uint initiatorNodeId)
+        public static SessionContext GetUnsecureSession(IPEndPoint ep, bool initiator, uint initiatorNodeId, uint responderNodeId)
         {
-            return GetUnsecureSession(GetConnection(ep), initiator, initiatorNodeId);
+            return GetUnsecureSession(GetConnection(ep), initiator, initiatorNodeId, responderNodeId);
         }
 
-        public static SessionContext GetUnsecureSession(IConnection connection, bool initiator, uint initiatorNodeId)
+        public static SessionContext GetUnsecureSession(IConnection connection, bool initiator, uint initiatorNodeId, uint responderNodeId)
         {
-            SessionContext ctx = new SessionContext(connection, initiator, initiatorNodeId, 0, 0, new MessageState());
+            SessionContext ctx = new SessionContext(connection, initiator, initiatorNodeId, responderNodeId, 0, 0, new MessageState());
             sessions.TryAdd(0, ctx);
             return ctx;
         }
@@ -47,7 +47,7 @@ namespace MatterDotNet.Protocol.Sessions
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session
-            SecureSession ctx = new SecureSession(connection, false, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, [], 0, new MessageState(), 0);
+            SecureSession ctx = new SecureSession(connection, false, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, [], 0, new MessageState(), 0, 0);
             Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
             sessions.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;
@@ -97,8 +97,8 @@ namespace MatterDotNet.Protocol.Sessions
         {
             SessionParameter param = new SessionParameter();
             param.SESSION_ACTIVE_THRESHOLD = 4000;
-            param.SESSION_ACTIVE_INTERVAL = 500;
-            param.SESSION_IDLE_INTERVAL = 300;
+            param.SessionActiveInterval = 500;
+            param.SessionIdleInterval = 300;
             param.MAX_PATHS_PER_INVOKE = 1;
             param.DATA_MODEL_REVISION = 17;
             param.INTERACTION_MODEL_REVISION = 11;

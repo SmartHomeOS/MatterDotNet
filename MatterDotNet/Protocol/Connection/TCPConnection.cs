@@ -33,7 +33,7 @@ namespace MatterDotNet.Protocol.Connection
             Task.Factory.StartNew(Run);
         }
 
-        public async Task SendFrame(Exchange exchange, Frame frame)
+        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable)
         {
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             writer.Seek(4);

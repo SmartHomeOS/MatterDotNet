@@ -25,7 +25,7 @@ namespace MatterDotNet.Protocol.Cryptography
         SPAKE2Plus spake = new SPAKE2Plus();
         (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
 
-        public async Task<ushort> EstablishSecureSession()
+        public async Task<SecureSession?> EstablishSecureSession()
         {
             Frame? resp = null;
             Exchange exchange = unsecureSession.CreateExchange();
@@ -49,9 +49,9 @@ namespace MatterDotNet.Protocol.Cryptography
                 throw new IOException("PASE failed with status: " + (SecureStatusCodes)status.ProtocolCode);
             ushort localSessionID = ((PBKDFParamReq)paramReq.Message.Payload!).InitiatorSessionId;
 
-            SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false);
+            SecureSession? session = SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false);
             unsecureSession.Dispose();
-            return localSessionID;
+            return session;
         }
 
         private Frame GeneratePake1(PBKDFParamResp paramResp)
@@ -62,8 +62,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Console.WriteLine("Iterations: " + (int)paramResp.Pbkdf_parameters!.Iterations);
             BigIntegerPoint pA = spake.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
             Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
-            Frame frame = new Frame(pk1) { Flags = MessageFlags.SourceNodeID };
-            frame.Message.OpCode = (byte)SecureOpCodes.PASEPake1;
+            Frame frame = new Frame(pk1, (byte)SecureOpCodes.PASEPake1) { Flags = MessageFlags.SourceNodeID };
             return frame;
         }
 
@@ -76,8 +75,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Pake3 pake3 = new Pake3() {
                 CA = SessionKeys.cA
             };
-            Frame frame = new Frame(pake3) { Flags = MessageFlags.SourceNodeID };
-            frame.Message.OpCode = (byte)SecureOpCodes.PASEPake3;
+            Frame frame = new Frame(pake3, (byte)SecureOpCodes.PASEPake3) { Flags = MessageFlags.SourceNodeID };
             return frame;
         }
 
@@ -91,9 +89,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 HasPBKDFParameters = hasOnboardingPayload
             };
 
-            Frame frame = new Frame(req);
-            frame.Message.OpCode = (byte)SecureOpCodes.PBKDFParamRequest;
-            frame.Flags |= MessageFlags.SourceNodeID;
+            Frame frame = new Frame(req, (byte)SecureOpCodes.PBKDFParamRequest) { Flags = MessageFlags.SourceNodeID };
             return frame;
         }
     }

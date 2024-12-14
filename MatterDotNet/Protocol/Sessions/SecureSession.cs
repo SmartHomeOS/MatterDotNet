@@ -16,13 +16,15 @@ namespace MatterDotNet.Protocol.Sessions
 {
     public class SecureSession : SessionContext
     {
+        public bool PASE {  get; init; }
         public byte[] I2RKey { get; init; }
         public byte[] R2IKey { get; init; }
         public byte[] SharedSecret { get; init; }
         public uint LocalMessageCtr { get; init; }
 
-        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong peerNodeId) : base(connection, initiator, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
+        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong initiatorNodeId, ulong peerNodeId) : base(connection, initiator, initiatorNodeId, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
         {
+            this.PASE = PASE;
             I2RKey = i2rKey;
             R2IKey = r2iKey;
             SharedSecret = sharedSecret;

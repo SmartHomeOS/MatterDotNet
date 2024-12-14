@@ -92,10 +92,10 @@ namespace MatterDotNet.Protocol.Payloads
             }
         }
 
-        public Frame(IPayload? payload)
+        public Frame(IPayload? payload, byte opCode)
         {
             Valid = true;
-            Message = new Version1Payload(payload);
+            Message = new Version1Payload(payload, opCode);
         }
 
         public Frame(Span<byte> payload)

@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, Encrypted3, 0);
+            writer.WriteBytes(1, Encrypted3);
             writer.EndContainer();
         }
     }

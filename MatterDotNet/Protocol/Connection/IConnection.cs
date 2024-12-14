@@ -18,7 +18,7 @@ namespace MatterDotNet.Protocol.Connection
     public interface IConnection : IDisposable
     {
         Task<Frame> Read();
-        Task SendFrame(Exchange exchange, Frame frame);
+        Task SendFrame(Exchange exchange, Frame frame, bool reliable);
         Task Close(Exchange exchange);
     }
 }

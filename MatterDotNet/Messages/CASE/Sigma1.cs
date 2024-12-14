@@ -56,16 +56,16 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom, 1);
+            writer.WriteBytes(1, InitiatorRandom);
             writer.WriteUShort(2, InitiatorSessionId);
-            writer.WriteBytes(3, DestinationId, 1);
-            writer.WriteBytes(4, InitiatorEphPubKey, 1);
+            writer.WriteBytes(3, DestinationId);
+            writer.WriteBytes(4, InitiatorEphPubKey);
             if (InitiatorSessionParams != null)
                 InitiatorSessionParams.Serialize(writer, 5);
             if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID, 1);
+                writer.WriteBytes(6, ResumptionID);
             if (InitiatorResumeMIC != null)
-                writer.WriteBytes(7, InitiatorResumeMIC, 1);
+                writer.WriteBytes(7, InitiatorResumeMIC);
             writer.EndContainer();
         }
     }

@@ -28,14 +28,14 @@ namespace MatterDotNet.Protocol.Sessions
             ID = id;
         }
 
-        public async Task SendFrame(Frame frame)
+        public async Task SendFrame(Frame frame, bool reliable = true)
         {
             frame.SessionID = Session.RemoteSessionID;
             if (Session.Initiator)
                 frame.Message.Flags |= ExchangeFlags.Initiator;
             frame.Message.ExchangeID = ID;
             frame.Counter = SessionManager.GlobalUnencryptedCounter;
-            await Session.Connection.SendFrame(this, frame);
+            await Session.Connection.SendFrame(this, frame, reliable);
         }
 
         public async Task<Frame> Read()

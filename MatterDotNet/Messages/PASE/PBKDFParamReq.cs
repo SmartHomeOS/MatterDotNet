@@ -49,7 +49,7 @@ namespace MatterDotNet.Messages.PASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom, 1);
+            writer.WriteBytes(1, InitiatorRandom);
             writer.WriteUShort(2, InitiatorSessionId);
             writer.WriteUShort(3, PasscodeId);
             writer.WriteBool(4, HasPBKDFParameters);

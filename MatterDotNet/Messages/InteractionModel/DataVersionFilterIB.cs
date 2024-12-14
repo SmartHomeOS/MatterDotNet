@@ -37,6 +37,7 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.StartStructure(structNumber);
             DataVersion = reader.GetUInt(0)!.Value;
             Path = new AttributePathIB(reader, 1);
+            Data = reader.GetAny(2)!;
             reader.EndContainer();
         }
 
@@ -45,6 +46,7 @@ namespace MatterDotNet.Messages.InteractionModel
             writer.StartStructure(structNumber);
             writer.WriteUInt(0, DataVersion);
             Path.Serialize(writer, 1);
+            writer.WriteAny(2, Data);
             writer.EndContainer();
         }
     }

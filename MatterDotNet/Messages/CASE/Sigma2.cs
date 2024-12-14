@@ -50,10 +50,10 @@ namespace MatterDotNet.Messages.CASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderRandom, 1);
+            writer.WriteBytes(1, ResponderRandom);
             writer.WriteUShort(2, ResponderSessionId);
-            writer.WriteBytes(3, ResponderEphPubKey, 1);
-            writer.WriteBytes(4, Encrypted2, 0);
+            writer.WriteBytes(3, ResponderEphPubKey);
+            writer.WriteBytes(4, Encrypted2);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 5);
             writer.EndContainer();

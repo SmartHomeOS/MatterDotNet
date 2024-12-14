@@ -50,8 +50,8 @@ namespace MatterDotNet.Messages.PASE
         /// <inheritdoc />
         public override void Serialize(TLVWriter writer, uint structNumber = 0) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom, 1);
-            writer.WriteBytes(2, ResponderRandom, 1);
+            writer.WriteBytes(1, InitiatorRandom);
+            writer.WriteBytes(2, ResponderRandom);
             writer.WriteUShort(3, ResponderSessionId);
             if (Pbkdf_parameters != null)
                 Pbkdf_parameters.Serialize(writer, 4);

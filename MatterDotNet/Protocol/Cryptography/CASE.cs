@@ -38,9 +38,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 InitiatorEphPubKey = keypair.Public
             };
 
-            Frame frame = new Frame(sigma1);
-            frame.Message.Flags |= ExchangeFlags.Initiator;
-            frame.Message.OpCode = (byte)SecureOpCodes.CASESigma1;
+            Frame frame = new Frame(sigma1, (byte)SecureOpCodes.CASESigma1);
             frame.Message.Protocol = ProtocolType.SecureChannel;
             return frame;
         }

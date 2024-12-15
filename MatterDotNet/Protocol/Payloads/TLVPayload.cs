@@ -34,14 +34,14 @@ namespace MatterDotNet.Protocol.Payloads
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="structureNumber"></param>
-        public TLVPayload(TLVReader reader, uint structureNumber = 0) { }
+        public TLVPayload(TLVReader reader, long structureNumber = -1) { }
 
         /// <summary>
         /// Write the TLVs to an application payload
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="structureNumber"></param>
-        public abstract void Serialize(TLVWriter writer, uint structureNumber = 0);
+        public abstract void Serialize(TLVWriter writer, long structureNumber = -1);
 
         /// <summary>
         /// Write the TLVs to an application payload

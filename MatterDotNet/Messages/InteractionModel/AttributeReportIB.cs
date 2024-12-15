@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public AttributeReportIB(TLVReader reader, uint structNumber = 0) {
+        public AttributeReportIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(0))
                 AttributeStatus = new AttributeStatusIB(reader, 0);
@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (AttributeStatus != null)
                 AttributeStatus.Serialize(writer, 0);

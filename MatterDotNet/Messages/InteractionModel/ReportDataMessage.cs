@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public ReportDataMessage(TLVReader reader, uint structNumber = 0) {
+        public ReportDataMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(0))
                 SubscriptionID = reader.GetULong(0);
@@ -45,7 +45,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(1);
                 List<AttributeReportIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new AttributeReportIB(reader, 0));
+                    items.Add(new AttributeReportIB(reader, -1));
                 }
                 reader.EndContainer();
                 AttributeReports = items.ToArray();
@@ -55,7 +55,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(2);
                 List<EventReportIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new EventReportIB(reader, 0));
+                    items.Add(new EventReportIB(reader, -1));
                 }
                 reader.EndContainer();
                 EventReports = items.ToArray();
@@ -69,7 +69,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (SubscriptionID != null)
                 writer.WriteULong(0, SubscriptionID);
@@ -77,7 +77,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(1);
                 foreach (var item in AttributeReports) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -85,7 +85,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(2);
                 foreach (var item in EventReports) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }

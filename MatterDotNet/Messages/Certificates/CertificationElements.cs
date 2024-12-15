@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public CertificationElements(TLVReader reader, uint structNumber = 0) {
+        public CertificationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Format_version = reader.GetUShort(0)!.Value;
             Vendor_id = reader.GetUShort(1)!.Value;
@@ -50,7 +50,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartArray(2);
                 List<uint> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(reader.GetUInt(0)!.Value);
+                    items.Add(reader.GetUInt(-1)!.Value);
                 }
                 reader.EndContainer();
                 Product_id_array = items.ToArray();
@@ -70,7 +70,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartArray(11);
                 List<byte[]> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(reader.GetBytes(0)!);
+                    items.Add(reader.GetBytes(-1)!);
                 }
                 reader.EndContainer();
                 Authorized_paa_list = items.ToArray();
@@ -79,14 +79,14 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUShort(0, Format_version);
             writer.WriteUShort(1, Vendor_id);
             {
                 writer.StartArray(2);
                 foreach (var item in Product_id_array) {
-                    writer.WriteUInt(0, item);
+                    writer.WriteUInt(-1, item);
                 }
                 writer.EndContainer();
             }
@@ -104,7 +104,7 @@ namespace MatterDotNet.Messages.Certificates
             {
                 writer.StartArray(11);
                 foreach (var item in Authorized_paa_list) {
-                    writer.WriteBytes(0, item);
+                    writer.WriteBytes(-1, item);
                 }
                 writer.EndContainer();
             }

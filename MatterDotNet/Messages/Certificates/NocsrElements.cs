@@ -35,7 +35,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public NocsrElements(TLVReader reader, uint structNumber = 0) {
+        public NocsrElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Csr = reader.GetBytes(1)!;
             CSRNonce = reader.GetBytes(2)!;
@@ -49,7 +49,7 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Csr);
             writer.WriteBytes(2, CSRNonce);

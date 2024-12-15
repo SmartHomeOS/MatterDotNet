@@ -42,9 +42,9 @@ namespace Generator
                 if (child.Type != DataType.Structure)
                     writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
             }
-            writer.WriteLine($"\r\n{indent}    /// <inheritdoc />\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    public {tag.Name}(TLVReader reader, uint structNumber = 0) {{");
+            writer.WriteLine($"\r\n{indent}    /// <inheritdoc />\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    public {tag.Name}(TLVReader reader, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
-                writer.WriteLine($"{indent}        reader.StartList();");
+                writer.WriteLine($"{indent}        reader.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        reader.StartStructure(structNumber);");
             foreach (Tag child in tag.Children)
@@ -125,9 +125,9 @@ namespace Generator
             }
             if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        reader.EndContainer();");
-            writer.WriteLine($"{indent}    }}\r\n\r\n{indent}    /// <inheritdoc />\r\n{indent}    public override void Serialize(TLVWriter writer, uint structNumber = 0) {{");
+            writer.WriteLine($"{indent}    }}\r\n\r\n{indent}    /// <inheritdoc />\r\n{indent}    public override void Serialize(TLVWriter writer, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
-                writer.WriteLine($"{indent}        writer.StartList();");
+                writer.WriteLine($"{indent}        writer.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        writer.StartStructure(structNumber);");
             foreach (Tag child in tag.Children)
@@ -335,7 +335,7 @@ namespace Generator
         private static string GetEnumerationIndex(Tag tag)
         {
             if (tag.Children.Count == 0)
-                return "0";
+                return "-1";
             return tag.Children[0].TagNumber.ToString();
         }
     }

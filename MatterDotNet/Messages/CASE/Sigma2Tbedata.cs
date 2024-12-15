@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Tbedata(TLVReader reader, uint structNumber = 0) {
+        public Sigma2Tbedata(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             ResponderNOC = reader.GetBytes(1)!;
             if (reader.IsTag(2))
@@ -45,7 +45,7 @@ namespace MatterDotNet.Messages.CASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, ResponderNOC);
             if (ResponderICAC != null)

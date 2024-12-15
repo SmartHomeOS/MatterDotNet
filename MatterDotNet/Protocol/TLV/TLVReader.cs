@@ -33,12 +33,14 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new EndOfStreamException("Payload is empty");
         }
 
-        public bool IsTag(uint tagNumber)
+        public bool IsTag(long tagNumber)
         {
+            if (tagNumber < 0)
+                return this.control == TLVControl.Anonymous;
             return this.tagNumber == tagNumber;
         }
 
-        public bool IsTag(uint tagNumber, ushort vendorID, ushort profileNumber)
+        public bool IsTag(long tagNumber, ushort vendorID, ushort profileNumber)
         {
             return this.tagNumber == tagNumber && this.vendorID == vendorID && this.profileNumber == profileNumber;
         }
@@ -48,29 +50,29 @@ namespace MatterDotNet.Protocol.Parsers
             return this.type == ElementType.EndOfContainer;
         }
 
-        public void StartStructure(uint structureNumber = 0)
+        public void StartStructure(long structureNumber = -1)
         {
             if (type != ElementType.Structure)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type structure but received {type}");
-            if (structureNumber != 0 && !IsTag(structureNumber))
+            if (!IsTag(structureNumber))
                 throw new InvalidDataException("Tag " + structureNumber + " not present");
             ReadTag();
         }
 
-        public void StartArray(uint arrayNumber = 0)
+        public void StartArray(long arrayNumber = -1)
         {
             if (type != ElementType.Array)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type array but received {type}");
-            if (arrayNumber != 0 && !IsTag(arrayNumber))
+            if (!IsTag(arrayNumber))
                 throw new InvalidDataException("Tag " + arrayNumber + " not present");
             ReadTag();
         }
 
-        public void StartList(uint listNumber = 0)
+        public void StartList(long listNumber = -1)
         {
             if (type != ElementType.List)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type list but received {type}");
-            if (listNumber != 0 && !IsTag(listNumber))
+            if (!IsTag(listNumber))
                 throw new InvalidDataException("Tag " + listNumber + " not present");
             ReadTag();
         }
@@ -84,7 +86,7 @@ namespace MatterDotNet.Protocol.Parsers
             ReadTag();
         }
 
-        public byte? GetByte(uint tagNumber, bool nullable = false)
+        public byte? GetByte(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -96,7 +98,7 @@ namespace MatterDotNet.Protocol.Parsers
             ReadTag();
             return val;
         }
-        public sbyte? GetSByte(uint tagNumber, bool nullable = false)
+        public sbyte? GetSByte(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -108,7 +110,7 @@ namespace MatterDotNet.Protocol.Parsers
             ReadTag();
             return val;
         }
-        public bool? GetBool(uint tagNumber, bool nullable = false)
+        public bool? GetBool(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -120,7 +122,7 @@ namespace MatterDotNet.Protocol.Parsers
             ReadTag();
             return val;
         }
-        public short? GetShort(uint tagNumber, bool nullable = false)
+        public short? GetShort(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -136,7 +138,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public ushort? GetUShort(uint tagNumber, bool nullable = false)
+        public ushort? GetUShort(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -152,7 +154,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public int? GetInt(uint tagNumber, bool nullable = false)
+        public int? GetInt(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -170,7 +172,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public uint? GetUInt(uint tagNumber, bool nullable = false)
+        public uint? GetUInt(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -188,7 +190,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public long? GetLong(uint tagNumber, bool nullable = false)
+        public long? GetLong(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -208,7 +210,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public ulong? GetULong(uint tagNumber, bool nullable = false)
+        public ulong? GetULong(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -228,7 +230,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public float? GetFloat(uint tagNumber, bool nullable = false)
+        public float? GetFloat(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -242,7 +244,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public double? GetDouble(uint tagNumber, bool nullable = false)
+        public double? GetDouble(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -256,7 +258,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public string? GetString(uint tagNumber, bool nullable = false)
+        public string? GetString(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -270,7 +272,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public byte[]? GetBytes(uint tagNumber, bool nullable = false)
+        public byte[]? GetBytes(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -284,7 +286,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public object? GetAny(uint tagNumber, bool nullable = false)
+        public object? GetAny(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -331,9 +333,28 @@ namespace MatterDotNet.Protocol.Parsers
                     List<object> array = new List<object>();
                     StartArray(tagNumber);
                     while (!IsEndContainer())
-                        array.Add(GetAny(0)!);
+                        array.Add(GetAny(-1)!);
                     EndContainer();
                     return array.ToArray();
+                case ElementType.List:
+                    List<object> list = new List<object>();
+                    StartArray(tagNumber);
+                    while (!IsEndContainer())
+                        list.Add(GetAny(control == TLVControl.Anonymous ? -1 : this.tagNumber)!);
+                    EndContainer();
+                    return list;
+                case ElementType.Structure:
+                    List<object> structure = new List<object>();
+                    StartStructure(tagNumber);
+                    while (!IsEndContainer())
+                    {
+                        if (control == TLVControl.Anonymous)
+                            structure.Add(GetAny(-1)!);
+                        else
+                            structure.Insert((int)this.tagNumber, GetAny(this.tagNumber)!);
+                    }
+                    EndContainer();
+                    return structure.ToArray();
                 default:
                     return GetBytes(tagNumber, nullable);
             }

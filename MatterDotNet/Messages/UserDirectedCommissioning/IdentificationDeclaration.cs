@@ -41,7 +41,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
 
             /// <inheritdoc />
             [SetsRequiredMembers]
-            public TargetApp(TLVReader reader, uint structNumber = 0) {
+            public TargetApp(TLVReader reader, long structNumber = -1) {
                 reader.StartStructure(structNumber);
                 if (reader.IsTag(11))
                     AppVendorId = reader.GetUShort(11);
@@ -51,7 +51,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             }
 
             /// <inheritdoc />
-            public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+            public override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (AppVendorId != null)
                     writer.WriteUShort(11, AppVendorId);
@@ -77,7 +77,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public IdentificationDeclaration(TLVReader reader, uint structNumber = 0) {
+        public IdentificationDeclaration(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 VendorId = reader.GetUShort(1);
@@ -119,7 +119,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (VendorId != null)
                 writer.WriteUShort(1, VendorId);

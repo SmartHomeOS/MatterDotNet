@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public AttestationElements(TLVReader reader, uint structNumber = 0) {
+        public AttestationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Certification_declaration = reader.GetBytes(1)!;
             Attestation_nonce = reader.GetBytes(2)!;
@@ -45,7 +45,7 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Certification_declaration);
             writer.WriteBytes(2, Attestation_nonce);

@@ -39,7 +39,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public SubscribeRequestMessage(TLVReader reader, uint structNumber = 0) {
+        public SubscribeRequestMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             KeepSubscriptions = reader.GetBool(0)!.Value;
             MinIntervalFloor = reader.GetULong(1)!.Value;
@@ -49,7 +49,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(3);
                 List<AttributePathIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new AttributePathIB(reader, 0));
+                    items.Add(new AttributePathIB(reader, -1));
                 }
                 reader.EndContainer();
                 AttributeRequests = items.ToArray();
@@ -59,7 +59,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(4);
                 List<EventPathIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new EventPathIB(reader, 0));
+                    items.Add(new EventPathIB(reader, -1));
                 }
                 reader.EndContainer();
                 EventRequests = items.ToArray();
@@ -69,7 +69,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(5);
                 List<EventFilterIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new EventFilterIB(reader, 0));
+                    items.Add(new EventFilterIB(reader, -1));
                 }
                 reader.EndContainer();
                 EventFilters = items.ToArray();
@@ -79,7 +79,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(8);
                 List<DataVersionFilterIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new DataVersionFilterIB(reader, 0));
+                    items.Add(new DataVersionFilterIB(reader, -1));
                 }
                 reader.EndContainer();
                 DataVersionFilters = items.ToArray();
@@ -89,7 +89,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(0, KeepSubscriptions);
             writer.WriteULong(1, MinIntervalFloor);
@@ -98,7 +98,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(3);
                 foreach (var item in AttributeRequests) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -106,7 +106,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(4);
                 foreach (var item in EventRequests) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -114,7 +114,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(5);
                 foreach (var item in EventFilters) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -122,7 +122,7 @@ namespace MatterDotNet.Messages.InteractionModel
             {
                 writer.StartArray(8);
                 foreach (var item in DataVersionFilters) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }

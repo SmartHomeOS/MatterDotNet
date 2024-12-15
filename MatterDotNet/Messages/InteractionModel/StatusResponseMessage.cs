@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public StatusResponseMessage(TLVReader reader, uint structNumber = 0) {
+        public StatusResponseMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Status = reader.GetByte(0)!.Value;
             InteractionModelRevision = reader.GetByte(255)!.Value;
@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteByte(0, Status);
             writer.WriteByte(255, InteractionModelRevision);

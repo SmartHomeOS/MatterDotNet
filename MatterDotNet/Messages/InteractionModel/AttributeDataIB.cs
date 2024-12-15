@@ -33,7 +33,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public AttributeDataIB(TLVReader reader, uint structNumber = 0) {
+        public AttributeDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             DataVersion = reader.GetUInt(0)!.Value;
             Path = new AttributePathIB(reader, 1);
@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUInt(0, DataVersion);
             Path.Serialize(writer, 1);

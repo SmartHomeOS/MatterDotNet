@@ -29,33 +29,39 @@ namespace MatterDotNet.Protocol.Parsers
             writer.Write((byte)(((byte)control << 5) | (byte)type));
         }
 
-        private void WriteTag(uint tagNumber, ElementType type)
+        private void WriteTag(long tagNumber, ElementType type)
         {
-            writer.Write((byte)(((byte)TLVControl.ContextSpecific << 5) | (byte)type));
-            writer.Write((byte)tagNumber);
+            if (tagNumber < 0)
+                WriteTag(TLVControl.Anonymous, type);
+            else
+            {
+                writer.Write((byte)(((byte)TLVControl.ContextSpecific << 5) | (byte)type));
+                writer.Write((byte)tagNumber);
+            }
         }
 
-        public void StartStructure(uint tagNumber)
+        public void StartStructure(long tagNumber)
         {
-            if (tagNumber == 0)
+            if (tagNumber < 0)
                 WriteTag(TLVControl.Anonymous, ElementType.Structure);
             else
                 WriteTag(tagNumber, ElementType.Structure);
         }
 
-        public void StartArray(uint tagNumber)
+        public void StartArray(long tagNumber = -1)
         {
-            WriteTag(tagNumber, ElementType.Array);
+            if (tagNumber < 0)
+                WriteTag(TLVControl.Anonymous, ElementType.Array);
+            else
+                WriteTag(tagNumber, ElementType.Array);
         }
 
-        public void StartList()
+        public void StartList(long tagNumber = -1)
         {
-            WriteTag(TLVControl.Anonymous, ElementType.List);
-        }
-
-        public void StartList(uint tagNumber)
-        {
-            WriteTag(tagNumber, ElementType.List);
+            if (tagNumber < 0)
+                WriteTag(TLVControl.Anonymous, ElementType.List);
+            else
+                WriteTag(tagNumber, ElementType.List);
         }
 
         public void EndContainer()
@@ -63,7 +69,7 @@ namespace MatterDotNet.Protocol.Parsers
             WriteTag(TLVControl.Anonymous, ElementType.EndOfContainer);
         }
 
-        public void WriteByte(uint tagNumber, byte? value)
+        public void WriteByte(long tagNumber, byte? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -73,7 +79,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteSByte(uint tagNumber, sbyte? value)
+        public void WriteSByte(long tagNumber, sbyte? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -83,7 +89,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteShort(uint tagNumber, short? value)
+        public void WriteShort(long tagNumber, short? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -98,7 +104,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteUShort(uint tagNumber, ushort? value)
+        public void WriteUShort(long tagNumber, ushort? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -113,7 +119,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteInt(uint tagNumber, int? value)
+        public void WriteInt(long tagNumber, int? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -128,7 +134,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteUInt(uint tagNumber, uint? value)
+        public void WriteUInt(long tagNumber, uint? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -143,7 +149,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteLong(uint tagNumber, long? value)
+        public void WriteLong(long tagNumber, long? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -158,7 +164,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteULong(uint tagNumber, ulong? value)
+        public void WriteULong(long tagNumber, ulong? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -173,7 +179,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteFloat(uint tagNumber, float? value)
+        public void WriteFloat(long tagNumber, float? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -183,7 +189,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteDouble(uint tagNumber, double? value)
+        public void WriteDouble(long tagNumber, double? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -194,7 +200,7 @@ namespace MatterDotNet.Protocol.Parsers
             }
         }
 
-        public void WriteBool(uint tagNumber, bool? value)
+        public void WriteBool(long tagNumber, bool? value)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -204,7 +210,7 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.False);
         }
 
-        public void WriteString(uint tagNumber, string? value)
+        public void WriteString(long tagNumber, string? value)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
@@ -229,7 +235,7 @@ namespace MatterDotNet.Protocol.Parsers
             }
         }
 
-        public void WriteBytes(uint tagNumber, byte[]? value, byte length = 0)
+        public void WriteBytes(long tagNumber, byte[]? value)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
@@ -254,7 +260,7 @@ namespace MatterDotNet.Protocol.Parsers
             }
         }
 
-        public void WriteAny(uint tagNumber, object? any)
+        public void WriteAny(long tagNumber, object? any)
         {
             if (any is TLVPayload payload)
                 payload.Serialize(this, tagNumber);
@@ -262,7 +268,7 @@ namespace MatterDotNet.Protocol.Parsers
             {
                 StartArray(tagNumber);
                 foreach (object item in array)
-                    WriteAny(0, item);
+                    WriteAny(-1, item);
                 EndContainer();
             }
             else if (any == null)
@@ -272,7 +278,7 @@ namespace MatterDotNet.Protocol.Parsers
             else if (any is uint || any is ulong || any is ushort || any is byte)
                 WriteULong(tagNumber, (ulong)any);
             else if (any is byte[])
-                WriteBytes(tagNumber, (byte[])any, 4);
+                WriteBytes(tagNumber, (byte[])any);
         }
     }
 }

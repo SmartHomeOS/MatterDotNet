@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public BasicConstraints(TLVReader reader, uint structNumber = 0) {
+        public BasicConstraints(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             IsCa = reader.GetBool(1)!.Value;
             if (reader.IsTag(2))
@@ -41,7 +41,7 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(1, IsCa);
             if (PathLenConstraint != null)

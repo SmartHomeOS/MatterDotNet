@@ -32,13 +32,13 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public WriteResponseMessage(TLVReader reader, uint structNumber = 0) {
+        public WriteResponseMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             {
                 reader.StartArray(0);
                 List<AttributeStatusIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new AttributeStatusIB(reader, 0));
+                    items.Add(new AttributeStatusIB(reader, -1));
                 }
                 reader.EndContainer();
                 WriteResponses = items.ToArray();
@@ -48,12 +48,12 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             {
                 writer.StartArray(0);
                 foreach (var item in WriteResponses) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }

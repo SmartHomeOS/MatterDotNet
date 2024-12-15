@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public InvokeRequestMessage(TLVReader reader, uint structNumber = 0) {
+        public InvokeRequestMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             SuppressResponse = reader.GetBool(0)!.Value;
             TimedRequest = reader.GetBool(1)!.Value;
@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 reader.StartArray(2);
                 List<CommandDataIB> items = new();
                 while (!reader.IsEndContainer()) {
-                    items.Add(new CommandDataIB(reader, 0));
+                    items.Add(new CommandDataIB(reader, -1));
                 }
                 reader.EndContainer();
                 InvokeRequests = items.ToArray();
@@ -52,14 +52,14 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(0, SuppressResponse);
             writer.WriteBool(1, TimedRequest);
             {
                 writer.StartArray(2);
                 foreach (var item in InvokeRequests) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }

@@ -33,7 +33,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public CommandDataIB(TLVReader reader, uint structNumber = 0) {
+        public CommandDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             CommandPath = new CommandPathIB(reader, 0);
             if (reader.IsTag(1))
@@ -44,7 +44,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             CommandPath.Serialize(writer, 0);
             if (CommandFields != null)

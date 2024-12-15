@@ -33,8 +33,8 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public ClusterPathIB(TLVReader reader, uint structNumber = 0) {
-            reader.StartList();
+        public ClusterPathIB(TLVReader reader, long structNumber = -1) {
+            reader.StartList(structNumber);
             if (reader.IsTag(0))
                 Node = reader.GetULong(0);
             if (reader.IsTag(1))
@@ -45,8 +45,8 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
-            writer.StartList();
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            writer.StartList(structNumber);
             if (Node != null)
                 writer.WriteULong(0, Node);
             if (Endpoint != null)

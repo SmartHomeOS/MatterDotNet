@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake2(TLVReader reader, uint structNumber = 0) {
+        public Pake2(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             PB = reader.GetBytes(1)!;
             CB = reader.GetBytes(2)!;
@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.PASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, PB);
             writer.WriteBytes(2, CB);

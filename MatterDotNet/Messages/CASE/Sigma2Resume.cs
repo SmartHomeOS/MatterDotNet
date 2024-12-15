@@ -35,7 +35,7 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2Resume(TLVReader reader, uint structNumber = 0) {
+        public Sigma2Resume(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             ResumptionID = reader.GetBytes(1)!;
             Sigma2ResumeMIC = reader.GetBytes(2)!;
@@ -46,7 +46,7 @@ namespace MatterDotNet.Messages.CASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, ResumptionID);
             writer.WriteBytes(2, Sigma2ResumeMIC);

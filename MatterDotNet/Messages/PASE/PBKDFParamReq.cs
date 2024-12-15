@@ -35,7 +35,7 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamReq(TLVReader reader, uint structNumber = 0) {
+        public PBKDFParamReq(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             InitiatorRandom = reader.GetBytes(1)!;
             InitiatorSessionId = reader.GetUShort(2)!.Value;
@@ -47,7 +47,7 @@ namespace MatterDotNet.Messages.PASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorRandom);
             writer.WriteUShort(2, InitiatorSessionId);

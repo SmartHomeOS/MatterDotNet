@@ -41,7 +41,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public MatterCertificate(TLVReader reader, uint structNumber = 0) {
+        public MatterCertificate(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             SerialNum = reader.GetBytes(1)!;
             SigAlgo = reader.GetULong(2)!.Value;
@@ -49,7 +49,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartList(3);
                 Issuer = new();
                 while (!reader.IsEndContainer()) {
-                    Issuer.Add(new DnAttribute(reader, 0));
+                    Issuer.Add(new DnAttribute(reader, -1));
                 }
                 reader.EndContainer();
             }
@@ -59,7 +59,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartList(6);
                 Subject = new();
                 while (!reader.IsEndContainer()) {
-                    Subject.Add(new DnAttribute(reader, 0));
+                    Subject.Add(new DnAttribute(reader, -1));
                 }
                 reader.EndContainer();
             }
@@ -70,7 +70,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartList(10);
                 Extensions = new();
                 while (!reader.IsEndContainer()) {
-                    Extensions.Add(reader.GetBytes(0)!);
+                    Extensions.Add(reader.GetBytes(-1)!);
                 }
                 reader.EndContainer();
             }
@@ -79,14 +79,14 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, SerialNum);
             writer.WriteULong(2, SigAlgo);
             {
                 writer.StartList(3);
                 foreach (var item in Issuer) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -95,7 +95,7 @@ namespace MatterDotNet.Messages.Certificates
             {
                 writer.StartList(6);
                 foreach (var item in Subject) {
-                    item.Serialize(writer, 0);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }
@@ -105,7 +105,7 @@ namespace MatterDotNet.Messages.Certificates
             {
                 writer.StartList(10);
                 foreach (var item in Extensions) {
-                    writer.WriteBytes(0, item);
+                    writer.WriteBytes(-1, item);
                 }
                 writer.EndContainer();
             }

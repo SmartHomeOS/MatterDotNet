@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public CommissionerDeclaration(TLVReader reader, uint structNumber = 0) {
+        public CommissionerDeclaration(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 ErrorCode = reader.GetUShort(1);
@@ -54,7 +54,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (ErrorCode != null)
                 writer.WriteUShort(1, ErrorCode);

@@ -27,23 +27,27 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public InvokeResponseIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required CommandDataIB Command { get; set; } 
-        public required CommandStatusIB Status { get; set; } 
+        public CommandDataIB? Command { get; set; } 
+        public CommandStatusIB? Status { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public InvokeResponseIB(TLVReader reader, uint structNumber = 0) {
+        public InvokeResponseIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            Command = new CommandDataIB(reader, 0);
-            Status = new CommandStatusIB(reader, 1);
+            if (reader.IsTag(0))
+                Command = new CommandDataIB(reader, 0);
+            if (reader.IsTag(1))
+                Status = new CommandStatusIB(reader, 1);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            Command.Serialize(writer, 0);
-            Status.Serialize(writer, 1);
+            if (Command != null)
+                Command.Serialize(writer, 0);
+            if (Status != null)
+                Status.Serialize(writer, 1);
             writer.EndContainer();
         }
     }

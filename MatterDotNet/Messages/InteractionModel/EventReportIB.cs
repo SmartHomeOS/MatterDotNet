@@ -27,23 +27,27 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public EventReportIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required EventStatusIB EventStatus { get; set; } 
-        public required EventDataIB EventData { get; set; } 
+        public EventStatusIB? EventStatus { get; set; } 
+        public EventDataIB? EventData { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public EventReportIB(TLVReader reader, uint structNumber = 0) {
+        public EventReportIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            EventStatus = new EventStatusIB(reader, 0);
-            EventData = new EventDataIB(reader, 1);
+            if (reader.IsTag(0))
+                EventStatus = new EventStatusIB(reader, 0);
+            if (reader.IsTag(1))
+                EventData = new EventDataIB(reader, 1);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, uint structNumber = 0) {
+        public override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            EventStatus.Serialize(writer, 0);
-            EventData.Serialize(writer, 1);
+            if (EventStatus != null)
+                EventStatus.Serialize(writer, 0);
+            if (EventData != null)
+                EventData.Serialize(writer, 1);
             writer.EndContainer();
         }
     }

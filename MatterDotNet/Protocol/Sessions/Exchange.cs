@@ -34,7 +34,7 @@ namespace MatterDotNet.Protocol.Sessions
             if (Session.Initiator)
                 frame.Message.Flags |= ExchangeFlags.Initiator;
             frame.Message.ExchangeID = ID;
-            frame.Counter = SessionManager.GlobalUnencryptedCounter;
+            frame.Counter = Session.GetSessionCounter();
             await Session.Connection.SendFrame(this, frame, reliable);
         }
 
@@ -45,7 +45,13 @@ namespace MatterDotNet.Protocol.Sessions
             {
                 frame = await Session.Connection.Read();
                 MessageState state = Session.PeerMessageCtr;
-                if (frame.Counter > state.MaxMessageCounter)
+                if (!state.Initialized)
+                {
+                    state.Initialized = true;
+                    state.CounterWindow = uint.MaxValue;
+                    state.MaxMessageCounter = frame.Counter;
+                }
+                else if (frame.Counter > state.MaxMessageCounter)
                 {
                     int offset = (int)Math.Min(frame.Counter - state.MaxMessageCounter, MSG_COUNTER_WINDOW_SIZE);
                     state.MaxMessageCounter = frame.Counter;
@@ -65,7 +71,7 @@ namespace MatterDotNet.Protocol.Sessions
                     {
                         if (Session is SecureSession)
                         {
-                            Console.WriteLine("DROPPED DUPLICATE: " + frame);
+                            Console.WriteLine("DROPPED DUPLICATE <behind window>: " + frame);
                             frame = null;
                         }
                         else
@@ -78,7 +84,7 @@ namespace MatterDotNet.Protocol.Sessions
                     {
                         if ((state.CounterWindow & (uint)(1 << (int)offset - 1)) != 0x0)
                         {
-                            Console.WriteLine("DROPPED DUPLICATE: " + frame);
+                            Console.WriteLine("DROPPED DUPLICATE <within window>: " + frame);
                             frame = null;
                         }
                         else

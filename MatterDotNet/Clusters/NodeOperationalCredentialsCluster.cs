@@ -225,11 +225,11 @@ namespace MatterDotNet.Clusters
         }
 
         // Commands
-        public async Task<AttestationResponse?> AttestationRequest (Exchange exchange, byte[] AttestationNonce) {
+        public async Task<AttestationResponse?> AttestationRequest (SecureSession session, byte[] AttestationNonce) {
             AttestationRequestPayload requestFields = new AttestationRequestPayload() {
                 AttestationNonce = AttestationNonce,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new AttestationResponse() {
@@ -238,11 +238,11 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<CertificateChainResponse?> CertificateChainRequest (Exchange exchange, CertificateChainTypeEnum CertificateType) {
+        public async Task<CertificateChainResponse?> CertificateChainRequest (SecureSession session, CertificateChainTypeEnum CertificateType) {
             CertificateChainRequestPayload requestFields = new CertificateChainRequestPayload() {
                 CertificateType = CertificateType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new CertificateChainResponse() {
@@ -250,12 +250,12 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<CSRResponse?> CSRRequest (Exchange exchange, byte[] CSRNonce, bool IsForUpdateNOC) {
+        public async Task<CSRResponse?> CSRRequest (SecureSession session, byte[] CSRNonce, bool IsForUpdateNOC) {
             CSRRequestPayload requestFields = new CSRRequestPayload() {
                 CSRNonce = CSRNonce,
                 IsForUpdateNOC = IsForUpdateNOC,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new CSRResponse() {
@@ -264,7 +264,7 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> AddNOC (Exchange exchange, byte[] NOCValue, byte[] ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
+        public async Task<NOCResponse?> AddNOC (SecureSession session, byte[] NOCValue, byte[] ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
             AddNOCPayload requestFields = new AddNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
@@ -272,7 +272,7 @@ namespace MatterDotNet.Clusters
                 CaseAdminSubject = CaseAdminSubject,
                 AdminVendorId = AdminVendorId,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -282,12 +282,12 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> UpdateNOC (Exchange exchange, byte[] NOCValue, byte[] ICACValue) {
+        public async Task<NOCResponse?> UpdateNOC (SecureSession session, byte[] NOCValue, byte[] ICACValue) {
             UpdateNOCPayload requestFields = new UpdateNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -297,11 +297,11 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> UpdateFabricLabel (Exchange exchange, string Label) {
+        public async Task<NOCResponse?> UpdateFabricLabel (SecureSession session, string Label) {
             UpdateFabricLabelPayload requestFields = new UpdateFabricLabelPayload() {
                 Label = Label,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x09, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -311,11 +311,11 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> RemoveFabric (Exchange exchange, byte FabricIndex) {
+        public async Task<NOCResponse?> RemoveFabric (SecureSession session, byte FabricIndex) {
             RemoveFabricPayload requestFields = new RemoveFabricPayload() {
                 FabricIndex = FabricIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0A, requestFields);
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -325,11 +325,11 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<bool> AddTrustedRootCertificate (Exchange exchange, byte[] RootCACertificate) {
+        public async Task<bool> AddTrustedRootCertificate (SecureSession session, byte[] RootCACertificate) {
             AddTrustedRootCertificatePayload requestFields = new AddTrustedRootCertificatePayload() {
                 RootCACertificate = RootCACertificate,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0B, requestFields);
             return validateResponse(resp);
         }
 

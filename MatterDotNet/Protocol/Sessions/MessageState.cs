@@ -14,6 +14,7 @@ namespace MatterDotNet.Protocol.Sessions
 {
     public struct MessageState
     {
+        public bool Initialized { get; set; }
         public uint CounterWindow { get; set; }
         public uint MaxMessageCounter { get; set; }
     }

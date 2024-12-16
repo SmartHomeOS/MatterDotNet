@@ -37,7 +37,7 @@ namespace MatterDotNet.Clusters
         }
         protected object GetField(InvokeResponseIB resp, int fieldNumber)
         {
-            object?[] fields = (object?[])resp.Command!.CommandFields!;
+            object[] fields = (object[])resp.Command!.CommandFields!;
             if (fieldNumber >= fields.Length)
                 throw new DataException("Field " + fieldNumber + " is missing");
             return fields[fieldNumber]!;

@@ -23,8 +23,6 @@ namespace MatterDotNet.Protocol.Connection
 {
     public class MRPConnection : IConnection
     {
-        public int RetryInterval { get; set; } = 500;
-
         private static readonly TimeSpan MRP_STANDALONE_ACK_TIMEOUT = TimeSpan.FromMilliseconds(200);
         private const int MRP_BACKOFF_THRESHOLD = 1;
         private const float MRP_BACKOFF_MARGIN = 1.1F;
@@ -84,7 +82,10 @@ namespace MatterDotNet.Protocol.Connection
                         rt.Ack.Release();
                         throw new IOException("Message retransmission timed out");
                     }
-                    double mrpBackoffTime = (RetryInterval * MRP_BACKOFF_MARGIN) * Math.Pow(MRP_BACKOFF_BASE, (Math.Max(0, rt.SendCount - MRP_BACKOFF_THRESHOLD))) * (1.0 + Random.Shared.NextDouble() * MRP_BACKOFF_JITTER);
+                    uint retryInterval = SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
+                    if (exchange.Session is SecureSession secureSession)
+                        retryInterval = secureSession.PeerActive ? secureSession.ActiveInterval : secureSession.IdleInterval;
+                    double mrpBackoffTime = (retryInterval * MRP_BACKOFF_MARGIN) * Math.Pow(MRP_BACKOFF_BASE, (Math.Max(0, rt.SendCount - MRP_BACKOFF_THRESHOLD))) * (1.0 + Random.Shared.NextDouble() * MRP_BACKOFF_JITTER);
                     if (await rt.Ack.WaitAsync((int)mrpBackoffTime))
                         return;
                     else
@@ -105,7 +106,7 @@ namespace MatterDotNet.Protocol.Connection
         {
             Frame ack = new Frame(null, (byte)SecureOpCodes.MRPStandaloneAcknowledgement);
             ack.SessionID = session?.RemoteSessionID ?? 0;
-            ack.Counter = SessionManager.GlobalUnencryptedCounter;
+            ack.Counter = session.GetSessionCounter();
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
             if (initiator)
@@ -146,6 +147,8 @@ namespace MatterDotNet.Protocol.Connection
                             transmission.Ack.Release();
                         }
                     }
+                    if (frame.SessionID != 0)
+                        SessionManager.SessionActive(frame.SessionID);
                     Console.WriteLine("Received: " + frame.ToString());
                     channel.Writer.TryWrite(frame);
                 }

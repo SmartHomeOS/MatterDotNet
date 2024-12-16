@@ -25,11 +25,14 @@ namespace Generator
             IEnumerable<string> clusterxmls = Directory.EnumerateFiles("..\\..\\..\\Clusters");
             foreach (string clusterxml in clusterxmls)
             {
-                Console.WriteLine("Generating " + clusterxml + "...");
-                Cluster? cluster = deserializer.Deserialize(File.OpenRead(clusterxml)) as Cluster;
-                if (cluster == null)
-                    throw new IOException("Failed to parse cluster " + clusterxml);
-                WriteClass(cluster);
+                if (clusterxml.EndsWith(".xml"))
+                {
+                    Console.WriteLine("Generating " + clusterxml + "...");
+                    Cluster? cluster = deserializer.Deserialize(File.OpenRead(clusterxml)) as Cluster;
+                    if (cluster == null)
+                        throw new IOException("Failed to parse cluster " + clusterxml);
+                    WriteClass(cluster);
+                }
             }
         }
 
@@ -266,7 +269,7 @@ namespace Generator
                         writer.Write("<bool> ");
                     else
                         writer.Write("<" + GeneratorUtil.SanitizeName(response.name) + "?> ");
-                    writer.Write(GeneratorUtil.SanitizeName(cmd.name) + " (Exchange exchange");
+                    writer.Write(GeneratorUtil.SanitizeName(cmd.name) + " (SecureSession session");
                     if (cmd.field != null)
                     {
                         foreach (var field in cmd.field)
@@ -283,14 +286,14 @@ namespace Generator
                         foreach (var field in cmd.field)
                             writer.WriteLine($"                {field.name} = {field.name},");
                         writer.WriteLine("            };");
-                        writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
+                        writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
                     }
                     else
                     {
                         if (cmd.response != "N")
-                            writer.WriteLine("            await InteractionManager.SendCommand(exchange, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                            writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
                         else
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(exchange, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
                     }
                     if (response == null)
                     {

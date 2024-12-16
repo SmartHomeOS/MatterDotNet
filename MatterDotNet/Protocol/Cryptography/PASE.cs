@@ -49,9 +49,18 @@ namespace MatterDotNet.Protocol.Cryptography
                 throw new IOException("PASE failed with status: " + (SecureStatusCodes)status.ProtocolCode);
             ushort localSessionID = ((PBKDFParamReq)paramReq.Message.Payload!).InitiatorSessionId;
 
-            SecureSession? session = SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false);
+            uint activeInterval = paramResp.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
+            uint activeThreshold = paramResp.ResponderSessionParams?.SessionActiveThreshold ?? SessionManager.GetDefaultSessionParams().SessionActiveThreshold!.Value;
+            uint idleInterval = paramResp.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
+
+            SecureSession ? session = SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false, idleInterval, activeInterval, activeThreshold);
             unsecureSession.Dispose();
             return session;
+        }
+
+        public byte[] GetAttestationChallenge()
+        {
+            return SessionKeys.AttestationChallenge;
         }
 
         private Frame GeneratePake1(PBKDFParamResp paramResp)

@@ -38,16 +38,16 @@ namespace MatterDotNet.Protocol.Sessions
             return ctx;
         }
 
-        public static SecureSession? CreateSession(IPEndPoint ep, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group)
+        public static SecureSession? CreateSession(IPEndPoint ep, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
-            return CreateSession(GetConnection(ep), initiator, initiatorSessionId, responderSessionId, i2r, r2i, group);
+            return CreateSession(GetConnection(ep), initiator, initiatorSessionId, responderSessionId, i2r, r2i, group, idleInterval, activeInterval, activeThreshold);
         }
 
-        public static SecureSession? CreateSession(IConnection connection, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group)
+        public static SecureSession? CreateSession(IConnection connection, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session
-            SecureSession ctx = new SecureSession(connection, false, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, [], 0, new MessageState(), 0, 0);
+            SecureSession ctx = new SecureSession(connection, false, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, [], 0, new MessageState(), 0, 0, idleInterval, activeInterval, activeThreshold);
             Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
             sessions.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;
@@ -104,6 +104,12 @@ namespace MatterDotNet.Protocol.Sessions
             param.InteractionModelRevision = 11;
             param.SpecificationVersion = 0;
             return param;
+        }
+
+        internal static void SessionActive(ushort sessionID)
+        {
+            if (sessions.TryGetValue(sessionID, out SessionContext? context) && context is SecureSession secureSession)
+                secureSession.LastActive = DateTime.Now;
         }
     }
 }

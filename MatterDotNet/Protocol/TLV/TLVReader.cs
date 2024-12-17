@@ -275,7 +275,7 @@ namespace MatterDotNet.Protocol.Parsers
         public byte[]? GetBytes(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
-                throw new InvalidDataException("Tag " + tagNumber + " not present");
+                throw new InvalidDataException("Tag " + tagNumber + " not present. Current tag is " + this.tagNumber);
             if (type == ElementType.Null && nullable)
                 return null;
             if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32)

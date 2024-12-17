@@ -30,6 +30,8 @@ namespace MatterDotNet.Protocol.Cryptography
             Y = new BigInteger(y, true, true);
         }
 
+        public BigIntegerPoint(ECPoint ec) : this(ec.X, ec.Y) { }
+
         public BigIntegerPoint(byte[] point)
         {
             switch (point[0])

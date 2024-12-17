@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.Certificates
         public required ulong PubKeyAlgo { get; set; } 
         public required ulong EcCurveId { get; set; } 
         public required byte[] EcPubKey { get; set; } 
-        public required List<byte[]> Extensions { get; set; } 
+        public required List<Extension> Extensions { get; set; } 
         public required byte[] Signature { get; set; } 
 
         /// <inheritdoc />
@@ -70,7 +70,7 @@ namespace MatterDotNet.Messages.Certificates
                 reader.StartList(10);
                 Extensions = new();
                 while (!reader.IsEndContainer()) {
-                    Extensions.Add(reader.GetBytes(-1)!);
+                    Extensions.Add(new Extension(reader, -1));
                 }
                 reader.EndContainer();
             }
@@ -105,7 +105,7 @@ namespace MatterDotNet.Messages.Certificates
             {
                 writer.StartList(10);
                 foreach (var item in Extensions) {
-                    writer.WriteBytes(-1, item);
+                    item.Serialize(writer, -1);
                 }
                 writer.EndContainer();
             }

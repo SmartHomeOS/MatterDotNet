@@ -166,8 +166,8 @@ namespace MatterDotNet.Protocol.Cryptography
             var p = ecc.ExportParameters(true);
             byte[] pub = new byte[PUBLIC_KEY_SIZE_BYTES];
             pub[0] = 0x4;
-            p.Q.X!.CopyTo(pub, 1);
-            p.Q.Y!.CopyTo(pub, GROUP_SIZE_BYTES + 1);
+            p.Q.X!.CopyTo(pub, 1 + 32 - p.Q.X.Length);
+            p.Q.Y!.CopyTo(pub, GROUP_SIZE_BYTES + 1 + 32 - p.Q.Y.Length);
             return (pub, p.D!);
         }
 

@@ -24,13 +24,13 @@ namespace MatterDotNet.PKI
         private static readonly TimeSpan EPOCH = TimeSpan.FromSeconds(946684800);
         protected X509Certificate2 cert;
 
-        protected const string OID_CommonName = "OID.2.5.4.3";
-        protected const string OID_NodeId = "OID.1.3.6.1.4.1.37244.1.1";
-        protected const string OID_FirmwareSigning = "OID.1.3.6.1.4.1.37244.1.2";
-        protected const string OID_ICAC = "OID.1.3.6.1.4.1.37244.1.3";
-        protected const string OID_RCAC = "OID.1.3.6.1.4.1.37244.1.4";
-        protected const string OID_FabricID = "OID.1.3.6.1.4.1.37244.1.5";
-        protected const string OID_NOCCat = "OID.1.3.6.1.4.1.37244.1.6";
+        protected const string OID_CommonName = "2.5.4.3";
+        protected const string OID_NodeId = "1.3.6.1.4.1.37244.1.1";
+        protected const string OID_FirmwareSigning = "1.3.6.1.4.1.37244.1.2";
+        protected const string OID_ICAC = "1.3.6.1.4.1.37244.1.3";
+        protected const string OID_RCAC = "1.3.6.1.4.1.37244.1.4";
+        protected const string OID_FabricID = "1.3.6.1.4.1.37244.1.5";
+        protected const string OID_NOCCat = "1.3.6.1.4.1.37244.1.6";
 
         protected OperationalCertificate() { }
 
@@ -52,64 +52,54 @@ namespace MatterDotNet.PKI
 
         private void ParseCert()
         {
-            string[] oids = this.cert.Subject.Split(',', StringSplitOptions.TrimEntries);
-            foreach (string kvp in oids)
+            foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
             {
-                string[] parts = kvp.Split('=', 2);
-                if (parts.Length == 2)
+                switch (dn.GetSingleElementType().Value)
                 {
-                    switch (parts[0].ToUpper())
-                    {
-                        case OID_CommonName:
-                            CommonName = parts[1];
-                            break;
-                        case OID_NodeId:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong id))
-                                NodeID = id;
-                            break;
-                        case OID_FirmwareSigning:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong firmware))
-                                FirmwareSigningID = firmware;
-                            break;
-                        case OID_ICAC:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong icac))
-                                ICAC = icac;
-                            break;
-                        case OID_RCAC:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong rcac))
-                                RCAC = rcac;
-                            break;
-                        case OID_FabricID:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong fabric))
-                                FabricID = fabric;
-                            break;
-                        case OID_NOCCat:
-                            if (uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint noc))
-                                NOCCat = noc;
-                            break;
-                        case "OID.1.3.6.1.4.1.37244.2.1":
-                            if (uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint vid))
-                                VendorID = vid;
-                            break;
-                        case "OID.1.3.6.1.4.1.37244.2.2":
-                            if (uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint pid))
-                                ProductID = pid;
-                            break;
-                    }
+                    case OID_CommonName:
+                        CommonName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_NodeId:
+                        if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong id))
+                            NodeID = id;
+                        break;
+                    case OID_FirmwareSigning:
+                        if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong firmware))
+                            FirmwareSigningID = firmware;
+                        break;
+                    case OID_ICAC:
+                        if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong icac))
+                            ICAC = icac;
+                        break;
+                    case OID_RCAC:
+                        if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong rcac))
+                            RCAC = rcac;
+                        break;
+                    case OID_FabricID:
+                        if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong fabric))
+                            FabricID = fabric;
+                        break;
+                    case OID_NOCCat:
+                        if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint noc))
+                            NOCCat = noc;
+                        break;
+                    case "1.3.6.1.4.1.37244.2.1":
+                        if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint vid))
+                            VendorID = vid;
+                        break;
+                    case "1.3.6.1.4.1.37244.2.2":
+                        if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint pid))
+                            ProductID = pid;
+                        break;
                 }
             }
-            string[] issuerOIDs = this.cert.Issuer.Split(',', StringSplitOptions.TrimEntries);
-            foreach (string kvp in issuerOIDs)
+            foreach (X500RelativeDistinguishedName dn in cert.IssuerName.EnumerateRelativeDistinguishedNames(false))
             {
-                string[] parts = kvp.Split('=', 2);
-                if (parts.Length == 2)
+                switch (dn.GetSingleElementType().Value)
                 {
-                    switch (parts[0].ToUpper())
-                    {
-                        case OID_CommonName:
-                            IssuerName = parts[1];
+                    case OID_CommonName:
+                            IssuerName = dn.GetSingleElementValue()!;
                             break;
-                    }
                 }
             }
         }
@@ -211,7 +201,7 @@ namespace MatterDotNet.PKI
             List<DnAttribute> attrs = new List<DnAttribute>();
             foreach (X500RelativeDistinguishedName dn in subject.EnumerateRelativeDistinguishedNames(false))
             {
-                switch ($"OID.{dn.GetSingleElementType().Value}")
+                switch (dn.GetSingleElementType().Value)
                 {
                     case OID_CommonName:
                         attrs.Add(new DnAttribute() { CommonName = dn.GetSingleElementValue() });

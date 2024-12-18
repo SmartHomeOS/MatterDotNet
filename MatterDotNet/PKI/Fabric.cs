@@ -31,8 +31,8 @@ namespace MatterDotNet.PKI
             this.RCAC = rcac;
             this.FabricID = fabricId;
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
-            builder.Add(OID_RCAC.Substring(4), $"{RCAC:X16}", UniversalTagNumber.UTF8String);
-            builder.Add(OID_FabricID.Substring(4), $"{FabricID:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_RCAC, $"{RCAC:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_FabricID, $"{FabricID:X16}", UniversalTagNumber.UTF8String);
             PrivateKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
             CertificateRequest req = new CertificateRequest(builder.Build(), PrivateKey, HashAlgorithmName.SHA256);
             req.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, true, 0, true));
@@ -49,23 +49,18 @@ namespace MatterDotNet.PKI
         protected Fabric(X509Certificate2 cert, ECDsa key)
         {
             this.cert = cert;
-            string[] oids = this.cert.Subject.Split(',', StringSplitOptions.TrimEntries);
-            foreach (string kvp in oids)
+            foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
             {
-                string[] parts = kvp.Split('=', 2);
-                if (parts.Length == 2)
+                switch (dn.GetSingleElementType().Value)
                 {
-                    switch (parts[0].ToUpper())
-                    {
-                        case OID_RCAC:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong rcac))
+                    case OID_RCAC:
+                            if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong rcac))
                                 RCAC = rcac;
                             break;
                         case OID_FabricID:
-                            if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong fabric))
+                            if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong fabric))
                                 FabricID = fabric;
                             break;
-                    }
                 }
             }
             PrivateKey = key;
@@ -78,8 +73,8 @@ namespace MatterDotNet.PKI
         {
             ulong nodeId = (ulong)(0xbaddeed2 + nodes.Count);
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
-            builder.Add(OID_NodeId.Substring(4), $"{nodeId:X16}", UniversalTagNumber.UTF8String);
-            builder.Add(OID_FabricID.Substring(4), $"{FabricID:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_NodeId, $"{nodeId:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_FabricID, $"{FabricID:X16}", UniversalTagNumber.UTF8String);
             CertificateRequest signingCSR = new CertificateRequest(builder.Build(), nocsr.PublicKey, HashAlgorithmName.SHA256);
             signingCSR.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
             signingCSR.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));
@@ -101,8 +96,8 @@ namespace MatterDotNet.PKI
             ulong nodeId = (ulong)(0xbaddeed2 + nodes.Count);
             ECDsa key = ECDsa.Create(new ECParameters() { Curve = ECCurve.NamedCurves.nistP256, D = privateKey, Q = new BigIntegerPoint(publicKey).ToECPoint()});
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
-            builder.Add(OID_NodeId.Substring(4), $"{nodeId:X16}", UniversalTagNumber.UTF8String);
-            builder.Add(OID_FabricID.Substring(4), $"{FabricID:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_NodeId, $"{nodeId:X16}", UniversalTagNumber.UTF8String);
+            builder.Add(OID_FabricID, $"{FabricID:X16}", UniversalTagNumber.UTF8String);
             CertificateRequest signingCSR = new CertificateRequest(builder.Build(), key, HashAlgorithmName.SHA256);
             signingCSR.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
             signingCSR.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));

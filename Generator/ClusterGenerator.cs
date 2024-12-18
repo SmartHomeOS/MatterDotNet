@@ -491,6 +491,9 @@ namespace Generator
                 case "double":
                     writer.Write($"{type}");
                     break;
+                case "ref_SemTag":
+                    writer.Write("SemanticTag");
+                    break;
                 default:
                     writer.Write(GeneratorUtil.SanitizeName(type));
                     break;

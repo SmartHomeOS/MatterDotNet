@@ -17,6 +17,7 @@ namespace Generator
         static void Main(string[] args)
         {
             Directory.CreateDirectory("outputs");
+            ClusterGenerator.Generate();
             foreach (string file in Directory.EnumerateFiles("..\\..\\..\\Structures"))
             {
                 Tag[] structs;
@@ -29,7 +30,7 @@ namespace Generator
                 foreach (Tag tag in structs)
                 {
                     if (tag.Namespace != null && !Directory.Exists($"outputs\\{tag.Namespace}\\"))
-                            Directory.CreateDirectory($"outputs\\{tag.Namespace}\\");
+                        Directory.CreateDirectory($"outputs\\{tag.Namespace}\\");
 
                     string path = $"outputs\\{((tag.Namespace != null) ? tag.Namespace + "\\" : "")}" + tag.Name + ".cs";
                     if (File.Exists(path))
@@ -43,7 +44,6 @@ namespace Generator
                     }
                 }
             }
-            Console.ReadLine();
         }
 
         

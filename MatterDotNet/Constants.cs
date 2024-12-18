@@ -17,5 +17,12 @@ namespace MatterDotNet
         public const int MATTER_10_REVISION = 10;
         public const int MATTER_12_REVISION = 11;
         public const int MATTER_13_REVISION = 12;
+
+        /// <summary>
+        /// The current limit of 900 bytes was chosen to accommodate the maximum size of IPv6 frames, transport headers, 
+        /// message layer headers and integrity protection and Interaction Model protocol encoding, 
+        /// while accounting for sufficient remaining space for signatures and to allow extensions to larger key and digest sizes in the future.
+        /// </summary>
+        public const int RESP_MAX = 900;
     }
 }

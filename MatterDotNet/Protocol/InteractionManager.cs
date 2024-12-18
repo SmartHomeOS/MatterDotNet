@@ -88,6 +88,12 @@ namespace MatterDotNet.Protocol
             }
         }
 
+        public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
+        {
+            using (Exchange exchange = session.CreateExchange())
+                return SendCommand(exchange, endpoint, cluster, command, payload);
+        }
+
         public static async Task SendCommand(Exchange exchange, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
         {
             InvokeRequestMessage run = new InvokeRequestMessage()

@@ -12,7 +12,6 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
@@ -65,7 +64,7 @@ namespace MatterDotNet.Clusters
             IndoorOutdoor = 2,
         }
 
-        public record BasicCommissioningInfoStruct : TLVPayload {
+        public record BasicCommissioningInfo : TLVPayload {
             public required ushort FailSafeExpiryLengthSeconds { get; set; }
             public required ushort MaxCumulativeFailsafeSeconds { get; set; }
             public override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -88,8 +87,8 @@ namespace MatterDotNet.Clusters
         }
 
         public struct ArmFailSafeResponse {
-            public CommissioningErrorEnum ErrorCode { get; set; }
-            public string DebugText { get; set; }
+            public required CommissioningErrorEnum ErrorCode { get; set; }
+            public required string DebugText { get; set; }
         }
 
         private record SetRegulatoryConfigPayload : TLVPayload {
@@ -107,7 +106,7 @@ namespace MatterDotNet.Clusters
 
         public struct SetRegulatoryConfigResponse {
             public required CommissioningErrorEnum ErrorCode { get; set; }
-            public required String DebugText { get; set; }
+            public required string DebugText { get; set; }
         }
 
         public struct CommissioningCompleteResponse {
@@ -125,7 +124,6 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new ArmFailSafeResponse() {
-                
                 ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
@@ -158,7 +156,7 @@ namespace MatterDotNet.Clusters
 
         // Attributes
         public ulong Breadcrumb { get; set; } = 0;
-        public BasicCommissioningInfoStruct BasicCommissioningInfo { get; }
+        public BasicCommissioningInfo BasicCommissioningInfoField { get; }
         public RegulatoryLocationTypeEnum RegulatoryConfig { get; } = RegulatoryLocationTypeEnum.IndoorOutdoor;
         public RegulatoryLocationTypeEnum LocationCapability { get; } = RegulatoryLocationTypeEnum.IndoorOutdoor;
         public bool SupportsConcurrentConnection { get; } = true;

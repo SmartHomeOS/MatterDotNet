@@ -8,9 +8,10 @@
 * Framing & TLV Parsing / Generation 
 * Sessions & Exchanges
 * QR Code / MDNS Payload Parsing
+* Device Commissioning
 
 #### What's In Progress:
-* Device Commissioning
+* Cluster generation
 
 #### Coming Soon
 * Matter 1.3 Standard Implementation

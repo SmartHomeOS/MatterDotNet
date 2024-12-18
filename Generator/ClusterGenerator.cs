@@ -79,7 +79,10 @@ namespace Generator
 
             writer.WriteLine("        // Attributes");
             foreach (var attribute in cluster.attributes)
-                WriteAttribute(attribute, writer);
+            {
+                if (attribute.type != null)
+                    WriteAttribute(attribute, writer);
+            }
 
             writer.WriteLine("    }");
             writer.Write("}");
@@ -93,10 +96,12 @@ namespace Generator
             writer.WriteLine($"        {(toServer ? "private record" : "public struct")} " + GeneratorUtil.SanitizeName(command.name) + (toServer ? "Payload : TLVPayload {" : " {"));
             foreach (clusterCommandField field in command.field)
             {
+                if (field.type == null) //Reserved/removed fields
+                    continue;
                 writer.Write("            public ");
                 if (field.optionalConform == null)
                     writer.Write("required ");
-                WriteType(field.type, null, writer);
+                WriteType(field.type, field.entry?.type, writer);
                 if (field.optionalConform != null)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(command.name))
@@ -208,9 +213,9 @@ namespace Generator
                 case "uint56":
                 case "uint64":
                 case "epoch-us":
-                case "posix-ms":
+                case "ref_DataTypePosixMs":
                 case "systime-us":
-                case "systime-ms":
+                case "ref_DataTypeSystemTimeMs":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -225,11 +230,11 @@ namespace Generator
                     writer.WriteLine($"{totalIndent}writer.WriteDouble({id}, {name});");
                     break;
                 case "octstr":
-                case "ipadr":
-                case "ipv4adr":
-                case "ipv6adr":
+                case "ref_IpAdr":
+                case "ref_Ipv4Adr":
+                case "ref_Ipv6Adr":
                 case "ipv6pre":
-                case "hwadr":
+                case "Hardware Address":
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name});");
                     break;
                 case "string":
@@ -274,8 +279,12 @@ namespace Generator
                     {
                         foreach (var field in cmd.field)
                         {
+                            if (field.type == null)
+                                continue;
                             writer.Write(", ");
-                            WriteType(field.type, null, writer);
+                            WriteType(field.type, field.entry?.type, writer);
+                            if (field.optionalConform != null)
+                                writer.Write('?');
                             writer.Write(" " + field.name);
                         }
                     }
@@ -290,7 +299,7 @@ namespace Generator
                     }
                     else
                     {
-                        if (cmd.response != "N")
+                        if (cmd.response == "N")
                             writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
                         else
                             writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
@@ -308,7 +317,7 @@ namespace Generator
                         foreach (var field in response.field)
                         {
                             writer.Write("                " + field.name + " = (");
-                            WriteType(field.type, null, writer);
+                            WriteType(field.type, field.entry?.type, writer);
                             if (field.optionalConform != null)
                                 writer.WriteLine($"?)GetOptionalField(resp, {field.id}),");
                             else
@@ -439,9 +448,9 @@ namespace Generator
                 case "uint56":
                 case "uint64":
                 case "epoch-us":
-                case "posix-ms":
+                case "ref_DataTypePosixMs":
                 case "systime-us":
-                case "systime-ms":
+                case "ref_DataTypeSystemTimeMs":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -479,11 +488,11 @@ namespace Generator
                     writer.Write("float");
                     break;
                 case "octstr":
-                case "ipadr":
-                case "ipv4adr":
-                case "ipv6adr":
+                case "ref_IpAdr":
+                case "ref_Ipv4Adr":
+                case "ref_Ipv6Adr":
                 case "ipv6pre":
-                case "hwadr":
+                case "Hardware Address":
                     writer.Write("byte[]");
                     break;
                 case "bool":

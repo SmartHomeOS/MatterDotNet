@@ -88,7 +88,7 @@ namespace MatterDotNet.PKI
             collection.Add(new Oid("1.3.6.1.5.5.7.3.2"));
             signingCSR.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(collection, true));
             signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(nocsr.PublicKey, false));
-            signingCSR.CertificateExtensions.Add(cert.Extensions.First(e => e is X509AuthorityKeyIdentifierExtension));
+            signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));
             byte[] serial = new byte[20];
             Random.Shared.NextBytes(serial);
             OperationalCertificate ret = new OperationalCertificate(signingCSR.Create(cert, DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(1), serial));
@@ -111,7 +111,7 @@ namespace MatterDotNet.PKI
             collection.Add(new Oid("1.3.6.1.5.5.7.3.2"));
             signingCSR.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(collection, true));
             signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(key.ExportSubjectPublicKeyInfo(), false));
-            signingCSR.CertificateExtensions.Add(cert.Extensions.First(e => e is X509AuthorityKeyIdentifierExtension));
+            signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));
             byte[] serial = new byte[20];
             Random.Shared.NextBytes(serial);
             OperationalCertificate ret = new OperationalCertificate(signingCSR.Create(cert, DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(1), serial));

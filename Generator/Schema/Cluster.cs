@@ -1663,6 +1663,20 @@ namespace Generator.Schema
 
         private bool defaultFieldSpecified;
 
+        private clusterAttributeEntry? entryField;
+
+        public clusterAttributeEntry? entry
+        {
+            get
+            {
+                return this.entryField;
+            }
+            set
+            {
+                this.entryField = value;
+            }
+        }
+
         /// <remarks/>
         public object optionalConform
         {

@@ -13,6 +13,7 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Messages.InteractionModel;
+using MatterDotNet.PKI;
 using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -250,7 +251,7 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<CSRResponse?> CSRRequest (SecureSession session, byte[] CSRNonce, bool IsForUpdateNOC) {
+        public async Task<CSRResponse?> CSRRequest (SecureSession session, byte[] CSRNonce, bool? IsForUpdateNOC) {
             CSRRequestPayload requestFields = new CSRRequestPayload() {
                 CSRNonce = CSRNonce,
                 IsForUpdateNOC = IsForUpdateNOC,
@@ -264,7 +265,7 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> AddNOC (SecureSession session, byte[] NOCValue, byte[] ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
+        public async Task<NOCResponse?> AddNOC (SecureSession session, byte[] NOCValue, byte[]? ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
             AddNOCPayload requestFields = new AddNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
@@ -276,13 +277,13 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
-                StatusCode = (NodeOperationalCertStatusEnum)GetField(resp, 0),
+                StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
                 FabricIndex = (byte?)GetOptionalField(resp, 1),
                 DebugText = (string?)GetOptionalField(resp, 2),
             };
         }
 
-        public async Task<NOCResponse?> UpdateNOC (SecureSession session, byte[] NOCValue, byte[] ICACValue) {
+        public async Task<NOCResponse?> UpdateNOC (SecureSession session, byte[] NOCValue, byte[]? ICACValue) {
             UpdateNOCPayload requestFields = new UpdateNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
@@ -323,6 +324,13 @@ namespace MatterDotNet.Clusters
                 FabricIndex = (byte?)GetOptionalField(resp, 1),
                 DebugText = (string?)GetOptionalField(resp, 2),
             };
+        }
+
+        public Task<bool> AddTrustedRootCertificate(SecureSession session, OperationalCertificate RootCACertificate)
+        {
+            PayloadWriter payload = new PayloadWriter(600);
+            RootCACertificate.ToMatterCertificate().Serialize(payload);
+            return AddTrustedRootCertificate(session, payload.GetPayload().ToArray());
         }
 
         public async Task<bool> AddTrustedRootCertificate (SecureSession session, byte[] RootCACertificate) {

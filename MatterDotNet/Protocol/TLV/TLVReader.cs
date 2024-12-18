@@ -351,7 +351,11 @@ namespace MatterDotNet.Protocol.Parsers
                         if (control == TLVControl.Anonymous)
                             structure.Add(GetAny(-1)!);
                         else
-                            structure.Insert((int)this.tagNumber, GetAny(this.tagNumber)!);
+                        {
+                            while (this.tagNumber > structure.Count)
+                                structure.Add(null!);
+                            structure.Add(GetAny(this.tagNumber)!);
+                        }
                     }
                     EndContainer();
                     return structure.ToArray();

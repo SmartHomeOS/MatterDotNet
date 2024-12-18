@@ -11,10 +11,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Messages.Certificates;
-using MatterDotNet.Protocol.Cryptography;
 using System.Formats.Asn1;
 using System.Globalization;
-using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -23,22 +22,17 @@ namespace MatterDotNet.PKI
     public class OperationalCertificate
     {
         private static readonly TimeSpan EPOCH = TimeSpan.FromSeconds(946684800);
-        X509Certificate2 cert;
+        protected X509Certificate2 cert;
 
-        public OperationalCertificate(ulong rcac, string commonName)
-        {
-            this.RCAC = rcac;
-            this.CommonName = commonName;
-            string subject = $"CN={CommonName},OID.1.3.6.1.4.1.37244.1.4={RCAC}";
-            PrivateKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-            CertificateRequest req = new CertificateRequest(subject, PrivateKey, HashAlgorithmName.SHA256);
-            req.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, true, 0, true));
-            req.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyCertSign | X509KeyUsageFlags.CrlSign, true));
-            byte[] subjectKeyIdentifier = SHA1.HashData(new BigIntegerPoint(PrivateKey.ExportParameters(false).Q).ToBytes(true));
-            req.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(subjectKeyIdentifier, false));
-            req.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromSubjectKeyIdentifier(subjectKeyIdentifier));
-            this.cert = req.CreateSelfSigned(DateTime.Now, DateTime.Now.AddYears(10));
-        }
+        protected const string OID_CommonName = "OID.2.5.4.3";
+        protected const string OID_NodeId = "OID.1.3.6.1.4.1.37244.1.1";
+        protected const string OID_FirmwareSigning = "OID.1.3.6.1.4.1.37244.1.2";
+        protected const string OID_ICAC = "OID.1.3.6.1.4.1.37244.1.3";
+        protected const string OID_RCAC = "OID.1.3.6.1.4.1.37244.1.4";
+        protected const string OID_FabricID = "OID.1.3.6.1.4.1.37244.1.5";
+        protected const string OID_NOCCat = "OID.1.3.6.1.4.1.37244.1.6";
+
+        protected OperationalCertificate() { }
 
         public OperationalCertificate(byte[] cert)
         {
@@ -47,6 +41,17 @@ namespace MatterDotNet.PKI
             #else
                 this.cert = new X509Certificate2(cert);
             #endif
+            ParseCert();
+        }
+
+        internal OperationalCertificate(X509Certificate2 cert)
+        {
+            this.cert = cert;
+            ParseCert();
+        }
+
+        private void ParseCert()
+        {
             string[] oids = this.cert.Subject.Split(',', StringSplitOptions.TrimEntries);
             foreach (string kvp in oids)
             {
@@ -55,30 +60,30 @@ namespace MatterDotNet.PKI
                 {
                     switch (parts[0].ToUpper())
                     {
-                        case "CN":
+                        case OID_CommonName:
                             CommonName = parts[1];
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.1":
+                        case OID_NodeId:
                             if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong id))
                                 NodeID = id;
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.2":
+                        case OID_FirmwareSigning:
                             if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong firmware))
                                 FirmwareSigningID = firmware;
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.3":
+                        case OID_ICAC:
                             if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong icac))
                                 ICAC = icac;
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.4":
+                        case OID_RCAC:
                             if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong rcac))
                                 RCAC = rcac;
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.5":
+                        case OID_FabricID:
                             if (ulong.TryParse(parts[1], NumberStyles.HexNumber, null, out ulong fabric))
                                 FabricID = fabric;
                             break;
-                        case "OID.1.3.6.1.4.1.37244.1.6":
+                        case OID_NOCCat:
                             if (uint.TryParse(parts[1], NumberStyles.HexNumber, null, out uint noc))
                                 NOCCat = noc;
                             break;
@@ -101,7 +106,7 @@ namespace MatterDotNet.PKI
                 {
                     switch (parts[0].ToUpper())
                     {
-                        case "CN":
+                        case OID_CommonName:
                             IssuerName = parts[1];
                             break;
                     }
@@ -109,18 +114,26 @@ namespace MatterDotNet.PKI
             }
         }
 
-        public bool VerifyChain(byte[] paiCert, X509Certificate2 paaCert)
+        public bool VerifyChain(byte[] intermediateCert, OperationalCertificate rootCert)
         {
             X509Chain chain = new X509Chain();
             #if NET9_0_OR_GREATER
-                chain.ChainPolicy.ExtraStore.Add(X509CertificateLoader.LoadCertificate(paiCert));
+                chain.ChainPolicy.ExtraStore.Add(X509CertificateLoader.LoadCertificate(intermediateCert));
             #else
-                chain.ChainPolicy.ExtraStore.Add(new X509Certificate2(paiCert));
+                chain.ChainPolicy.ExtraStore.Add(new X509Certificate2(intermediateCert));
             #endif
-            chain.ChainPolicy.CustomTrustStore.Add(paaCert);
+            chain.ChainPolicy.CustomTrustStore.Add(rootCert.cert);
             chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
             chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreWrongUsage;
+            return chain.Build(cert);
+        }
+
+        public bool VerifyChain(OperationalCertificate rootCert)
+        {
+            X509Chain chain = new X509Chain();
+            chain.ChainPolicy.CustomTrustStore.Add(rootCert.cert);
+            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
             return chain.Build(cert);
         }
 
@@ -140,10 +153,14 @@ namespace MatterDotNet.PKI
             var algorithmSpan = certificateSpan.Slice(tbsOffset + tbsLength);
             AsnDecoder.ReadSequence(algorithmSpan, encodingRules, out var algOffset, out var algLength, out _);
 
-            byte[] signatureBlock = AsnDecoder.ReadBitString(algorithmSpan.Slice(algOffset + algLength), encodingRules, out _, out _ );
+            byte[] signatureSequence = AsnDecoder.ReadBitString(algorithmSpan.Slice(algOffset + algLength), encodingRules, out _, out _ );
+            AsnDecoder.ReadSequence(signatureSequence, encodingRules, out var sigOffset, out int sigLength, out _);
+            BigInteger part1 = AsnDecoder.ReadInteger(signatureSequence.AsSpan(sigOffset, sigLength), encodingRules, out var intLen);
+            BigInteger part2 = AsnDecoder.ReadInteger(signatureSequence.AsSpan(sigOffset + intLen), encodingRules, out _);
+
             byte[] signature = new byte[64];
-            Array.Copy(signatureBlock, 4, signature, 0, 32);
-            Array.Copy(signatureBlock, 39, signature, 32, 32);
+            Array.Copy(part1.ToByteArray(true, true), 0, signature, 0, 32);
+            Array.Copy(part2.ToByteArray(true, true), 0, signature, 32, 32);
             return signature;
         }
 
@@ -188,6 +205,46 @@ namespace MatterDotNet.PKI
             }
             return extUsage.ToArray();
         }
+        
+        private static List<DnAttribute> GetDNs(X500DistinguishedName subject)
+        {
+            List<DnAttribute> attrs = new List<DnAttribute>();
+            foreach (X500RelativeDistinguishedName dn in subject.EnumerateRelativeDistinguishedNames(false))
+            {
+                switch ($"OID.{dn.GetSingleElementType().Value}")
+                {
+                    case OID_CommonName:
+                        attrs.Add(new DnAttribute() { CommonName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_NodeId:
+                        if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong id))
+                            attrs.Add(new DnAttribute() { MatterNodeId = id });
+                        break;
+                    case OID_FirmwareSigning:
+                        if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong firmware))
+                            attrs.Add(new DnAttribute() { MatterFirmwareSigningId = firmware });
+                        break;
+                    case OID_ICAC:
+                        if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong icac))
+                            attrs.Add(new DnAttribute() { MatterIcacId = icac });
+                        break;
+                    case OID_RCAC:
+                        if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong rcac))
+                            attrs.Add(new DnAttribute() { MatterRcacId = rcac });
+                        break;
+                    case OID_FabricID:
+                        if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong fabric))
+                            attrs.Add(new DnAttribute() { MatterFabricId = fabric });
+                        break;
+                    case OID_NOCCat:
+                        if (uint.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out uint noc))
+                            attrs.Add(new DnAttribute() { MatterNocCat = noc });
+                        break;
+                }
+            }
+            
+            return attrs;
+        }
 
         public MatterCertificate ToMatterCertificate()
         {
@@ -221,55 +278,14 @@ namespace MatterDotNet.PKI
                 NotAfter = (uint)((DateTimeOffset)cert.NotAfter - EPOCH).ToUnixTimeSeconds(),
                 Signature = GetSignature(),
                 Extensions = extensions,
-                Issuer = GetDNs(cert.Issuer),
-                Subject = GetDNs(cert.Subject)
+                Issuer = GetDNs(cert.IssuerName),
+                Subject = GetDNs(cert.SubjectName)
             };
         }
 
-        private static List<DnAttribute> GetDNs(string subject)
+        internal X509Certificate2 GetRaw()
         {
-            List<DnAttribute> attrs = new List<DnAttribute>();
-            string[] oids = subject.Split(',', StringSplitOptions.TrimEntries);
-            Dictionary<string, string> kvps = new Dictionary<string, string>();
-            foreach (string oid in oids)
-            {
-                string[] parts = oid.Split('=', 2);
-                if (parts.Length == 2)
-                    kvps.Add(parts[0], parts[1]);
-            }
-            if (kvps.ContainsKey("CN"))
-                attrs.Add(new DnAttribute() { CommonName = kvps["CN"] });
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.1"))
-            {
-                if (ulong.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.1"], NumberStyles.HexNumber, null, out ulong id))
-                    attrs.Add(new DnAttribute() { MatterNodeId = id });
-            }
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.2"))
-            {
-                if (ulong.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.2"], NumberStyles.HexNumber, null, out ulong firmware))
-                    attrs.Add(new DnAttribute() { MatterFirmwareSigningId = firmware });
-            }
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.3"))
-            {
-                if (ulong.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.3"], NumberStyles.HexNumber, null, out ulong icac))
-                    attrs.Add(new DnAttribute() { MatterIcacId = icac });
-            }
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.4"))
-            {
-                if (ulong.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.4"], NumberStyles.HexNumber, null, out ulong rcac))
-                    attrs.Add(new DnAttribute() { MatterRcacId = rcac });
-            }
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.5"))
-            {
-                if (ulong.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.5"], NumberStyles.HexNumber, null, out ulong fabric))
-                    attrs.Add(new DnAttribute() { MatterFabricId = fabric });
-            }
-            if (kvps.ContainsKey("OID.1.3.6.1.4.1.37244.1.6"))
-            {
-                if (uint.TryParse(kvps["OID.1.3.6.1.4.1.37244.1.6"], NumberStyles.HexNumber, null, out uint noc))
-                    attrs.Add(new DnAttribute() { MatterNocCat = noc });
-            }
-            return attrs;
+            return cert;
         }
 
         public string IssuerName { get; set; } = string.Empty;
@@ -292,6 +308,5 @@ namespace MatterDotNet.PKI
 
         public uint ProductID { get; set; }
         public byte[] PublicKey { get { return cert.GetPublicKey(); } }
-        public ECDsa? PrivateKey { get; init; }
     }
 }

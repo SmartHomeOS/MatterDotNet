@@ -14,6 +14,8 @@ using MatterDotNet.Messages.Certificates;
 using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Test
 {
@@ -42,6 +44,21 @@ namespace Test
         }
 
         [Test]
+        public void RCACEncoding()
+        {
+            byte[] rcacDER = Convert.FromBase64String("MIIBnTCCAUOgAwIBAgIIWeqmMpR/VBwwCgYIKoZIzj0EAwIwIjEgMB4GCisGAQQBgqJ8AQQMEENBQ0FDQUNBMDAwMDAwMDEwHhcNMjAxMDE1MTQyMzQzWhcNNDAxMDE1MTQyMzQyWjAiMSAwHgYKKwYBBAGConwBBAwQQ0FDQUNBQ0EwMDAwMDAwMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABBNTo7PvHacIxJCASAFOQH1ZkM4ivE6zPppayyWoVgPrptzYITZmpORPWsoT63Z/r6fc3dwzQR+CowtUPdHSS6ijYzBhMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQTr4GrNzdLLtKpZJsSt6OkKH4VHTAfBgNVHSMEGDAWgBQTr4GrNzdLLtKpZJsSt6OkKH4VHTAKBggqhkjOPQQDAgNIADBFAiBFgWRGbI8ZWrwKu3xstaJ6g/QdN/jVO+7FIKvSoNoFCQIhALinwlwELjDPZNww/jNOEgAZZk5RUEkTT1eBI4RE/HUx");
+            byte[] nocTLV = Convert.FromHexString("1530010859eaa632947f541c2402013703271401000000cacacaca182604ef171b2726056eb5b94c3706271401000000cacacaca18240701240801300941041353a3b3ef1da708c4908048014e407d5990ce22bc4eb33e9a5acb25a85603eba6dcd8213666a4e44f5aca13eb767fafa7dcdddc33411f82a30b543dd1d24ba8370a350129011824026030041413af81ab37374b2ed2a9649b12b7a3a4287e151d30051413af81ab37374b2ed2a9649b12b7a3a4287e151d18300b40458164466c8f195abc0abb7c6cb5a27a83f41d37f8d53beec520abd2a0da0509b8a7c25c042e30cf64dc30fe334e120019664e515049134f5781238444fc753118");
+
+            OperationalCertificate cert = new OperationalCertificate(rcacDER);
+            MatterCertificate control = new MatterCertificate(nocTLV);
+
+            MatterCertificate tlv = cert.ToMatterCertificate();
+            PayloadWriter output = new PayloadWriter(400);
+            tlv.Serialize(new TLVWriter(output));
+            CollectionAssert.AreEqual(output.GetPayload().Span.ToArray(), nocTLV);
+        }
+
+        [Test]
         public void NOCEncoding()
         {
             byte[] nocDER = Convert.FromBase64String("MIIB4DCCAYagAwIBAgIIPvz/FwK5oXowCgYIKoZIzj0EAwIwIjEgMB4GCisGAQQBgqJ8AQMMEENBQ0FDQUNBMDAwMDAwMDMwHhcNMjAxMDE1MTQyMzQzWhcNNDAxMDE1MTQyMzQyWjBEMSAwHgYKKwYBBAGConwBAQwQREVERURFREUwMDAxMDAwMTEgMB4GCisGAQQBgqJ8AQUMEEZBQjAwMDAwMDAwMDAwMUQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASaKiFvs53WtvohG4NciePmr7ZsFPdYMZVPn/T3o/ARLIoNjq8pxlMpTUju4HCKAyzKOTk8OntG8YGuoHj+rYODo4GDMIGAMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAdBgNVHQ4EFgQUn1Wia35DA+YIg+kTv5T0+14qYWEwHwYDVR0jBBgwFoAUU1LXBZ6cFaUIkGhihkgBop8fQdMwCgYIKoZIzj0EAwIDSAAwRQIgeVXCAmMLS6TVkSUmMi/fKPie3+WvnA5XK9ihSqq7TRICIQC4PKF8ewX7Fkt315xSlhMxa8/ReJXksqTyQEuYFzJxWQ==");
@@ -51,9 +68,22 @@ namespace Test
             MatterCertificate control = new MatterCertificate(nocTLV);
 
             MatterCertificate tlv = cert.ToMatterCertificate();
-            PayloadWriter output = new PayloadWriter(512);
+            PayloadWriter output = new PayloadWriter(400);
             tlv.Serialize(new TLVWriter(output));
             CollectionAssert.AreEqual(output.GetPayload().Span.ToArray(), nocTLV);
+        }
+
+        [Test]
+        public void NOCSigning()
+        {
+            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1);
+            ECDsa key = ECDsa.Create();
+            CertificateRequest req = new CertificateRequest("CN=Test", key, HashAlgorithmName.SHA256);
+            OperationalCertificate noc = fabric.Sign(req);
+            MatterCertificate cert = noc.ToMatterCertificate();
+            Assert.That(noc.VerifyChain(fabric));
+            OperationalCertificate reparsed = new OperationalCertificate(fabric.Export()[0].Export(X509ContentType.Cert));
+            Assert.That(reparsed.FabricID, Is.EqualTo(fabric.FabricID));
         }
     }
 }

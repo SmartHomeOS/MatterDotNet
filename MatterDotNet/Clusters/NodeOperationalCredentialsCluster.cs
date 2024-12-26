@@ -13,7 +13,6 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Messages.InteractionModel;
-using MatterDotNet.PKI;
 using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -21,12 +20,22 @@ using MatterDotNet.Protocol.Sessions;
 
 namespace MatterDotNet.Clusters
 {
+    /// <summary>
+    /// Node Operational Credentials Cluster
+    /// </summary>
     public class NodeOperationalCredentialsCluster : ClusterBase
     {
         private const uint CLUSTER_ID = 0x003E;
 
+        /// <summary>
+        /// Node Operational Credentials Cluster
+        /// </summary>
         public NodeOperationalCredentialsCluster(ushort endPoint) : base(endPoint) { }
 
+        #region Enums
+        /// <summary>
+        /// Certificate Chain Type
+        /// </summary>
         public enum CertificateChainTypeEnum {
             /// <summary>
             /// Request the DER-encoded DAC certificate
@@ -38,6 +47,9 @@ namespace MatterDotNet.Clusters
             PAICertificate = 2,
         }
 
+        /// <summary>
+        /// Node Operational Cert Status
+        /// </summary>
         public enum NodeOperationalCertStatusEnum {
             /// <summary>
             /// OK, no error
@@ -88,7 +100,9 @@ namespace MatterDotNet.Clusters
             /// </summary>
             InvalidFabricIndex = 11,
         }
+        #endregion Enums
 
+        #region Records
         public record FabricDescriptor : TLVPayload {
             public required byte[] RootPublicKey { get; set; }
             public required ushort VendorID { get; set; }
@@ -117,7 +131,9 @@ namespace MatterDotNet.Clusters
                 writer.EndContainer();
             }
         }
+        #endregion Records
 
+        #region Payloads
         private record AttestationRequestPayload : TLVPayload {
             public required byte[] AttestationNonce { get; set; }
             public override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -127,7 +143,7 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct AttestationResponse {
+        public struct AttestationResponse() {
             public required byte[] AttestationElements { get; set; }
             public required byte[] AttestationSignature { get; set; }
         }
@@ -141,7 +157,7 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct CertificateChainResponse {
+        public struct CertificateChainResponse() {
             public required byte[] Certificate { get; set; }
         }
 
@@ -157,7 +173,7 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct CSRResponse {
+        public struct CSRResponse() {
             public required byte[] NOCSRElements { get; set; }
             public required byte[] AttestationSignature { get; set; }
         }
@@ -192,7 +208,7 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct NOCResponse {
+        public struct NOCResponse() {
             public required NodeOperationalCertStatusEnum StatusCode { get; set; }
             public byte? FabricIndex { get; set; }
             public string? DebugText { get; set; }
@@ -224,9 +240,13 @@ namespace MatterDotNet.Clusters
                 writer.EndContainer();
             }
         }
+        #endregion Payloads
 
-        // Commands
-        public async Task<AttestationResponse?> AttestationRequest (SecureSession session, byte[] AttestationNonce) {
+        #region Commands
+        /// <summary>
+        /// Attestation Request
+        /// </summary>
+        public async Task<AttestationResponse?> AttestationRequest(SecureSession session, byte[] AttestationNonce) {
             AttestationRequestPayload requestFields = new AttestationRequestPayload() {
                 AttestationNonce = AttestationNonce,
             };
@@ -239,7 +259,10 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<CertificateChainResponse?> CertificateChainRequest (SecureSession session, CertificateChainTypeEnum CertificateType) {
+        /// <summary>
+        /// Certificate Chain Request
+        /// </summary>
+        public async Task<CertificateChainResponse?> CertificateChainRequest(SecureSession session, CertificateChainTypeEnum CertificateType) {
             CertificateChainRequestPayload requestFields = new CertificateChainRequestPayload() {
                 CertificateType = CertificateType,
             };
@@ -251,7 +274,10 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<CSRResponse?> CSRRequest (SecureSession session, byte[] CSRNonce, bool? IsForUpdateNOC) {
+        /// <summary>
+        /// CSR Request
+        /// </summary>
+        public async Task<CSRResponse?> CSRRequest(SecureSession session, byte[] CSRNonce, bool? IsForUpdateNOC) {
             CSRRequestPayload requestFields = new CSRRequestPayload() {
                 CSRNonce = CSRNonce,
                 IsForUpdateNOC = IsForUpdateNOC,
@@ -265,7 +291,10 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> AddNOC (SecureSession session, byte[] NOCValue, byte[]? ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
+        /// <summary>
+        /// Add NOC
+        /// </summary>
+        public async Task<NOCResponse?> AddNOC(SecureSession session, byte[] NOCValue, byte[]? ICACValue, byte[] IPKValue, ulong CaseAdminSubject, ushort AdminVendorId) {
             AddNOCPayload requestFields = new AddNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
@@ -283,7 +312,10 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<NOCResponse?> UpdateNOC (SecureSession session, byte[] NOCValue, byte[]? ICACValue) {
+        /// <summary>
+        /// Update NOC
+        /// </summary>
+        public async Task<NOCResponse?> UpdateNOC(SecureSession session, byte[] NOCValue, byte[]? ICACValue) {
             UpdateNOCPayload requestFields = new UpdateNOCPayload() {
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
@@ -292,13 +324,16 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
-                StatusCode = (NodeOperationalCertStatusEnum)GetField(resp, 0),
+                StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
                 FabricIndex = (byte?)GetOptionalField(resp, 1),
                 DebugText = (string?)GetOptionalField(resp, 2),
             };
         }
 
-        public async Task<NOCResponse?> UpdateFabricLabel (SecureSession session, string Label) {
+        /// <summary>
+        /// Update Fabric Label
+        /// </summary>
+        public async Task<NOCResponse?> UpdateFabricLabel(SecureSession session, string Label) {
             UpdateFabricLabelPayload requestFields = new UpdateFabricLabelPayload() {
                 Label = Label,
             };
@@ -306,13 +341,16 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
-                StatusCode = (NodeOperationalCertStatusEnum)GetField(resp, 0),
+                StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
                 FabricIndex = (byte?)GetOptionalField(resp, 1),
                 DebugText = (string?)GetOptionalField(resp, 2),
             };
         }
 
-        public async Task<NOCResponse?> RemoveFabric (SecureSession session, byte FabricIndex) {
+        /// <summary>
+        /// Remove Fabric
+        /// </summary>
+        public async Task<NOCResponse?> RemoveFabric(SecureSession session, byte FabricIndex) {
             RemoveFabricPayload requestFields = new RemoveFabricPayload() {
                 FabricIndex = FabricIndex,
             };
@@ -320,33 +358,36 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new NOCResponse() {
-                StatusCode = (NodeOperationalCertStatusEnum)GetField(resp, 0),
+                StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
                 FabricIndex = (byte?)GetOptionalField(resp, 1),
                 DebugText = (string?)GetOptionalField(resp, 2),
             };
         }
 
-        public Task<bool> AddTrustedRootCertificate(SecureSession session, OperationalCertificate RootCACertificate)
-        {
-            PayloadWriter payload = new PayloadWriter(600);
-            RootCACertificate.ToMatterCertificate().Serialize(payload);
-            return AddTrustedRootCertificate(session, payload.GetPayload().ToArray());
-        }
-
-        public async Task<bool> AddTrustedRootCertificate (SecureSession session, byte[] RootCACertificate) {
+        /// <summary>
+        /// Add Trusted Root Certificate
+        /// </summary>
+        public async Task<bool> AddTrustedRootCertificate(SecureSession session, byte[] RootCACertificate) {
             AddTrustedRootCertificatePayload requestFields = new AddTrustedRootCertificatePayload() {
                 RootCACertificate = RootCACertificate,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0B, requestFields);
             return validateResponse(resp);
         }
+        #endregion Commands
 
-        // Attributes
+        #region Attributes
         public List<NOC> NOCs { get; }
+
         public List<FabricDescriptor> Fabrics { get; }
+
         public byte SupportedFabrics { get; }
+
         public byte CommissionedFabrics { get; }
+
         public List<byte[]> TrustedRootCertificates { get; }
+
         public byte CurrentFabricIndex { get; } = 0;
+        #endregion Attributes
     }
 }

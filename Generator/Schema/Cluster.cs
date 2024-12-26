@@ -1472,6 +1472,7 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterCommand
     {
+        private clusterCommandFieldQuality qualityField;
 
         private clusterCommandAccess accessField;
 
@@ -1486,6 +1487,19 @@ namespace Generator.Schema
         private string directionField;
 
         private string responseField;
+
+        /// <remarks/>
+        public clusterCommandFieldQuality quality
+        {
+            get
+            {
+                return this.qualityField;
+            }
+            set
+            {
+                this.qualityField = value;
+            }
+        }
 
         /// <remarks/>
         public clusterCommandAccess access
@@ -1588,6 +1602,30 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class clusterCommandFieldQuality
+    {
+
+        private bool nullableField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool nullable
+        {
+            get
+            {
+                return this.nullableField;
+            }
+            set
+            {
+                this.nullableField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterCommandAccess
     {
 
@@ -1646,10 +1684,13 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterCommandField
     {
+        private clusterCommandFieldQuality qualityField;
 
         private object optionalConformField;
 
         private object mandatoryConformField;
+
+        private object disallowConformField;
 
         private clusterCommandFieldConstraint constraintField;
 
@@ -1664,6 +1705,18 @@ namespace Generator.Schema
         private bool defaultFieldSpecified;
 
         private clusterAttributeEntry? entryField;
+
+        public clusterCommandFieldQuality? quality
+        {
+            get
+            {
+                return this.qualityField;
+            }
+            set
+            {
+                this.qualityField = value;
+            }
+        }
 
         public clusterAttributeEntry? entry
         {
@@ -1700,6 +1753,19 @@ namespace Generator.Schema
             set
             {
                 this.mandatoryConformField = value;
+            }
+        }
+
+        /// <remarks/>
+        public object disallowConform
+        {
+            get 
+            {
+                return this.disallowConformField; 
+            }
+            set
+            {
+                this.disallowConformField = value;
             }
         }
 

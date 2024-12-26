@@ -54,35 +54,85 @@ namespace Generator
             writer.WriteLine("using MatterDotNet.Messages.InteractionModel;\r\nusing MatterDotNet.Protocol;\r\nusing MatterDotNet.Protocol.Parsers;\r\nusing MatterDotNet.Protocol.Payloads;\r\nusing MatterDotNet.Protocol.Sessions;");
             writer.WriteLine();
             writer.WriteLine($"namespace MatterDotNet.Clusters\r\n{{");
+            writer.WriteLine("    /// <summary>");
+            writer.WriteLine($"    /// {cluster.name}");
+            writer.WriteLine("    /// </summary>");
             writer.WriteLine("    public class " + cluster.name.Replace(" ", "") + " : ClusterBase");
             writer.WriteLine("    {");
             writer.WriteLine("        private const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
             writer.WriteLine();
+            writer.WriteLine("        /// <summary>");
+            writer.WriteLine($"        /// {cluster.name}");
+            writer.WriteLine("        /// </summary>");
             writer.WriteLine("        public " + cluster.name.Replace(" ", "") + "(ushort endPoint) : base(endPoint) { }");
             writer.WriteLine();
             if (cluster.dataTypes.@enum != null)
             {
+                writer.WriteLine("        #region Enums");
+                bool firstEnum=true;
                 foreach (clusterDataTypesEnum enumType in cluster.dataTypes.@enum)
+                {
+                    if (enumType.item == null)
+                        continue;
+                    if (firstEnum)
+                        firstEnum = false;
+                    else
+                        writer.WriteLine();
                     WriteEnum(enumType, writer);
+                }
+                writer.WriteLine("        #endregion Enums");
+                writer.WriteLine();
             }
             if (cluster.dataTypes.@struct != null)
             {
+                writer.WriteLine("        #region Records");
+                bool firstRecord = true;
                 foreach (clusterDataTypesStruct structType in cluster.dataTypes.@struct)
+                {
+                    if (structType.field == null)
+                        continue;
+                    if (firstRecord)
+                        firstRecord = false;
+                    else
+                        writer.WriteLine();
                     WriteStruct(structType, cluster, writer);
+                }
+                writer.WriteLine("        #endregion Records");
+                writer.WriteLine();
             }
             if (cluster.commands != null && cluster.commands.Length > 0)
             {
+                writer.WriteLine("        #region Payloads");
+                bool firstPayload = true;
                 foreach (var command in cluster.commands)
+                {
+                    if (command.field == null)
+                        continue;
+                    if (firstPayload)
+                        firstPayload = false;
+                    else
+                        writer.WriteLine();
                     WriteStruct(command, command.direction == "commandToServer", writer, cluster);
+                }
+                writer.WriteLine("        #endregion Payloads");
+                writer.WriteLine();
                 WriteCommands(cluster, writer);
             }
 
-            writer.WriteLine("        // Attributes");
+            writer.WriteLine("        #region Attributes");
+            bool firstAttribute = true;
             foreach (var attribute in cluster.attributes)
             {
                 if (attribute.type != null)
+                {
+                    if (firstAttribute)
+                        firstAttribute = false;
+                    else
+                        writer.WriteLine();
                     WriteAttribute(attribute, writer);
+                }
             }
+            writer.WriteLine("        #endregion Attributes");
 
             writer.WriteLine("    }");
             writer.Write("}");
@@ -91,25 +141,28 @@ namespace Generator
 
         private static void WriteStruct(clusterCommand command, bool toServer, StreamWriter writer, Cluster cluster)
         {
-            if (command.field == null)
-                return;
-            writer.WriteLine($"        {(toServer ? "private record" : "public struct")} " + GeneratorUtil.SanitizeName(command.name) + (toServer ? "Payload : TLVPayload {" : " {"));
+            writer.WriteLine($"        {(toServer ? "private record" : "public struct")} " + GeneratorUtil.SanitizeName(command.name) + (toServer ? "Payload : TLVPayload {" : "() {"));
             foreach (clusterCommandField field in command.field)
             {
-                if (field.type == null) //Reserved/removed fields
+                if (field.type == null || field.disallowConform != null) //Reserved/removed fields
                     continue;
                 writer.Write("            public ");
                 if (field.optionalConform == null)
                     writer.Write("required ");
                 WriteType(field.type, field.entry?.type, writer);
-                if (field.optionalConform != null)
+                if (field.optionalConform != null || field.quality?.nullable == true)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(command.name))
                     writer.Write(" " + field.name + "Field { get; set; }");
                 else
                     writer.Write(" " + field.name + " { get; set; }");
                 if (field.@default != null)
-                    writer.WriteLine(" = " + SanitizeDefault(field.@default) + ";");
+                {
+                    if (field.type.EndsWith("Enum"))
+                        writer.WriteLine(" = " + field.type + "." + field.@default + ";");
+                    else
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default) + ";");
+                }
                 else
                     writer.WriteLine();
             }
@@ -118,12 +171,15 @@ namespace Generator
                 writer.WriteLine("            public override void Serialize(TLVWriter writer, long structNumber = -1) {");
                 writer.WriteLine("                writer.StartStructure(structNumber);");
                 foreach (clusterCommandField field in command.field)
+                {
+                    if (field.type == null || field.disallowConform != null) //Reserved/removed fields
+                        continue;
                     WriteStructType(field.optionalConform != null, field.type, field.id, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
+                }
                 writer.WriteLine("                writer.EndContainer();");
                 writer.WriteLine("            }");
             }
             writer.WriteLine("        }");
-            writer.WriteLine();
         }
 
         private static void WriteStructType(bool optional, string type, byte id, string name, Cluster cluster, StreamWriter writer)
@@ -261,11 +317,19 @@ namespace Generator
 
         private static void WriteCommands(Cluster cluster, StreamWriter writer)
         {
-            writer.WriteLine("        // Commands");
+            writer.WriteLine("        #region Commands");
+            bool first = true;
             foreach (clusterCommand cmd in cluster.commands)
             {
                 if (cmd.direction == "commandToServer")
                 {
+                    if (first)
+                        first = false;
+                    else
+                        writer.WriteLine();
+                    writer.WriteLine("        /// <summary>");
+                    writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(cmd.name));
+                    writer.WriteLine("        /// </summary>");
                     writer.Write("        public async Task");
                     clusterCommand? response = GetResponseType(cluster.commands, cmd.response, writer);
                     if (cmd.response == "N")
@@ -274,12 +338,12 @@ namespace Generator
                         writer.Write("<bool> ");
                     else
                         writer.Write("<" + GeneratorUtil.SanitizeName(response.name) + "?> ");
-                    writer.Write(GeneratorUtil.SanitizeName(cmd.name) + " (SecureSession session");
+                    writer.Write(GeneratorUtil.SanitizeName(cmd.name) + "(SecureSession session");
                     if (cmd.field != null)
                     {
                         foreach (var field in cmd.field)
                         {
-                            if (field.type == null)
+                            if (field.type == null || field.disallowConform != null)
                                 continue;
                             writer.Write(", ");
                             WriteType(field.type, field.entry?.type, writer);
@@ -293,7 +357,11 @@ namespace Generator
                     {
                         writer.WriteLine("            " + GeneratorUtil.SanitizeName(cmd.name) + "Payload requestFields = new " + GeneratorUtil.SanitizeName(cmd.name) + "Payload() {");
                         foreach (var field in cmd.field)
+                        {
+                            if (field.type == null || field.disallowConform != null)
+                                continue;
                             writer.WriteLine($"                {field.name} = {field.name},");
+                        }
                         writer.WriteLine("            };");
                         writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
                     }
@@ -319,17 +387,25 @@ namespace Generator
                             writer.Write("                " + field.name + " = (");
                             WriteType(field.type, field.entry?.type, writer);
                             if (field.optionalConform != null)
+                            {
+                                if (field.type.EndsWith("Enum"))
+                                    writer.Write("?)(byte");
                                 writer.WriteLine($"?)GetOptionalField(resp, {field.id}),");
+                            }
                             else
+                            {
+                                if (field.type.EndsWith("Enum"))
+                                    writer.Write(")(byte");
                                 writer.WriteLine($")GetField(resp, {field.id}),");
+                            }
                         }
                         writer.WriteLine("            };");
                     }
                     writer.WriteLine("        }");
-                    writer.WriteLine();
                 }
             }
-            
+            writer.WriteLine("        #endregion Commands");
+            writer.WriteLine();
         }
 
         private static clusterCommand? GetResponseType(clusterCommand[] cmds, string response, StreamWriter writer)
@@ -344,8 +420,6 @@ namespace Generator
 
         private static void WriteStruct(clusterDataTypesStruct structType, Cluster cluster, StreamWriter writer)
         {
-            if (structType.field == null)
-                return;
             writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {");
             foreach (clusterDataTypesStructField field in structType.field)
             {
@@ -360,7 +434,12 @@ namespace Generator
                 else
                     writer.Write(" " + field.name + " { get; set; }");
                 if (field.@default != null)
-                    writer.WriteLine(" = " + SanitizeDefault(field.@default) + ";");
+                {
+                    if (field.type.EndsWith("Enum"))
+                        writer.WriteLine(" = " + field.type + "." + field.@default + ";");
+                    else
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default) + ";");
+                }
                 else
                     writer.WriteLine();
             }
@@ -371,7 +450,6 @@ namespace Generator
             writer.WriteLine("                writer.EndContainer();");
             writer.WriteLine("            }");
             writer.WriteLine("        }");
-            writer.WriteLine();
         }
 
         /// <summary>
@@ -381,8 +459,9 @@ namespace Generator
         /// <param name="writer"></param>
         private static void WriteEnum(clusterDataTypesEnum enumType, StreamWriter writer)
         {
-            if (enumType.item == null)
-                return;
+            writer.WriteLine("        /// <summary>");
+            writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(enumType.name));
+            writer.WriteLine("        /// </summary>");
             writer.WriteLine("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " {");
             foreach (clusterDataTypesEnumItem item in enumType.item)
             {
@@ -390,7 +469,6 @@ namespace Generator
                 writer.WriteLine("            " + item.name + " = " + item.value + ",");
             }
             writer.WriteLine("        }");
-            writer.WriteLine();
         }
 
         private static void WriteAttribute(clusterAttribute attribute, StreamWriter writer)
@@ -496,9 +574,12 @@ namespace Generator
                     writer.Write("byte[]");
                     break;
                 case "bool":
+                case "Bool":
                 case "string":
+                case "String":
                 case "double":
-                    writer.Write($"{type}");
+                case "Double":
+                    writer.Write($"{type.ToLower()}");
                     break;
                 case "ref_SemTag":
                     writer.Write("SemanticTag");

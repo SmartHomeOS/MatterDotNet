@@ -20,12 +20,22 @@ using MatterDotNet.Protocol.Sessions;
 
 namespace MatterDotNet.Clusters
 {
+    /// <summary>
+    /// General Commissioning Cluster
+    /// </summary>
     public class GeneralCommissioningCluster : ClusterBase
     {
         private const uint CLUSTER_ID = 0x0030;
 
+        /// <summary>
+        /// General Commissioning Cluster
+        /// </summary>
         public GeneralCommissioningCluster(ushort endPoint) : base(endPoint) { }
 
+        #region Enums
+        /// <summary>
+        /// Commissioning Error
+        /// </summary>
         public enum CommissioningErrorEnum {
             /// <summary>
             /// No error
@@ -49,6 +59,9 @@ namespace MatterDotNet.Clusters
             BusyWithOtherAdmin = 4,
         }
 
+        /// <summary>
+        /// Regulatory Location Type
+        /// </summary>
         public enum RegulatoryLocationTypeEnum {
             /// <summary>
             /// Indoor only
@@ -63,7 +76,9 @@ namespace MatterDotNet.Clusters
             /// </summary>
             IndoorOutdoor = 2,
         }
+        #endregion Enums
 
+        #region Records
         public record BasicCommissioningInfo : TLVPayload {
             public required ushort FailSafeExpiryLengthSeconds { get; set; }
             public required ushort MaxCumulativeFailsafeSeconds { get; set; }
@@ -74,7 +89,9 @@ namespace MatterDotNet.Clusters
                 writer.EndContainer();
             }
         }
+        #endregion Records
 
+        #region Payloads
         private record ArmFailSafePayload : TLVPayload {
             public required ushort ExpiryLengthSeconds { get; set; } = 900;
             public required ulong Breadcrumb { get; set; }
@@ -86,9 +103,9 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct ArmFailSafeResponse {
-            public required CommissioningErrorEnum ErrorCode { get; set; }
-            public required string DebugText { get; set; }
+        public struct ArmFailSafeResponse() {
+            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
+            public required string DebugText { get; set; } = "";
         }
 
         private record SetRegulatoryConfigPayload : TLVPayload {
@@ -104,18 +121,22 @@ namespace MatterDotNet.Clusters
             }
         }
 
-        public struct SetRegulatoryConfigResponse {
-            public required CommissioningErrorEnum ErrorCode { get; set; }
-            public required string DebugText { get; set; }
+        public struct SetRegulatoryConfigResponse() {
+            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
+            public required string DebugText { get; set; } = "";
         }
 
-        public struct CommissioningCompleteResponse {
-            public required CommissioningErrorEnum ErrorCode { get; set; }
-            public required string DebugText { get; set; }
+        public struct CommissioningCompleteResponse() {
+            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
+            public required string DebugText { get; set; } = "";
         }
+        #endregion Payloads
 
-        // Commands
-        public async Task<ArmFailSafeResponse?> ArmFailSafe (SecureSession session, ushort ExpiryLengthSeconds, ulong Breadcrumb) {
+        #region Commands
+        /// <summary>
+        /// Arm Fail Safe
+        /// </summary>
+        public async Task<ArmFailSafeResponse?> ArmFailSafe(SecureSession session, ushort ExpiryLengthSeconds, ulong Breadcrumb) {
             ArmFailSafePayload requestFields = new ArmFailSafePayload() {
                 ExpiryLengthSeconds = ExpiryLengthSeconds,
                 Breadcrumb = Breadcrumb,
@@ -129,7 +150,10 @@ namespace MatterDotNet.Clusters
             };
         }
 
-        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig (SecureSession session, RegulatoryLocationTypeEnum NewRegulatoryConfig, string CountryCode, ulong Breadcrumb) {
+        /// <summary>
+        /// Set Regulatory Config
+        /// </summary>
+        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig(SecureSession session, RegulatoryLocationTypeEnum NewRegulatoryConfig, string CountryCode, ulong Breadcrumb) {
             SetRegulatoryConfigPayload requestFields = new SetRegulatoryConfigPayload() {
                 NewRegulatoryConfig = NewRegulatoryConfig,
                 CountryCode = CountryCode,
@@ -139,26 +163,35 @@ namespace MatterDotNet.Clusters
             if (!validateResponse(resp))
                 return null;
             return new SetRegulatoryConfigResponse() {
-                ErrorCode = (CommissioningErrorEnum)GetField(resp, 0),
+                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
         }
 
-        public async Task<CommissioningCompleteResponse?> CommissioningComplete (SecureSession session) {
+        /// <summary>
+        /// Commissioning Complete
+        /// </summary>
+        public async Task<CommissioningCompleteResponse?> CommissioningComplete(SecureSession session) {
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04);
             if (!validateResponse(resp))
                 return null;
             return new CommissioningCompleteResponse() {
-                ErrorCode = (CommissioningErrorEnum)GetField(resp, 0),
+                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
         }
+        #endregion Commands
 
-        // Attributes
+        #region Attributes
         public ulong Breadcrumb { get; set; } = 0;
+
         public BasicCommissioningInfo BasicCommissioningInfoField { get; }
-        public RegulatoryLocationTypeEnum RegulatoryConfig { get; } = RegulatoryLocationTypeEnum.IndoorOutdoor;
+
+        public RegulatoryLocationTypeEnum RegulatoryConfig { get; }
+
         public RegulatoryLocationTypeEnum LocationCapability { get; } = RegulatoryLocationTypeEnum.IndoorOutdoor;
+
         public bool SupportsConcurrentConnection { get; } = true;
+        #endregion Attributes
     }
 }

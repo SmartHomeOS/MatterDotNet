@@ -36,5 +36,22 @@ namespace Generator
             }
             return ret.ToString();
         }
+
+        public static string FieldNameToComment(string name)
+        {
+            if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
+                name = name.Substring(0, name.Length - 6);
+            if (name.EndsWith("enum", StringComparison.InvariantCultureIgnoreCase))
+                name = name.Substring(0, name.Length - 4);
+            StringBuilder ret = new StringBuilder(name.Length);
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (char.IsUpper(name[i]) && i > 0 && (i + 1 != name.Length) && (!char.IsUpper(name[i+1]) || (!char.IsUpper(name[i-1]))))
+                    ret.Append(' ');
+
+                ret.Append(name[i]);
+            }
+            return ret.ToString();
+        }
     }
 }

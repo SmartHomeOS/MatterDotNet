@@ -55,7 +55,7 @@ namespace Test
             MatterCertificate tlv = cert.ToMatterCertificate();
             PayloadWriter output = new PayloadWriter(400);
             tlv.Serialize(new TLVWriter(output));
-            CollectionAssert.AreEqual(output.GetPayload().Span.ToArray(), nocTLV);
+            Assert.That(nocTLV, Is.EqualTo(output.GetPayload().Span.ToArray()).AsCollection);
         }
 
         [Test]
@@ -70,13 +70,13 @@ namespace Test
             MatterCertificate tlv = cert.ToMatterCertificate();
             PayloadWriter output = new PayloadWriter(400);
             tlv.Serialize(new TLVWriter(output));
-            CollectionAssert.AreEqual(output.GetPayload().Span.ToArray(), nocTLV);
+            Assert.That(nocTLV, Is.EqualTo(output.GetPayload().Span.ToArray()).AsCollection);
         }
 
         [Test]
         public void NOCSigning()
         {
-            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1);
+            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1, []);
             ECDsa key = ECDsa.Create();
             CertificateRequest req = new CertificateRequest("CN=Test", key, HashAlgorithmName.SHA256);
             OperationalCertificate noc = fabric.Sign(req);

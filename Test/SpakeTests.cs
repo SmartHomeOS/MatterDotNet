@@ -56,8 +56,8 @@ namespace Test
             (BigIntegerPoint Z, BigIntegerPoint V) responderValidation = initiator.InitiatorValidate(pB);
             Assert.That(ininiatorValidation.V, Is.EqualTo(responderValidation.V));
             Assert.That(ininiatorValidation.Z, Is.EqualTo(responderValidation.Z));
-            CollectionAssert.AreEqual(ininiatorValidation.V.ToBytes(true).ToArray(), responderValidation.V.ToBytes(true).ToArray());
-            CollectionAssert.AreEqual(ininiatorValidation.Z.ToBytes(true).ToArray(), responderValidation.Z.ToBytes(true).ToArray());
+            Assert.That(responderValidation.V.ToBytes(true).ToArray(), Is.EqualTo(ininiatorValidation.V.ToBytes(true).ToArray()).AsCollection);
+            Assert.That(responderValidation.Z.ToBytes(true).ToArray(), Is.EqualTo(ininiatorValidation.Z.ToBytes(true).ToArray()).AsCollection);
 
             PBKDFParamReq req = new PBKDFParamReq() { HasPBKDFParameters = false, InitiatorRandom = [], InitiatorSessionId = 23, PasscodeId = 0 };
             PBKDFParamResp resp = new PBKDFParamResp() { InitiatorRandom = [], ResponderRandom = [], ResponderSessionId = 23 };

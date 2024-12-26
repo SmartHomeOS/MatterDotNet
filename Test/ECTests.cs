@@ -10,6 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Cryptography;
 using System.Security.Cryptography;
 
@@ -44,6 +45,17 @@ namespace Test
             var keypair = Crypto.GenerateKeypair();
             byte[] signature = Crypto.Sign(keypair.Private, msg);
             Assert.That(Crypto.Verify(keypair.Public, msg, signature), Is.True);
+        }
+
+        [Test]
+        public void TestSignVerify()
+        {
+            byte[] msg = RandomNumberGenerator.GetBytes(32);
+            var keypair = Crypto.GenerateKeypair();
+            Fabric fabric = new Fabric(0x678, 0x789, []);
+            OperationalCertificate cert = fabric.CreateCommissioner(keypair.Public, keypair.Private);
+            byte[] signature = Crypto.Sign(cert.GetPrivateKey()!, msg);
+            Assert.That(Crypto.Verify(cert.PublicKey, msg, signature), Is.True);
         }
 
         [Test]

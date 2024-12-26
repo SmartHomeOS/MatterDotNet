@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Messages.Certificates;
+using MatterDotNet.Protocol.Payloads;
 using System.Formats.Asn1;
 using System.Globalization;
 using System.Numerics;
@@ -31,6 +32,8 @@ namespace MatterDotNet.PKI
         protected const string OID_RCAC = "1.3.6.1.4.1.37244.1.4";
         protected const string OID_FabricID = "1.3.6.1.4.1.37244.1.5";
         protected const string OID_NOCCat = "1.3.6.1.4.1.37244.1.6";
+        protected const string OID_VendorID = "1.3.6.1.4.1.37244.2.1";
+        protected const string OID_ProductID = "1.3.6.1.4.1.37244.2.2";
 
         protected OperationalCertificate() { }
 
@@ -83,11 +86,11 @@ namespace MatterDotNet.PKI
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint noc))
                             NOCCat = noc;
                         break;
-                    case "1.3.6.1.4.1.37244.2.1":
+                    case OID_VendorID:
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint vid))
                             VendorID = vid;
                         break;
-                    case "1.3.6.1.4.1.37244.2.2":
+                    case OID_ProductID:
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint pid))
                             ProductID = pid;
                         break;
@@ -263,7 +266,7 @@ namespace MatterDotNet.PKI
                 PubKeyAlgo = 0x1,
                 SigAlgo = 0x1,
                 EcPubKey = cert.GetPublicKey(),
-                SerialNum = cert.GetSerialNumber().Reverse().ToArray(),
+                SerialNum = cert.SerialNumberBytes.ToArray(),
                 NotBefore = (uint)((DateTimeOffset)cert.NotBefore - EPOCH).ToUnixTimeSeconds(),
                 NotAfter = (uint)((DateTimeOffset)cert.NotAfter - EPOCH).ToUnixTimeSeconds(),
                 Signature = GetSignature(),
@@ -273,9 +276,23 @@ namespace MatterDotNet.PKI
             };
         }
 
+        public byte[] GetMatterCertBytes()
+        {
+            PayloadWriter payload = new PayloadWriter(600);
+            ToMatterCertificate().Serialize(payload);
+            return payload.GetPayload().ToArray();
+        }
+
         internal X509Certificate2 GetRaw()
         {
             return cert;
+        }
+
+        public byte[]? GetPrivateKey()
+        {
+            if (!cert.HasPrivateKey)
+                return null;
+            return cert.GetECDsaPrivateKey()?.ExportParameters(true).D;
         }
 
         public string IssuerName { get; set; } = string.Empty;
@@ -297,6 +314,7 @@ namespace MatterDotNet.PKI
         public uint VendorID { get; set; }
 
         public uint ProductID { get; set; }
+
         public byte[] PublicKey { get { return cert.GetPublicKey(); } }
     }
 }

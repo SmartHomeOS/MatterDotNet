@@ -19,7 +19,7 @@ using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
 {
-    public class TCPConnection : IConnection
+    internal class TCPConnection : IConnection
     {
         TcpClient client;
         NetworkStream stream;

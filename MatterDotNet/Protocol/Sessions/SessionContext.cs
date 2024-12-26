@@ -46,7 +46,7 @@ namespace MatterDotNet.Protocol.Sessions
             return SessionManager.GlobalUnencryptedCounter;
         }
 
-        public Exchange CreateExchange()
+        internal Exchange CreateExchange()
         {
             if (exchanges.Count >= 5)
                 throw new InvalidOperationException("5 Exchanges are already open");

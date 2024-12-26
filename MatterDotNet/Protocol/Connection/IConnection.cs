@@ -15,7 +15,7 @@ using MatterDotNet.Protocol.Sessions;
 
 namespace MatterDotNet.Protocol.Connection
 {
-    public interface IConnection : IDisposable
+    internal interface IConnection : IDisposable
     {
         Task<Frame> Read();
         Task SendFrame(Exchange exchange, Frame frame, bool reliable);

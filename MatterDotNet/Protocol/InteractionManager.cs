@@ -19,7 +19,7 @@ using MatterDotNet.Protocol.Sessions;
 
 namespace MatterDotNet.Protocol
 {
-    public class InteractionManager
+    internal class InteractionManager
     {
         public static async Task<List<AttributeReportIB>> GetAttributes(SecureSession session, ushort endpoint, uint cluster, params uint[] attributes)
         {

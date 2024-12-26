@@ -31,7 +31,7 @@ namespace MatterDotNet.Protocol.Sessions
             return GetUnsecureSession(GetConnection(ep), initiator, initiatorNodeId, responderNodeId);
         }
 
-        public static SessionContext GetUnsecureSession(IConnection connection, bool initiator, uint initiatorNodeId, uint responderNodeId)
+        internal static SessionContext GetUnsecureSession(IConnection connection, bool initiator, uint initiatorNodeId, uint responderNodeId)
         {
             SessionContext ctx = new SessionContext(connection, initiator, initiatorNodeId, responderNodeId, 0, 0, new MessageState());
             sessions.TryAdd(0, ctx);
@@ -43,7 +43,7 @@ namespace MatterDotNet.Protocol.Sessions
             return CreateSession(GetConnection(ep), initiator, initiatorSessionId, responderSessionId, i2r, r2i, group, idleInterval, activeInterval, activeThreshold);
         }
 
-        public static SecureSession? CreateSession(IConnection connection, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        internal static SecureSession? CreateSession(IConnection connection, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session

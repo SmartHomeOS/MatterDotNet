@@ -15,7 +15,7 @@ using MatterDotNet.Protocol.Sessions;
 
 namespace MatterDotNet.Protocol.Connection
 {
-    public record Retransmission (Exchange Exchange, uint Counter, PayloadWriter data)
+    internal record Retransmission (Exchange Exchange, uint Counter, PayloadWriter data)
     {
         public SemaphoreSlim Ack { get; init; } = new SemaphoreSlim(0);
         public int SendCount { get; set; }

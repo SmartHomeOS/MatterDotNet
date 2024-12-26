@@ -19,7 +19,7 @@ using System.Text;
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    public class Frame
+    internal class Frame
     {
         internal const int MAX_SIZE = 1280;
         internal static readonly byte[] PRIVACY_INFO = Encoding.UTF8.GetBytes("PrivacyKey");
@@ -156,8 +156,7 @@ namespace MatterDotNet.Protocol.Payloads
                 //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
 
                 if (Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
-                                          slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES),
-                                          slice.Slice(slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES, Crypto.AEAD_MIC_LENGTH_BYTES),
+                                          slice,
                                           payload.Slice(0, payload.Length - slice.Length),
                                           nonce))
                     Message = new Version1Payload(slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));

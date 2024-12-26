@@ -15,7 +15,7 @@ using MatterDotNet.Protocol.Payloads.Flags;
 
 namespace MatterDotNet.Protocol.Sessions
 {
-    public class Exchange : IDisposable
+    internal class Exchange : IDisposable
     {
         private const int MSG_COUNTER_WINDOW_SIZE = 32;
 

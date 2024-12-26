@@ -13,7 +13,6 @@
 using MatterDotNet.Security;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
@@ -57,12 +56,12 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <param name="additionalData"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public static bool AEAD_DecryptVerify(byte[] key, Span<byte> payload, ReadOnlySpan<byte> mic, ReadOnlySpan<byte> additionalData, ReadOnlySpan<byte> nonce)
+        public static bool AEAD_DecryptVerify(byte[] key, Span<byte> payload, ReadOnlySpan<byte> additionalData, ReadOnlySpan<byte> nonce)
         {
             try
             {
                 AesCcm aes = new AesCcm(key);
-                aes.Decrypt(nonce, payload, mic, payload, additionalData);
+                aes.Decrypt(nonce, payload.Slice(0, payload.Length - AEAD_MIC_LENGTH_BYTES), payload.Slice(payload.Length - AEAD_MIC_LENGTH_BYTES, AEAD_MIC_LENGTH_BYTES), payload.Slice(0, payload.Length - AEAD_MIC_LENGTH_BYTES), additionalData);
                 return true;
             }
             catch (CryptographicException)

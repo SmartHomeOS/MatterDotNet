@@ -31,7 +31,7 @@ namespace MatterDotNet.Protocol.Sessions
         public uint ActiveThreshold { get; init; }
         public bool PeerActive { get { return (DateTime.Now - LastActive).TotalMilliseconds < SessionManager.GetDefaultSessionParams().SessionActiveThreshold; } }
 
-        public SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong initiatorNodeId, ulong peerNodeId, uint sessionIdleInterval, uint sessionActiveInterval, uint sessionActiveThreshold) : base(connection, initiator, initiatorNodeId, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
+        internal SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong initiatorNodeId, ulong peerNodeId, uint sessionIdleInterval, uint sessionActiveInterval, uint sessionActiveThreshold) : base(connection, initiator, initiatorNodeId, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
         {
             this.PASE = PASE;
             I2RKey = i2rKey;

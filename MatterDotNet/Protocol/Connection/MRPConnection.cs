@@ -21,7 +21,7 @@ using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
 {
-    public class MRPConnection : IConnection
+    internal class MRPConnection : IConnection
     {
         private static readonly TimeSpan MRP_STANDALONE_ACK_TIMEOUT = TimeSpan.FromMilliseconds(200);
         private const int MRP_BACKOFF_THRESHOLD = 1;

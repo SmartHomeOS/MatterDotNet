@@ -71,6 +71,7 @@ namespace Test
             PayloadWriter output = new PayloadWriter(400);
             tlv.Serialize(new TLVWriter(output));
             Assert.That(nocTLV, Is.EqualTo(output.GetPayload().Span.ToArray()).AsCollection);
+            Assert.That(cert.PublicKey, Is.EqualTo(tlv.EcPubKey));
         }
 
         [Test]

@@ -34,6 +34,8 @@ namespace MatterDotNet.PKI
         protected const string OID_NOCCat = "1.3.6.1.4.1.37244.1.6";
         protected const string OID_VendorID = "1.3.6.1.4.1.37244.2.1";
         protected const string OID_ProductID = "1.3.6.1.4.1.37244.2.2";
+        protected const string OID_ServerAuth = "1.3.6.1.5.5.7.3.1";
+        protected const string OID_ClientAuth = "1.3.6.1.5.5.7.3.2";
 
         protected OperationalCertificate() { }
 
@@ -152,8 +154,10 @@ namespace MatterDotNet.PKI
             BigInteger part2 = AsnDecoder.ReadInteger(signatureSequence.AsSpan(sigOffset + intLen), encodingRules, out _);
 
             byte[] signature = new byte[64];
-            Array.Copy(part1.ToByteArray(true, true), 0, signature, 0, 32);
-            Array.Copy(part2.ToByteArray(true, true), 0, signature, 32, 32);
+            byte[] part1bytes = part1.ToByteArray(true, true);
+            Array.Copy(part1bytes, 0, signature, 32 - part1bytes.Length, part1bytes.Length);
+            byte[] part2bytes = part2.ToByteArray(true, true);
+            Array.Copy(part2bytes, 0, signature, 64 - part2bytes.Length, part2bytes.Length);
             return signature;
         }
 

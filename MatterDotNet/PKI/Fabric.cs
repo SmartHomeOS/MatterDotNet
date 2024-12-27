@@ -85,8 +85,8 @@ namespace MatterDotNet.PKI
             signingCSR.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
             signingCSR.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));
             OidCollection collection = new OidCollection();
-            collection.Add(new Oid("1.3.6.1.5.5.7.3.1"));
-            collection.Add(new Oid("1.3.6.1.5.5.7.3.2"));
+            collection.Add(new Oid(OID_ServerAuth));
+            collection.Add(new Oid(OID_ClientAuth));
             signingCSR.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(collection, true));
             signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(nocsr.PublicKey, false));
             signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));
@@ -108,8 +108,8 @@ namespace MatterDotNet.PKI
             signingCSR.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
             signingCSR.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));
             OidCollection collection = new OidCollection();
-            collection.Add(new Oid("1.3.6.1.5.5.7.3.1"));
-            collection.Add(new Oid("1.3.6.1.5.5.7.3.2"));
+            collection.Add(new Oid(OID_ServerAuth));
+            collection.Add(new Oid(OID_ClientAuth));
             signingCSR.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(collection, true));
             signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(key.ExportSubjectPublicKeyInfo(), false));
             signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));

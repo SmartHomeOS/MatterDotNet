@@ -44,6 +44,7 @@ namespace Test
             byte[] msg = RandomNumberGenerator.GetBytes(32);
             var keypair = Crypto.GenerateKeypair();
             byte[] signature = Crypto.Sign(keypair.Private, msg);
+            Assert.That(signature.Length, Is.EqualTo(Crypto.GROUP_SIZE_BYTES * 2));
             Assert.That(Crypto.Verify(keypair.Public, msg, signature), Is.True);
         }
 

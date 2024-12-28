@@ -34,24 +34,24 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma3Tbsdata(TLVReader reader, long structNumber = -1) {
+        internal Sigma3Tbsdata(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             InitiatorNOC = reader.GetBytes(1)!;
             if (reader.IsTag(2))
                 InitiatorICAC = reader.GetBytes(2);
-            InitiatorEphPubKey = reader.GetBytes(3)!;
-            ResponderEphPubKey = reader.GetBytes(4)!;
+            InitiatorEphPubKey = reader.GetBytes(3, false, 65, 65)!;
+            ResponderEphPubKey = reader.GetBytes(4, false, 65, 65)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorNOC);
             if (InitiatorICAC != null)
                 writer.WriteBytes(2, InitiatorICAC);
-            writer.WriteBytes(3, InitiatorEphPubKey);
-            writer.WriteBytes(4, ResponderEphPubKey);
+            writer.WriteBytes(3, InitiatorEphPubKey, 65, 65);
+            writer.WriteBytes(4, ResponderEphPubKey, 65, 65);
             writer.EndContainer();
         }
     }

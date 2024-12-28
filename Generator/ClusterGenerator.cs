@@ -168,13 +168,13 @@ namespace Generator
             }
             if (toServer)
             {
-                writer.WriteLine("            public override void Serialize(TLVWriter writer, long structNumber = -1) {");
+                writer.WriteLine("            internal override void Serialize(TLVWriter writer, long structNumber = -1) {");
                 writer.WriteLine("                writer.StartStructure(structNumber);");
                 foreach (clusterCommandField field in command.field)
                 {
                     if (field.type == null || field.disallowConform != null) //Reserved/removed fields
                         continue;
-                    WriteStructType(field.optionalConform != null, field.type, field.id, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
+                    WriteStructType(field.optionalConform != null, field.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
                 }
                 writer.WriteLine("                writer.EndContainer();");
                 writer.WriteLine("            }");
@@ -182,7 +182,7 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteStructType(bool optional, string type, byte id, string name, Cluster cluster, StreamWriter writer)
+        private static void WriteStructType(bool optional, string type, byte id, int? from, int? to, string name, Cluster cluster, StreamWriter writer)
         {
             string totalIndent = "                ";
             if (optional)
@@ -291,10 +291,10 @@ namespace Generator
                 case "ref_Ipv6Adr":
                 case "ipv6pre":
                 case "Hardware Address":
-                    writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name});");
+                    writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}{(to != null ? $", {to.Value});" : ");")}");
                     break;
                 case "string":
-                    writer.WriteLine($"{totalIndent}writer.WriteString({id}, {name});");
+                    writer.WriteLine($"{totalIndent}writer.WriteString({id}, {name}{(to != null ? $", {to.Value});" : ");")}");
                     break;
                 default:
                     if (HasEnum(cluster, type))
@@ -443,10 +443,10 @@ namespace Generator
                 else
                     writer.WriteLine();
             }
-            writer.WriteLine("            public override void Serialize(TLVWriter writer, long structNumber = -1) {");
+            writer.WriteLine("            internal override void Serialize(TLVWriter writer, long structNumber = -1) {");
             writer.WriteLine("                writer.StartStructure(structNumber);");
             foreach (clusterDataTypesStructField field in structType.field)
-                WriteStructType(field.@default != null, field.type, field.id, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
+                WriteStructType(field.@default != null, field.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
             writer.WriteLine("                writer.EndContainer();");
             writer.WriteLine("            }");
             writer.WriteLine("        }");

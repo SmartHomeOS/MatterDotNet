@@ -42,7 +42,7 @@ namespace Generator
                 if (child.Type != DataType.Structure)
                     writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
             }
-            writer.WriteLine($"\r\n{indent}    /// <inheritdoc />\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    public {tag.Name}(TLVReader reader, long structNumber = -1) {{");
+            writer.WriteLine($"\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    internal {tag.Name}(TLVReader reader, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
                 writer.WriteLine($"{indent}        reader.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)
@@ -109,10 +109,42 @@ namespace Generator
                             writer.WriteLine($"{totalIndent}{child.Name} = reader.GetDouble({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                         break;
                     case DataType.Bytes:
-                        writer.WriteLine($"{totalIndent}{child.Name} = reader.GetBytes({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!;" : ";")}");
+                        writer.Write($"{totalIndent}{child.Name} = reader.GetBytes({child.TagNumber}");
+                        if (child.Nullable)
+                            writer.Write(", true");
+                        else if (child.Max != 0 || child.Min != 0)
+                            writer.Write(", false");
+                        if (child.Max != 0)
+                            writer.Write($", {child.Max}");
+                        if (child.Min != 0)
+                        {
+                            if (child.Max == 0)
+                                writer.Write(", int.MaxValue");
+                            writer.Write($", {child.Min}");
+                        }
+                        if (!child.Nullable && !child.Optional)
+                            writer.WriteLine(")!;");
+                        else
+                            writer.WriteLine(");");
                         break;
                     case DataType.String:
-                        writer.WriteLine($"{totalIndent}{child.Name} = reader.GetString({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!;" : ";")}");
+                        writer.Write($"{totalIndent}{child.Name} = reader.GetString({child.TagNumber}");
+                        if (child.Nullable)
+                            writer.Write(", true");
+                        else if (child.Max != 0 || child.Min != 0)
+                            writer.Write(", false");
+                        if (child.Max != 0)
+                            writer.Write($", {child.Max}");
+                        if (child.Min != 0)
+                        {
+                            if (child.Max == 0)
+                                writer.Write(", int.MaxValue");
+                            writer.Write($", {child.Min}");
+                        }
+                        if (!child.Nullable && !child.Optional)
+                            writer.WriteLine(")!;");
+                        else
+                            writer.WriteLine(");");
                         break;
                     case DataType.Any:
                         writer.WriteLine($"{totalIndent}{child.Name} = reader.GetAny({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!;" : ";")}");
@@ -125,7 +157,7 @@ namespace Generator
             }
             if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        reader.EndContainer();");
-            writer.WriteLine($"{indent}    }}\r\n\r\n{indent}    /// <inheritdoc />\r\n{indent}    public override void Serialize(TLVWriter writer, long structNumber = -1) {{");
+            writer.WriteLine($"{indent}    }}\r\n\r\n{indent}    internal override void Serialize(TLVWriter writer, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
                 writer.WriteLine($"{indent}        writer.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)
@@ -143,6 +175,14 @@ namespace Generator
                 {
                     case DataType.Array:
                         writer.WriteLine($"{totalIndent}{{");
+                        if (child.Min != 0 || child.Max != 0)
+                        {
+                            writer.Write($"{totalIndent}    Constrain({child.Name}, {child.Min}");
+                            if (child.Max != 0)
+                                writer.WriteLine($", {child.Max});");
+                            else
+                                writer.WriteLine(");");
+                        }
                         writer.WriteLine($"{totalIndent}    writer.StartArray({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    foreach (var item in {child.Name}) {{");
                         writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child), GetEnumerationIndex(child))};");
@@ -152,6 +192,14 @@ namespace Generator
                         break;
                     case DataType.List:
                         writer.WriteLine($"{totalIndent}{{");
+                        if (child.Min != 0 || child.Max != 0)
+                        {
+                            writer.Write($"{totalIndent}    Constrain({child.Name}, {child.Min}");
+                            if (child.Max != 0)
+                                writer.WriteLine($", {child.Max});");
+                            else
+                                writer.WriteLine(");");
+                        }
                         writer.WriteLine($"{totalIndent}    writer.StartList({child.TagNumber});");
                         writer.WriteLine($"{totalIndent}    foreach (var item in {child.Name}) {{");
                         writer.WriteLine($"{totalIndent}        {GetWriter(GetEnumerationType(child), GetEnumerationIndex(child))};");
@@ -189,10 +237,30 @@ namespace Generator
                             writer.WriteLine($"{totalIndent}writer.WriteDouble({child.TagNumber}, {child.Name});");
                         break;
                     case DataType.Bytes:
-                        writer.WriteLine($"{totalIndent}writer.WriteBytes({child.TagNumber}, {child.Name});");
+                        writer.Write($"{totalIndent}writer.WriteBytes({child.TagNumber}, {child.Name}");
+                        if (child.Max != 0)
+                            writer.Write($", {child.Max}");
+                        if (child.Min != 0)
+                        {
+                            if (child.Max == 0)
+                                writer.Write($", int.MaxValue, {child.Min}");
+                            else
+                                writer.Write($", {child.Min}");
+                        }
+                        writer.WriteLine(");");
                         break;
                     case DataType.String:
-                        writer.WriteLine($"{totalIndent}writer.WriteString({child.TagNumber}, {child.Name});");
+                        writer.Write($"{totalIndent}writer.WriteString({child.TagNumber}, {child.Name}");
+                        if (child.Max != 0)
+                            writer.Write($", {child.Max}");
+                        if (child.Min != 0)
+                        {
+                            if (child.Max == 0)
+                                writer.Write($", int.MaxValue, {child.Min}");
+                            else
+                                writer.Write($", {child.Min}");
+                        }
+                        writer.WriteLine(");");
                         break;
                     case DataType.Any:
                         writer.WriteLine($"{totalIndent}writer.WriteAny({child.TagNumber}, {child.Name});");

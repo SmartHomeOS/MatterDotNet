@@ -1,6 +1,6 @@
 ﻿/* 
 *  Copyright (c) Microsoft Corporation. All rights reserved.
-*  Licensed under the MIT License. See the LICENSE file in the project root for full license information.
+*  Licensed under the MIT License.
 */
 
 using MatterDotNet.Protocol.Cryptography;
@@ -8,6 +8,9 @@ using System.Numerics;
 
 namespace MatterDotNet.Security
 {
+    /// <summary>
+    /// Big Integer Math
+    /// </summary>
     public class BigIntUtil
     {
         private static BigIntegerPoint Mul(BigIntegerPoint a, BigIntegerPoint b, BigInteger p, BigInteger w2)

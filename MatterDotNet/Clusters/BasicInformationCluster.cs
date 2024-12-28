@@ -155,7 +155,7 @@ namespace MatterDotNet.Clusters
         public record CapabilityMinima : TLVPayload {
             public ushort? CaseSessionsPerFabric { get; set; } = 3;
             public ushort? SubscriptionsPerFabric { get; set; } = 3;
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (CaseSessionsPerFabric != null)
                     writer.WriteUShort(0, CaseSessionsPerFabric);
@@ -168,7 +168,7 @@ namespace MatterDotNet.Clusters
         public record ProductAppearance : TLVPayload {
             public required ProductFinishEnum Finish { get; set; }
             public required ColorEnum PrimaryColor { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Finish);
                 writer.WriteUShort(1, (ushort)PrimaryColor);

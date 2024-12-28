@@ -111,9 +111,9 @@ namespace MatterDotNet.PKI
             collection.Add(new Oid(OID_ServerAuth));
             collection.Add(new Oid(OID_ClientAuth));
             signingCSR.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(collection, true));
-            signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(key.ExportSubjectPublicKeyInfo(), false));
+            signingCSR.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(SHA1.HashData(publicKey), false));
             signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));
-            byte[] serial = new byte[20];
+            byte[] serial = new byte[19];
             Random.Shared.NextBytes(serial);
             OperationalCertificate ret = new OperationalCertificate(signingCSR.Create(cert, DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(1), serial).CopyWithPrivateKey(key));
             nodes.Add(ret.NodeID, ret);

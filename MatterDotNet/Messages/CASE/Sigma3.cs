@@ -31,14 +31,14 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma3(TLVReader reader, long structNumber = -1) {
+        internal Sigma3(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Encrypted3 = reader.GetBytes(1)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Encrypted3);
             writer.EndContainer();

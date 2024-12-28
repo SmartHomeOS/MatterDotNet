@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Extension(TLVReader reader, long structNumber = -1) {
+        internal Extension(TLVReader reader, long structNumber = -1) {
             if (reader.IsTag(1))
                 BasicCnstr = new BasicConstraints(reader, 1);
             else if (reader.IsTag(2))
@@ -52,21 +52,22 @@ namespace MatterDotNet.Messages.Certificates
                 ExtendedKeyUsage = items.ToArray();
             }
             else if (reader.IsTag(4))
-                SubjectKeyId = reader.GetBytes(4);
+                SubjectKeyId = reader.GetBytes(4, false, 20, 20);
             else if (reader.IsTag(5))
-                AuthorityKeyId = reader.GetBytes(5);
+                AuthorityKeyId = reader.GetBytes(5, false, 20, 20);
             else if (reader.IsTag(6))
                 FutureExtension = reader.GetBytes(6);
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             if (BasicCnstr != null)
                 BasicCnstr.Serialize(writer, 1);
             else if (KeyUsage != null)
                 writer.WriteUShort(2, KeyUsage);
             else if (ExtendedKeyUsage != null)
             {
+                Constrain(ExtendedKeyUsage, 1);
                 writer.StartArray(3);
                 foreach (var item in ExtendedKeyUsage) {
                     writer.WriteUInt(-1, item);
@@ -74,9 +75,9 @@ namespace MatterDotNet.Messages.Certificates
                 writer.EndContainer();
             }
             else if (SubjectKeyId != null)
-                writer.WriteBytes(4, SubjectKeyId);
+                writer.WriteBytes(4, SubjectKeyId, 20, 20);
             else if (AuthorityKeyId != null)
-                writer.WriteBytes(5, AuthorityKeyId);
+                writer.WriteBytes(5, AuthorityKeyId, 20, 20);
             else if (FutureExtension != null)
                 writer.WriteBytes(6, FutureExtension);
         }

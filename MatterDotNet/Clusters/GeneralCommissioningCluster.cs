@@ -82,7 +82,7 @@ namespace MatterDotNet.Clusters
         public record BasicCommissioningInfo : TLVPayload {
             public required ushort FailSafeExpiryLengthSeconds { get; set; }
             public required ushort MaxCumulativeFailsafeSeconds { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, FailSafeExpiryLengthSeconds);
                 writer.WriteUShort(1, MaxCumulativeFailsafeSeconds);
@@ -95,7 +95,7 @@ namespace MatterDotNet.Clusters
         private record ArmFailSafePayload : TLVPayload {
             public required ushort ExpiryLengthSeconds { get; set; } = 900;
             public required ulong Breadcrumb { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, ExpiryLengthSeconds);
                 writer.WriteULong(1, Breadcrumb);
@@ -112,7 +112,7 @@ namespace MatterDotNet.Clusters
             public required RegulatoryLocationTypeEnum NewRegulatoryConfig { get; set; }
             public required string CountryCode { get; set; }
             public required ulong Breadcrumb { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)NewRegulatoryConfig);
                 writer.WriteString(1, CountryCode);

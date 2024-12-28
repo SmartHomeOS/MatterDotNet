@@ -37,7 +37,7 @@ namespace MatterDotNet.Messages.Certificates
         public AttestationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Certification_declaration = reader.GetBytes(1)!;
-            Attestation_nonce = reader.GetBytes(2)!;
+            Attestation_nonce = reader.GetBytes(2, false, 32, 32)!;
             Timestamp = reader.GetUInt(3)!.Value;
             if (reader.IsTag(4))
                 Firmware_information = reader.GetBytes(4);
@@ -45,10 +45,10 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Certification_declaration);
-            writer.WriteBytes(2, Attestation_nonce);
+            writer.WriteBytes(2, Attestation_nonce, 32, 32);
             writer.WriteUInt(3, Timestamp);
             if (Firmware_information != null)
                 writer.WriteBytes(4, Firmware_information);

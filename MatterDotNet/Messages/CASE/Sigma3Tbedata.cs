@@ -33,22 +33,22 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma3Tbedata(TLVReader reader, long structNumber = -1) {
+        internal Sigma3Tbedata(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             InitiatorNOC = reader.GetBytes(1)!;
             if (reader.IsTag(2))
                 InitiatorICAC = reader.GetBytes(2);
-            Signature = reader.GetBytes(3)!;
+            Signature = reader.GetBytes(3, false, 64, 64)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorNOC);
             if (InitiatorICAC != null)
                 writer.WriteBytes(2, InitiatorICAC);
-            writer.WriteBytes(3, Signature);
+            writer.WriteBytes(3, Signature, 64, 64);
             writer.EndContainer();
         }
     }

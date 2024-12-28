@@ -109,7 +109,7 @@ namespace MatterDotNet.Clusters
             public required ulong FabricID { get; set; }
             public required ulong NodeID { get; set; }
             public string? Label { get; set; } = "";
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(1, RootPublicKey);
                 writer.WriteUShort(2, VendorID);
@@ -124,7 +124,7 @@ namespace MatterDotNet.Clusters
         public record NOC : TLVPayload {
             public required byte[] NOCField { get; set; }
             public required byte[] ICAC { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(1, NOCField);
                 writer.WriteBytes(2, ICAC);
@@ -136,7 +136,7 @@ namespace MatterDotNet.Clusters
         #region Payloads
         private record AttestationRequestPayload : TLVPayload {
             public required byte[] AttestationNonce { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, AttestationNonce);
                 writer.EndContainer();
@@ -150,7 +150,7 @@ namespace MatterDotNet.Clusters
 
         private record CertificateChainRequestPayload : TLVPayload {
             public required CertificateChainTypeEnum CertificateType { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)CertificateType);
                 writer.EndContainer();
@@ -164,7 +164,7 @@ namespace MatterDotNet.Clusters
         private record CSRRequestPayload : TLVPayload {
             public required byte[] CSRNonce { get; set; }
             public bool? IsForUpdateNOC { get; set; } = false;
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, CSRNonce);
                 if (IsForUpdateNOC != null)
@@ -184,7 +184,7 @@ namespace MatterDotNet.Clusters
             public required byte[] IPKValue { get; set; }
             public required ulong CaseAdminSubject { get; set; }
             public required ushort AdminVendorId { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, NOCValue);
                 if (ICACValue != null)
@@ -199,7 +199,7 @@ namespace MatterDotNet.Clusters
         private record UpdateNOCPayload : TLVPayload {
             public required byte[] NOCValue { get; set; }
             public byte[]? ICACValue { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, NOCValue);
                 if (ICACValue != null)
@@ -216,7 +216,7 @@ namespace MatterDotNet.Clusters
 
         private record UpdateFabricLabelPayload : TLVPayload {
             public required string Label { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Label);
                 writer.EndContainer();
@@ -225,7 +225,7 @@ namespace MatterDotNet.Clusters
 
         private record RemoveFabricPayload : TLVPayload {
             public required byte FabricIndex { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, FabricIndex);
                 writer.EndContainer();
@@ -234,7 +234,7 @@ namespace MatterDotNet.Clusters
 
         private record AddTrustedRootCertificatePayload : TLVPayload {
             public required byte[] RootCACertificate { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, RootCACertificate);
                 writer.EndContainer();

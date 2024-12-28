@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public EventStatusIB(TLVReader reader, long structNumber = -1) {
+        internal EventStatusIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Path = new EventPathIB(reader, 0);
             Status = new StatusIB(reader, 1);
@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             Path.Serialize(writer, 0);
             Status.Serialize(writer, 1);

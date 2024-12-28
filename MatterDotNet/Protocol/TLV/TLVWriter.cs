@@ -11,11 +11,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Protocol.Payloads;
+using System.Runtime.CompilerServices;
 using System.Text;
 
+[assembly: InternalsVisibleTo("Test")]
 namespace MatterDotNet.Protocol.Parsers
 {
-    public class TLVWriter
+    internal class TLVWriter
     {
         PayloadWriter writer;
 
@@ -210,12 +212,16 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteTag(tagNumber, ElementType.False);
         }
 
-        public void WriteString(long tagNumber, string? value)
+        public void WriteString(long tagNumber, string? value, int maxLen = int.MaxValue, int minLen = 0)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value.Length > maxLen)
+                    throw new InvalidDataException("Constraint Violated! Maximum length: " + maxLen + ", Actual: " + value.Length);
+                if (value.Length < minLen)
+                    throw new InvalidDataException("Constraint Violated! Minimum length: " + maxLen + ", Actual: " + value.Length);
                 if (value.Length <= byte.MaxValue)
                 {
                     WriteTag(tagNumber, ElementType.String8);
@@ -235,12 +241,16 @@ namespace MatterDotNet.Protocol.Parsers
             }
         }
 
-        public void WriteBytes(long tagNumber, byte[]? value)
+        public void WriteBytes(long tagNumber, byte[]? value, int maxLen = int.MaxValue, int minLen = 0)
         {
             if (value == null)
                 WriteTag(tagNumber, ElementType.Null);
             else
             {
+                if (value.Length > maxLen)
+                    throw new InvalidDataException("Constraint Violated! Maximum length: " + maxLen + ", Actual: " + value.Length);
+                if (value.Length < minLen)
+                    throw new InvalidDataException("Constraint Violated! Minimum length: " + maxLen + ", Actual: " + value.Length);
                 if (value.Length <= byte.MaxValue)
                 {
                     WriteTag(tagNumber, ElementType.Bytes8);

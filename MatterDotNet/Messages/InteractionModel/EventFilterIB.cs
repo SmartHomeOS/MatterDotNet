@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public EventFilterIB(TLVReader reader, long structNumber = -1) {
+        internal EventFilterIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Node = reader.GetULong(0)!.Value;
             EventMin = reader.GetULong(1)!.Value;
@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteULong(0, Node);
             writer.WriteULong(1, EventMin);

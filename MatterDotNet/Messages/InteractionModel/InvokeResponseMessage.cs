@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public InvokeResponseMessage(TLVReader reader, long structNumber = -1) {
+        internal InvokeResponseMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             SuppressResponse = reader.GetBool(0)!.Value;
             {
@@ -53,7 +53,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(0, SuppressResponse);
             {

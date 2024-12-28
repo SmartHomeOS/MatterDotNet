@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public TimedRequestMessage(TLVReader reader, long structNumber = -1) {
+        internal TimedRequestMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Timeout = reader.GetUShort(0)!.Value;
             InteractionModelRevision = reader.GetByte(255)!.Value;
@@ -40,7 +40,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUShort(0, Timeout);
             writer.WriteByte(255, InteractionModelRevision);

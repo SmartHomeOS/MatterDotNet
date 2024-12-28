@@ -12,7 +12,7 @@
 
 namespace Generator.Schema
 {
-    // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -822,12 +822,72 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterDataTypesStructFieldConstraint
     {
+        private int toField;
+        private int fromField;
+        private bool fromFieldSpecified;
+        private bool toFieldSpecified;
 
         private string typeField;
 
         private string valueField;
 
         private bool valueFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int from
+        {
+            get
+            {
+                return this.fromField;
+            }
+            set
+            {
+                this.fromField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool fromSpecified
+        {
+            get
+            {
+                return this.fromFieldSpecified;
+            }
+            set
+            {
+                this.fromFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int to
+        {
+            get
+            {
+                return this.toField;
+            }
+            set
+            {
+                this.toField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool toSpecified
+        {
+            get
+            {
+                return this.toFieldSpecified;
+            }
+            set
+            {
+                this.toFieldSpecified = value;
+            }
+        }
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -1684,7 +1744,7 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterCommandField
     {
-        private clusterCommandFieldQuality qualityField;
+        private clusterCommandFieldQuality? qualityField;
 
         private object optionalConformField;
 
@@ -1956,4 +2016,5 @@ namespace Generator.Schema
             }
         }
     }
+    #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }

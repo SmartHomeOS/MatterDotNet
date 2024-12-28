@@ -67,7 +67,7 @@ namespace MatterDotNet.Clusters
             public required ushort GroupId { get; set; }
             public required List<ushort> Endpoints { get; set; }
             public required string GroupName { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
                 {
@@ -84,7 +84,7 @@ namespace MatterDotNet.Clusters
         public record GroupKeyMap : TLVPayload {
             public required ushort GroupId { get; set; }
             public required ushort GroupKeySetID { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
                 writer.WriteUShort(2, GroupKeySetID);
@@ -102,7 +102,7 @@ namespace MatterDotNet.Clusters
             public required byte[] EpochKey2 { get; set; }
             public required ulong EpochStartTime2 { get; set; }
             public required GroupKeyMulticastPolicyEnum GroupKeyMulticastPolicy { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
                 writer.WriteUShort(1, (ushort)GroupKeySecurityPolicy);
@@ -121,7 +121,7 @@ namespace MatterDotNet.Clusters
         #region Payloads
         private record KeySetWriteCommandPayload : TLVPayload {
             public required GroupKeySet GroupKeySet { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 GroupKeySet.Serialize(writer, 0);
                 writer.EndContainer();
@@ -130,7 +130,7 @@ namespace MatterDotNet.Clusters
 
         private record KeySetReadCommandPayload : TLVPayload {
             public required ushort GroupKeySetID { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
                 writer.EndContainer();
@@ -143,7 +143,7 @@ namespace MatterDotNet.Clusters
 
         private record KeySetRemoveCommandPayload : TLVPayload {
             public required ushort GroupKeySetID { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
                 writer.EndContainer();
@@ -151,7 +151,7 @@ namespace MatterDotNet.Clusters
         }
 
         private record KeySetReadAllIndicesCommandPayload : TLVPayload {
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.EndContainer();
             }

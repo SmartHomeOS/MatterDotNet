@@ -36,11 +36,11 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma2(TLVReader reader, long structNumber = -1) {
+        internal Sigma2(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            ResponderRandom = reader.GetBytes(1)!;
+            ResponderRandom = reader.GetBytes(1, false, 32, 32)!;
             ResponderSessionId = reader.GetUShort(2)!.Value;
-            ResponderEphPubKey = reader.GetBytes(3)!;
+            ResponderEphPubKey = reader.GetBytes(3, false, 65, 65)!;
             Encrypted2 = reader.GetBytes(4)!;
             if (reader.IsTag(5))
                 ResponderSessionParams = new SessionParameter(reader, 5);
@@ -48,11 +48,11 @@ namespace MatterDotNet.Messages.CASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResponderRandom);
+            writer.WriteBytes(1, ResponderRandom, 32, 32);
             writer.WriteUShort(2, ResponderSessionId);
-            writer.WriteBytes(3, ResponderEphPubKey);
+            writer.WriteBytes(3, ResponderEphPubKey, 65, 65);
             writer.WriteBytes(4, Encrypted2);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 5);

@@ -32,7 +32,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public StatusIB(TLVReader reader, long structNumber = -1) {
+        internal StatusIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Status = reader.GetByte(0)!.Value;
             if (reader.IsTag(1))
@@ -41,7 +41,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteByte(0, Status);
             if (ClusterStatus != null)

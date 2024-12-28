@@ -35,7 +35,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public EventPathIB(TLVReader reader, long structNumber = -1) {
+        internal EventPathIB(TLVReader reader, long structNumber = -1) {
             reader.StartList(structNumber);
             if (reader.IsTag(0))
                 Node = reader.GetULong(0);
@@ -51,7 +51,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartList(structNumber);
             if (Node != null)
                 writer.WriteULong(0, Node);

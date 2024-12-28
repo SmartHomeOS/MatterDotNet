@@ -41,7 +41,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
 
             /// <inheritdoc />
             [SetsRequiredMembers]
-            public TargetApp(TLVReader reader, long structNumber = -1) {
+            internal TargetApp(TLVReader reader, long structNumber = -1) {
                 reader.StartStructure(structNumber);
                 if (reader.IsTag(11))
                     AppVendorId = reader.GetUShort(11);
@@ -51,7 +51,7 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             }
 
             /// <inheritdoc />
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (AppVendorId != null)
                     writer.WriteUShort(11, AppVendorId);
@@ -77,22 +77,22 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public IdentificationDeclaration(TLVReader reader, long structNumber = -1) {
+        internal IdentificationDeclaration(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 VendorId = reader.GetUShort(1);
             if (reader.IsTag(2))
                 ProductId = reader.GetUShort(2);
             if (reader.IsTag(3))
-                DeviceName = reader.GetString(3);
+                DeviceName = reader.GetString(3, false, 32);
             if (reader.IsTag(4))
                 DeviceType = reader.GetUInt(4);
             if (reader.IsTag(5))
-                PairingInstruction = reader.GetString(5);
+                PairingInstruction = reader.GetString(5, false, 32);
             if (reader.IsTag(6))
                 PairingHint = reader.GetUInt(6);
             if (reader.IsTag(7))
-                RotatingDeviceId = reader.GetString(7);
+                RotatingDeviceId = reader.GetString(7, false, 100);
             if (reader.IsTag(8))
                 Port = reader.GetUShort(8);
             if (reader.IsTag(9))
@@ -119,22 +119,22 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (VendorId != null)
                 writer.WriteUShort(1, VendorId);
             if (ProductId != null)
                 writer.WriteUShort(2, ProductId);
             if (DeviceName != null)
-                writer.WriteString(3, DeviceName);
+                writer.WriteString(3, DeviceName, 32);
             if (DeviceType != null)
                 writer.WriteUInt(4, DeviceType);
             if (PairingInstruction != null)
-                writer.WriteString(5, PairingInstruction);
+                writer.WriteString(5, PairingInstruction, 32);
             if (PairingHint != null)
                 writer.WriteUInt(6, PairingHint);
             if (RotatingDeviceId != null)
-                writer.WriteString(7, RotatingDeviceId);
+                writer.WriteString(7, RotatingDeviceId, 100);
             if (Port != null)
                 writer.WriteUShort(8, Port);
             if (TargetAppList != null)

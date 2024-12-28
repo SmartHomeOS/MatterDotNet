@@ -32,7 +32,7 @@ namespace MatterDotNet.Protocol
                 {
                     InteractionModelRevision = Constants.MATTER_13_REVISION,
                     FabricFiltered = false,
-                    AttributeRequests = paths
+                    AttributeRequests = paths,
                 };
                 Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
                 readFrame.Flags |= MessageFlags.SourceNodeID;

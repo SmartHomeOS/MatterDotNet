@@ -31,16 +31,16 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Pake3(TLVReader reader, long structNumber = -1) {
+        internal Pake3(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            CA = reader.GetBytes(1)!;
+            CA = reader.GetBytes(1, false, 32, 32)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, CA);
+            writer.WriteBytes(1, CA, 32, 32);
             writer.EndContainer();
         }
     }

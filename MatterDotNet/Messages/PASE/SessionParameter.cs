@@ -37,7 +37,7 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public SessionParameter(TLVReader reader, long structNumber = -1) {
+        internal SessionParameter(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(1))
                 SessionIdleInterval = reader.GetUInt(1);
@@ -57,7 +57,7 @@ namespace MatterDotNet.Messages.PASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (SessionIdleInterval != null)
                 writer.WriteUInt(1, SessionIdleInterval);

@@ -39,7 +39,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public SubscribeRequestMessage(TLVReader reader, long structNumber = -1) {
+        internal SubscribeRequestMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             KeepSubscriptions = reader.GetBool(0)!.Value;
             MinIntervalFloor = reader.GetULong(1)!.Value;
@@ -89,7 +89,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(0, KeepSubscriptions);
             writer.WriteULong(1, MinIntervalFloor);

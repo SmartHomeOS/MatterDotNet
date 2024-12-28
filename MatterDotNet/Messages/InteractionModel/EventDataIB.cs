@@ -30,37 +30,45 @@ namespace MatterDotNet.Messages.InteractionModel
         public required EventPathIB Path { get; set; } 
         public required ulong EventNumber { get; set; } 
         public required byte Priority { get; set; } 
-        public required ulong EpochTimestamp { get; set; } 
-        public required ulong SystemTimestamp { get; set; } 
-        public required ulong DeltaEpochTimestamp { get; set; } 
-        public required ulong DeltaSystemTimestamp { get; set; } 
+        public ulong? EpochTimestamp { get; set; } 
+        public ulong? SystemTimestamp { get; set; } 
+        public ulong? DeltaEpochTimestamp { get; set; } 
+        public ulong? DeltaSystemTimestamp { get; set; } 
         public required object Data { get; set; } 
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public EventDataIB(TLVReader reader, long structNumber = -1) {
+        internal EventDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Path = new EventPathIB(reader, 0);
             EventNumber = reader.GetULong(1)!.Value;
             Priority = reader.GetByte(2)!.Value;
-            EpochTimestamp = reader.GetULong(3)!.Value;
-            SystemTimestamp = reader.GetULong(4)!.Value;
-            DeltaEpochTimestamp = reader.GetULong(5)!.Value;
-            DeltaSystemTimestamp = reader.GetULong(6)!.Value;
+            if (reader.IsTag(3))
+                EpochTimestamp = reader.GetULong(3);
+            if (reader.IsTag(4))
+                SystemTimestamp = reader.GetULong(4);
+            if (reader.IsTag(5))
+                DeltaEpochTimestamp = reader.GetULong(5);
+            if (reader.IsTag(6))
+                DeltaSystemTimestamp = reader.GetULong(6);
             Data = reader.GetAny(7)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             Path.Serialize(writer, 0);
             writer.WriteULong(1, EventNumber);
             writer.WriteByte(2, Priority);
-            writer.WriteULong(3, EpochTimestamp);
-            writer.WriteULong(4, SystemTimestamp);
-            writer.WriteULong(5, DeltaEpochTimestamp);
-            writer.WriteULong(6, DeltaSystemTimestamp);
+            if (EpochTimestamp != null)
+                writer.WriteULong(3, EpochTimestamp);
+            if (SystemTimestamp != null)
+                writer.WriteULong(4, SystemTimestamp);
+            if (DeltaEpochTimestamp != null)
+                writer.WriteULong(5, DeltaEpochTimestamp);
+            if (DeltaSystemTimestamp != null)
+                writer.WriteULong(6, DeltaSystemTimestamp);
             writer.WriteAny(7, Data);
             writer.EndContainer();
         }

@@ -258,7 +258,7 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public string? GetString(long tagNumber, bool nullable = false)
+        public string? GetString(long tagNumber, bool nullable = false, int max = int.MaxValue, int min = 0)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
@@ -266,13 +266,17 @@ namespace MatterDotNet.Protocol.Parsers
                 return null;
             if (type != ElementType.String8 && type != ElementType.String16 && type != ElementType.String32)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
+            if (length > max)
+                throw new InvalidDataException($"Constraint Violation! Max length is {max} but received {length}");
+            if (length < min)
+                throw new InvalidDataException($"Constraint Violation! Min length is {min} but received {length}");
             string val = Encoding.UTF8.GetString(data.Slice(offset, length).Span);
             offset += length;
             ReadTag();
             return val;
         }
 
-        public byte[]? GetBytes(long tagNumber, bool nullable = false)
+        public byte[]? GetBytes(long tagNumber, bool nullable = false, int max = int.MaxValue, int min = 0)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present. Current tag is " + this.tagNumber);
@@ -280,6 +284,10 @@ namespace MatterDotNet.Protocol.Parsers
                 return null;
             if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type bytes but received {type}");
+            if (length > max)
+                throw new InvalidDataException($"Constraint Violation! Max length is {max} but received {length}");
+            if (length < min)
+                throw new InvalidDataException($"Constraint Violation! Min length is {min} but received {length}");
             byte[] val = data.Slice(offset, length).ToArray();
             offset += length;
             ReadTag();

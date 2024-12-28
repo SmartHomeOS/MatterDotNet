@@ -42,7 +42,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public CertificationElements(TLVReader reader, long structNumber = -1) {
+        internal CertificationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Format_version = reader.GetUShort(0)!.Value;
             Vendor_id = reader.GetUShort(1)!.Value;
@@ -56,7 +56,7 @@ namespace MatterDotNet.Messages.Certificates
                 Product_id_array = items.ToArray();
             }
             Device_type_id = reader.GetUInt(3)!.Value;
-            Certificate_id = reader.GetString(4)!;
+            Certificate_id = reader.GetString(4, false, 19, 19)!;
             Security_level = reader.GetByte(5)!.Value;
             Security_information = reader.GetUShort(6)!.Value;
             Version_number = reader.GetUShort(7)!.Value;
@@ -79,11 +79,12 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUShort(0, Format_version);
             writer.WriteUShort(1, Vendor_id);
             {
+                Constrain(Product_id_array, 1, 100);
                 writer.StartArray(2);
                 foreach (var item in Product_id_array) {
                     writer.WriteUInt(-1, item);
@@ -91,7 +92,7 @@ namespace MatterDotNet.Messages.Certificates
                 writer.EndContainer();
             }
             writer.WriteUInt(3, Device_type_id);
-            writer.WriteString(4, Certificate_id);
+            writer.WriteString(4, Certificate_id, 19, 19);
             writer.WriteByte(5, Security_level);
             writer.WriteUShort(6, Security_information);
             writer.WriteUShort(7, Version_number);
@@ -102,6 +103,7 @@ namespace MatterDotNet.Messages.Certificates
                 writer.WriteUShort(10, Dac_origin_product_id);
             if (Authorized_paa_list != null)
             {
+                Constrain(Authorized_paa_list, 1, 10);
                 writer.StartArray(11);
                 foreach (var item in Authorized_paa_list) {
                     writer.WriteBytes(-1, item);

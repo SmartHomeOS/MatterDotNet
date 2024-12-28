@@ -27,21 +27,21 @@ namespace MatterDotNet.Protocol.Payloads
         /// Parse the TLVs from a frame into this message
         /// </summary>
         /// <param name="data"></param>
-        public TLVPayload(Memory<byte> data) : this(new TLVReader(data)) {}
+        internal TLVPayload(Memory<byte> data) : this(new TLVReader(data)) {}
 
         /// <summary>
         /// Parse the TLVs from a frame into this message
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="structureNumber"></param>
-        public TLVPayload(TLVReader reader, long structureNumber = -1) { }
+        internal TLVPayload(TLVReader reader, long structureNumber = -1) { }
 
         /// <summary>
         /// Write the TLVs to an application payload
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="structureNumber"></param>
-        public abstract void Serialize(TLVWriter writer, long structureNumber = -1);
+        internal abstract void Serialize(TLVWriter writer, long structureNumber = -1);
 
         /// <summary>
         /// Write the TLVs to an application payload
@@ -51,6 +51,38 @@ namespace MatterDotNet.Protocol.Payloads
         public void Serialize(PayloadWriter writer)
         {
             Serialize(new TLVWriter(writer));
+        }
+
+        /// <summary>
+        /// Throw an error if the list does not fall within the valid size range
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <exception cref="InvalidDataException"></exception>
+        protected void Constrain<T>(List<T> list, int min, int max = int.MaxValue)
+        {
+            if (list.Count < min)
+                throw new InvalidDataException($"List must contain at least {min} element{(min == 1 ? "" : "s")} but contained {list.Count}");
+            if (list.Count > max)
+                throw new InvalidDataException($"List may not contain more than {max} element{(min == 1 ? "" : "s")} but contained {list.Count}");
+        }
+
+        /// <summary>
+        /// Throw an error if the array does not fall within the valid size range
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <exception cref="InvalidDataException"></exception>
+        protected void Constrain<T>(T[] array, int min, int max = int.MaxValue)
+        {
+            if (array.Length < min)
+                throw new InvalidDataException($"Array must contain at least {min} element{(min == 1 ? "" : "s")} but contained {array.Length}");
+            if (array.Length > max)
+                throw new InvalidDataException($"Array may not contain more than {max} element{(min == 1 ? "" : "s")} but contained {array.Length}");
         }
     }
 }

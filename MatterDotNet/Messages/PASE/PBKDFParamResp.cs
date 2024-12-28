@@ -35,10 +35,10 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamResp(TLVReader reader, long structNumber = -1) {
+        internal PBKDFParamResp(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            InitiatorRandom = reader.GetBytes(1)!;
-            ResponderRandom = reader.GetBytes(2)!;
+            InitiatorRandom = reader.GetBytes(1, false, 32, 32)!;
+            ResponderRandom = reader.GetBytes(2, false, 32, 32)!;
             ResponderSessionId = reader.GetUShort(3)!.Value;
             if (reader.IsTag(4))
                 Pbkdf_parameters = new Crypto_PBKDFParameterSet(reader, 4);
@@ -48,10 +48,10 @@ namespace MatterDotNet.Messages.PASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom);
-            writer.WriteBytes(2, ResponderRandom);
+            writer.WriteBytes(1, InitiatorRandom, 32, 32);
+            writer.WriteBytes(2, ResponderRandom, 32, 32);
             writer.WriteUShort(3, ResponderSessionId);
             if (Pbkdf_parameters != null)
                 Pbkdf_parameters.Serialize(writer, 4);

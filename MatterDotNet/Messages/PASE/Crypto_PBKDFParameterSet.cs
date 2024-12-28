@@ -32,18 +32,18 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Crypto_PBKDFParameterSet(TLVReader reader, long structNumber = -1) {
+        internal Crypto_PBKDFParameterSet(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Iterations = reader.GetUInt(1)!.Value;
-            Salt = reader.GetBytes(2)!;
+            Salt = reader.GetBytes(2, false, 32, 16)!;
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUInt(1, Iterations);
-            writer.WriteBytes(2, Salt);
+            writer.WriteBytes(2, Salt, 32, 16);
             writer.EndContainer();
         }
     }

@@ -38,34 +38,34 @@ namespace MatterDotNet.Messages.CASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public Sigma1(TLVReader reader, long structNumber = -1) {
+        internal Sigma1(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            InitiatorRandom = reader.GetBytes(1)!;
+            InitiatorRandom = reader.GetBytes(1, false, 32, 32)!;
             InitiatorSessionId = reader.GetUShort(2)!.Value;
-            DestinationId = reader.GetBytes(3)!;
-            InitiatorEphPubKey = reader.GetBytes(4)!;
+            DestinationId = reader.GetBytes(3, false, 32, 32)!;
+            InitiatorEphPubKey = reader.GetBytes(4, false, 65, 65)!;
             if (reader.IsTag(5))
                 InitiatorSessionParams = new SessionParameter(reader, 5);
             if (reader.IsTag(6))
-                ResumptionID = reader.GetBytes(6);
+                ResumptionID = reader.GetBytes(6, false, 16, 16);
             if (reader.IsTag(7))
-                InitiatorResumeMIC = reader.GetBytes(7);
+                InitiatorResumeMIC = reader.GetBytes(7, false, 16, 16);
             reader.EndContainer();
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom);
+            writer.WriteBytes(1, InitiatorRandom, 32, 32);
             writer.WriteUShort(2, InitiatorSessionId);
-            writer.WriteBytes(3, DestinationId);
-            writer.WriteBytes(4, InitiatorEphPubKey);
+            writer.WriteBytes(3, DestinationId, 32, 32);
+            writer.WriteBytes(4, InitiatorEphPubKey, 65, 65);
             if (InitiatorSessionParams != null)
                 InitiatorSessionParams.Serialize(writer, 5);
             if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID);
+                writer.WriteBytes(6, ResumptionID, 16, 16);
             if (InitiatorResumeMIC != null)
-                writer.WriteBytes(7, InitiatorResumeMIC);
+                writer.WriteBytes(7, InitiatorResumeMIC, 16, 16);
             writer.EndContainer();
         }
     }

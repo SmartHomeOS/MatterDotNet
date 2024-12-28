@@ -35,10 +35,10 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public NocsrElements(TLVReader reader, long structNumber = -1) {
+        internal NocsrElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Csr = reader.GetBytes(1)!;
-            CSRNonce = reader.GetBytes(2)!;
+            CSRNonce = reader.GetBytes(2, false, 32, 32)!;
             if (reader.IsTag(3))
                 Vendor_reserved1 = reader.GetBytes(3);
             if (reader.IsTag(4))
@@ -49,10 +49,10 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Csr);
-            writer.WriteBytes(2, CSRNonce);
+            writer.WriteBytes(2, CSRNonce, 32, 32);
             if (Vendor_reserved1 != null)
                 writer.WriteBytes(3, Vendor_reserved1);
             if (Vendor_reserved2 != null)

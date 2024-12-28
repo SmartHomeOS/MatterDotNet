@@ -41,9 +41,9 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public MatterCertificate(TLVReader reader, long structNumber = -1) {
+        internal MatterCertificate(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            SerialNum = reader.GetBytes(1)!;
+            SerialNum = reader.GetBytes(1, false, 20)!;
             SigAlgo = reader.GetULong(2)!.Value;
             {
                 reader.StartList(3);
@@ -79,11 +79,12 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, SerialNum);
+            writer.WriteBytes(1, SerialNum, 20);
             writer.WriteULong(2, SigAlgo);
             {
+                Constrain(Issuer, 1);
                 writer.StartList(3);
                 foreach (var item in Issuer) {
                     item.Serialize(writer, -1);
@@ -93,6 +94,7 @@ namespace MatterDotNet.Messages.Certificates
             writer.WriteUInt(4, NotBefore);
             writer.WriteUInt(5, NotAfter);
             {
+                Constrain(Subject, 1);
                 writer.StartList(6);
                 foreach (var item in Subject) {
                     item.Serialize(writer, -1);
@@ -103,6 +105,7 @@ namespace MatterDotNet.Messages.Certificates
             writer.WriteULong(8, EcCurveId);
             writer.WriteBytes(9, EcPubKey);
             {
+                Constrain(Extensions, 1);
                 writer.StartList(10);
                 foreach (var item in Extensions) {
                     item.Serialize(writer, -1);

@@ -59,7 +59,7 @@ namespace MatterDotNet.Clusters
             public required ushort Discriminator { get; set; }
             public required uint Iterations { get; set; }
             public required byte[] Salt { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, CommissioningTimeout);
                 writer.WriteBytes(1, PAKEPasscodeVerifier);
@@ -72,7 +72,7 @@ namespace MatterDotNet.Clusters
 
         private record OpenBasicCommissioningWindowPayload : TLVPayload {
             public required ushort CommissioningTimeout { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, CommissioningTimeout);
                 writer.EndContainer();

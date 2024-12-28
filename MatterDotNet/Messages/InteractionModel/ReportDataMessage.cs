@@ -36,7 +36,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public ReportDataMessage(TLVReader reader, long structNumber = -1) {
+        internal ReportDataMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(0))
                 SubscriptionID = reader.GetULong(0);
@@ -69,7 +69,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (SubscriptionID != null)
                 writer.WriteULong(0, SubscriptionID);

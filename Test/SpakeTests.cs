@@ -59,8 +59,9 @@ namespace Test
             Assert.That(responderValidation.V.ToBytes(true).ToArray(), Is.EqualTo(ininiatorValidation.V.ToBytes(true).ToArray()).AsCollection);
             Assert.That(responderValidation.Z.ToBytes(true).ToArray(), Is.EqualTo(ininiatorValidation.Z.ToBytes(true).ToArray()).AsCollection);
 
-            PBKDFParamReq req = new PBKDFParamReq() { HasPBKDFParameters = false, InitiatorRandom = [], InitiatorSessionId = 23, PasscodeId = 0 };
-            PBKDFParamResp resp = new PBKDFParamResp() { InitiatorRandom = [], ResponderRandom = [], ResponderSessionId = 23 };
+            byte[] random = RandomNumberGenerator.GetBytes(32);
+            PBKDFParamReq req = new PBKDFParamReq() { HasPBKDFParameters = false, InitiatorRandom = random, InitiatorSessionId = 23, PasscodeId = 0 };
+            PBKDFParamResp resp = new PBKDFParamResp() { InitiatorRandom = random, ResponderRandom = random, ResponderSessionId = 23 };
             responder.Finish(req, resp, pA.ToBytes(false), pB.ToBytes(false));
         }
     }

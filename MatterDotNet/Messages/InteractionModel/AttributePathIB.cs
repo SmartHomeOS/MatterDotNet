@@ -37,7 +37,7 @@ namespace MatterDotNet.Messages.InteractionModel
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public AttributePathIB(TLVReader reader, long structNumber = -1) {
+        internal AttributePathIB(TLVReader reader, long structNumber = -1) {
             reader.StartList(structNumber);
             if (reader.IsTag(0))
                 EnableTagCompression = reader.GetBool(0);
@@ -57,7 +57,7 @@ namespace MatterDotNet.Messages.InteractionModel
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartList(structNumber);
             if (EnableTagCompression != null)
                 writer.WriteBool(0, EnableTagCompression);

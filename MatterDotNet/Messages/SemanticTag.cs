@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public SemanticTag(TLVReader reader, long structNumber = -1) {
+        internal SemanticTag(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             if (reader.IsTag(0))
                 MfgCode = reader.GetUShort(0, true);
@@ -46,7 +46,7 @@ namespace MatterDotNet.Messages
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (MfgCode != null)
                 writer.WriteUShort(0, MfgCode);

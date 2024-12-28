@@ -35,9 +35,9 @@ namespace MatterDotNet.Messages.PASE
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public PBKDFParamReq(TLVReader reader, long structNumber = -1) {
+        internal PBKDFParamReq(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            InitiatorRandom = reader.GetBytes(1)!;
+            InitiatorRandom = reader.GetBytes(1, false, 32, 32)!;
             InitiatorSessionId = reader.GetUShort(2)!.Value;
             PasscodeId = reader.GetUShort(3)!.Value;
             HasPBKDFParameters = reader.GetBool(4)!.Value;
@@ -47,9 +47,9 @@ namespace MatterDotNet.Messages.PASE
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, InitiatorRandom);
+            writer.WriteBytes(1, InitiatorRandom, 32, 32);
             writer.WriteUShort(2, InitiatorSessionId);
             writer.WriteUShort(3, PasscodeId);
             writer.WriteBool(4, HasPBKDFParameters);

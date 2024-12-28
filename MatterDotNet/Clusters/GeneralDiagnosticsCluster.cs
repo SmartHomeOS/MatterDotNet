@@ -210,7 +210,7 @@ namespace MatterDotNet.Clusters
             public required List<byte[]> IPv4Addresses { get; set; }
             public required List<byte[]> IPv6Addresses { get; set; }
             public required InterfaceTypeEnum Type { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Name);
                 writer.WriteBool(1, IsOperational);
@@ -241,7 +241,7 @@ namespace MatterDotNet.Clusters
         private record TestEventTriggerPayload : TLVPayload {
             public required byte[] EnableKey { get; set; }
             public required ulong EventTrigger { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, EnableKey);
                 writer.WriteULong(1, EventTrigger);
@@ -258,7 +258,7 @@ namespace MatterDotNet.Clusters
             public required byte[] EnableKey { get; set; }
             public required byte Value { get; set; }
             public required ushort Count { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, EnableKey);
                 writer.WriteByte(1, Value);

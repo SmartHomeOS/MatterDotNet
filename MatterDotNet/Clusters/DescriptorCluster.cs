@@ -34,7 +34,7 @@ namespace MatterDotNet.Clusters
         public record DeviceType : TLVPayload {
             public required uint DeviceTypeField { get; set; }
             public required ushort Revision { get; set; }
-            public override void Serialize(TLVWriter writer, long structNumber = -1) {
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, DeviceTypeField);
                 writer.WriteUShort(1, Revision);

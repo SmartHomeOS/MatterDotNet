@@ -67,7 +67,7 @@ namespace MatterDotNet.Messages.Certificates
 
         /// <inheritdoc />
         [SetsRequiredMembers]
-        public DnAttribute(TLVReader reader, long structNumber = -1) {
+        internal DnAttribute(TLVReader reader, long structNumber = -1) {
             if (reader.IsTag(1))
                 CommonName = reader.GetString(1);
             else if (reader.IsTag(2))
@@ -145,7 +145,7 @@ namespace MatterDotNet.Messages.Certificates
         }
 
         /// <inheritdoc />
-        public override void Serialize(TLVWriter writer, long structNumber = -1) {
+        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             if (CommonName != null)
                 writer.WriteString(1, CommonName);
             else if (Surname != null)

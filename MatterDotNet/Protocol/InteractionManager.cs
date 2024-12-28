@@ -35,8 +35,9 @@ namespace MatterDotNet.Protocol
                     AttributeRequests = paths,
                 };
                 Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
-                readFrame.Flags |= MessageFlags.SourceNodeID;
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
+                readFrame.SourceNodeID = session.InitiatorNodeID;
+                readFrame.DestinationNodeID = session.ResponderNodeID; 
                 await secExchange.SendFrame(readFrame);
                 List<AttributeReportIB> results = new List<AttributeReportIB>();
                 bool more = false;
@@ -52,7 +53,6 @@ namespace MatterDotNet.Protocol
                         {
                             var status = new StatusResponseMessage() { InteractionModelRevision = Constants.MATTER_13_REVISION, Status = (byte)IMStatusCode.SUCCESS };
                             Frame statusFrame = new Frame(status, (byte)IMOpCodes.StatusResponse);
-                            readFrame.Flags |= MessageFlags.SourceNodeID;
                             readFrame.Message.Protocol = ProtocolType.InteractionModel;
                             await secExchange.SendFrame(statusFrame);
                         }
@@ -73,8 +73,9 @@ namespace MatterDotNet.Protocol
                     AttributeRequests = [new AttributePathIB() { Node = session.InitiatorNodeID, Endpoint = endpoint, Cluster = cluster, Attribute = attribute }]
                 };
                 Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
-                readFrame.Flags |= MessageFlags.SourceNodeID;
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
+                readFrame.SourceNodeID = session.InitiatorNodeID;
+                readFrame.DestinationNodeID = session.ResponderNodeID; 
                 await secExchange.SendFrame(readFrame);
                 while (true)
                 {
@@ -103,10 +104,11 @@ namespace MatterDotNet.Protocol
                 InteractionModelRevision = Constants.MATTER_13_REVISION,
                 InvokeRequests = [new CommandDataIB() { CommandFields = payload, CommandPath = new CommandPathIB() { Endpoint = endpoint, Cluster = cluster, Command = command } }]
             };
-            Frame readFrame = new Frame(run, (byte)IMOpCodes.InvokeRequest);
-            readFrame.Flags |= MessageFlags.SourceNodeID;
-            readFrame.Message.Protocol = ProtocolType.InteractionModel;
-            await exchange.SendFrame(readFrame);
+            Frame invokeFrame = new Frame(run, (byte)IMOpCodes.InvokeRequest);
+            invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
+            invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
+            invokeFrame.DestinationNodeID = exchange.Session.ResponderNodeID;
+            await exchange.SendFrame(invokeFrame);
         }
 
         public static async Task<InvokeResponseIB> ExecCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)

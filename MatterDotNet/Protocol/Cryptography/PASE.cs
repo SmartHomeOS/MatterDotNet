@@ -47,15 +47,14 @@ namespace MatterDotNet.Protocol.Cryptography
             StatusPayload status = (StatusPayload)resp.Message.Payload!;
             if (status.GeneralCode != GeneralCode.SUCCESS)
                 throw new IOException("PASE failed with status: " + (SecureStatusCodes)status.ProtocolCode);
+            exchange.Dispose();
             ushort localSessionID = ((PBKDFParamReq)paramReq.Message.Payload!).InitiatorSessionId;
 
             uint activeInterval = paramResp.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
             uint activeThreshold = paramResp.ResponderSessionParams?.SessionActiveThreshold ?? SessionManager.GetDefaultSessionParams().SessionActiveThreshold!.Value;
             uint idleInterval = paramResp.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
 
-            SecureSession ? session = SessionManager.CreateSession(unsecureSession.Connection, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, false, idleInterval, activeInterval, activeThreshold);
-            unsecureSession.Dispose();
-            return session;
+            return SessionManager.CreateSession(unsecureSession.Connection, true, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, 0, 0, [], false, idleInterval, activeInterval, activeThreshold);
         }
 
         public byte[] GetAttestationChallenge()
@@ -71,7 +70,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Console.WriteLine("Iterations: " + (int)paramResp.Pbkdf_parameters!.Iterations);
             BigIntegerPoint pA = spake.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
             Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
-            Frame frame = new Frame(pk1, (byte)SecureOpCodes.PASEPake1) { Flags = MessageFlags.SourceNodeID };
+            Frame frame = new Frame(pk1, (byte)SecureOpCodes.PASEPake1);
             return frame;
         }
 
@@ -84,7 +83,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Pake3 pake3 = new Pake3() {
                 CA = SessionKeys.cA
             };
-            Frame frame = new Frame(pake3, (byte)SecureOpCodes.PASEPake3) { Flags = MessageFlags.SourceNodeID };
+            Frame frame = new Frame(pake3, (byte)SecureOpCodes.PASEPake3);
             return frame;
         }
 
@@ -98,7 +97,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 HasPBKDFParameters = hasOnboardingPayload
             };
 
-            Frame frame = new Frame(req, (byte)SecureOpCodes.PBKDFParamRequest) { Flags = MessageFlags.SourceNodeID };
+            Frame frame = new Frame(req, (byte)SecureOpCodes.PBKDFParamRequest);
             return frame;
         }
     }

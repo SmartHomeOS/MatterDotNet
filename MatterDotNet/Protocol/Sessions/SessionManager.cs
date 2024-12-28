@@ -26,28 +26,28 @@ namespace MatterDotNet.Protocol.Sessions
         private static ConcurrentDictionary<IPEndPoint, IConnection> connections = new ConcurrentDictionary<IPEndPoint, IConnection>();
         private static ConcurrentDictionary<ushort, SessionContext> sessions = new ConcurrentDictionary<ushort, SessionContext>();
 
-        public static SessionContext GetUnsecureSession(IPEndPoint ep, bool initiator, uint initiatorNodeId, uint responderNodeId)
+        public static SessionContext GetUnsecureSession(IPEndPoint ep, bool initiator)
         {
-            return GetUnsecureSession(GetConnection(ep), initiator, initiatorNodeId, responderNodeId);
+            return GetUnsecureSession(GetConnection(ep), initiator);
         }
 
-        internal static SessionContext GetUnsecureSession(IConnection connection, bool initiator, uint initiatorNodeId, uint responderNodeId)
+        internal static SessionContext GetUnsecureSession(IConnection connection, bool initiator)
         {
-            SessionContext ctx = new SessionContext(connection, initiator, initiatorNodeId, responderNodeId, 0, 0, new MessageState());
+            SessionContext ctx = new SessionContext(connection, initiator, 0, 0, 0, 0, new MessageState());
             sessions.TryAdd(0, ctx);
             return ctx;
         }
 
-        public static SecureSession? CreateSession(IPEndPoint ep, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        public static SecureSession? CreateSession(IPEndPoint ep, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
-            return CreateSession(GetConnection(ep), initiator, initiatorSessionId, responderSessionId, i2r, r2i, group, idleInterval, activeInterval, activeThreshold);
+            return CreateSession(GetConnection(ep), PASE, initiator, initiatorSessionId, responderSessionId, i2r, r2i, localNodeId, peerNodeId, sharedSecret, group, idleInterval, activeInterval, activeThreshold);
         }
 
-        internal static SecureSession? CreateSession(IConnection connection, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        internal static SecureSession? CreateSession(IConnection connection, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session
-            SecureSession ctx = new SecureSession(connection, false, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, [], 0, new MessageState(), 0, 0, idleInterval, activeInterval, activeThreshold);
+            SecureSession ctx = new SecureSession(connection, PASE, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, sharedSecret, 0, new MessageState(), localNodeId, peerNodeId, idleInterval, activeInterval, activeThreshold);
             Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
             sessions.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;

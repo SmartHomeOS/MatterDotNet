@@ -50,7 +50,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 InitiatorSessionParams = SessionManager.GetDefaultSessionParams()
             };
 
-            Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1) { Flags = MessageFlags.SourceNodeID };
+            Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
             await exchange.SendFrame(sigma1);
             Console.WriteLine("Sent SIGMA 1");
             resp = await exchange.Read();
@@ -111,12 +111,9 @@ namespace MatterDotNet.Protocol.Cryptography
                 return null;
             }
 
-            PayloadWriter noc = new PayloadWriter(512);
-            fabric.Commissioner!.ToMatterCertificate().Serialize(noc);
-
             Sigma3Tbsdata s3sig = new Sigma3Tbsdata()
             {
-                InitiatorNOC = noc.GetPayload().ToArray(),
+                InitiatorNOC = fabric.Commissioner!.GetMatterCertBytes(),
                 InitiatorEphPubKey = ephKeys.Public,
                 ResponderEphPubKey = Msg2.ResponderEphPubKey
             };
@@ -129,20 +126,22 @@ namespace MatterDotNet.Protocol.Cryptography
                 Signature = Crypto.Sign(fabric.Commissioner.GetPrivateKey()!, s3sigBytes.GetPayload().ToArray())
             };
             PayloadWriter s3tbeBytes = new PayloadWriter(512);
-            s3sig.Serialize(s3tbeBytes);
+            s3tbe.Serialize(s3tbeBytes);
 
-            byte[] Msg1Msg2 = new byte[Msg1Bytes.Length + Msg2Bytes.Length];
-            Msg1Bytes.GetPayload().CopyTo(Msg1Msg2);
-            Msg2Bytes.GetPayload().CopyTo(Msg1Msg2.AsMemory(Msg1Bytes.Length));
-            byte[] transcript3 = Crypto.Hash(Msg1Msg2);
+            byte[] Msg1Msg2Bytes = new byte[Msg1Bytes.Length + Msg2Bytes.Length];
+            Msg1Bytes.GetPayload().CopyTo(Msg1Msg2Bytes);
+            Msg2Bytes.GetPayload().CopyTo(Msg1Msg2Bytes.AsMemory(Msg1Bytes.Length));
+            byte[] transcript3 = Crypto.Hash(Msg1Msg2Bytes);
             byte[] salt3 = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Crypto.HASH_LEN_BYTES];
             Array.Copy(fabric.OperationalIdentityProtectionKey, salt3, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
             Array.Copy(transcript3, 0, salt3, Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.HASH_LEN_BYTES);
             byte[] S3K = Crypto.KDF(SharedSecret, salt3, S3K_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
 
+            Memory<byte> mic = Crypto.AEAD_GenerateEncrypt(S3K, s3tbeBytes.GetPayload().Span, [], TBEData3_Nonce).ToArray();
+            s3tbeBytes.Write(mic);
             Sigma3 Msg3 = new Sigma3()
             {
-                Encrypted3 = Crypto.AEAD_GenerateEncrypt(S3K, s3tbeBytes.GetPayload().Span, [], TBEData3_Nonce).ToArray()
+                Encrypted3 = s3tbeBytes.GetPayload().ToArray()
             };
             PayloadWriter Msg3Bytes = new PayloadWriter(1024);
             Msg3.Serialize(Msg3Bytes);
@@ -153,13 +152,16 @@ namespace MatterDotNet.Protocol.Cryptography
 
             StatusPayload s3resp = (StatusPayload)resp.Message.Payload!;
             if (s3resp.GeneralCode != GeneralCode.SUCCESS)
-                throw new IOException("CASE step 3 failed with status: " + (SecureStatusCodes)s3resp.ProtocolCode);
+                throw new IOException("CASE step 3 failed with status: " + (SecureStatusCodes)s3resp.ProtocolCode);;
 
-            byte[] salt = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Msg1Msg2.Length + Msg3Bytes.Length];
-            fabric.OperationalIdentityProtectionKey.CopyTo(salt, 0);
-            Msg1Msg2.CopyTo(salt, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
-            Msg3Bytes.GetPayload().CopyTo(salt.AsMemory(Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Msg1Msg2.Length));
-            byte[] sessionKeys = Crypto.KDF(SharedSecret, salt, SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
+            byte[] Msg1Msg2Msg3 = new byte[Msg1Msg2Bytes.Length + Msg3Bytes.Length];
+            Msg1Msg2Bytes.CopyTo((Memory<byte>)Msg1Msg2Msg3);
+            Msg3Bytes.GetPayload().CopyTo(Msg1Msg2Msg3.AsMemory(Msg1Msg2Bytes.Length));
+            byte[] transcript4 = Crypto.Hash(Msg1Msg2Msg3);
+            byte[] salt4 = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Crypto.HASH_LEN_BYTES];
+            Array.Copy(fabric.OperationalIdentityProtectionKey, salt4, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
+            Array.Copy(transcript4, 0, salt4, Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.HASH_LEN_BYTES);
+            byte[] sessionKeys = Crypto.KDF(SharedSecret, salt4, SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
             attestationChallenge = sessionKeys.AsSpan(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray();
 
             uint activeInterval = Msg2.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
@@ -167,10 +169,10 @@ namespace MatterDotNet.Protocol.Cryptography
             uint idleInterval = Msg2.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
 
             Console.WriteLine("Created CASE session");
-            SecureSession? session = SessionManager.CreateSession(unsecureSession.Connection, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId, 
-                                                                  sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
+            SecureSession? session = SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
+                                                                  sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
                                                                   sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
-                                                                  false, idleInterval, activeInterval, activeThreshold);
+                                                                  fabric.Commissioner.NodeID, nodeId, SharedSecret, false, idleInterval, activeInterval, activeThreshold);
             unsecureSession.Dispose();
             return session;
         }

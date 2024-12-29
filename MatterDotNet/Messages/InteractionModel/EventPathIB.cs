@@ -33,7 +33,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public uint? Event { get; set; } 
         public bool? IsUrgent { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal EventPathIB(TLVReader reader, long structNumber = -1) {
             reader.StartList(structNumber);
@@ -50,7 +49,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartList(structNumber);
             if (Node != null)

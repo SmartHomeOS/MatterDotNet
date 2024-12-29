@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public AttributeStatusIB? AttributeStatus { get; set; } 
         public AttributeDataIB? AttributeData { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal AttributeReportIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -41,7 +40,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (AttributeStatus != null)

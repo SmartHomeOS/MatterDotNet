@@ -34,7 +34,6 @@ namespace MatterDotNet.Messages.CASE
         public required byte[] Encrypted2 { get; set; } 
         public SessionParameter? ResponderSessionParams { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Sigma2(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -47,7 +46,6 @@ namespace MatterDotNet.Messages.CASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, ResponderRandom, 32, 32);

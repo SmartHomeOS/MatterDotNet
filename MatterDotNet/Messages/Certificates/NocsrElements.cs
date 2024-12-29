@@ -33,7 +33,6 @@ namespace MatterDotNet.Messages.Certificates
         public byte[]? Vendor_reserved2 { get; set; } 
         public byte[]? Vendor_reserved3 { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal NocsrElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -48,7 +47,6 @@ namespace MatterDotNet.Messages.Certificates
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Csr);

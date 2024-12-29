@@ -34,7 +34,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         public bool? CommissionerPasscode { get; set; } 
         public bool? QRCodeDisplayed { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal CommissionerDeclaration(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -53,7 +52,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (ErrorCode != null)

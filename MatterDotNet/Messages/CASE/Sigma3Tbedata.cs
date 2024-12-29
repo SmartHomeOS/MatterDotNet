@@ -31,7 +31,6 @@ namespace MatterDotNet.Messages.CASE
         public byte[]? InitiatorICAC { get; set; } 
         public required byte[] Signature { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Sigma3Tbedata(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -42,7 +41,6 @@ namespace MatterDotNet.Messages.CASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorNOC);

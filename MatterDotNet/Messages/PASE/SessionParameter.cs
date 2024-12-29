@@ -35,7 +35,6 @@ namespace MatterDotNet.Messages.PASE
         public uint? SpecificationVersion { get; set; } 
         public ushort? MaxPathsPerInvoke { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal SessionParameter(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -56,7 +55,6 @@ namespace MatterDotNet.Messages.PASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (SessionIdleInterval != null)

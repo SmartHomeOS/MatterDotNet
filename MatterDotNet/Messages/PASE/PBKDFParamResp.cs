@@ -33,7 +33,6 @@ namespace MatterDotNet.Messages.PASE
         public Crypto_PBKDFParameterSet? Pbkdf_parameters { get; set; } 
         public SessionParameter? ResponderSessionParams { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal PBKDFParamResp(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -47,7 +46,6 @@ namespace MatterDotNet.Messages.PASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorRandom, 32, 32);

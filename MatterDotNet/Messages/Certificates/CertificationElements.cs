@@ -40,7 +40,6 @@ namespace MatterDotNet.Messages.Certificates
         public ushort? Dac_origin_product_id { get; set; } 
         public byte[][]? Authorized_paa_list { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal CertificationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -78,7 +77,6 @@ namespace MatterDotNet.Messages.Certificates
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUShort(0, Format_version);

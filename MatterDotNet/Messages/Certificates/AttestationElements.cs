@@ -32,7 +32,6 @@ namespace MatterDotNet.Messages.Certificates
         public required uint Timestamp { get; set; } 
         public byte[]? Firmware_information { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         public AttestationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -44,7 +43,6 @@ namespace MatterDotNet.Messages.Certificates
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Certification_declaration);

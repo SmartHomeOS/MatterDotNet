@@ -32,7 +32,6 @@ namespace MatterDotNet.Messages
         public required byte Tag { get; set; } 
         public string? Label { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal SemanticTag(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -45,7 +44,6 @@ namespace MatterDotNet.Messages
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (MfgCode != null)

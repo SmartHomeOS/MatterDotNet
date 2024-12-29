@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public EventStatusIB? EventStatus { get; set; } 
         public EventDataIB? EventData { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal EventReportIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -41,7 +40,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (EventStatus != null)

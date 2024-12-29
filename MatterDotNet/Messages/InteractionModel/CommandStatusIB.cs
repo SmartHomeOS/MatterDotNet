@@ -31,7 +31,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public required StatusIB Status { get; set; } 
         public ushort? CommandRef { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal CommandStatusIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -42,7 +41,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             CommandPath.Serialize(writer, 0);

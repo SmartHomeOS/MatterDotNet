@@ -31,7 +31,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public ushort? Endpoint { get; set; } 
         public uint? Cluster { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal ClusterPathIB(TLVReader reader, long structNumber = -1) {
             reader.StartList(structNumber);
@@ -44,7 +43,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartList(structNumber);
             if (Node != null)

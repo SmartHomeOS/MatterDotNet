@@ -14,13 +14,14 @@ namespace Generator
 {
     public static class ClassGenerator
     {
-        public static readonly string HEADER = "// MatterDotNet Copyright (C) 2024 \n//\n// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU Affero General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or any later version.\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY, without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n// See the GNU Affero General Public License for more details.\n// You should have received a copy of the GNU Affero General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n//\n// WARNING: This file was auto-generated. Do not edit.\n\nusing MatterDotNet.Protocol.Parsers;\nusing MatterDotNet.Protocol.Payloads;\nusing System.Diagnostics.CodeAnalysis;\n";
+        public static readonly string HEADER = "// MatterDotNet Copyright (C) 2025 \n//\n// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU Affero General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or any later version.\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY, without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n// See the GNU Affero General Public License for more details.\n// You should have received a copy of the GNU Affero General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n//\n// WARNING: This file was auto-generated. Do not edit.\n\nusing MatterDotNet.Protocol.Parsers;\nusing MatterDotNet.Protocol.Payloads;\nusing System.Diagnostics.CodeAnalysis;\n";
         public static bool Emit(Stream stream, Tag tag)
         {
             StreamWriter writer = new StreamWriter(stream);
             {
-                writer.WriteLine(HEADER.Replace("\n", "\r\n"));
-                writer.WriteLine($"namespace MatterDotNet.Messages{(tag.Namespace != null ? '.' + tag.Namespace : "")}\r\n{{");
+                writer.NewLine = "\n";
+                writer.WriteLine(HEADER);
+                writer.WriteLine($"namespace MatterDotNet.Messages{(tag.Namespace != null ? '.' + tag.Namespace : "")}\n{{");
                 WriteTag("    ", tag, writer);
                 writer.Write("}");
                 writer.Flush();
@@ -31,7 +32,7 @@ namespace Generator
         private static void WriteTag(string indent, Tag tag, StreamWriter writer)
         {
             writer.Write($"{indent}public record {tag.Name}");
-            writer.WriteLine($" : TLVPayload\r\n{indent}{{\r\n{indent}    /// <inheritdoc />\r\n{indent}    public {tag.Name}() {{}}\r\n\r\n{indent}    /// <inheritdoc />\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    public {tag.Name}(Memory<byte> data) : this(new TLVReader(data)) {{}}\r\n");
+            writer.WriteLine($" : TLVPayload\n{indent}{{\n{indent}    /// <inheritdoc />\n{indent}    public {tag.Name}() {{}}\n\n{indent}    /// <inheritdoc />\n{indent}    [SetsRequiredMembers]\n{indent}    public {tag.Name}(Memory<byte> data) : this(new TLVReader(data)) {{}}\n");
             foreach (Tag child in tag.Children)
             {
                 if ((child.Type == DataType.Array || child.Type == DataType.List) && child.Children.Count > 0)
@@ -42,7 +43,7 @@ namespace Generator
                 if (child.Type != DataType.Structure)
                     writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
             }
-            writer.WriteLine($"\r\n{indent}    [SetsRequiredMembers]\r\n{indent}    internal {tag.Name}(TLVReader reader, long structNumber = -1) {{");
+            writer.WriteLine($"\n{indent}    [SetsRequiredMembers]\n{indent}    internal {tag.Name}(TLVReader reader, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
                 writer.WriteLine($"{indent}        reader.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)
@@ -157,7 +158,7 @@ namespace Generator
             }
             if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        reader.EndContainer();");
-            writer.WriteLine($"{indent}    }}\r\n\r\n{indent}    internal override void Serialize(TLVWriter writer, long structNumber = -1) {{");
+            writer.WriteLine($"{indent}    }}\n\n{indent}    internal override void Serialize(TLVWriter writer, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
                 writer.WriteLine($"{indent}        writer.StartList(structNumber);");
             else if (tag.Type != DataType.Choice)

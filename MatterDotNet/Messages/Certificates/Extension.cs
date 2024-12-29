@@ -34,7 +34,6 @@ namespace MatterDotNet.Messages.Certificates
         public byte[]? AuthorityKeyId { get; set; } 
         public byte[]? FutureExtension { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Extension(TLVReader reader, long structNumber = -1) {
             if (reader.IsTag(1))
@@ -59,7 +58,6 @@ namespace MatterDotNet.Messages.Certificates
                 FutureExtension = reader.GetBytes(6);
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             if (BasicCnstr != null)
                 BasicCnstr.Serialize(writer, 1);

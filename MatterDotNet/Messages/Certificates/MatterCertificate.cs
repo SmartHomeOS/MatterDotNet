@@ -39,7 +39,6 @@ namespace MatterDotNet.Messages.Certificates
         public required List<Extension> Extensions { get; set; } 
         public required byte[] Signature { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal MatterCertificate(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -78,7 +77,6 @@ namespace MatterDotNet.Messages.Certificates
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, SerialNum, 20);

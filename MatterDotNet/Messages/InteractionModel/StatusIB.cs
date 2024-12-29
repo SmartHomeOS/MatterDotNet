@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public required byte Status { get; set; } 
         public byte? ClusterStatus { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal StatusIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -40,7 +39,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteByte(0, Status);

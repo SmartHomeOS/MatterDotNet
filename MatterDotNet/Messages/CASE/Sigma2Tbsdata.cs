@@ -32,7 +32,6 @@ namespace MatterDotNet.Messages.CASE
         public required byte[] ResponderEphPubKey { get; set; } 
         public required byte[] InitiatorEphPubKey { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Sigma2Tbsdata(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -44,7 +43,6 @@ namespace MatterDotNet.Messages.CASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, ResponderNOC);

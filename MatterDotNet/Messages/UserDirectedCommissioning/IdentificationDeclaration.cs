@@ -39,7 +39,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             public ushort? AppVendorId { get; set; } 
             public ushort? AppProductId { get; set; } 
 
-            /// <inheritdoc />
             [SetsRequiredMembers]
             internal TargetApp(TLVReader reader, long structNumber = -1) {
                 reader.StartStructure(structNumber);
@@ -50,7 +49,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
                 reader.EndContainer();
             }
 
-            /// <inheritdoc />
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (AppVendorId != null)
@@ -75,7 +73,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         public bool? CommissionerPasscodeReady { get; set; } 
         public bool? CancelPasscode { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal IdentificationDeclaration(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -118,7 +115,6 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (VendorId != null)

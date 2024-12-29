@@ -36,7 +36,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public ulong? DeltaSystemTimestamp { get; set; } 
         public required object Data { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal EventDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -55,7 +54,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             Path.Serialize(writer, 0);

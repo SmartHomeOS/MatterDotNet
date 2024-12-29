@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public CommandDataIB? Command { get; set; } 
         public CommandStatusIB? Status { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal InvokeResponseIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -41,7 +40,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (Command != null)

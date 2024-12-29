@@ -65,7 +65,6 @@ namespace MatterDotNet.Messages.Certificates
         public string? DnQualifierPs { get; set; } 
         public string? PseudonymPs { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal DnAttribute(TLVReader reader, long structNumber = -1) {
             if (reader.IsTag(1))
@@ -144,7 +143,6 @@ namespace MatterDotNet.Messages.Certificates
                 PseudonymPs = reader.GetString(143);
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             if (CommonName != null)
                 writer.WriteString(1, CommonName);

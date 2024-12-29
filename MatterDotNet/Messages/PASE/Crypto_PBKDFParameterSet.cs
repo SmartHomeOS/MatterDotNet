@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.PASE
         public required uint Iterations { get; set; } 
         public required byte[] Salt { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Crypto_PBKDFParameterSet(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -39,7 +38,6 @@ namespace MatterDotNet.Messages.PASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteUInt(1, Iterations);

@@ -30,7 +30,6 @@ namespace MatterDotNet.Messages.Certificates
         public required bool IsCa { get; set; } 
         public byte? PathLenConstraint { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal BasicConstraints(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -40,7 +39,6 @@ namespace MatterDotNet.Messages.Certificates
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBool(1, IsCa);

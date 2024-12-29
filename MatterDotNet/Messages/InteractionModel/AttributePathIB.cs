@@ -35,7 +35,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public ushort? ListIndex { get; set; } 
         public uint? WildcardPathFlags { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal AttributePathIB(TLVReader reader, long structNumber = -1) {
             reader.StartList(structNumber);
@@ -56,7 +55,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartList(structNumber);
             if (EnableTagCompression != null)

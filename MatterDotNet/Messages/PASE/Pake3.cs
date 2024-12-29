@@ -29,7 +29,6 @@ namespace MatterDotNet.Messages.PASE
 
         public required byte[] CA { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Pake3(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -37,7 +36,6 @@ namespace MatterDotNet.Messages.PASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, CA, 32, 32);

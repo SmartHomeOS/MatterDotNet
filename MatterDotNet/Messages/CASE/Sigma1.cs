@@ -36,7 +36,6 @@ namespace MatterDotNet.Messages.CASE
         public byte[]? ResumptionID { get; set; } 
         public byte[]? InitiatorResumeMIC { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Sigma1(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -53,7 +52,6 @@ namespace MatterDotNet.Messages.CASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, InitiatorRandom, 32, 32);

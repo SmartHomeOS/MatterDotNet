@@ -34,7 +34,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public DataVersionFilterIB[]? DataVersionFilters { get; set; } 
         public required byte InteractionModelRevision { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal ReadRequestMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -83,7 +82,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (AttributeRequests != null)

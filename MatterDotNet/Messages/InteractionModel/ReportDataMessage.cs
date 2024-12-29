@@ -34,7 +34,6 @@ namespace MatterDotNet.Messages.InteractionModel
         public bool? SuppressResponse { get; set; } 
         public required byte InteractionModelRevision { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal ReportDataMessage(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -68,7 +67,6 @@ namespace MatterDotNet.Messages.InteractionModel
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             if (SubscriptionID != null)

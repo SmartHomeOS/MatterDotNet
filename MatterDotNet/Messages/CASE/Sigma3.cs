@@ -29,7 +29,6 @@ namespace MatterDotNet.Messages.CASE
 
         public required byte[] Encrypted3 { get; set; } 
 
-        /// <inheritdoc />
         [SetsRequiredMembers]
         internal Sigma3(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
@@ -37,7 +36,6 @@ namespace MatterDotNet.Messages.CASE
             reader.EndContainer();
         }
 
-        /// <inheritdoc />
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
             writer.WriteBytes(1, Encrypted3);

@@ -27,22 +27,23 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public AttributeDataIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required uint DataVersion { get; set; } 
+        public uint? DataVersion { get; set; } 
         public required AttributePathIB Path { get; set; } 
-        public required object Data { get; set; } 
+        public required object? Data { get; set; } 
 
         [SetsRequiredMembers]
         internal AttributeDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            DataVersion = reader.GetUInt(0)!.Value;
+            DataVersion = reader.GetUInt(0);
             Path = new AttributePathIB(reader, 1);
-            Data = reader.GetAny(2)!;
+            Data = reader.GetAny(2);
             reader.EndContainer();
         }
 
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteUInt(0, DataVersion);
+            if (DataVersion != null)
+                writer.WriteUInt(0, DataVersion);
             Path.Serialize(writer, 1);
             writer.WriteAny(2, Data);
             writer.EndContainer();

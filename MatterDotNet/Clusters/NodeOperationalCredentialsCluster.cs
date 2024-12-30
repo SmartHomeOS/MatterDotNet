@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -17,6 +17,7 @@ using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters
 {
@@ -30,7 +31,7 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// Node Operational Credentials Cluster
         /// </summary>
-        public NodeOperationalCredentialsCluster(ushort endPoint) : base(endPoint) { }
+        public NodeOperationalCredentialsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -103,7 +104,19 @@ namespace MatterDotNet.Clusters
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Fabric Descriptor
+        /// </summary>
         public record FabricDescriptor : TLVPayload {
+            [SetsRequiredMembers]
+            internal FabricDescriptor(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                RootPublicKey = reader.GetBytes(1, false)!;
+                VendorID = reader.GetUShort(2)!.Value;
+                FabricID = reader.GetULong(3)!.Value;
+                NodeID = reader.GetULong(4)!.Value;
+                Label = reader.GetString(5, false);
+            }
             public required byte[] RootPublicKey { get; set; }
             public required ushort VendorID { get; set; }
             public required ulong FabricID { get; set; }
@@ -121,7 +134,16 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// NOC
+        /// </summary>
         public record NOC : TLVPayload {
+            [SetsRequiredMembers]
+            internal NOC(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                NOCField = reader.GetBytes(1, false)!;
+                ICAC = reader.GetBytes(2, false)!;
+            }
             public required byte[] NOCField { get; set; }
             public required byte[] ICAC { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -251,7 +273,7 @@ namespace MatterDotNet.Clusters
                 AttestationNonce = AttestationNonce,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new AttestationResponse() {
                 AttestationElements = (byte[])GetField(resp, 0),
@@ -267,7 +289,7 @@ namespace MatterDotNet.Clusters
                 CertificateType = CertificateType,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new CertificateChainResponse() {
                 Certificate = (byte[])GetField(resp, 0),
@@ -283,7 +305,7 @@ namespace MatterDotNet.Clusters
                 IsForUpdateNOC = IsForUpdateNOC,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new CSRResponse() {
                 NOCSRElements = (byte[])GetField(resp, 0),
@@ -303,7 +325,7 @@ namespace MatterDotNet.Clusters
                 AdminVendorId = AdminVendorId,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
                 StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
@@ -321,7 +343,7 @@ namespace MatterDotNet.Clusters
                 ICACValue = ICACValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
                 StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
@@ -338,7 +360,7 @@ namespace MatterDotNet.Clusters
                 Label = Label,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x09, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
                 StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
@@ -355,7 +377,7 @@ namespace MatterDotNet.Clusters
                 FabricIndex = FabricIndex,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0A, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
                 StatusCode = (NodeOperationalCertStatusEnum)(byte)GetField(resp, 0),
@@ -372,22 +394,52 @@ namespace MatterDotNet.Clusters
                 RootCACertificate = RootCACertificate,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0B, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
         #endregion Commands
 
         #region Attributes
-        public List<NOC> NOCs { get; }
+        /// <summary>
+        /// Get the NO Cs attribute
+        /// </summary>
+        public async Task<List<NOC>> GetNOCs (SecureSession session) {
+            return (List<NOC>)(dynamic?)(await GetAttribute(session, 0))!;
+        }
 
-        public List<FabricDescriptor> Fabrics { get; }
+        /// <summary>
+        /// Get the Fabrics attribute
+        /// </summary>
+        public async Task<List<FabricDescriptor>> GetFabrics (SecureSession session) {
+            return (List<FabricDescriptor>)(dynamic?)(await GetAttribute(session, 1))!;
+        }
 
-        public byte SupportedFabrics { get; }
+        /// <summary>
+        /// Get the Supported Fabrics attribute
+        /// </summary>
+        public async Task<byte> GetSupportedFabrics (SecureSession session) {
+            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
+        }
 
-        public byte CommissionedFabrics { get; }
+        /// <summary>
+        /// Get the Commissioned Fabrics attribute
+        /// </summary>
+        public async Task<byte> GetCommissionedFabrics (SecureSession session) {
+            return (byte)(dynamic?)(await GetAttribute(session, 3))!;
+        }
 
-        public List<byte[]> TrustedRootCertificates { get; }
+        /// <summary>
+        /// Get the Trusted Root Certificates attribute
+        /// </summary>
+        public async Task<List<byte[]>> GetTrustedRootCertificates (SecureSession session) {
+            return (List<byte[]>)(dynamic?)(await GetAttribute(session, 4))!;
+        }
 
-        public byte CurrentFabricIndex { get; } = 0;
+        /// <summary>
+        /// Get the Current Fabric Index attribute
+        /// </summary>
+        public async Task<byte> GetCurrentFabricIndex (SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 5) ?? 0;
+        }
         #endregion Attributes
     }
 }

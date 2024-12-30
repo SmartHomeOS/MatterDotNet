@@ -287,8 +287,18 @@ namespace MatterDotNet.Protocol.Parsers
                 WriteBool(tagNumber, (bool)any);
             else if (any is uint || any is ulong || any is ushort || any is byte)
                 WriteULong(tagNumber, (ulong)any);
+            else if (any is int || any is long || any is short || any is sbyte)
+                WriteLong(tagNumber, (long)any);
             else if (any is byte[])
                 WriteBytes(tagNumber, (byte[])any);
+            else if (any is string)
+                WriteString(tagNumber, (string)any);
+            else if (any is float)
+                WriteFloat(tagNumber, (float)any);
+            else if (any is double)
+                WriteDouble(tagNumber, (double)any);
+            else
+                throw new NotImplementedException("Unknown type " + any.GetType());
         }
     }
 }

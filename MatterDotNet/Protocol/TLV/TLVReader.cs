@@ -264,7 +264,7 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return null;
-            if (type != ElementType.String8 && type != ElementType.String16 && type != ElementType.String32)
+            if (type != ElementType.String8 && type != ElementType.String16 && type != ElementType.String32 && type != ElementType.String64)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
             if (length > max)
                 throw new InvalidDataException($"Constraint Violation! Max length is {max} but received {length}");
@@ -282,7 +282,7 @@ namespace MatterDotNet.Protocol.Parsers
                 throw new InvalidDataException("Tag " + tagNumber + " not present. Current tag is " + this.tagNumber);
             if (type == ElementType.Null && nullable)
                 return null;
-            if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32)
+            if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32 && type != ElementType.Bytes64)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type bytes but received {type}");
             if (length > max)
                 throw new InvalidDataException($"Constraint Violation! Max length is {max} but received {length}");

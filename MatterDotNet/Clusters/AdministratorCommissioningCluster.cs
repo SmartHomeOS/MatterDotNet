@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -30,9 +30,20 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// Administrator Commissioning Cluster
         /// </summary>
-        public AdministratorCommissioningCluster(ushort endPoint) : base(endPoint) { }
+        public AdministratorCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// Node supports Basic Commissioning Method.
+            /// </summary>
+            Basic = 1,
+        }
+
         /// <summary>
         /// Commissioning Window Status
         /// </summary>
@@ -65,7 +76,7 @@ namespace MatterDotNet.Clusters
                 writer.WriteBytes(1, PAKEPasscodeVerifier);
                 writer.WriteUShort(2, Discriminator);
                 writer.WriteUInt(3, Iterations);
-                writer.WriteBytes(4, Salt);
+                writer.WriteBytes(4, Salt, 32, 16);
                 writer.EndContainer();
             }
         }
@@ -93,7 +104,7 @@ namespace MatterDotNet.Clusters
                 Salt = Salt,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
 
         /// <summary>
@@ -104,7 +115,7 @@ namespace MatterDotNet.Clusters
                 CommissioningTimeout = CommissioningTimeout,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
 
         /// <summary>
@@ -112,16 +123,52 @@ namespace MatterDotNet.Clusters
         /// </summary>
         public async Task<bool> RevokeCommissioning(SecureSession session) {
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
         #endregion Commands
 
         #region Attributes
-        public CommissioningWindowStatusEnum WindowStatus { get; }
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
 
-        public byte AdminFabricIndex { get; }
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
 
-        public ushort AdminVendorId { get; }
+        /// <summary>
+        /// Get the Window Status attribute
+        /// </summary>
+        public async Task<CommissioningWindowStatusEnum> GetWindowStatus (SecureSession session) {
+            return (CommissioningWindowStatusEnum)await GetEnumAttribute(session, 0);
+        }
+
+        /// <summary>
+        /// Get the Admin Fabric Index attribute
+        /// </summary>
+        public async Task<byte?> GetAdminFabricIndex (SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 1, true);
+        }
+
+        /// <summary>
+        /// Get the Admin Vendor Id attribute
+        /// </summary>
+        public async Task<ushort?> GetAdminVendorId (SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
+        }
         #endregion Attributes
     }
 }

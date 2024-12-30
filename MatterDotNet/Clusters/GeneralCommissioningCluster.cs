@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -17,6 +17,7 @@ using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters
 {
@@ -30,7 +31,7 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// General Commissioning Cluster
         /// </summary>
-        public GeneralCommissioningCluster(ushort endPoint) : base(endPoint) { }
+        public GeneralCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -79,7 +80,16 @@ namespace MatterDotNet.Clusters
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Basic Commissioning Info
+        /// </summary>
         public record BasicCommissioningInfo : TLVPayload {
+            [SetsRequiredMembers]
+            internal BasicCommissioningInfo(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                FailSafeExpiryLengthSeconds = reader.GetUShort(0)!.Value;
+                MaxCumulativeFailsafeSeconds = reader.GetUShort(1)!.Value;
+            }
             public required ushort FailSafeExpiryLengthSeconds { get; set; }
             public required ushort MaxCumulativeFailsafeSeconds { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -142,7 +152,7 @@ namespace MatterDotNet.Clusters
                 Breadcrumb = Breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new ArmFailSafeResponse() {
                 ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
@@ -160,7 +170,7 @@ namespace MatterDotNet.Clusters
                 Breadcrumb = Breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new SetRegulatoryConfigResponse() {
                 ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
@@ -173,7 +183,7 @@ namespace MatterDotNet.Clusters
         /// </summary>
         public async Task<CommissioningCompleteResponse?> CommissioningComplete(SecureSession session) {
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new CommissioningCompleteResponse() {
                 ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
@@ -183,15 +193,47 @@ namespace MatterDotNet.Clusters
         #endregion Commands
 
         #region Attributes
-        public ulong Breadcrumb { get; set; } = 0;
+        /// <summary>
+        /// Get the Breadcrumb attribute
+        /// </summary>
+        public async Task<ulong> GetBreadcrumb (SecureSession session) {
+            return (ulong?)(dynamic?)await GetAttribute(session, 0) ?? 0;
+        }
 
-        public BasicCommissioningInfo BasicCommissioningInfoField { get; }
+        /// <summary>
+        /// Set the Breadcrumb attribute
+        /// </summary>
+        public async Task SetBreadcrumb (SecureSession session, ulong? value = 0) {
+            await SetAttribute(session, 0, value);
+        }
 
-        public RegulatoryLocationTypeEnum RegulatoryConfig { get; }
+        /// <summary>
+        /// Get the Basic Commissioning Info attribute
+        /// </summary>
+        public async Task<BasicCommissioningInfo> GetBasicCommissioningInfo (SecureSession session) {
+            return new BasicCommissioningInfo((object[])(await GetAttribute(session, 1))!);
+        }
 
-        public RegulatoryLocationTypeEnum LocationCapability { get; } = RegulatoryLocationTypeEnum.IndoorOutdoor;
+        /// <summary>
+        /// Get the Regulatory Config attribute
+        /// </summary>
+        public async Task<RegulatoryLocationTypeEnum> GetRegulatoryConfig (SecureSession session) {
+            return (RegulatoryLocationTypeEnum)await GetEnumAttribute(session, 2);
+        }
 
-        public bool SupportsConcurrentConnection { get; } = true;
+        /// <summary>
+        /// Get the Location Capability attribute
+        /// </summary>
+        public async Task<RegulatoryLocationTypeEnum> GetLocationCapability (SecureSession session) {
+            return (RegulatoryLocationTypeEnum?)await GetEnumAttribute(session, 3) ?? RegulatoryLocationTypeEnum.IndoorOutdoor;
+        }
+
+        /// <summary>
+        /// Get the Supports Concurrent Connection attribute
+        /// </summary>
+        public async Task<bool> GetSupportsConcurrentConnection (SecureSession session) {
+            return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
+        }
         #endregion Attributes
     }
 }

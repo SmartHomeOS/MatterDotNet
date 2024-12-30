@@ -12,7 +12,6 @@
 
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Payloads;
-using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
@@ -121,6 +120,42 @@ namespace MatterDotNet.Protocol
                     Frame response = await exchange.Read();
                     if (response.Message.Payload is InvokeResponseMessage msg)
                         return msg.InvokeResponses[0];
+                    else if (response.Message.Payload is StatusResponseMessage status)
+                        throw new IOException("Error: " + (IMStatusCode)status.Status);
+                }
+            }
+        }
+
+        internal static async Task<AttributeStatusIB> SetAttribute(SecureSession session, ushort endPoint, uint cluster, ushort attribute, object? value)
+        {
+            using (Exchange secExchange = session.CreateExchange())
+            {
+                WriteRequestMessage write = new WriteRequestMessage()
+                {
+                    InteractionModelRevision = Constants.MATTER_13_REVISION,
+                    WriteRequests = [ new AttributeDataIB() {
+                                        Path = new AttributePathIB() { Node = session.InitiatorNodeID, Endpoint = endPoint, Cluster = cluster, Attribute = attribute },
+                                        Data = value
+                                      }
+                                    ],
+                    TimedRequest = false,
+                    MoreChunkedMessages = false
+                };
+                Frame readFrame = new Frame(write, (byte)IMOpCodes.WriteRequest);
+                readFrame.Message.Protocol = ProtocolType.InteractionModel;
+                readFrame.SourceNodeID = session.InitiatorNodeID;
+                readFrame.DestinationNodeID = session.ResponderNodeID;
+                await secExchange.SendFrame(readFrame);
+                while (true)
+                {
+                    Frame response = await secExchange.Read();
+                    if (response.Message.Payload is WriteResponseMessage msg)
+                    {
+                        if (msg.WriteResponses != null)
+                            return msg.WriteResponses[0];
+                    }
+                    else if (response.Message.Payload is StatusResponseMessage status)
+                        throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
             }
         }

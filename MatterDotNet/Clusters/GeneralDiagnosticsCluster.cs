@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -17,6 +17,8 @@ using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace MatterDotNet.Clusters
 {
@@ -30,9 +32,20 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// General Diagnostics Cluster
         /// </summary>
-        public GeneralDiagnosticsCluster(ushort endPoint) : base(endPoint) { }
+        public GeneralDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// Support specific testing needs for extended Data Model features
+            /// </summary>
+            DataModelTest = 1,
+        }
+
         /// <summary>
         /// Boot Reason
         /// </summary>
@@ -201,14 +214,39 @@ namespace MatterDotNet.Clusters
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Network Interface
+        /// </summary>
         public record NetworkInterface : TLVPayload {
+            [SetsRequiredMembers]
+            internal NetworkInterface(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Name = reader.GetString(0, false)!;
+                IsOperational = reader.GetBool(1)!.Value;
+                OffPremiseServicesReachableIPv4 = reader.GetBool(2)!.Value;
+                OffPremiseServicesReachableIPv6 = reader.GetBool(3)!.Value;
+                HardwareAddress = reader.GetBytes(4, false)!;
+                {
+                    IPv4Addresses = new List<IPAddress>();
+                    foreach (var item in (List<object>)fields[5]) {
+                        IPv4Addresses.Add(new IPAddress(reader.GetBytes(-1, false, 4, 4)!));
+                    }
+                }
+                {
+                    IPv6Addresses = new List<IPAddress>();
+                    foreach (var item in (List<object>)fields[6]) {
+                        IPv6Addresses.Add(new IPAddress(reader.GetBytes(-1, false, 16, 16)!));
+                    }
+                }
+                Type = (InterfaceTypeEnum)reader.GetUShort(7)!.Value;
+            }
             public required string Name { get; set; }
             public required bool IsOperational { get; set; }
             public bool? OffPremiseServicesReachableIPv4 { get; set; } = null;
             public bool? OffPremiseServicesReachableIPv6 { get; set; } = null;
             public required byte[] HardwareAddress { get; set; }
-            public required List<byte[]> IPv4Addresses { get; set; }
-            public required List<byte[]> IPv6Addresses { get; set; }
+            public required List<IPAddress> IPv4Addresses { get; set; }
+            public required List<IPAddress> IPv6Addresses { get; set; }
             public required InterfaceTypeEnum Type { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -222,12 +260,14 @@ namespace MatterDotNet.Clusters
                 {
                     writer.StartList(5);
                     foreach (var item in IPv4Addresses) {
+                        writer.WriteBytes(-1, item.GetAddressBytes());
                     }
                     writer.EndContainer();
                 }
                 {
                     writer.StartList(6);
                     foreach (var item in IPv6Addresses) {
+                        writer.WriteBytes(-1, item.GetAddressBytes());
                     }
                     writer.EndContainer();
                 }
@@ -282,7 +322,7 @@ namespace MatterDotNet.Clusters
                 EventTrigger = EventTrigger,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
 
         /// <summary>
@@ -290,7 +330,7 @@ namespace MatterDotNet.Clusters
         /// </summary>
         public async Task<TimeSnapshotResponse?> TimeSnapshot(SecureSession session) {
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new TimeSnapshotResponse() {
                 SystemTimeMs = (ulong)GetField(resp, 0),
@@ -308,7 +348,7 @@ namespace MatterDotNet.Clusters
                 Count = Count,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new PayloadTestResponse() {
                 Payload = (byte[])GetField(resp, 0),
@@ -317,23 +357,89 @@ namespace MatterDotNet.Clusters
         #endregion Commands
 
         #region Attributes
-        public List<NetworkInterface> NetworkInterfaces { get; }
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
 
-        public ushort RebootCount { get; }
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
 
-        public ulong UpTime { get; }
+        /// <summary>
+        /// Get the Network Interfaces attribute
+        /// </summary>
+        public async Task<List<NetworkInterface>> GetNetworkInterfaces (SecureSession session) {
+            return (List<NetworkInterface>)(dynamic?)(await GetAttribute(session, 0))!;
+        }
 
-        public uint TotalOperationalHours { get; }
+        /// <summary>
+        /// Get the Reboot Count attribute
+        /// </summary>
+        public async Task<ushort> GetRebootCount (SecureSession session) {
+            return (ushort)(dynamic?)(await GetAttribute(session, 1))!;
+        }
 
-        public BootReasonEnum BootReason { get; }
+        /// <summary>
+        /// Get the Up Time attribute
+        /// </summary>
+        public async Task<ulong> GetUpTime (SecureSession session) {
+            return (ulong)(dynamic?)(await GetAttribute(session, 2))!;
+        }
 
-        public List<HardwareFaultEnum> ActiveHardwareFaults { get; }
+        /// <summary>
+        /// Get the Total Operational Hours attribute
+        /// </summary>
+        public async Task<uint> GetTotalOperationalHours (SecureSession session) {
+            return (uint)(dynamic?)(await GetAttribute(session, 3))!;
+        }
 
-        public List<RadioFaultEnum> ActiveRadioFaults { get; }
+        /// <summary>
+        /// Get the Boot Reason attribute
+        /// </summary>
+        public async Task<BootReasonEnum> GetBootReason (SecureSession session) {
+            return (BootReasonEnum)await GetEnumAttribute(session, 4);
+        }
 
-        public List<NetworkFaultEnum> ActiveNetworkFaults { get; }
+        /// <summary>
+        /// Get the Active Hardware Faults attribute
+        /// </summary>
+        public async Task<List<HardwareFaultEnum>> GetActiveHardwareFaults (SecureSession session) {
+            return (List<HardwareFaultEnum>)(dynamic?)(await GetAttribute(session, 5))!;
+        }
 
-        public bool TestEventTriggersEnabled { get; }
+        /// <summary>
+        /// Get the Active Radio Faults attribute
+        /// </summary>
+        public async Task<List<RadioFaultEnum>> GetActiveRadioFaults (SecureSession session) {
+            return (List<RadioFaultEnum>)(dynamic?)(await GetAttribute(session, 6))!;
+        }
+
+        /// <summary>
+        /// Get the Active Network Faults attribute
+        /// </summary>
+        public async Task<List<NetworkFaultEnum>> GetActiveNetworkFaults (SecureSession session) {
+            return (List<NetworkFaultEnum>)(dynamic?)(await GetAttribute(session, 7))!;
+        }
+
+        /// <summary>
+        /// Get the Test Event Triggers Enabled attribute
+        /// </summary>
+        public async Task<bool> GetTestEventTriggersEnabled (SecureSession session) {
+            return (bool)(dynamic?)(await GetAttribute(session, 8))!;
+        }
         #endregion Attributes
     }
 }

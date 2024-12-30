@@ -33,11 +33,27 @@ namespace Generator.Schema
 
         private clusterCommand[] commandsField;
 
+        private clusterFeature[] featuresField;
+
         private string idField;
 
         private string nameField;
 
         private byte revisionField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("feature", IsNullable = false)]
+        public clusterFeature[] features
+        {
+            get
+            {
+                return this.featuresField;
+            }
+            set
+            {
+                this.featuresField = value;
+            }
+        }
 
         /// <remarks/>
         public clusterRevisionHistory revisionHistory
@@ -356,6 +372,77 @@ namespace Generator.Schema
             set
             {
                 this.scopeField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class clusterFeature
+    {
+        private byte bitField;
+
+        private string codeField;
+
+        private string nameField;
+
+        private string summaryField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public byte bit
+        {
+            get
+            {
+                return this.bitField;
+            }
+            set
+            {
+                this.bitField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string code
+        {
+            get
+            {
+                return this.codeField;
+            }
+            set
+            {
+                this.codeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string summary
+        {
+            get
+            {
+                return this.summaryField;
+            }
+            set
+            {
+                this.summaryField = value;
             }
         }
     }

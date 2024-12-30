@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -17,6 +17,7 @@ using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters
 {
@@ -30,9 +31,20 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// Group Key Management Cluster
         /// </summary>
-        public GroupKeyManagementCluster(ushort endPoint) : base(endPoint) { }
+        public GroupKeyManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// The ability to support CacheAndSync security policy and MCSP.
+            /// </summary>
+            CacheAndSync = 1,
+        }
+
         /// <summary>
         /// Group Key Multicast Policy
         /// </summary>
@@ -63,7 +75,22 @@ namespace MatterDotNet.Clusters
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Group Info Map
+        /// </summary>
         public record GroupInfoMap : TLVPayload {
+            [SetsRequiredMembers]
+            internal GroupInfoMap(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                GroupId = reader.GetUShort(1)!.Value;
+                {
+                    Endpoints = new List<ushort>();
+                    foreach (var item in (List<object>)fields[2]) {
+                        Endpoints.Add(reader.GetUShort(-1)!.Value);
+                    }
+                }
+                GroupName = reader.GetString(3, true)!;
+            }
             public required ushort GroupId { get; set; }
             public required List<ushort> Endpoints { get; set; }
             public required string GroupName { get; set; }
@@ -73,6 +100,7 @@ namespace MatterDotNet.Clusters
                 {
                     writer.StartList(2);
                     foreach (var item in Endpoints) {
+                        writer.WriteUShort(-1, item);
                     }
                     writer.EndContainer();
                 }
@@ -81,7 +109,16 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Group Key Map
+        /// </summary>
         public record GroupKeyMap : TLVPayload {
+            [SetsRequiredMembers]
+            internal GroupKeyMap(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                GroupId = reader.GetUShort(1)!.Value;
+                GroupKeySetID = reader.GetUShort(2)!.Value;
+            }
             public required ushort GroupId { get; set; }
             public required ushort GroupKeySetID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -92,7 +129,23 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Group Key Set
+        /// </summary>
         public record GroupKeySet : TLVPayload {
+            [SetsRequiredMembers]
+            internal GroupKeySet(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                GroupKeySetID = reader.GetUShort(0)!.Value;
+                GroupKeySecurityPolicy = (GroupKeySecurityPolicyEnum)reader.GetUShort(1)!.Value;
+                EpochKey0 = reader.GetBytes(2, false)!;
+                EpochStartTime0 = reader.GetULong(3)!.Value;
+                EpochKey1 = reader.GetBytes(4, false)!;
+                EpochStartTime1 = reader.GetULong(5)!.Value;
+                EpochKey2 = reader.GetBytes(6, false)!;
+                EpochStartTime2 = reader.GetULong(7)!.Value;
+                GroupKeyMulticastPolicy = (GroupKeyMulticastPolicyEnum)reader.GetUShort(8, true)!.Value;
+            }
             public required ushort GroupKeySetID { get; set; }
             public required GroupKeySecurityPolicyEnum GroupKeySecurityPolicy { get; set; }
             public required byte[] EpochKey0 { get; set; }
@@ -171,7 +224,7 @@ namespace MatterDotNet.Clusters
                 GroupKeySet = GroupKeySet,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
 
         /// <summary>
@@ -182,7 +235,7 @@ namespace MatterDotNet.Clusters
                 GroupKeySetID = GroupKeySetID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadResponseCommand() {
                 GroupKeySet = (GroupKeySet)GetField(resp, 0),
@@ -197,7 +250,7 @@ namespace MatterDotNet.Clusters
                 GroupKeySetID = GroupKeySetID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
-            return validateResponse(resp);
+            return ValidateResponse(resp);
         }
 
         /// <summary>
@@ -207,7 +260,7 @@ namespace MatterDotNet.Clusters
             KeySetReadAllIndicesCommandPayload requestFields = new KeySetReadAllIndicesCommandPayload() {
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
-            if (!validateResponse(resp))
+            if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadAllIndicesResponseCommand() {
                 GroupKeySetIDs = (List<ushort>)GetField(resp, 0),
@@ -216,13 +269,61 @@ namespace MatterDotNet.Clusters
         #endregion Commands
 
         #region Attributes
-        public List<GroupKeyMap> GroupKeyMapField { get; set; } = [];
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
 
-        public List<GroupInfoMap> GroupTable { get; } = [];
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
 
-        public ushort MaxGroupsPerFabric { get; } = 0;
+        /// <summary>
+        /// Get the Group Key Map attribute
+        /// </summary>
+        public async Task<List<GroupKeyMap>> GetGroupKeyMap (SecureSession session) {
+            return (List<GroupKeyMap>?)(dynamic?)await GetAttribute(session, 0) ?? new List<GroupKeyMap>();
+        }
 
-        public ushort MaxGroupKeysPerFabric { get; } = 1;
+        /// <summary>
+        /// Set the Group Key Map attribute
+        /// </summary>
+        public async Task SetGroupKeyMap (SecureSession session, List<GroupKeyMap>? value) {
+            await SetAttribute(session, 0, value ?? new List<GroupKeyMap>());
+        }
+
+        /// <summary>
+        /// Get the Group Table attribute
+        /// </summary>
+        public async Task<List<GroupInfoMap>> GetGroupTable (SecureSession session) {
+            return (List<GroupInfoMap>?)(dynamic?)await GetAttribute(session, 1) ?? new List<GroupInfoMap>();
+        }
+
+        /// <summary>
+        /// Get the Max Groups Per Fabric attribute
+        /// </summary>
+        public async Task<ushort> GetMaxGroupsPerFabric (SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0;
+        }
+
+        /// <summary>
+        /// Get the Max Group Keys Per Fabric attribute
+        /// </summary>
+        public async Task<ushort> GetMaxGroupKeysPerFabric (SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 1;
+        }
         #endregion Attributes
     }
 }

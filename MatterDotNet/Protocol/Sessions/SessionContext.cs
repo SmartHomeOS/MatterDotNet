@@ -27,6 +27,8 @@ namespace MatterDotNet.Protocol.Sessions
         public ulong ResponderNodeID { get; init; }
         public MessageState PeerMessageCtr { get; set; }
         internal IConnection Connection { get; init; }
+        public DateTime LastActive { get; set; }
+        public DateTime Timestamp { get; set; }
 
         private ConcurrentDictionary<ushort, Exchange> exchanges = new ConcurrentDictionary<ushort, Exchange>();
 
@@ -39,6 +41,8 @@ namespace MatterDotNet.Protocol.Sessions
             LocalSessionID = localSessionId;
             RemoteSessionID = remoteSessionId;
             PeerMessageCtr = remoteCtr;
+            Timestamp = DateTime.Now;
+            LastActive = Timestamp;
         }
 
         internal virtual uint GetSessionCounter()
@@ -64,7 +68,7 @@ namespace MatterDotNet.Protocol.Sessions
 
         internal async Task DeleteExchange(Exchange exchange)
         {
-            await Connection.Close(exchange);
+            await Connection.CloseExchange(exchange);
             exchanges.TryRemove(exchange.ID, out _);
         }
 

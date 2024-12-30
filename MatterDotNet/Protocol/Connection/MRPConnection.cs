@@ -72,6 +72,7 @@ namespace MatterDotNet.Protocol.Connection
             }
             Console.WriteLine("SENT: " + frame.ToString());
             await client.SendAsync(writer.GetPayload());
+            exchange.Session.Timestamp = DateTime.Now;
             while (reliable)
             {
                 try
@@ -163,7 +164,7 @@ namespace MatterDotNet.Protocol.Connection
             }
         }
 
-        public async Task Close(Exchange exchange)
+        public async Task CloseExchange(Exchange exchange)
         {
             if (AckTable.TryGetValue(exchange.ID, out uint ctr))
                 await SendAck(exchange.Session, exchange.ID, ctr, exchange.Session.Initiator);

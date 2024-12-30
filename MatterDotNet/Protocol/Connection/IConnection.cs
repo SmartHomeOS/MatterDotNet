@@ -19,6 +19,6 @@ namespace MatterDotNet.Protocol.Connection
     {
         Task<Frame> Read();
         Task SendFrame(Exchange exchange, Frame frame, bool reliable);
-        Task Close(Exchange exchange);
+        Task CloseExchange(Exchange exchange);
     }
 }

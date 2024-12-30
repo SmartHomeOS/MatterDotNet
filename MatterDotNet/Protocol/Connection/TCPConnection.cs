@@ -40,6 +40,7 @@ namespace MatterDotNet.Protocol.Connection
             frame.Serialize(writer, exchange.Session);
             BinaryPrimitives.WriteUInt32LittleEndian(writer.GetPayload().Slice(0, 4).Span, (uint)writer.Length);
             await stream.WriteAsync(writer.GetPayload());
+            exchange.Session.Timestamp = DateTime.Now;
         }
 
         public async Task<Frame> Read()
@@ -58,7 +59,10 @@ namespace MatterDotNet.Protocol.Connection
                 frameLen = BinaryPrimitives.ReadInt32LittleEndian(len);
                 await stream.ReadExactlyAsync(data.Slice(0, frameLen));
                 Console.WriteLine("READ: " + Convert.ToHexString(data.Slice(0, frameLen).Span));
-                channel.Writer.TryWrite(new Frame(data.Slice(0, frameLen).Span));
+                Frame frame = new Frame(data.Slice(0, frameLen).Span);
+                channel.Writer.TryWrite(frame);
+                if (frame.SessionID != 0)
+                    SessionManager.SessionActive(frame.SessionID);
             }
             channel.Writer.Complete();
         }
@@ -70,7 +74,7 @@ namespace MatterDotNet.Protocol.Connection
             client.Dispose();
         }
 
-        public Task Close(Exchange exchange)
+        public Task CloseExchange(Exchange exchange)
         {
             //Do Nothing
             return Task.CompletedTask;

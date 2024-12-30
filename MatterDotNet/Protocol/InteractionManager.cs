@@ -88,18 +88,18 @@ namespace MatterDotNet.Protocol
             }
         }
 
-        public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
+        public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, bool timed, TLVPayload? payload = null)
         {
             using (Exchange exchange = session.CreateExchange())
-                return SendCommand(exchange, endpoint, cluster, command, payload);
+                return SendCommand(exchange, endpoint, cluster, command, timed, payload);
         }
 
-        public static async Task SendCommand(Exchange exchange, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
+        public static async Task SendCommand(Exchange exchange, ushort endpoint, uint cluster, uint command, bool timed, TLVPayload? payload = null)
         {
             InvokeRequestMessage run = new InvokeRequestMessage()
             {
                 SuppressResponse = false,
-                TimedRequest = false,
+                TimedRequest = timed,
                 InteractionModelRevision = Constants.MATTER_13_REVISION,
                 InvokeRequests = [new CommandDataIB() { CommandFields = payload, CommandPath = new CommandPathIB() { Endpoint = endpoint, Cluster = cluster, Command = command } }]
             };
@@ -110,11 +110,52 @@ namespace MatterDotNet.Protocol
             await exchange.SendFrame(invokeFrame);
         }
 
+        public static async Task StartTimed(Exchange exchange, ushort timeout)
+        {
+            TimedRequestMessage time = new TimedRequestMessage()
+            {
+                Timeout = timeout,
+                InteractionModelRevision = Constants.MATTER_13_REVISION,
+            };
+            Frame invokeFrame = new Frame(time, (byte)IMOpCodes.TimedRequest);
+            invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
+            invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
+            invokeFrame.DestinationNodeID = exchange.Session.ResponderNodeID;
+            await exchange.SendFrame(invokeFrame);
+            while (true)
+            {
+                Frame response = await exchange.Read();
+                if (response.Message.Payload is StatusResponseMessage status)
+                {
+                    if ((IMStatusCode)status.Status == IMStatusCode.SUCCESS)
+                        return;
+                    throw new IOException("Error: " + (IMStatusCode)status.Status);
+                }
+            }
+         }
+
         public static async Task<InvokeResponseIB> ExecCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
         {
             using (Exchange exchange = secSession.CreateExchange())
             {
-                await SendCommand(exchange, endpoint, cluster, command, payload);
+                await SendCommand(exchange, endpoint, cluster, command, false, payload);
+                while (true)
+                {
+                    Frame response = await exchange.Read();
+                    if (response.Message.Payload is InvokeResponseMessage msg)
+                        return msg.InvokeResponses[0];
+                    else if (response.Message.Payload is StatusResponseMessage status)
+                        throw new IOException("Error: " + (IMStatusCode)status.Status);
+                }
+            }
+        }
+
+        public static async Task<InvokeResponseIB> ExecTimedCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, ushort timeoutMS, TLVPayload? payload = null)
+        {
+            using (Exchange exchange = secSession.CreateExchange())
+            {
+                await StartTimed(exchange, timeoutMS);
+                await SendCommand(exchange, endpoint, cluster, command, true, payload);
                 while (true)
                 {
                     Frame response = await exchange.Read();

@@ -1775,12 +1775,27 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterCommandAccess
     {
+        private bool timedField;
 
         private string invokePrivilegeField;
 
         private bool fabricScopedField;
 
         private bool fabricScopedFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool timed
+        {
+            get
+            {
+                return this.timedField;
+            }
+            set
+            {
+                this.timedField = value;
+            }
+        }
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]

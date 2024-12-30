@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Generator.Schema;
+using System.Collections.Immutable;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -18,6 +19,7 @@ namespace Generator
 {
     public class ClusterGenerator
     {
+        private static HashSet<string> includes = new HashSet<string>();
         public static void Generate()
         {
             if (!Directory.Exists($"outputs\\Clusters\\"))
@@ -26,6 +28,7 @@ namespace Generator
             IEnumerable<string> clusterxmls = Directory.EnumerateFiles("..\\..\\..\\Clusters");
             foreach (string clusterxml in clusterxmls)
             {
+                includes.Clear();
                 if (clusterxml.EndsWith(".xml"))
                 {
                     Console.WriteLine("Generating " + clusterxml + "...");
@@ -45,17 +48,27 @@ namespace Generator
             using (FileStream outstream = File.OpenWrite(path))
             {
                 using (StreamWriter writer = new StreamWriter(outstream, Encoding.UTF8))
-                    WriteClass(cluster, writer);
+                {
+                    writer.NewLine = "\n";
+                    StringBuilder sb = new StringBuilder();
+                    StringWriter sw = new StringWriter(sb);
+                    sw.NewLine = "\n";
+                    WriteClass(cluster, sw);
+                    writer.WriteLine("// MatterDotNet Copyright (C) 2025 \n//\n// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU Affero General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or any later version.\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY, without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n// See the GNU Affero General Public License for more details.\n// You should have received a copy of the GNU Affero General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n//\n// WARNING: This file was auto-generated. Do not edit.\n");
+                    foreach (string include in includes.ToImmutableSortedSet())
+                        writer.WriteLine("using " + include + ";");
+                    writer.Write(sb);
+                }
             }
         }
 
-        private static void WriteClass(Cluster cluster, StreamWriter writer)
+        private static void WriteClass(Cluster cluster, TextWriter writer)
         {
-            writer.NewLine = "\n";
-            writer.WriteLine("// MatterDotNet Copyright (C) 2025 \n//\n// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU Affero General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or any later version.\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY, without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n// See the GNU Affero General Public License for more details.\n// You should have received a copy of the GNU Affero General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n//\n// WARNING: This file was auto-generated. Do not edit.\n".Replace("\n", "\n"));
-            writer.WriteLine("using MatterDotNet.Messages.InteractionModel;\nusing MatterDotNet.Protocol;\nusing MatterDotNet.Protocol.Parsers;\nusing MatterDotNet.Protocol.Payloads;\nusing MatterDotNet.Protocol.Sessions;\nusing System.Diagnostics.CodeAnalysis;");
+            includes.Add("MatterDotNet.Protocol.Parsers");
+            includes.Add("MatterDotNet.Protocol.Payloads");
+            includes.Add("MatterDotNet.Protocol.Sessions");
             writer.WriteLine();
-            writer.WriteLine($"namespace MatterDotNet.Clusters\n{{");
+            writer.WriteLine($"namespace MatterDotNet.Clusters.{GeneratorUtil.SanitizeName(cluster.classification.role) ?? "Misc"}\n{{");
             writer.WriteLine("    /// <summary>");
             writer.WriteLine($"    /// {cluster.name}");
             writer.WriteLine("    /// </summary>");
@@ -95,6 +108,7 @@ namespace Generator
             }
             if (cluster.dataTypes.@struct != null)
             {
+                includes.Add("System.Diagnostics.CodeAnalysis");
                 writer.WriteLine("        #region Records");
                 bool firstRecord = true;
                 foreach (clusterDataTypesStruct structType in cluster.dataTypes.@struct)
@@ -112,6 +126,8 @@ namespace Generator
             }
             if (cluster.commands != null && cluster.commands.Length > 0)
             {
+                includes.Add("MatterDotNet.Messages.InteractionModel");
+                includes.Add("MatterDotNet.Protocol");
                 writer.WriteLine("        #region Payloads");
                 bool firstPayload = true;
                 foreach (var command in cluster.commands)
@@ -156,14 +172,16 @@ namespace Generator
             writer.Flush();
         }
 
-        private static void WriteFeatureFunctions(StreamWriter writer)
+        private static void WriteFeatureFunctions(TextWriter writer)
         {
             writer.WriteLine("        /// <summary>\n        /// Features supported by this cluster\n        /// </summary>\n        /// <param name=\"session\"></param>\n        /// <returns></returns>\n        public async Task<Feature> GetSupportedFeatures(SecureSession session)\n        {\n            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;\n        }\n\n        /// <summary>\n        /// Returns true when the feature is supported by the cluster\n        /// </summary>\n        /// <param name=\"session\"></param>\n        /// <param name=\"feature\"></param>\n        /// <returns></returns>\n        public async Task<bool> Supports(SecureSession session, Feature feature)\n        {\n            return ((feature & await GetSupportedFeatures(session)) != 0);\n        }");
         }
 
-        private static void WriteStruct(clusterCommand command, bool toServer, StreamWriter writer, Cluster cluster)
+        private static void WriteStruct(clusterCommand command, bool toServer, TextWriter writer, Cluster cluster)
         {
-            writer.WriteLine($"        {(toServer ? "private record" : "public struct")} " + GeneratorUtil.SanitizeName(command.name) + (toServer ? "Payload : TLVPayload {" : "() {"));
+            if (!toServer)
+                writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(command.name)} - Reply from server\n        /// </summary>");
+           writer.WriteLine($"        {(toServer ? "private record" : "public struct")} " + GeneratorUtil.SanitizeName(command.name) + (toServer ? "Payload : TLVPayload {" : "() {"));
             foreach (clusterCommandField field in command.field)
             {
                 if (field.type == null || field.disallowConform != null) //Reserved/removed fields
@@ -178,7 +196,7 @@ namespace Generator
                     writer.Write(" " + field.name + "Field { get; set; }");
                 else
                     writer.Write(" " + field.name + " { get; set; }");
-                if (field.@default != null)
+                if (field.@default != null && DefaultValid(field.@default))
                 {
                     if (field.type.EndsWith("Enum"))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
@@ -196,7 +214,36 @@ namespace Generator
                 {
                     if (field.type == null || field.disallowConform != null) //Reserved/removed fields
                         continue;
-                    WriteStructType(field.optionalConform != null, field.type, field.entry?.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
+                    int? from = null;
+                    int? to = null;
+                    if (field.constraint != null)
+                    {
+                        switch (field.constraint.type)
+                        {
+                            case "min":
+                            case "minCount":
+                            case "minLength":
+                                if (int.TryParse(field.constraint.value, out int fromVal))
+                                    from = fromVal;
+                                break;
+                            case "max":
+                            case "maxCount":
+                            case "maxLength":
+                                if (int.TryParse(field.constraint.value, out int toVal))
+                                    to = toVal;
+                                break;
+                            case "between":
+                            case "lengthBetween":
+                                to = field.constraint.to;
+                                from = field.constraint.from;
+                                break;
+                            case "desc":
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                    WriteStructType(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
                 }
                 writer.WriteLine("                writer.EndContainer();");
                 writer.WriteLine("            }");
@@ -204,7 +251,7 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteStructType(bool optional, string type, string? entryType, int id, int? from, int? to, string name, Cluster cluster, StreamWriter writer)
+        private static void WriteStructType(bool optional, bool nullable, string type, string? entryType, int id, int? from, int? to, string name, Cluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
             if (optional)
@@ -216,38 +263,74 @@ namespace Generator
             switch (type)
             {
                 case "array":
+                    if (optional || nullable)
+                        writer.WriteLine($"{totalIndent}if ({name} != null)");
                     writer.WriteLine($"{totalIndent}{{");
+                    if (from != null || to != null)
+                        writer.WriteLine($"{totalIndent}    Constrain({name}, {from ?? 0}{(to == null ? "" : $", {to}")});");
                     writer.WriteLine($"{totalIndent}    writer.StartArray({id});");
                     writer.WriteLine($"{totalIndent}    foreach (var item in {name}) {{");
                     writer.Write("        ");
-                    WriteStructType(false, entryType!, null, -1, null, null, "item", cluster, writer);
+                    WriteStructType(false, false, entryType!, null, -1, null, null, "item", cluster, writer);
                     writer.WriteLine($"{totalIndent}    }}");
                     writer.WriteLine($"{totalIndent}    writer.EndContainer();");
                     writer.WriteLine($"{totalIndent}}}");
+                    if (nullable)
+                        writer.WriteLine($"{totalIndent}else\n{totalIndent}    writer.WriteNull({id});");
                     break;
                 case "list":
+                    if (optional || nullable)
+                        writer.WriteLine($"{totalIndent}if ({name} != null)");
                     writer.WriteLine($"{totalIndent}{{");
+                    if (from != null || to != null)
+                        writer.WriteLine($"{totalIndent}    Constrain({name}, {from ?? 0}{(to == null ? "" : $", {to}")});");
                     writer.WriteLine($"{totalIndent}    writer.StartList({id});");
                     writer.WriteLine($"{totalIndent}    foreach (var item in {name}) {{");
                     writer.Write("        ");
-                    WriteStructType(false, entryType!, null, -1, null, null, "item", cluster, writer);
+                    WriteStructType(false, false, entryType!, null, -1, null, null, "item", cluster, writer);
                     writer.WriteLine($"{totalIndent}    }}");
                     writer.WriteLine($"{totalIndent}    writer.EndContainer();");
                     writer.WriteLine($"{totalIndent}}}");
+                    if (nullable)
+                        writer.WriteLine($"{totalIndent}else\n{totalIndent}    writer.WriteNull({id});");
                     break;
                 case "bool":
                     writer.WriteLine($"{totalIndent}writer.WriteBool({id}, {name});");
                     break;
                 case "int8":
-                    writer.WriteLine($"{totalIndent}writer.WriteSByte({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteSByte({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", sbyte.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "int16":
                 case "temperature":
-                    writer.WriteLine($"{totalIndent}writer.WriteShort({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteShort({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", short.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "int24":
                 case "int32":
-                    writer.WriteLine($"{totalIndent}writer.WriteInt({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteInt({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", int.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "int40":
                 case "int48":
@@ -257,14 +340,30 @@ namespace Generator
                 case "amperage-mA":
                 case "voltage-mW":
                 case "energy-mWh":
-                    writer.WriteLine($"{totalIndent}writer.WriteLong({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteLong({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", long.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "uint8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
                 case "action-id":
-                    writer.WriteLine($"{totalIndent}writer.WriteByte({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteByte({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", byte.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "uint16":
                 case "group-id":
@@ -272,7 +371,15 @@ namespace Generator
                 case "vendor-id":
                 case "entry-idx":
                 case "percent100ths":
-                    writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteUShort({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", ushort.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "uint24":
                 case "uint32":
@@ -286,7 +393,15 @@ namespace Generator
                 case "command-id":
                 case "trans-id":
                 case "data-ver":
-                    writer.WriteLine($"{totalIndent}writer.WriteUInt({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", uint.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "uint40":
                 case "uint48":
@@ -301,22 +416,48 @@ namespace Generator
                 case "EUI64":
                 case "event-no":
                 case "SubjectID":
-                    writer.WriteLine($"{totalIndent}writer.WriteULong({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", ulong.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "single":
-                    writer.WriteLine($"{totalIndent}writer.WriteFloat({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteFloat({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", float.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "double":
-                    writer.WriteLine($"{totalIndent}writer.WriteDouble({id}, {name});");
+                    writer.Write($"{totalIndent}writer.WriteDouble({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null)
+                        writer.Write(", double.MaxValue");
+                    if (from != null)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
                     break;
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
                     break;
+                case "Hardware Address":
+                    writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
+                    break;
                 case "octstr":
                 case "ipv6pre":
-                case "Hardware Address":
                     writer.Write($"{totalIndent}writer.WriteBytes({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -347,7 +488,7 @@ namespace Generator
             }
         }
 
-        private static void WriteFieldReader(bool optional, string type, string? entryType, int id, int? from, int? to, string name, string structName, Cluster cluster, StreamWriter writer)
+        private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, int id, int? from, int? to, string name, string structName, Cluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
             if (id != -1 && type != "list")
@@ -368,7 +509,7 @@ namespace Generator
                     writer.WriteLine(">();");
                     writer.WriteLine($"{totalIndent}    foreach (var item in (List<object>)fields[{id}]) {{");
                     writer.Write($"{totalIndent}        {name}.Add(");
-                    WriteFieldReader(false, entryType!, null, -1, null, null, "item", structName, cluster, writer);
+                    WriteFieldReader(false, false, entryType!, null, -1, null, null, "item", structName, cluster, writer);
                     writer.WriteLine($"{totalIndent}    }}");
                     writer.WriteLine($"{totalIndent}}}");
                     return;
@@ -447,7 +588,7 @@ namespace Generator
                     writer.Write($"reader.GetDouble({id}");
                     break;
                 case "ref_IpAdr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}{(id == -1 ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4{(id == -1 ? ")!))" : ")!)")};");
                     return;
                 case "ref_Ipv4Adr":
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4{(id == -1 ? ")!))" : ")!)")};");
@@ -455,9 +596,11 @@ namespace Generator
                 case "ref_Ipv6Adr":
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16{(id == -1 ? ")!))" : ")!)")};");
                     return;
+                case "Hardware Address":
+                    writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == -1 ? ")!))" : ")!)")};");
+                    return;
                 case "octstr":
                 case "ipv6pre":
-                case "Hardware Address":
                     writer.Write($"reader.GetBytes({id}, {(optional ? "true" : "false")}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -501,7 +644,7 @@ namespace Generator
                             writer.WriteLine(")!.Value;");
                     }
                     else
-                        writer.WriteLine($"new {name}(fields[{id}]{(id == -1 ? "))" : ")")};");
+                        writer.WriteLine($"new {GeneratorUtil.SanitizeName(type)}({(id == -1 ? "(object[])item))" : "fields[{id}])")};");
                     return;
             }
             if (optional)
@@ -556,7 +699,7 @@ namespace Generator
             return false;
         }
 
-        private static void WriteCommands(Cluster cluster, StreamWriter writer)
+        private static void WriteCommands(Cluster cluster, TextWriter writer)
         {
             writer.WriteLine("        #region Commands");
             bool first = true;
@@ -580,6 +723,8 @@ namespace Generator
                     else
                         writer.Write("<" + GeneratorUtil.SanitizeName(response.name) + "?> ");
                     writer.Write(GeneratorUtil.SanitizeName(cmd.name) + "(SecureSession session");
+                    if (cmd.access.timed)
+                        writer.Write(", ushort commandTimeoutMS");
                     if (cmd.field != null)
                     {
                         foreach (var field in cmd.field)
@@ -604,14 +749,27 @@ namespace Generator
                             writer.WriteLine($"                {field.name} = {field.name},");
                         }
                         writer.WriteLine("            };");
-                        writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
+                        if (cmd.access.timed)
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ", requestFields);");
+                        else
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
                     }
                     else
                     {
                         if (cmd.response == "N")
-                            writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                        {
+                            if (cmd.access.timed)
+                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ");");
+                            else
+                                writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                        }
                         else
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                        {
+                            if (cmd.access.timed)
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ");");
+                            else
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                        }
                     }
                     if (response == null)
                     {
@@ -649,7 +807,7 @@ namespace Generator
             writer.WriteLine();
         }
 
-        private static clusterCommand? GetResponseType(clusterCommand[] cmds, string response, StreamWriter writer)
+        private static clusterCommand? GetResponseType(clusterCommand[] cmds, string response, TextWriter writer)
         {
             foreach (clusterCommand cmd in cmds)
             {
@@ -659,7 +817,7 @@ namespace Generator
             return null;
         }
 
-        private static void WriteStruct(clusterDataTypesStruct structType, Cluster cluster, StreamWriter writer)
+        private static void WriteStruct(clusterDataTypesStruct structType, Cluster cluster, TextWriter writer)
         {
             writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(structType.name)}\n        /// </summary>");
             writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {\n            [SetsRequiredMembers]");
@@ -667,19 +825,19 @@ namespace Generator
             writer.WriteLine($"            internal {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             foreach (clusterDataTypesStructField field in structType.field)
-                WriteFieldReader(field.mandatoryConform == null, field.type, field.entry?.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, field.name, structType.name, cluster, writer);
+                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, field.name, structType.name, cluster, writer);
 
             writer.WriteLine("            }");
             foreach (clusterDataTypesStructField field in structType.field)
             {
-                bool hasDefault = field.@default != null;
+                bool hasDefault = field.@default != null && DefaultValid(field.@default);
                 if (hasDefault && HasEnum(cluster, field.type) && !HasEnumValue(cluster, field.type, field.@default!))
                     hasDefault = false;
                 writer.Write("            public ");
-                if (field.@default == null)
+                if (field.mandatoryConform != null)
                     writer.Write("required ");
                 WriteType(field.type, field.entry?.type, writer);
-                if (field.@default != null)
+                if (field.mandatoryConform == null || field.quality?.nullable == true)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(structType.name))
                     writer.Write(" " + field.name + "Field { get; set; }");
@@ -698,7 +856,38 @@ namespace Generator
             writer.WriteLine("            internal override void Serialize(TLVWriter writer, long structNumber = -1) {");
             writer.WriteLine("                writer.StartStructure(structNumber);");
             foreach (clusterDataTypesStructField field in structType.field)
-                WriteStructType(field.@default != null, field.type, field.entry?.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
+            {
+                int? from = null;
+                int? to = null;
+                if (field.constraint != null)
+                {
+                    switch (field.constraint.type)
+                    {
+                        case "min":
+                        case "minCount":
+                        case "minLength":
+                            if (int.TryParse(field.constraint.value, out int fromVal))
+                                from = fromVal;
+                            break;
+                        case "max":
+                        case "maxCount":
+                        case "maxLength":
+                            if (int.TryParse(field.constraint.value, out int toVal))
+                                to = toVal;
+                            break;
+                        case "between":
+                        case "lengthBetween":
+                            to = field.constraint.to;
+                            from = field.constraint.from;
+                            break;
+                        case "desc":
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                WriteStructType(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
+            }
             writer.WriteLine("                writer.EndContainer();");
             writer.WriteLine("            }");
             writer.WriteLine("        }");
@@ -709,7 +898,7 @@ namespace Generator
         /// </summary>
         /// <param name="enumType"></param>
         /// <param name="writer"></param>
-        private static void WriteEnum(clusterDataTypesEnum enumType, StreamWriter writer)
+        private static void WriteEnum(clusterDataTypesEnum enumType, TextWriter writer)
         {
             writer.WriteLine("        /// <summary>");
             writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(enumType.name));
@@ -728,7 +917,7 @@ namespace Generator
         /// </summary>
         /// <param name="features"></param>
         /// <param name="writer"></param>
-        private static void WriteFeatures(clusterFeature[] features, StreamWriter writer)
+        private static void WriteFeatures(clusterFeature[] features, TextWriter writer)
         {
             writer.WriteLine("        /// <summary>");
             writer.WriteLine("        /// Supported Features");
@@ -743,9 +932,9 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteAttribute(Cluster cluster, clusterAttribute attribute, StreamWriter writer)
+        private static void WriteAttribute(Cluster cluster, clusterAttribute attribute, TextWriter writer)
         {
-            bool hasDefault = attribute.@default != null && attribute.@default != "MS" && attribute.@default != "desc";
+            bool hasDefault = attribute.@default != null && DefaultValid(attribute.@default);
             if (hasDefault && HasEnum(cluster, attribute.type) && !HasEnumValue(cluster, attribute.type, attribute.@default!))
                 hasDefault = false;
             if (attribute.access.read)
@@ -812,7 +1001,7 @@ namespace Generator
                 writer.WriteLine(") {");
                 writer.Write("            await SetAttribute(session, " + Convert.ToUInt16(attribute.id, 16) + ", value");
                 if (hasDefault && attribute.type == "list")
-                    writer.Write(" = " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entry?.type));
+                    writer.Write(" ?? " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entry?.type));
                 if (attribute.quality?.nullable == true)
                     writer.Write(", true");
                 writer.WriteLine(");");
@@ -900,11 +1089,15 @@ namespace Generator
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
+                    includes.Add("System.Net");
                     writer.Write("IPAddress");
+                    break;
+                case "Hardware Address":
+                    includes.Add("System.Net.NetworkInformation");
+                    writer.Write("PhysicalAddress");
                     break;
                 case "octstr":
                 case "ipv6pre":
-                case "Hardware Address":
                     writer.Write("byte[]");
                     break;
                 case "bool":
@@ -916,6 +1109,7 @@ namespace Generator
                     writer.Write($"{type.ToLower()}");
                     break;
                 case "ref_SemTag":
+                    includes.Add("MatterDotNet.Messages");
                     writer.Write("SemanticTag");
                     break;
                 default:
@@ -945,6 +1139,15 @@ namespace Generator
                 return value;
             else
                 return value.ToLowerInvariant();
+        }
+
+        private static bool DefaultValid(string value)
+        {
+            if (value.Equals("MS", StringComparison.InvariantCultureIgnoreCase))
+                return false;
+            if (value.Equals("desc", StringComparison.InvariantCultureIgnoreCase))
+                return false;
+            return true;
         }
     }
 }

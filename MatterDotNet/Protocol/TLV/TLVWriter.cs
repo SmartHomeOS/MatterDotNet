@@ -71,8 +71,17 @@ namespace MatterDotNet.Protocol.Parsers
             WriteTag(TLVControl.Anonymous, ElementType.EndOfContainer);
         }
 
-        public void WriteByte(long tagNumber, byte? value)
+        public void WriteNull(long tagNumber)
         {
+            WriteTag(tagNumber, ElementType.Null);
+        }
+
+        public void WriteByte(long tagNumber, byte? value, byte max = byte.MaxValue, byte min = byte.MinValue)
+        {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -81,8 +90,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteSByte(long tagNumber, sbyte? value)
+        public void WriteSByte(long tagNumber, sbyte? value, sbyte max = sbyte.MaxValue, sbyte min = sbyte.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -91,8 +104,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteShort(long tagNumber, short? value)
+        public void WriteShort(long tagNumber, short? value, short max = short.MaxValue, short min = short.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -106,8 +123,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteUShort(long tagNumber, ushort? value)
+        public void WriteUShort(long tagNumber, ushort? value, ushort max = ushort.MaxValue, ushort min = ushort.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -121,8 +142,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteInt(long tagNumber, int? value)
+        public void WriteInt(long tagNumber, int? value, int max = int.MaxValue, int min = int.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -136,8 +161,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteUInt(long tagNumber, uint? value)
+        public void WriteUInt(long tagNumber, uint? value, uint max = uint.MaxValue, uint min = uint.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -151,8 +180,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteLong(long tagNumber, long? value)
+        public void WriteLong(long tagNumber, long? value, long max = long.MaxValue, long min = long.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -166,8 +199,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteULong(long tagNumber, ulong? value)
+        public void WriteULong(long tagNumber, ulong? value, ulong max = ulong.MaxValue, ulong min = ulong.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -181,8 +218,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteFloat(long tagNumber, float? value)
+        public void WriteFloat(long tagNumber, float? value, float max = float.MaxValue, float min = float.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -191,8 +232,12 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteDouble(long tagNumber, double? value)
+        public void WriteDouble(long tagNumber, double? value, double max = double.MaxValue, double min = double.MinValue)
         {
+            if (value > max)
+                throw new InvalidDataException("Constraint Violated! Maximum value: " + max + ", Actual: " + value);
+            if (value < min)
+                throw new InvalidDataException("Constraint Violated! Minimum value: " + min + ", Actual: " + value);
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
             else
@@ -221,7 +266,7 @@ namespace MatterDotNet.Protocol.Parsers
                 if (value.Length > maxLen)
                     throw new InvalidDataException("Constraint Violated! Maximum length: " + maxLen + ", Actual: " + value.Length);
                 if (value.Length < minLen)
-                    throw new InvalidDataException("Constraint Violated! Minimum length: " + maxLen + ", Actual: " + value.Length);
+                    throw new InvalidDataException("Constraint Violated! Minimum length: " + minLen + ", Actual: " + value.Length);
                 if (value.Length <= byte.MaxValue)
                 {
                     WriteTag(tagNumber, ElementType.String8);
@@ -250,7 +295,7 @@ namespace MatterDotNet.Protocol.Parsers
                 if (value.Length > maxLen)
                     throw new InvalidDataException("Constraint Violated! Maximum length: " + maxLen + ", Actual: " + value.Length);
                 if (value.Length < minLen)
-                    throw new InvalidDataException("Constraint Violated! Minimum length: " + maxLen + ", Actual: " + value.Length);
+                    throw new InvalidDataException("Constraint Violated! Minimum length: " + minLen + ", Actual: " + value.Length);
                 if (value.Length <= byte.MaxValue)
                 {
                     WriteTag(tagNumber, ElementType.Bytes8);

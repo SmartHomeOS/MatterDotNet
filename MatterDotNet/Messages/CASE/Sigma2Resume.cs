@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -28,17 +28,17 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma2Resume(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResumptionID { get; set; } 
+        public required byte[] ResumptionId { get; set; } 
         public required byte[] Sigma2ResumeMIC { get; set; } 
-        public required ushort ResponderSessionID { get; set; } 
+        public required ushort ResponderSessionId { get; set; } 
         public SessionParameter? ResponderSessionParams { get; set; } 
 
         [SetsRequiredMembers]
         internal Sigma2Resume(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            ResumptionID = reader.GetBytes(1, false, 16, 16)!;
+            ResumptionId = reader.GetBytes(1, false, 16, 16)!;
             Sigma2ResumeMIC = reader.GetBytes(2, false, 16, 16)!;
-            ResponderSessionID = reader.GetUShort(3)!.Value;
+            ResponderSessionId = reader.GetUShort(3)!.Value;
             if (reader.IsTag(4))
                 ResponderSessionParams = new SessionParameter(reader, 4);
             reader.EndContainer();
@@ -46,9 +46,9 @@ namespace MatterDotNet.Messages.CASE
 
         internal override void Serialize(TLVWriter writer, long structNumber = -1) {
             writer.StartStructure(structNumber);
-            writer.WriteBytes(1, ResumptionID, 16, 16);
+            writer.WriteBytes(1, ResumptionId, 16, 16);
             writer.WriteBytes(2, Sigma2ResumeMIC, 16, 16);
-            writer.WriteUShort(3, ResponderSessionID);
+            writer.WriteUShort(3, ResponderSessionId);
             if (ResponderSessionParams != null)
                 ResponderSessionParams.Serialize(writer, 4);
             writer.EndContainer();

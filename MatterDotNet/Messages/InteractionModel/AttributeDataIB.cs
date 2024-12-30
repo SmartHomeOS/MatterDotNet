@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,10 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         internal AttributeDataIB(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
-            DataVersion = reader.GetUInt(0);
+            if (reader.IsTag(0))
+                DataVersion = reader.GetUInt(0);
             Path = new AttributePathIB(reader, 1);
-            Data = reader.GetAny(2);
+            Data = reader.GetAny(2, true);
             reader.EndContainer();
         }
 

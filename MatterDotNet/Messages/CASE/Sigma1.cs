@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ namespace MatterDotNet.Messages.CASE
         public required byte[] DestinationId { get; set; } 
         public required byte[] InitiatorEphPubKey { get; set; } 
         public SessionParameter? InitiatorSessionParams { get; set; } 
-        public byte[]? ResumptionID { get; set; } 
+        public byte[]? ResumptionId { get; set; } 
         public byte[]? InitiatorResumeMIC { get; set; } 
 
         [SetsRequiredMembers]
@@ -46,7 +46,7 @@ namespace MatterDotNet.Messages.CASE
             if (reader.IsTag(5))
                 InitiatorSessionParams = new SessionParameter(reader, 5);
             if (reader.IsTag(6))
-                ResumptionID = reader.GetBytes(6, false, 16, 16);
+                ResumptionId = reader.GetBytes(6, false, 16, 16);
             if (reader.IsTag(7))
                 InitiatorResumeMIC = reader.GetBytes(7, false, 16, 16);
             reader.EndContainer();
@@ -60,8 +60,8 @@ namespace MatterDotNet.Messages.CASE
             writer.WriteBytes(4, InitiatorEphPubKey, 65, 65);
             if (InitiatorSessionParams != null)
                 InitiatorSessionParams.Serialize(writer, 5);
-            if (ResumptionID != null)
-                writer.WriteBytes(6, ResumptionID, 16, 16);
+            if (ResumptionId != null)
+                writer.WriteBytes(6, ResumptionId, 16, 16);
             if (InitiatorResumeMIC != null)
                 writer.WriteBytes(7, InitiatorResumeMIC, 16, 16);
             writer.EndContainer();

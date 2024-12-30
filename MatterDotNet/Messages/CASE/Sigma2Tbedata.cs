@@ -1,4 +1,4 @@
-// MatterDotNet Copyright (C) 2024 
+// MatterDotNet Copyright (C) 2025 
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ namespace MatterDotNet.Messages.CASE
         public required byte[] ResponderNOC { get; set; } 
         public byte[]? ResponderICAC { get; set; } 
         public required byte[] Signature { get; set; } 
-        public required byte[] ResumptionID { get; set; } 
+        public required byte[] ResumptionId { get; set; } 
 
         [SetsRequiredMembers]
         internal Sigma2Tbedata(TLVReader reader, long structNumber = -1) {
@@ -39,7 +39,7 @@ namespace MatterDotNet.Messages.CASE
             if (reader.IsTag(2))
                 ResponderICAC = reader.GetBytes(2);
             Signature = reader.GetBytes(3, false, 64, 64)!;
-            ResumptionID = reader.GetBytes(4, false, 16, 16)!;
+            ResumptionId = reader.GetBytes(4, false, 16, 16)!;
             reader.EndContainer();
         }
 
@@ -49,7 +49,7 @@ namespace MatterDotNet.Messages.CASE
             if (ResponderICAC != null)
                 writer.WriteBytes(2, ResponderICAC);
             writer.WriteBytes(3, Signature, 64, 64);
-            writer.WriteBytes(4, ResumptionID, 16, 16);
+            writer.WriteBytes(4, ResumptionId, 16, 16);
             writer.EndContainer();
         }
     }

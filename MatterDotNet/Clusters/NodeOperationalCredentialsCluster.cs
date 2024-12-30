@@ -115,21 +115,20 @@ namespace MatterDotNet.Clusters
                 VendorID = reader.GetUShort(2)!.Value;
                 FabricID = reader.GetULong(3)!.Value;
                 NodeID = reader.GetULong(4)!.Value;
-                Label = reader.GetString(5, false);
+                Label = reader.GetString(5, false)!;
             }
             public required byte[] RootPublicKey { get; set; }
             public required ushort VendorID { get; set; }
             public required ulong FabricID { get; set; }
             public required ulong NodeID { get; set; }
-            public string? Label { get; set; } = "";
+            public required string Label { get; set; } = "";
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(1, RootPublicKey);
+                writer.WriteBytes(1, RootPublicKey, 65);
                 writer.WriteUShort(2, VendorID);
                 writer.WriteULong(3, FabricID);
                 writer.WriteULong(4, NodeID);
-                if (Label != null)
-                    writer.WriteString(5, Label);
+                writer.WriteString(5, Label, 32);
                 writer.EndContainer();
             }
         }
@@ -145,11 +144,11 @@ namespace MatterDotNet.Clusters
                 ICAC = reader.GetBytes(2, false)!;
             }
             public required byte[] NOCField { get; set; }
-            public required byte[] ICAC { get; set; }
+            public required byte[]? ICAC { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(1, NOCField);
-                writer.WriteBytes(2, ICAC);
+                writer.WriteBytes(1, NOCField, 400);
+                writer.WriteBytes(2, ICAC, 400);
                 writer.EndContainer();
             }
         }
@@ -160,11 +159,14 @@ namespace MatterDotNet.Clusters
             public required byte[] AttestationNonce { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, AttestationNonce);
+                writer.WriteBytes(0, AttestationNonce, 32);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// Attestation Response - Reply from server
+        /// </summary>
         public struct AttestationResponse() {
             public required byte[] AttestationElements { get; set; }
             public required byte[] AttestationSignature { get; set; }
@@ -179,6 +181,9 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Certificate Chain Response - Reply from server
+        /// </summary>
         public struct CertificateChainResponse() {
             public required byte[] Certificate { get; set; }
         }
@@ -188,13 +193,16 @@ namespace MatterDotNet.Clusters
             public bool? IsForUpdateNOC { get; set; } = false;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, CSRNonce);
+                writer.WriteBytes(0, CSRNonce, 32);
                 if (IsForUpdateNOC != null)
                     writer.WriteBool(1, IsForUpdateNOC);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// CSR Response - Reply from server
+        /// </summary>
         public struct CSRResponse() {
             public required byte[] NOCSRElements { get; set; }
             public required byte[] AttestationSignature { get; set; }
@@ -208,10 +216,10 @@ namespace MatterDotNet.Clusters
             public required ushort AdminVendorId { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NOCValue);
+                writer.WriteBytes(0, NOCValue, 400);
                 if (ICACValue != null)
-                    writer.WriteBytes(1, ICACValue);
-                writer.WriteBytes(2, IPKValue);
+                    writer.WriteBytes(1, ICACValue, 400);
+                writer.WriteBytes(2, IPKValue, 16);
                 writer.WriteULong(3, CaseAdminSubject);
                 writer.WriteUShort(4, AdminVendorId);
                 writer.EndContainer();
@@ -223,13 +231,16 @@ namespace MatterDotNet.Clusters
             public byte[]? ICACValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NOCValue);
+                writer.WriteBytes(0, NOCValue, 400);
                 if (ICACValue != null)
-                    writer.WriteBytes(1, ICACValue);
+                    writer.WriteBytes(1, ICACValue, 400);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// NOC Response - Reply from server
+        /// </summary>
         public struct NOCResponse() {
             public required NodeOperationalCertStatusEnum StatusCode { get; set; }
             public byte? FabricIndex { get; set; }
@@ -240,7 +251,7 @@ namespace MatterDotNet.Clusters
             public required string Label { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, Label);
+                writer.WriteString(0, Label, 32);
                 writer.EndContainer();
             }
         }
@@ -249,7 +260,7 @@ namespace MatterDotNet.Clusters
             public required byte FabricIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, FabricIndex);
+                writer.WriteByte(0, FabricIndex, 254, 1);
                 writer.EndContainer();
             }
         }
@@ -258,7 +269,7 @@ namespace MatterDotNet.Clusters
             public required byte[] RootCACertificate { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, RootCACertificate);
+                writer.WriteBytes(0, RootCACertificate, 400);
                 writer.EndContainer();
             }
         }

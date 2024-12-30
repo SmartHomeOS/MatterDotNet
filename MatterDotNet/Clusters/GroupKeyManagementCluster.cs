@@ -89,22 +89,24 @@ namespace MatterDotNet.Clusters
                         Endpoints.Add(reader.GetUShort(-1)!.Value);
                     }
                 }
-                GroupName = reader.GetString(3, true)!;
+                GroupName = reader.GetString(3, true);
             }
             public required ushort GroupId { get; set; }
             public required List<ushort> Endpoints { get; set; }
-            public required string GroupName { get; set; }
+            public string? GroupName { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
                 {
+                    Constrain(Endpoints, 1);
                     writer.StartList(2);
                     foreach (var item in Endpoints) {
                         writer.WriteUShort(-1, item);
                     }
                     writer.EndContainer();
                 }
-                writer.WriteString(3, GroupName);
+                if (GroupName != null)
+                    writer.WriteString(3, GroupName, 16);
                 writer.EndContainer();
             }
         }
@@ -124,7 +126,7 @@ namespace MatterDotNet.Clusters
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
-                writer.WriteUShort(2, GroupKeySetID);
+                writer.WriteUShort(2, GroupKeySetID, 65535, 1);
                 writer.EndContainer();
             }
         }
@@ -148,24 +150,25 @@ namespace MatterDotNet.Clusters
             }
             public required ushort GroupKeySetID { get; set; }
             public required GroupKeySecurityPolicyEnum GroupKeySecurityPolicy { get; set; }
-            public required byte[] EpochKey0 { get; set; }
-            public required ulong EpochStartTime0 { get; set; }
-            public required byte[] EpochKey1 { get; set; }
-            public required ulong EpochStartTime1 { get; set; }
-            public required byte[] EpochKey2 { get; set; }
-            public required ulong EpochStartTime2 { get; set; }
-            public required GroupKeyMulticastPolicyEnum GroupKeyMulticastPolicy { get; set; }
+            public required byte[]? EpochKey0 { get; set; }
+            public required ulong? EpochStartTime0 { get; set; }
+            public required byte[]? EpochKey1 { get; set; }
+            public required ulong? EpochStartTime1 { get; set; }
+            public required byte[]? EpochKey2 { get; set; }
+            public required ulong? EpochStartTime2 { get; set; }
+            public GroupKeyMulticastPolicyEnum? GroupKeyMulticastPolicy { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
                 writer.WriteUShort(1, (ushort)GroupKeySecurityPolicy);
-                writer.WriteBytes(2, EpochKey0);
+                writer.WriteBytes(2, EpochKey0, 16);
                 writer.WriteULong(3, EpochStartTime0);
-                writer.WriteBytes(4, EpochKey1);
+                writer.WriteBytes(4, EpochKey1, 16);
                 writer.WriteULong(5, EpochStartTime1);
-                writer.WriteBytes(6, EpochKey2);
+                writer.WriteBytes(6, EpochKey2, 16);
                 writer.WriteULong(7, EpochStartTime2);
-                writer.WriteUShort(8, (ushort)GroupKeyMulticastPolicy);
+                if (GroupKeyMulticastPolicy != null)
+                    writer.WriteUShort(8, (ushort)GroupKeyMulticastPolicy);
                 writer.EndContainer();
             }
         }
@@ -190,6 +193,9 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Key Set Read Response  Command - Reply from server
+        /// </summary>
         public struct KeySetReadResponseCommand() {
             public required GroupKeySet GroupKeySet { get; set; }
         }
@@ -210,6 +216,9 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Key Set Read All Indices Response  Command - Reply from server
+        /// </summary>
         public struct KeySetReadAllIndicesResponseCommand() {
             public required List<ushort> GroupKeySetIDs { get; set; }
         }

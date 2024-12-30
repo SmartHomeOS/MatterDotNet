@@ -61,7 +61,7 @@ namespace MatterDotNet.Clusters
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, DeviceTypeField);
-                writer.WriteUShort(1, Revision);
+                writer.WriteUShort(1, Revision, ushort.MaxValue, 1);
                 writer.EndContainer();
             }
         }

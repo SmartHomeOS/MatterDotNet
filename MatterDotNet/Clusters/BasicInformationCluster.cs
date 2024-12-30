@@ -12,8 +12,6 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages.InteractionModel;
-using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
@@ -166,14 +164,12 @@ namespace MatterDotNet.Clusters
                 CaseSessionsPerFabric = reader.GetUShort(0)!.Value;
                 SubscriptionsPerFabric = reader.GetUShort(1)!.Value;
             }
-            public ushort? CaseSessionsPerFabric { get; set; } = 3;
-            public ushort? SubscriptionsPerFabric { get; set; } = 3;
+            public required ushort CaseSessionsPerFabric { get; set; } = 3;
+            public required ushort SubscriptionsPerFabric { get; set; } = 3;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (CaseSessionsPerFabric != null)
-                    writer.WriteUShort(0, CaseSessionsPerFabric);
-                if (SubscriptionsPerFabric != null)
-                    writer.WriteUShort(1, SubscriptionsPerFabric);
+                writer.WriteUShort(0, CaseSessionsPerFabric, ushort.MaxValue, 3);
+                writer.WriteUShort(1, SubscriptionsPerFabric, ushort.MaxValue, 3);
                 writer.EndContainer();
             }
         }
@@ -189,7 +185,7 @@ namespace MatterDotNet.Clusters
                 PrimaryColor = (ColorEnum)reader.GetUShort(1)!.Value;
             }
             public required ProductFinishEnum Finish { get; set; }
-            public required ColorEnum PrimaryColor { get; set; }
+            public required ColorEnum? PrimaryColor { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Finish);

@@ -74,8 +74,8 @@ namespace MatterDotNet.Clusters
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, CommissioningTimeout);
                 writer.WriteBytes(1, PAKEPasscodeVerifier);
-                writer.WriteUShort(2, Discriminator);
-                writer.WriteUInt(3, Iterations);
+                writer.WriteUShort(2, Discriminator, 4095);
+                writer.WriteUInt(3, Iterations, 100000, 1000);
                 writer.WriteBytes(4, Salt, 32, 16);
                 writer.EndContainer();
             }
@@ -95,7 +95,7 @@ namespace MatterDotNet.Clusters
         /// <summary>
         /// Open Commissioning Window
         /// </summary>
-        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort CommissioningTimeout, byte[] PAKEPasscodeVerifier, ushort Discriminator, uint Iterations, byte[] Salt) {
+        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort CommissioningTimeout, byte[] PAKEPasscodeVerifier, ushort Discriminator, uint Iterations, byte[] Salt) {
             OpenCommissioningWindowPayload requestFields = new OpenCommissioningWindowPayload() {
                 CommissioningTimeout = CommissioningTimeout,
                 PAKEPasscodeVerifier = PAKEPasscodeVerifier,
@@ -103,26 +103,26 @@ namespace MatterDotNet.Clusters
                 Iterations = Iterations,
                 Salt = Salt,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Open Basic Commissioning Window
         /// </summary>
-        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort CommissioningTimeout) {
+        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort CommissioningTimeout) {
             OpenBasicCommissioningWindowPayload requestFields = new OpenBasicCommissioningWindowPayload() {
                 CommissioningTimeout = CommissioningTimeout,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Revoke Commissioning
         /// </summary>
-        public async Task<bool> RevokeCommissioning(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02);
+        public async Task<bool> RevokeCommissioning(SecureSession session, ushort commandTimeoutMS) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x02);
             return ValidateResponse(resp);
         }
         #endregion Commands

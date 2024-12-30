@@ -19,6 +19,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.NetworkInformation;
 
 namespace MatterDotNet.Clusters
 {
@@ -225,7 +226,7 @@ namespace MatterDotNet.Clusters
                 IsOperational = reader.GetBool(1)!.Value;
                 OffPremiseServicesReachableIPv4 = reader.GetBool(2)!.Value;
                 OffPremiseServicesReachableIPv6 = reader.GetBool(3)!.Value;
-                HardwareAddress = reader.GetBytes(4, false)!;
+                HardwareAddress = new PhysicalAddress(reader.GetBytes(4, false, 8, 6)!);
                 {
                     IPv4Addresses = new List<IPAddress>();
                     foreach (var item in (List<object>)fields[5]) {
@@ -242,22 +243,21 @@ namespace MatterDotNet.Clusters
             }
             public required string Name { get; set; }
             public required bool IsOperational { get; set; }
-            public bool? OffPremiseServicesReachableIPv4 { get; set; } = null;
-            public bool? OffPremiseServicesReachableIPv6 { get; set; } = null;
-            public required byte[] HardwareAddress { get; set; }
+            public required bool? OffPremiseServicesReachableIPv4 { get; set; } = null;
+            public required bool? OffPremiseServicesReachableIPv6 { get; set; } = null;
+            public required PhysicalAddress HardwareAddress { get; set; }
             public required List<IPAddress> IPv4Addresses { get; set; }
             public required List<IPAddress> IPv6Addresses { get; set; }
             public required InterfaceTypeEnum Type { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, Name);
+                writer.WriteString(0, Name, 32);
                 writer.WriteBool(1, IsOperational);
-                if (OffPremiseServicesReachableIPv4 != null)
-                    writer.WriteBool(2, OffPremiseServicesReachableIPv4);
-                if (OffPremiseServicesReachableIPv6 != null)
-                    writer.WriteBool(3, OffPremiseServicesReachableIPv6);
-                writer.WriteBytes(4, HardwareAddress);
+                writer.WriteBool(2, OffPremiseServicesReachableIPv4);
+                writer.WriteBool(3, OffPremiseServicesReachableIPv6);
+                writer.WriteBytes(4, HardwareAddress.GetAddressBytes());
                 {
+                    Constrain(IPv4Addresses, 0, 4);
                     writer.StartList(5);
                     foreach (var item in IPv4Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
@@ -265,6 +265,7 @@ namespace MatterDotNet.Clusters
                     writer.EndContainer();
                 }
                 {
+                    Constrain(IPv6Addresses, 0, 8);
                     writer.StartList(6);
                     foreach (var item in IPv6Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
@@ -283,12 +284,15 @@ namespace MatterDotNet.Clusters
             public required ulong EventTrigger { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, EnableKey);
+                writer.WriteBytes(0, EnableKey, 16);
                 writer.WriteULong(1, EventTrigger);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// Time Snapshot Response - Reply from server
+        /// </summary>
         public struct TimeSnapshotResponse() {
             public required ulong SystemTimeMs { get; set; }
             public required ulong? PosixTimeMs { get; set; } = null;
@@ -300,13 +304,16 @@ namespace MatterDotNet.Clusters
             public required ushort Count { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, EnableKey);
+                writer.WriteBytes(0, EnableKey, 16);
                 writer.WriteByte(1, Value);
-                writer.WriteUShort(2, Count);
+                writer.WriteUShort(2, Count, 2048);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// Payload Test Response - Reply from server
+        /// </summary>
         public struct PayloadTestResponse() {
             public required byte[] Payload { get; set; }
         }

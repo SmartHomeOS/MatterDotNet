@@ -113,6 +113,9 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Arm Fail Safe Response - Reply from server
+        /// </summary>
         public struct ArmFailSafeResponse() {
             public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
             public required string DebugText { get; set; } = "";
@@ -125,17 +128,23 @@ namespace MatterDotNet.Clusters
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)NewRegulatoryConfig);
-                writer.WriteString(1, CountryCode);
+                writer.WriteString(1, CountryCode, 2);
                 writer.WriteULong(2, Breadcrumb);
                 writer.EndContainer();
             }
         }
 
+        /// <summary>
+        /// Set Regulatory Config Response - Reply from server
+        /// </summary>
         public struct SetRegulatoryConfigResponse() {
             public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
             public required string DebugText { get; set; } = "";
         }
 
+        /// <summary>
+        /// Commissioning Complete Response - Reply from server
+        /// </summary>
         public struct CommissioningCompleteResponse() {
             public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
             public required string DebugText { get; set; } = "";

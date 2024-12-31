@@ -97,7 +97,7 @@ namespace MatterDotNet.Protocol.Connection
                 }
                 catch (OperationCanceledException)
                 {
-                    await client.SendAsync(rt.data.GetPayload());
+                    await client.SendAsync(rt!.data.GetPayload());
                     Console.WriteLine("RT #" + rt.SendCount);
                 }
             }
@@ -107,7 +107,7 @@ namespace MatterDotNet.Protocol.Connection
         {
             Frame ack = new Frame(null, (byte)SecureOpCodes.MRPStandaloneAcknowledgement);
             ack.SessionID = session?.RemoteSessionID ?? 0;
-            ack.Counter = session.GetSessionCounter();
+            ack.Counter = session!.GetSessionCounter();
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
             if (initiator)

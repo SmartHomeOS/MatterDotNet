@@ -163,7 +163,10 @@ namespace MatterDotNet.Protocol.Payloads
                                           nonce))
                     Message = new Version1Payload(slice.Slice(0, slice.Length - Crypto.AEAD_MIC_LENGTH_BYTES));
                 else
+                {
+                    Message = null!;
                     Valid = false;
+                }
             }
         }
 

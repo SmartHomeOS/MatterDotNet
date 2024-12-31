@@ -86,7 +86,7 @@ namespace MatterDotNet.PKI
                         break;
                     case OID_NOCCat:
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint noc))
-                            NOCCat = noc;
+                            Cats.Add(new CASEAuthenticatedTag(noc));
                         break;
                     case OID_VendorID:
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint vid))
@@ -299,12 +299,16 @@ namespace MatterDotNet.PKI
             return cert.GetECDsaPrivateKey()?.ExportParameters(true).D;
         }
 
-        public byte[]? Sign(byte[] message)
+        public byte[]? SignData(byte[] message)
         {
-            cert.Export(X509ContentType.Pkcs12, "test");
             if (!cert.HasPrivateKey)
                 return null;
             return cert.GetECDsaPrivateKey()?.SignData(message, HashAlgorithmName.SHA256);
+        }
+
+        public bool VerifyData(byte[] message, byte[] signature)
+        {
+            return cert.GetECDsaPublicKey()?.VerifyData(message, signature, HashAlgorithmName.SHA256) ?? false;
         }
 
         public string IssuerName { get; set; } = string.Empty;
@@ -321,7 +325,7 @@ namespace MatterDotNet.PKI
 
         public ulong FabricID { get; set; }
 
-        public uint NOCCat { get; set; }
+        public List<CASEAuthenticatedTag> Cats { get; set; } = [];
 
         public uint VendorID { get; set; }
 

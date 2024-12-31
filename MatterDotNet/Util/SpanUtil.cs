@@ -14,28 +14,48 @@ using System.Text;
 
 namespace MatterDotNet.Security
 {
+    /// <summary>
+    /// Utility functions for byte spans
+    /// </summary>
     public static class SpanUtil
     {
+        /// <summary>
+        /// Combine multiple arrays
+        /// </summary>
+        /// <param name="arrays"></param>
+        /// <returns></returns>
         public static byte[] Combine(params byte[][] arrays)
         {
-            byte[] rv = new byte[arrays.Sum(a => a.Length)];
+            byte[] ret = new byte[arrays.Sum(a => a.Length)];
             int offset = 0;
             foreach (byte[] array in arrays)
             {
-                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                Buffer.BlockCopy(array, 0, ret, offset, array.Length);
                 offset += array.Length;
             }
-            return rv;
+            return ret;
         }
 
+        /// <summary>
+        /// Combine multiple arrays
+        /// </summary>
+        /// <param name="span1"></param>
+        /// <param name="span2"></param>
+        /// <returns></returns>
         public static byte[] Combine(ReadOnlySpan<byte> span1, ReadOnlySpan<byte> span2)
         {
-            byte[] rv = new byte[span1.Length + span2.Length];
-            span1.CopyTo(rv);
-            span2.CopyTo(rv.AsSpan(span1.Length));
-            return rv;
+            byte[] ret = new byte[span1.Length + span2.Length];
+            span1.CopyTo(ret);
+            span2.CopyTo(ret.AsSpan(span1.Length));
+            return ret;
         }
 
+        /// <summary>
+        /// Fill a span with a count of vals
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public static Span<byte> Fill(byte val, int count)
         {
             Span<byte> ret = new byte[count];
@@ -44,6 +64,12 @@ namespace MatterDotNet.Security
             return ret;
         }
 
+        /// <summary>
+        /// Pad the given number of zeros onto a span
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public static Span<byte> PadZeros(Span<byte> val, int count)
         {
             if (count <= 0)
@@ -54,15 +80,12 @@ namespace MatterDotNet.Security
             return ret.Span;
         }
 
-        public static Span<byte> LeftShift1(Span<byte> array)
-        {
-            Memory<byte> ret = new byte[array.Length];
-            for (int i = 0; i < ret.Length - 1; i++)
-                ret.Span[i] = (byte)(array[i] << 1 | (array[i + 1] >> 7));
-            ret.Span[ret.Length - 1] = (byte)(array[array.Length - 1] << 1);
-            return ret.Span;
-        }
-
+        /// <summary>
+        /// Get the leftmost values
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static Span<byte> Leftmost(ReadOnlySpan<byte> data, int length)
         {
             Span<byte> ret = new byte[(length + 7) >> 3];
@@ -72,6 +95,13 @@ namespace MatterDotNet.Security
             return ret;
         }
 
+        /// <summary>
+        /// XOR two spans
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static Span<byte> XOR(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
         {
             if (a.Length != b.Length)
@@ -82,13 +112,10 @@ namespace MatterDotNet.Security
             return ret.Span;
         }
 
-        public static byte XOR(ReadOnlySpan<byte> a, byte start)
-        {
-            foreach (byte b in a)
-                start ^= b;
-            return start;
-        }
-
+        /// <summary>
+        /// Increment a value stored as a span
+        /// </summary>
+        /// <param name="mem"></param>
         public static void Increment(Span<byte> mem)
         {
             for (int i = mem.Length - 1; i >= 0; i--)
@@ -97,18 +124,6 @@ namespace MatterDotNet.Security
                 if (mem[i] != 0x0)
                     return;
             }
-        }
-
-        public static string Print(ReadOnlySpan<byte> span)
-        {
-            StringBuilder ret = new StringBuilder(span.Length * 3);
-            foreach (byte b in span)
-            {
-                if (ret.Length > 0)
-                    ret.Append(' ');
-                ret.Append(b.ToString("X2"));
-            }
-            return ret.ToString();
         }
     }
 }

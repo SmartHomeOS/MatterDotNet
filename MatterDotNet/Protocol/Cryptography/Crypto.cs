@@ -41,6 +41,7 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <returns></returns>
         public static ReadOnlySpan<byte> AEAD_GenerateEncrypt(byte[] key, Span<byte> payload, ReadOnlySpan<byte> additionalData, Span<byte> nonce)
         {
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
             Span<byte> tag = new byte[16];
             AesCcm aes = new AesCcm(key);
             aes.Encrypt(nonce, payload, payload, tag, additionalData);
@@ -58,6 +59,7 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <returns></returns>
         public static bool AEAD_DecryptVerify(byte[] key, Span<byte> payload, ReadOnlySpan<byte> additionalData, ReadOnlySpan<byte> nonce)
         {
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
             try
             {
                 AesCcm aes = new AesCcm(key);
@@ -79,6 +81,8 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <returns></returns>
         public static Span<byte> Privacy_Decrypt(byte[] key, Span<byte> message, byte[] nonce)
         {
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
+            ArgumentNullException.ThrowIfNull(nonce, nameof(nonce));
             AesCtr ctr = new AesCtr(key, nonce);
             return ctr.EncryptDecrypt(message);
         }
@@ -92,6 +96,8 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <returns></returns>
         public static Span<byte> Privacy_Encrypt(byte[] key, Span<byte> message, byte[] nonce)
         {
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
+            ArgumentNullException.ThrowIfNull(nonce, nameof(nonce));
             AesCtr ctr = new AesCtr(key, nonce);
             return ctr.EncryptDecrypt(message);
         }
@@ -170,42 +176,52 @@ namespace MatterDotNet.Protocol.Cryptography
             return (pub, p.D!);
         }
 
-        public static byte[] Sign(byte[] privateKey, byte[] message)
-        {
-            ECParameters ecp = new ECParameters();
-            ecp.Curve = ECCurve.NamedCurves.nistP256;
-            ecp.D = privateKey;
-            ECDsa ec = ECDsa.Create(ecp);
-            return ec.SignData(message, HashAlgorithmName.SHA256);
-        }
+        //public static byte[] Sign(byte[] privateKey, byte[] message)
+        //{
+        //    ArgumentNullException.ThrowIfNull(privateKey, nameof(privateKey));
+        //    ArgumentNullException.ThrowIfNull(message, nameof(message));
+        //    ECParameters ecp = new ECParameters();
+        //    ecp.Curve = ECCurve.NamedCurves.nistP256;
+        //    ecp.D = privateKey;
+        //    ECDsa ec = ECDsa.Create(ecp);
+        //    return ec.SignData(message, HashAlgorithmName.SHA256);
+        //}
 
-        public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
-        {
-            ECParameters ecp = new ECParameters();
-            ecp.Curve = ECCurve.NamedCurves.nistP256;
-            ecp.Q = new BigIntegerPoint(publicKey).ToECPoint();
-            ecp.Validate();
-            ECDsa ec = ECDsa.Create(ecp);
-            return ec.VerifyData(message, signature, HashAlgorithmName.SHA256);
-        }
+        //public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
+        //{
+        //    ArgumentNullException.ThrowIfNull(publicKey, nameof(publicKey));
+        //    ArgumentNullException.ThrowIfNull(message, nameof(message));
+        //    ArgumentNullException.ThrowIfNull(signature, nameof(signature));
+        //    ECParameters ecp = new ECParameters();
+        //    ecp.Curve = ECCurve.NamedCurves.nistP256;
+        //    ecp.Q = new BigIntegerPoint(publicKey).ToECPoint();
+        //    ecp.Validate();
+        //    ECDsa ec = ECDsa.Create(ecp);
+        //    return ec.VerifyData(message, signature, HashAlgorithmName.SHA256);
+        //}
 
         public static byte[] ECDH(byte[] myPrivateKey, byte[] theirPublicKey)
         {
-            //WTF .net
-
-            ECParameters ec = new ECParameters();
-            ec.Curve = ECCurve.NamedCurves.nistP256;
-            ec.D = myPrivateKey;
+            ArgumentNullException.ThrowIfNull(myPrivateKey, nameof(myPrivateKey));
+            ArgumentNullException.ThrowIfNull(theirPublicKey, nameof(theirPublicKey));
+            ECParameters ec = new ECParameters()
+            {
+                Curve = ECCurve.NamedCurves.nistP256,
+                D = myPrivateKey
+            };
             ECDiffieHellman ecdh = ECDiffieHellman.Create(ec);
             return ecdh.DeriveRawSecretAgreement(GetKey(theirPublicKey));
         }
 
         public static ECDiffieHellmanPublicKey GetKey(byte[] key)
         {
-            //I hate how clunky this is
-            ECParameters ec = new ECParameters();
-            ec.Curve = ECCurve.NamedCurves.nistP256;
-            ec.Q = new BigIntegerPoint(key).ToECPoint();
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
+            //I hate how clunky this is but there isn't a public key constructor
+            ECParameters ec = new ECParameters()
+            {
+                Curve = ECCurve.NamedCurves.nistP256,
+                Q = new BigIntegerPoint(key).ToECPoint()
+            };
             return ECDiffieHellman.Create(ec).PublicKey;
         }
     }

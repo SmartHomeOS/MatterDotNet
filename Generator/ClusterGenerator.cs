@@ -42,7 +42,10 @@ namespace Generator
 
         private static void WriteClass(Cluster cluster)
         {
-            string path = $"outputs\\Clusters\\" + cluster.name.Replace(" ", "") + ".cs";
+            string folder = $"outputs\\Clusters\\{GeneratorUtil.SanitizeName(cluster.classification.role) ?? "Misc"}\\";
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+            string path = folder + cluster.name.Replace(" ", "").Replace('/', '-') + ".cs";
             if (File.Exists(path))
                 File.Delete(path);
             using (FileStream outstream = File.OpenWrite(path))
@@ -72,14 +75,14 @@ namespace Generator
             writer.WriteLine("    /// <summary>");
             writer.WriteLine($"    /// {cluster.name}");
             writer.WriteLine("    /// </summary>");
-            writer.WriteLine("    public class " + cluster.name.Replace(" ", "") + " : ClusterBase");
+            writer.WriteLine("    public class " + cluster.name.Replace(" ", "").Replace('/', '_') + " : ClusterBase");
             writer.WriteLine("    {");
             writer.WriteLine("        private const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
             writer.WriteLine();
             writer.WriteLine("        /// <summary>");
             writer.WriteLine($"        /// {cluster.name}");
             writer.WriteLine("        /// </summary>");
-            writer.WriteLine("        public " + cluster.name.Replace(" ", "") + "(ushort endPoint) : base(CLUSTER_ID, endPoint) { }");
+            writer.WriteLine("        public " + cluster.name.Replace(" ", "").Replace('/', '_') + "(ushort endPoint) : base(CLUSTER_ID, endPoint) { }");
             writer.WriteLine();
             if (cluster.dataTypes.@enum != null || (cluster.features != null && cluster.features.Length > 0))
             {
@@ -101,6 +104,19 @@ namespace Generator
                         else
                             writer.WriteLine();
                         WriteEnum(enumType, writer);
+                    }
+                }
+                if (cluster.dataTypes.bitmap != null)
+                {
+                    foreach (clusterDataTypesBitfield bitmapType in cluster.dataTypes.bitmap)
+                    {
+                        if (bitmapType.bitfield == null)
+                            continue;
+                        if (firstEnum)
+                            firstEnum = false;
+                        else
+                            writer.WriteLine();
+                        WriteBitfield(bitmapType, writer);
                     }
                 }
                 writer.WriteLine("        #endregion Enums");
@@ -351,6 +367,7 @@ namespace Generator
                         writer.WriteLine(");");
                     break;
                 case "uint8":
+                case "enum8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -366,6 +383,7 @@ namespace Generator
                         writer.WriteLine(");");
                     break;
                 case "uint16":
+                case "enum16":
                 case "group-id":
                 case "endpoint-no":
                 case "vendor-id":
@@ -480,7 +498,7 @@ namespace Generator
                         writer.WriteLine(");");
                     break;
                 default:
-                    if (HasEnum(cluster, type))
+                    if (HasEnum(cluster, type) || HasBitmap(cluster, type))
                         writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, (ushort){name});");
                     else
                         writer.WriteLine($"{totalIndent}{name}.Serialize(writer, {id});");
@@ -538,6 +556,7 @@ namespace Generator
                     writer.Write($"reader.GetLong({id}");
                     break;
                 case "uint8":
+                case "enum8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -545,6 +564,7 @@ namespace Generator
                     writer.Write($"reader.GetByte({id}");
                     break;
                 case "uint16":
+                case "enum16":
                 case "group-id":
                 case "endpoint-no":
                 case "vendor-id":
@@ -633,7 +653,7 @@ namespace Generator
                         writer.WriteLine(';');
                     return;
                 default:
-                    if (HasEnum(cluster, type))
+                    if (HasEnum(cluster, type) || HasBitmap(cluster, type))
                     {
                         writer.Write($"({type})reader.GetUShort({id}");
                         if (optional)
@@ -680,6 +700,36 @@ namespace Generator
                     foreach (var item in enumType.item)
                     {
                         if (item.name == value)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool HasBitmap(Cluster cluster, string name)
+        {
+            if (cluster.dataTypes.bitmap == null)
+                return false;
+            foreach (clusterDataTypesBitfield bitfieldType in cluster.dataTypes.bitmap)
+            {
+                if (bitfieldType.name == name)
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool HasBitmapValue(Cluster cluster, string name, string value)
+        {
+            if (cluster.dataTypes.bitmap == null)
+                return false;
+            foreach (clusterDataTypesBitfield bitfieldType in cluster.dataTypes.bitmap)
+            {
+                if (bitfieldType.name == name)
+                {
+                    foreach (var bitfield in bitfieldType.bitfield)
+                    {
+                        if (bitfield.name == value)
                             return true;
                     }
                 }
@@ -787,13 +837,13 @@ namespace Generator
                             WriteType(field.type, field.entry?.type, writer);
                             if (field.optionalConform != null)
                             {
-                                if (HasEnum(cluster, field.type))
+                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                                     writer.Write("?)(byte");
                                 writer.WriteLine($"?)GetOptionalField(resp, {field.id}),");
                             }
                             else
                             {
-                                if (HasEnum(cluster, field.type))
+                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                                     writer.Write(")(byte");
                                 writer.WriteLine($")GetField(resp, {field.id}),");
                             }
@@ -833,6 +883,8 @@ namespace Generator
                 bool hasDefault = field.@default != null && DefaultValid(field.@default);
                 if (hasDefault && HasEnum(cluster, field.type) && !HasEnumValue(cluster, field.type, field.@default!))
                     hasDefault = false;
+                if (hasDefault && HasBitmap(cluster, field.type) && !HasBitmapValue(cluster, field.type, field.@default!))
+                    hasDefault = false;
                 writer.Write("            public ");
                 if (field.mandatoryConform != null)
                     writer.Write("required ");
@@ -845,7 +897,7 @@ namespace Generator
                     writer.Write(" " + field.name + " { get; set; }");
                 if (hasDefault)
                 {
-                    if (HasEnum(cluster, field.type))
+                    if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
                         writer.WriteLine(" = " + SanitizeDefault(field.@default!, "") + ";");
@@ -893,11 +945,6 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enumType"></param>
-        /// <param name="writer"></param>
         private static void WriteEnum(clusterDataTypesEnum enumType, TextWriter writer)
         {
             writer.WriteLine("        /// <summary>");
@@ -906,8 +953,25 @@ namespace Generator
             writer.WriteLine("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " {");
             foreach (clusterDataTypesEnumItem item in enumType.item)
             {
-                writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                if (item.summary != null)
+                    writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
                 writer.WriteLine("            " + item.name + " = " + item.value + ",");
+            }
+            writer.WriteLine("        }");
+        }
+
+        private static void WriteBitfield(clusterDataTypesBitfield enumType, TextWriter writer)
+        {
+            writer.WriteLine("        /// <summary>");
+            writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(enumType.name));
+            writer.WriteLine("        /// </summary>");
+            writer.WriteLine("        [Flags]");
+            writer.WriteLine("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " {");
+            foreach (clusterDataTypesBitfieldItem item in enumType.bitfield)
+            {
+                if (item.summary != null)
+                    writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                writer.WriteLine("            " + item.name + " = " + (1<<item.bit) + ",");
             }
             writer.WriteLine("        }");
         }
@@ -937,6 +1001,8 @@ namespace Generator
             bool hasDefault = attribute.@default != null && DefaultValid(attribute.@default);
             if (hasDefault && HasEnum(cluster, attribute.type) && !HasEnumValue(cluster, attribute.type, attribute.@default!))
                 hasDefault = false;
+            if (hasDefault && HasBitmap(cluster, attribute.type) && !HasBitmapValue(cluster, attribute.type, attribute.@default!))
+                hasDefault = false;
             if (attribute.access.read)
             {
                 writer.WriteLine($"        /// <summary>\n        /// Get the {GeneratorUtil.FieldNameToComment(attribute.name)} attribute\n        /// </summary>");
@@ -954,7 +1020,7 @@ namespace Generator
                     WriteType(attribute.type, attribute.entry?.type, writer);
                     if (attribute.quality?.nullable == true || hasDefault)
                         writer.Write('?');
-                    if (HasEnum(cluster, attribute.type))
+                    if (HasEnum(cluster, attribute.type) || HasBitmap(cluster, attribute.type))
                         writer.Write(")await GetEnumAttribute(session, " + Convert.ToUInt16(attribute.id, 16));
                     else
                     {
@@ -972,7 +1038,7 @@ namespace Generator
 
                 if (hasDefault)
                 {
-                    if (HasEnum(cluster, attribute.type))
+                    if (HasEnum(cluster, attribute.type) || HasBitmap(cluster, attribute.type))
                         writer.WriteLine(" ?? " + attribute.type + "." + attribute.@default + ";");
                     else
                         writer.WriteLine(" ?? " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entry?.type) + ";");
@@ -993,7 +1059,7 @@ namespace Generator
                 writer.Write(" value");
                 if (hasDefault)
                 {
-                    if (HasEnum(cluster, attribute.type))
+                    if (HasEnum(cluster, attribute.type) || HasBitmap(cluster, attribute.type))
                         writer.Write(" = " + attribute.type + "." + attribute.@default);
                     else if (attribute.type != "list")
                         writer.Write(" = " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entry?.type));
@@ -1014,6 +1080,7 @@ namespace Generator
             switch (type)
             {
                 case "uint8":
+                case "enum8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -1021,6 +1088,7 @@ namespace Generator
                     writer.Write("byte");
                     break;
                 case "uint16":
+                case "enum16":
                 case "group-id":
                 case "endpoint-no":
                 case "vendor-id":

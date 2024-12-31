@@ -460,6 +460,8 @@ namespace Generator.Schema
 
         private clusterDataTypesStruct[] structField;
 
+        private clusterDataTypesBitfield[] bitmapField;
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("number")]
         public clusterDataTypesNumber[] number
@@ -485,6 +487,20 @@ namespace Generator.Schema
             set
             {
                 this.enumField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("bitmap")]
+        public clusterDataTypesBitfield[] bitmap
+        {
+            get
+            {
+                return this.bitmapField;
+            }
+            set
+            {
+                this.bitmapField = value;
             }
         }
 
@@ -587,12 +603,52 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class clusterDataTypesEnumItem
+    public partial class clusterDataTypesBitfield
+    {
+
+        private clusterDataTypesBitfieldItem[] bitfieldField;
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("bitfield")]
+        public clusterDataTypesBitfieldItem[] bitfield
+        {
+            get
+            {
+                return this.bitfieldField;
+            }
+            set
+            {
+                this.bitfieldField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class clusterDataTypesBitfieldItem
     {
 
         private object mandatoryConformField;
 
-        private byte valueField;
+        private int bitField;
 
         private string nameField;
 
@@ -613,7 +669,78 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte value
+        public int bit
+        {
+            get
+            {
+                return this.bitField;
+            }
+            set
+            {
+                this.bitField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string summary
+        {
+            get
+            {
+                return this.summaryField;
+            }
+            set
+            {
+                this.summaryField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class clusterDataTypesEnumItem
+    {
+
+        private object mandatoryConformField;
+
+        private string valueField;
+
+        private string nameField;
+
+        private string summaryField;
+
+        /// <remarks/>
+        public object mandatoryConform
+        {
+            get
+            {
+                return this.mandatoryConformField;
+            }
+            set
+            {
+                this.mandatoryConformField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string value
         {
             get
             {

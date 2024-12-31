@@ -21,7 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace MatterDotNet.Clusters
+namespace MatterDotNet.Clusters.Utility
 {
     /// <summary>
     /// General Diagnostics Cluster

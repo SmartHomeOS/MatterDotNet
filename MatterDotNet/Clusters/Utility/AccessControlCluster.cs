@@ -17,7 +17,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters
+namespace MatterDotNet.Clusters.Utility
 {
     /// <summary>
     /// Access Control Cluster

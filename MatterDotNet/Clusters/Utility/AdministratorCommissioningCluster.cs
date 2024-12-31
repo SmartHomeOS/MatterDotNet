@@ -18,7 +18,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters
+namespace MatterDotNet.Clusters.Utility
 {
     /// <summary>
     /// Administrator Commissioning Cluster

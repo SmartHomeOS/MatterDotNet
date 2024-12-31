@@ -70,9 +70,10 @@ namespace MatterDotNet.Protocol.Payloads
                     stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
                     if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
                         BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
-                    //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
+                    else if (!secureContext!.PASE)
+                        BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), session.Initiator ? session.InitiatorNodeID : session.ResponderNodeID);
 
-                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(secureContext.Initiator ? secureContext.I2RKey : secureContext.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
+                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(secureContext!.Initiator ? secureContext.I2RKey : secureContext.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
                     stream.Write(secureStream);
                     stream.Write(mic);
                     if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
@@ -153,7 +154,8 @@ namespace MatterDotNet.Protocol.Payloads
                 BinaryPrimitives.WriteUInt32LittleEndian(nonce.Slice(1, 4), Counter);
                 if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
                     BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
-                //TODO: For a CASE session, the Nonce Source Node ID SHALL be determined via the Secure Session Context associated with the Session Identifier.
+                else if (!session.PASE)
+                    BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), session.Initiator ? session.ResponderNodeID : session.InitiatorNodeID);
 
                 if (Crypto.AEAD_DecryptVerify(session.Initiator ? session.R2IKey : session.I2RKey,
                                           slice,

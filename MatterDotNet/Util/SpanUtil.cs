@@ -22,9 +22,17 @@ namespace MatterDotNet.Security
             int offset = 0;
             foreach (byte[] array in arrays)
             {
-                System.Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
                 offset += array.Length;
             }
+            return rv;
+        }
+
+        public static byte[] Combine(ReadOnlySpan<byte> span1, ReadOnlySpan<byte> span2)
+        {
+            byte[] rv = new byte[span1.Length + span2.Length];
+            span1.CopyTo(rv);
+            span2.CopyTo(rv.AsSpan(span1.Length));
             return rv;
         }
 

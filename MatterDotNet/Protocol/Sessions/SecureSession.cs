@@ -24,19 +24,20 @@ namespace MatterDotNet.Protocol.Sessions
         public byte[] I2RKey { get; init; }
         public byte[] R2IKey { get; init; }
         public byte[] SharedSecret { get; init; }
+        public byte[] ResumptionID { get; init; }
         public uint LocalMessageCtr { get { return Interlocked.Increment(ref localMessageCtr); } }
-        public DateTime LastActive { get; set; }
         public uint ActiveInterval { get; init; }
         public uint IdleInterval { get; init; }
         public uint ActiveThreshold { get; init; }
         public bool PeerActive { get { return (DateTime.Now - LastActive).TotalMilliseconds < SessionManager.GetDefaultSessionParams().SessionActiveThreshold; } }
 
-        internal SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, uint localMessageCounter, MessageState remoteMessageCounter, ulong initiatorNodeId, ulong peerNodeId, uint sessionIdleInterval, uint sessionActiveInterval, uint sessionActiveThreshold) : base(connection, initiator, initiatorNodeId, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
+        internal SecureSession(IConnection connection, bool PASE, bool initiator, ushort localSessionID, ushort remoteSessionID, byte[] i2rKey, byte[] r2iKey, byte[] sharedSecret, byte[] resumptionId, uint localMessageCounter, MessageState remoteMessageCounter, ulong initiatorNodeId, ulong peerNodeId, uint sessionIdleInterval, uint sessionActiveInterval, uint sessionActiveThreshold) : base(connection, initiator, initiatorNodeId, peerNodeId, localSessionID, remoteSessionID, remoteMessageCounter)
         {
             this.PASE = PASE;
             I2RKey = i2rKey;
             R2IKey = r2iKey;
             SharedSecret = sharedSecret;
+            ResumptionID = resumptionId;
             ActiveInterval = sessionActiveInterval;
             IdleInterval = sessionIdleInterval;
             ActiveThreshold = sessionActiveThreshold;
@@ -59,12 +60,6 @@ namespace MatterDotNet.Protocol.Sessions
             up Fabric metadata related to the Fabric for which this session context applies.
             ◦ This field SHALL contain the "no Fabric" value of 0 when the SessionType is PASE and successful
             invocation of the AddNOC command has not yet occurred during commissioning.
-            11. Peer Node ID: Records the authenticated node ID of the remote peer, when available.
-            ◦ This field SHALL contain the "Unspecified Node ID" value of 0 when the SessionType is PASE.
-            12. Resumption ID: The ID used when resuming a session between the local and remote peer.
-            13. SessionTimestamp: A timestamp indicating the time at which the last message was sent or
-            received. This timestamp SHALL be initialized with the time the session was created. See Section
-            4.11.1.1, “Session Establishment - Out of Resources” for more information.
         */
     }
 }

@@ -14,10 +14,10 @@ using MatterDotNet.Messages.CASE;
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Payloads;
-using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Security;
 using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
@@ -32,6 +32,8 @@ namespace MatterDotNet.Protocol.Cryptography
         private static readonly byte[] S3K_Info = [0x53, 0x69, 0x67, 0x6d, 0x61, 0x33]; /* "Sigma3" */
         private static readonly byte[] SEKeys_Info = [0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73]; /* "SessionKeys" */
         private static readonly byte[] RSEKeys_Info = [0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73]; /* "SessionResumptionKeys" */
+        private static readonly byte[] S1RK_Info = [0x53, 0x69, 0x67, 0x6d, 0x61, 0x31, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65]; /* "Sigma1_Resume" */
+        private static readonly byte[] S2RK_Info = [0x53, 0x69, 0x67, 0x6d, 0x61, 0x32, 0x5f, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65]; /* "Sigma2_Resume" */
 
         private byte[]? attestationChallenge;
 
@@ -52,25 +54,25 @@ namespace MatterDotNet.Protocol.Cryptography
 
             Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
             await exchange.SendFrame(sigma1);
-            Console.WriteLine("Sent SIGMA 1");
             resp = await exchange.Read();
             if (resp.Message.Payload is StatusPayload error)
             {
-                throw new IOException("Failed to establish PASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
+                throw new IOException("Failed to establish CASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
             }
-            Sigma2 Msg2 = (Sigma2)resp.Message.Payload!;
+            return await ProcessSigma2(Msg1, (Sigma2)resp.Message.Payload!, fabric, nodeId, ephKeys, exchange);
+        }
+
+        private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, ulong nodeId, (byte[] Public, byte[] Private) ephKeys, Exchange exchange)
+        { 
             PayloadWriter Msg2Bytes = new PayloadWriter(1024);
             Msg2.Serialize(Msg2Bytes);
-            byte[] SharedSecret = Crypto.ECDH(ephKeys.Private, Msg2.ResponderEphPubKey);
+            byte[] sharedSecret = Crypto.ECDH(ephKeys.Private, Msg2.ResponderEphPubKey);
             PayloadWriter Msg1Bytes = new PayloadWriter(512);
             Msg1.Serialize(Msg1Bytes);
-            byte[] transcript2 = Crypto.Hash(Msg1Bytes.GetPayload().Span);
-            byte[] salt2 = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + 32 + Crypto.PUBLIC_KEY_SIZE_BYTES + Crypto.HASH_LEN_BYTES];
-            Array.Copy(fabric.OperationalIdentityProtectionKey, salt2, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
-            Array.Copy(Msg2.ResponderRandom, 0, salt2, Crypto.SYMMETRIC_KEY_LENGTH_BYTES, 32);
-            Array.Copy(Msg2.ResponderEphPubKey, 0, salt2, Crypto.SYMMETRIC_KEY_LENGTH_BYTES + 32, Crypto.PUBLIC_KEY_SIZE_BYTES);
-            Array.Copy(transcript2, 0, salt2, Crypto.SYMMETRIC_KEY_LENGTH_BYTES + 32 + Crypto.PUBLIC_KEY_SIZE_BYTES, Crypto.HASH_LEN_BYTES);
-            byte[] S2K = Crypto.KDF(SharedSecret, salt2, S2K_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+
+            byte[] transcriptHash2 = Crypto.Hash(Msg1Bytes.GetPayload().Span);
+            byte[] salt2 = SpanUtil.Combine(fabric.OperationalIdentityProtectionKey, Msg2.ResponderRandom, Msg2.ResponderEphPubKey, transcriptHash2);
+            byte[] S2K = Crypto.KDF(sharedSecret, salt2, S2K_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
             if (!Crypto.AEAD_DecryptVerify(S2K, Msg2.Encrypted2, [], TBEData2_Nonce))
             {
                 Console.WriteLine("Sigma2 decryption failed");
@@ -123,19 +125,14 @@ namespace MatterDotNet.Protocol.Cryptography
             Sigma3Tbedata s3tbe = new Sigma3Tbedata()
             {
                 InitiatorNOC = s3sig.InitiatorNOC,
-                Signature = Crypto.Sign(fabric.Commissioner.GetPrivateKey()!, s3sigBytes.GetPayload().ToArray())
+                Signature = fabric.Commissioner.Sign(s3sigBytes.GetPayload().ToArray())!
             };
             PayloadWriter s3tbeBytes = new PayloadWriter(512);
             s3tbe.Serialize(s3tbeBytes);
 
-            byte[] Msg1Msg2Bytes = new byte[Msg1Bytes.Length + Msg2Bytes.Length];
-            Msg1Bytes.GetPayload().CopyTo(Msg1Msg2Bytes);
-            Msg2Bytes.GetPayload().CopyTo(Msg1Msg2Bytes.AsMemory(Msg1Bytes.Length));
-            byte[] transcript3 = Crypto.Hash(Msg1Msg2Bytes);
-            byte[] salt3 = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Crypto.HASH_LEN_BYTES];
-            Array.Copy(fabric.OperationalIdentityProtectionKey, salt3, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
-            Array.Copy(transcript3, 0, salt3, Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.HASH_LEN_BYTES);
-            byte[] S3K = Crypto.KDF(SharedSecret, salt3, S3K_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+            byte[] Msg1Msg2Bytes = SpanUtil.Combine(Msg1Bytes.GetPayload().Span, Msg2Bytes.GetPayload().Span);
+            byte[] salt3 = SpanUtil.Combine(fabric.OperationalIdentityProtectionKey, Crypto.Hash(Msg1Msg2Bytes));
+            byte[] S3K = Crypto.KDF(sharedSecret, salt3, S3K_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
 
             Memory<byte> mic = Crypto.AEAD_GenerateEncrypt(S3K, s3tbeBytes.GetPayload().Span, [], TBEData3_Nonce).ToArray();
             s3tbeBytes.Write(mic);
@@ -147,21 +144,15 @@ namespace MatterDotNet.Protocol.Cryptography
             Msg3.Serialize(Msg3Bytes);
 
             await exchange.SendFrame(new Frame(Msg3, (byte)SecureOpCodes.CASESigma3));
-            Console.WriteLine("Sent SIGMA 3");
-            resp = await exchange.Read();
+            Frame? resp = await exchange.Read();
 
             StatusPayload s3resp = (StatusPayload)resp.Message.Payload!;
             if (s3resp.GeneralCode != GeneralCode.SUCCESS)
                 throw new IOException("CASE step 3 failed with status: " + (SecureStatusCodes)s3resp.ProtocolCode);;
 
-            byte[] Msg1Msg2Msg3 = new byte[Msg1Msg2Bytes.Length + Msg3Bytes.Length];
-            Msg1Msg2Bytes.CopyTo((Memory<byte>)Msg1Msg2Msg3);
-            Msg3Bytes.GetPayload().CopyTo(Msg1Msg2Msg3.AsMemory(Msg1Msg2Bytes.Length));
-            byte[] transcript4 = Crypto.Hash(Msg1Msg2Msg3);
-            byte[] salt4 = new byte[Crypto.SYMMETRIC_KEY_LENGTH_BYTES + Crypto.HASH_LEN_BYTES];
-            Array.Copy(fabric.OperationalIdentityProtectionKey, salt4, Crypto.SYMMETRIC_KEY_LENGTH_BYTES);
-            Array.Copy(transcript4, 0, salt4, Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.HASH_LEN_BYTES);
-            byte[] sessionKeys = Crypto.KDF(SharedSecret, salt4, SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
+            byte[] transcriptSession = SpanUtil.Combine(Msg1Msg2Bytes, Msg3Bytes.GetPayload().Span);
+            byte[] saltSession = SpanUtil.Combine(fabric.OperationalIdentityProtectionKey, Crypto.Hash(transcriptSession));
+            byte[] sessionKeys = Crypto.KDF(sharedSecret, saltSession, SEKeys_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS * 3);
             attestationChallenge = sessionKeys.AsSpan(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray();
 
             uint activeInterval = Msg2.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
@@ -169,17 +160,69 @@ namespace MatterDotNet.Protocol.Cryptography
             uint idleInterval = Msg2.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
 
             Console.WriteLine("Created CASE session");
-            SecureSession? session = SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
-                                                                  sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
-                                                                  sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
-                                                                  fabric.Commissioner.NodeID, nodeId, SharedSecret, false, idleInterval, activeInterval, activeThreshold);
-            unsecureSession.Dispose();
-            return session;
+            return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
+                                                sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
+                                                sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
+                                                fabric.Commissioner.NodeID, nodeId, sharedSecret, tbeData2.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
+        }
+        
+        public async Task<SecureSession?> ResumeSecureSession(Fabric fabric, ulong nodeId, byte[] resumptionId, byte[] sharedSecret)
+        {
+            Frame? resp = null;
+            Exchange exchange = unsecureSession.CreateExchange();
+            byte[] initiatorRandom = RandomNumberGenerator.GetBytes(32);
+            var ephKeys = Crypto.GenerateKeypair();
+            byte[] S1RK = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, resumptionId), S1RK_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+
+            Sigma1 Msg1 = new Sigma1()
+            {
+                InitiatorRandom = initiatorRandom,
+                InitiatorSessionId = SessionManager.GetAvailableSessionID(),
+                DestinationId = fabric.ComputeDestinationID(initiatorRandom, nodeId),
+                InitiatorEphPubKey = ephKeys.Public,
+                InitiatorSessionParams = SessionManager.GetDefaultSessionParams(),
+                ResumptionId = resumptionId,
+                InitiatorResumeMIC = Crypto.AEAD_GenerateEncrypt(S1RK, [], [], Resume1MIC_Nonce).ToArray()
+            };
+
+            Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
+            await exchange.SendFrame(sigma1);
+            resp = await exchange.Read();
+            if (resp.Message.Payload is StatusPayload error)
+                throw new IOException("Failed to establish CASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
+            if (resp.Message.Payload is Sigma2 sigma2)
+            {
+                Console.WriteLine("Failed to establish CASE session. Peer falling back to full establishment");
+                return await ProcessSigma2(Msg1, sigma2, fabric, nodeId, ephKeys, exchange);
+            }
+            Sigma2Resume Msg2 = (Sigma2Resume)resp.Message.Payload!;
+            byte[] S2RK = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, Msg2.ResumptionId), S2RK_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+            if (!Crypto.AEAD_DecryptVerify(S2RK, Msg2.Sigma2ResumeMIC, [], Resume2MIC_Nonce))
+            {
+                Console.WriteLine("Sigma2 resume invalid signature");
+                StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
+                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                return null;
+            }
+            StatusPayload sigmaFinished = new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.SESSION_ESTABLISHMENT_SUCCESS);
+            await exchange.SendFrame(new Frame(sigmaFinished, (byte)SecureOpCodes.StatusReport));
+
+            byte[] sessionKeys = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, Msg2.ResumptionId), RSEKeys_Info, 3 * Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+            uint activeInterval = Msg2.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
+            uint activeThreshold = Msg2.ResponderSessionParams?.SessionActiveThreshold ?? SessionManager.GetDefaultSessionParams().SessionActiveThreshold!.Value;
+            uint idleInterval = Msg2.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
+            attestationChallenge = sessionKeys.AsSpan(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray();
+
+            Console.WriteLine("Created CASE session");
+            return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
+                                                sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
+                                                sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
+                                                fabric.Commissioner!.NodeID, nodeId, sharedSecret, Msg2.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
         }
 
         public byte[] GetAttestationChallenge()
         {
-            return attestationChallenge;
+            return attestationChallenge!;
         }
     }
 }

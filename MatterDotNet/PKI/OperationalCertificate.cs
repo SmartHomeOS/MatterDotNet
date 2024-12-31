@@ -299,6 +299,14 @@ namespace MatterDotNet.PKI
             return cert.GetECDsaPrivateKey()?.ExportParameters(true).D;
         }
 
+        public byte[]? Sign(byte[] message)
+        {
+            cert.Export(X509ContentType.Pkcs12, "test");
+            if (!cert.HasPrivateKey)
+                return null;
+            return cert.GetECDsaPrivateKey()?.SignData(message, HashAlgorithmName.SHA256);
+        }
+
         public string IssuerName { get; set; } = string.Empty;
 
         public string CommonName { get; set; } = string.Empty;

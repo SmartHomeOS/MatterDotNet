@@ -25,7 +25,6 @@ namespace MatterDotNet.PKI
         private static readonly byte[] COMPRESSED_FABRIC_INFO = new byte[] {0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63};
         
         private Dictionary<ulong, OperationalCertificate> nodes = new Dictionary<ulong, OperationalCertificate>();
-        private byte[] epochIPK;
 
         public Fabric(ulong rcac, ulong fabricId, byte[] ipk) : base()
         {
@@ -33,28 +32,28 @@ namespace MatterDotNet.PKI
                 throw new ArgumentException("Invalid Fabric ID");
             this.RCAC = rcac;
             this.FabricID = fabricId;
-            epochIPK = ipk;
+            EpochKey = ipk;
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
             builder.Add(OID_RCAC, $"{RCAC:X16}", UniversalTagNumber.UTF8String);
             builder.Add(OID_FabricID, $"{FabricID:X16}", UniversalTagNumber.UTF8String);
-            PrivateKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-            CertificateRequest req = new CertificateRequest(builder.Build(), PrivateKey, HashAlgorithmName.SHA256);
+            ECDsa privateKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+            CertificateRequest req = new CertificateRequest(builder.Build(), privateKey, HashAlgorithmName.SHA256);
             req.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, true, 0, true));
             req.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyCertSign | X509KeyUsageFlags.CrlSign, true));
-            X509SubjectKeyIdentifierExtension subjectKeyIdentifier = new X509SubjectKeyIdentifierExtension(SHA1.HashData(new BigIntegerPoint(PrivateKey.ExportParameters(false).Q).ToBytes(false)), false);
+            X509SubjectKeyIdentifierExtension subjectKeyIdentifier = new X509SubjectKeyIdentifierExtension(SHA1.HashData(new BigIntegerPoint(privateKey.ExportParameters(false).Q).ToBytes(false)), false);
             req.CertificateExtensions.Add(subjectKeyIdentifier);
             req.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromSubjectKeyIdentifier(subjectKeyIdentifier));
             this.cert = req.CreateSelfSigned(DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(10));
             byte[] fabricIDBytes = new byte[8];
             BinaryPrimitives.WriteUInt64BigEndian(fabricIDBytes, FabricID);
             CompressedFabricID = Crypto.KDF(PublicKey.AsSpan(1), fabricIDBytes, COMPRESSED_FABRIC_INFO, 64);
-            OperationalIdentityProtectionKey = Crypto.KDF(ipk, CompressedFabricID, Encoding.ASCII.GetBytes("GroupKey v1.0"), Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+            OperationalIdentityProtectionKey = Crypto.KDF(EpochKey, CompressedFabricID, Encoding.ASCII.GetBytes("GroupKey v1.0"), Crypto.SYMMETRIC_KEY_LENGTH_BITS);
         }
 
-        protected Fabric(X509Certificate2 cert, ECDsa key)
+        protected Fabric(X509Certificate2 cert, byte[] ipk)
         {
             this.cert = cert;
-            epochIPK = []; //TODO
+            EpochKey = ipk;
             foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
             {
                 switch (dn.GetSingleElementType().Value)
@@ -69,10 +68,10 @@ namespace MatterDotNet.PKI
                             break;
                 }
             }
-            PrivateKey = key;
             byte[] fabricIDBytes = new byte[8];
             BinaryPrimitives.WriteUInt64BigEndian(fabricIDBytes, FabricID);
             CompressedFabricID = Crypto.KDF(PublicKey.AsSpan(1), fabricIDBytes, COMPRESSED_FABRIC_INFO, 64);
+            OperationalIdentityProtectionKey = Crypto.KDF(EpochKey, CompressedFabricID, Encoding.ASCII.GetBytes("GroupKey v1.0"), Crypto.SYMMETRIC_KEY_LENGTH_BITS);
         }
 
         public OperationalCertificate Sign(CertificateRequest nocsr)
@@ -115,10 +114,9 @@ namespace MatterDotNet.PKI
             signingCSR.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromCertificate(cert, true, false));
             byte[] serial = new byte[19];
             Random.Shared.NextBytes(serial);
-            OperationalCertificate ret = new OperationalCertificate(signingCSR.Create(cert, DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(1), serial).CopyWithPrivateKey(key));
-            nodes.Add(ret.NodeID, ret);
-            Commissioner = ret;
-            return ret;
+            Commissioner = new OperationalCertificate(signingCSR.Create(cert, DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(1), serial).CopyWithPrivateKey(key));
+            nodes.Add(Commissioner.NodeID, Commissioner);
+            return Commissioner;
         }
 
         public X509Certificate2Collection Export()
@@ -138,18 +136,20 @@ namespace MatterDotNet.PKI
         public void Export(string certPath, string keyPath)
         {
             X509Certificate2Collection collection = Export();
-            string export = collection.ExportCertificatePems();
-            File.WriteAllText(certPath, export);
-            File.WriteAllBytes(keyPath, PrivateKey.ExportPkcs8PrivateKey());
+            byte[] export = collection.Export(X509ContentType.Pkcs12)!;
+            File.WriteAllBytes(certPath, export);
+            File.WriteAllBytes(keyPath, EpochKey);
         }
 
         public static Fabric Import(string certPath, string keyPath)
         {
-            X509Certificate2Collection collection = new X509Certificate2Collection();
-            collection.ImportFromPemFile(certPath);
-            ECDsa key = ECDsa.Create();
-            key.ImportPkcs8PrivateKey(File.ReadAllBytes(keyPath), out _);
-            Fabric fabric = new Fabric(collection[0], key);
+            #if NET9_0_OR_GREATER
+                X509Certificate2Collection collection = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
+            #else
+                X509Certificate2Collection collection = new X509Certificate2Collection();
+                collection.Import(certPath, null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
+            #endif
+            Fabric fabric = new Fabric(collection[0], File.ReadAllBytes(keyPath));
             for (int i = 1; i < collection.Count; i++)
             {
                 OperationalCertificate noc = new OperationalCertificate(collection[i]);
@@ -182,9 +182,9 @@ namespace MatterDotNet.PKI
             return Crypto.HMAC(OperationalIdentityProtectionKey, message);
         }
 
-        public ECDsa PrivateKey { get; init; }
         public byte[] CompressedFabricID { get; init; }
         public OperationalCertificate? Commissioner { get; private set; }
         public byte[] OperationalIdentityProtectionKey { get; init; }
+        public byte[] EpochKey { get; init; }
     }
 }

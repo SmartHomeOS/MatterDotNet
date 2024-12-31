@@ -38,16 +38,16 @@ namespace MatterDotNet.Protocol.Sessions
             return ctx;
         }
 
-        public static SecureSession? CreateSession(IPEndPoint ep, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        public static SecureSession? CreateSession(IPEndPoint ep, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, byte[] resumptionId, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
-            return CreateSession(GetConnection(ep), PASE, initiator, initiatorSessionId, responderSessionId, i2r, r2i, localNodeId, peerNodeId, sharedSecret, group, idleInterval, activeInterval, activeThreshold);
+            return CreateSession(GetConnection(ep), PASE, initiator, initiatorSessionId, responderSessionId, i2r, r2i, localNodeId, peerNodeId, sharedSecret, resumptionId, group, idleInterval, activeInterval, activeThreshold);
         }
 
-        internal static SecureSession? CreateSession(IConnection connection, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        internal static SecureSession? CreateSession(IConnection connection, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, byte[] resumptionId, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session
-            SecureSession ctx = new SecureSession(connection, PASE, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, sharedSecret, 0, new MessageState(), localNodeId, peerNodeId, idleInterval, activeInterval, activeThreshold);
+            SecureSession ctx = new SecureSession(connection, PASE, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, sharedSecret, resumptionId, 0, new MessageState(), localNodeId, peerNodeId, idleInterval, activeInterval, activeThreshold);
             Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
             sessions.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;
@@ -101,15 +101,18 @@ namespace MatterDotNet.Protocol.Sessions
             param.SessionIdleInterval = 300;
             param.MaxPathsPerInvoke = 1;
             param.DataModelRevision = 17;
-            param.InteractionModelRevision = 11;
+            param.InteractionModelRevision = Constants.MATTER_13_REVISION;
             param.SpecificationVersion = 0;
             return param;
         }
 
         internal static void SessionActive(ushort sessionID)
         {
-            if (sessions.TryGetValue(sessionID, out SessionContext? context) && context is SecureSession secureSession)
-                secureSession.LastActive = DateTime.Now;
+            if (sessions.TryGetValue(sessionID, out SessionContext? context))
+            {
+                context.Timestamp = DateTime.Now;
+                context.LastActive = DateTime.Now;
+            }
         }
     }
 }

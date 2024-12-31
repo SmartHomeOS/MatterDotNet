@@ -38,7 +38,7 @@ namespace MatterDotNet.Protocol.Connection
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             writer.Seek(4);
             frame.Serialize(writer, exchange.Session);
-            BinaryPrimitives.WriteUInt32LittleEndian(writer.GetPayload().Slice(0, 4).Span, (uint)writer.Length);
+            BinaryPrimitives.WriteUInt32LittleEndian(writer.GetPayload().Slice(0, 4).Span, (uint)writer.Length - 4);
             await stream.WriteAsync(writer.GetPayload());
             exchange.Session.Timestamp = DateTime.Now;
         }

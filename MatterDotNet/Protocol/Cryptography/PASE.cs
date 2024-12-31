@@ -25,7 +25,7 @@ namespace MatterDotNet.Protocol.Cryptography
         SPAKE2Plus spake = new SPAKE2Plus();
         (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
 
-        public async Task<SecureSession?> EstablishSecureSession()
+        public async Task<SecureSession?> EstablishSecureSession(uint passcode)
         {
             Frame? resp = null;
             Exchange exchange = unsecureSession.CreateExchange();
@@ -37,7 +37,7 @@ namespace MatterDotNet.Protocol.Cryptography
                 throw new IOException("Failed to establish PASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
             }
             PBKDFParamResp paramResp = (PBKDFParamResp)resp.Message.Payload!;
-            Frame pake1 = GeneratePake1(paramResp);
+            Frame pake1 = GeneratePake1(paramResp, passcode);
             await exchange.SendFrame(pake1);
             resp = await exchange.Read();
             Pake2 pake2 = (Pake2)resp.Message.Payload!;
@@ -54,7 +54,7 @@ namespace MatterDotNet.Protocol.Cryptography
             uint activeThreshold = paramResp.ResponderSessionParams?.SessionActiveThreshold ?? SessionManager.GetDefaultSessionParams().SessionActiveThreshold!.Value;
             uint idleInterval = paramResp.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
 
-            return SessionManager.CreateSession(unsecureSession.Connection, true, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, 0, 0, [], false, idleInterval, activeInterval, activeThreshold);
+            return SessionManager.CreateSession(unsecureSession.Connection, true, true, localSessionID, paramResp.ResponderSessionId, SessionKeys.I2RKey, SessionKeys.R2IKey, 0, 0, [], [], false, idleInterval, activeInterval, activeThreshold);
         }
 
         public byte[] GetAttestationChallenge()
@@ -62,13 +62,13 @@ namespace MatterDotNet.Protocol.Cryptography
             return SessionKeys.AttestationChallenge;
         }
 
-        private Frame GeneratePake1(PBKDFParamResp paramResp)
+        private Frame GeneratePake1(PBKDFParamResp paramResp, uint passcode)
         {
             if (paramResp.Pbkdf_parameters == null)
                 throw new InvalidDataException("Missing PBKDF Parameters");
             ushort session = paramResp.ResponderSessionId;
             Console.WriteLine("Iterations: " + (int)paramResp.Pbkdf_parameters!.Iterations);
-            BigIntegerPoint pA = spake.PAKEValues_Initiator(36331256, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
+            BigIntegerPoint pA = spake.PAKEValues_Initiator(passcode, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
             Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
             Frame frame = new Frame(pk1, (byte)SecureOpCodes.PASEPake1);
             return frame;

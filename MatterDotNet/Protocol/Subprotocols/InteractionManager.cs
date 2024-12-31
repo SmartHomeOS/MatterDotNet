@@ -16,7 +16,7 @@ using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Protocol
+namespace MatterDotNet.Protocol.Subprotocols
 {
     internal class InteractionManager
     {
@@ -36,7 +36,7 @@ namespace MatterDotNet.Protocol
                 Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
                 readFrame.SourceNodeID = session.InitiatorNodeID;
-                readFrame.DestinationNodeID = session.ResponderNodeID; 
+                readFrame.DestinationNodeID = session.ResponderNodeID;
                 await secExchange.SendFrame(readFrame);
                 List<AttributeReportIB> results = new List<AttributeReportIB>();
                 bool more = false;
@@ -45,7 +45,7 @@ namespace MatterDotNet.Protocol
                     Frame response = await secExchange.Read();
                     if (response.Message.Payload is ReportDataMessage msg)
                     {
-                        more = (msg.MoreChunkedMessages == true);
+                        more = msg.MoreChunkedMessages == true;
                         if (msg.AttributeReports != null)
                             results.AddRange(msg.AttributeReports);
                         if (more)
@@ -74,7 +74,7 @@ namespace MatterDotNet.Protocol
                 Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
                 readFrame.SourceNodeID = session.InitiatorNodeID;
-                readFrame.DestinationNodeID = session.ResponderNodeID; 
+                readFrame.DestinationNodeID = session.ResponderNodeID;
                 await secExchange.SendFrame(readFrame);
                 while (true)
                 {
@@ -132,7 +132,7 @@ namespace MatterDotNet.Protocol
                     throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
             }
-         }
+        }
 
         public static async Task<InvokeResponseIB> ExecCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
         {

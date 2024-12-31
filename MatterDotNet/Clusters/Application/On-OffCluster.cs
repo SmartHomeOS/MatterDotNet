@@ -13,10 +13,10 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Messages.InteractionModel;
-using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Protocol.Subprotocols;
 
 namespace MatterDotNet.Clusters.Application
 {

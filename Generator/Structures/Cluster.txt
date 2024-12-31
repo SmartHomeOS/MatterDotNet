@@ -1,0 +1,7 @@
+﻿SemanticTag => STRUCTURE
+{
+	MfgCode [0, optional] : UNSIGNED INTEGER [ range 16-bits, nullable ]
+	NamespaceID [1] : UNSIGNED INTEGER [ range 8-bits ]
+	Tag [2] : UNSIGNED INTEGER [ range 8-bits ]
+	Label [3, optional] : string
+}

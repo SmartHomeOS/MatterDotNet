@@ -1,0 +1,207 @@
+﻿namespace InteractionModel
+{
+	StatusResponseMessage => STRUCTURE
+	{
+		Status [0] : UNSIGNED INTEGER [ range 8-bits ]
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	ReadRequestMessage => STRUCTURE
+	{
+		AttributeRequests [0, optional] : ARRAY [ length 0.. ] OF AttributePathIB
+		EventRequests [1, optional] : ARRAY [ length 0.. ] OF EventPathIB
+		EventFilters [2, optional] : ARRAY [ length 0.. ] OF EventFilterIB
+		FabricFiltered [3] : BOOLEAN
+		DataVersionFilters [4, optional] : ARRAY [ length 0.. ] OF DataVersionFilterIB
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	ReportDataMessage => STRUCTURE
+	{
+		SubscriptionID [0, optional] : UNSIGNED INTEGER
+		AttributeReports [1, optional] : ARRAY [ length 0.. ] OF AttributeReportIB
+		EventReports [2, optional] : ARRAY [ length 0.. ] OF EventReportIB
+		MoreChunkedMessages [3, optional] : BOOLEAN
+		SuppressResponse [4, optional] : BOOLEAN
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	SubscribeRequestMessage => STRUCTURE
+	{
+		KeepSubscriptions [0] : BOOLEAN
+		MinIntervalFloor [1] : UNSIGNED INTEGER
+		MaxIntervalCeiling [2] : UNSIGNED INTEGER
+		AttributeRequests [3, optional] : ARRAY [ length 0.. ] OF AttributePathIB
+		EventRequests [4, optional] : ARRAY [ length 0.. ] OF EventPathIB
+		EventFilters [5, optional] : ARRAY [ length 0.. ] OF EventFilterIB
+		FabricFiltered [7] : BOOLEAN
+		DataVersionFilters [8] : ARRAY [ length 0.. ] OF DataVersionFilterIB
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	SubscribeResponseMessage => STRUCTURE
+	{
+		SubscriptionID [0] : UNSIGNED INTEGER [ range 32-bits ]
+		MaxInterval [2] : UNSIGNED INTEGER [ range 16-bits ]
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	WriteRequestMessage => STRUCTURE
+	{
+		SuppressResponse [0, optional] : BOOLEAN
+		TimedRequest [1] : BOOLEAN
+		WriteRequests [2] : ARRAY [ length 0.. ] OF AttributeDataIB
+		MoreChunkedMessages [3, optional] : BOOLEAN
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	WriteResponseMessage => STRUCTURE
+	{
+		WriteResponses [0] : ARRAY [ length 0.. ] OF AttributeStatusIB
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	TimedRequestMessage => STRUCTURE
+	{
+		Timeout [0] : UNSIGNED INTEGER [ range 16-bits ]
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	InvokeRequestMessage => STRUCTURE
+	{
+		SuppressResponse [0] : BOOLEAN
+		TimedRequest [1] : BOOLEAN
+		InvokeRequests [2] : ARRAY [ length 0.. ] OF CommandDataIB
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	InvokeResponseMessage => STRUCTURE
+	{
+		SuppressResponse [0] : BOOLEAN
+		InvokeResponses [1] : ARRAY [ length 0.. ] OF InvokeResponseIB
+		MoreChunkedMessages [2, optional] : BOOLEAN
+		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	AttributePathIB => LIST
+	{
+		EnableTagCompression [0, optional] : BOOLEAN
+		Node [1, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		Endpoint [2, optional] : UNSIGNED INTEGER [ range 16-bits ]
+		Cluster [3, optional] : UNSIGNED INTEGER [ range 32-bits ]
+		Attribute [4, optional] : UNSIGNED INTEGER [ range 32-bits ]
+		ListIndex [5, optional] : UNSIGNED INTEGER [ range 16-bits, nullable ]
+		WildcardPathFlags [6, optional] : UNSIGNED INTEGER [ range 32-bits ]
+	}
+
+	DataVersionFilterIB => STRUCTURE
+	{
+		Path [0] : ClusterPathIB
+		DataVersion [1] : UNSIGNED INTEGER [ range 32-bits ]
+	}
+
+	DataVersionFilterIB => STRUCTURE
+	{
+		DataVersion [0] : UNSIGNED INTEGER [ range 32-bits ]
+		Path [1] : AttributePathIB
+		Data [2] : ANY
+	}
+
+	AttributeReportIB => STRUCTURE
+	{
+		AttributeStatus [0, optional] : AttributeStatusIB
+		AttributeData [1, optional] : AttributeDataIB
+	}
+
+	EventFilterIB => STRUCTURE
+	{
+		Node [0] : UNSIGNED INTEGER [ range 64-bits ]
+		EventMin [1] : UNSIGNED INTEGER [ range 64-bits ]
+	}
+
+	ClusterPathIB => LIST
+	{
+		Node [0, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		Endpoint [1, optional] : UNSIGNED INTEGER [ range 16-bits ]
+		Cluster [2, optional] : UNSIGNED INTEGER [ range 32-bits ]
+	}
+
+	EventPathIB => LIST
+	{
+		Node [0, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		Endpoint [1, optional] : UNSIGNED INTEGER [ range 16-bits ]
+		Cluster [2, optional] : UNSIGNED INTEGER [ range 32-bits ]
+		Event [3, optional] : UNSIGNED INTEGER [ range 32-bits ]
+		IsUrgent [4, optional] : BOOLEAN
+	}
+
+	EventDataIB => STRUCTURE
+	{
+		Path [0] : EventPathIB
+		EventNumber [1] : UNSIGNED INTEGER [ range 64-bits ]
+		Priority [2] : UNSIGNED INTEGER [ range 8-bits ]
+		EpochTimestamp [3, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		SystemTimestamp [4, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		DeltaEpochTimestamp [5, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		DeltaSystemTimestamp [6, optional] : UNSIGNED INTEGER [ range 64-bits ]
+		Data [7] : ANY
+	}
+
+	EventReportIB => STRUCTURE
+	{
+		EventStatus [0, optional] : EventStatusIB
+		EventData [1, optional] : EventDataIB
+	}
+
+	CommandPathIB => LIST
+	{
+		Endpoint [0] : UNSIGNED INTEGER [ range 16-bits ]
+		Cluster [1] : UNSIGNED INTEGER [ range 32-bits ]
+		Command [2] : UNSIGNED INTEGER [ range 32-bits ]
+	}
+
+	CommandDataIB => STRUCTURE
+	{
+		CommandPath [0] : CommandPathIB
+		CommandFields [1, optional] : ANY
+		CommandRef [2, optional] : UNSIGNED INTEGER [ range 16-bits ]
+	}
+
+	InvokeResponseIB => STRUCTURE
+	{
+		Command [0, optional] : CommandDataIB
+		Status [1, optional] : CommandStatusIB
+	}
+
+	CommandStatusIB => STRUCTURE
+	{
+		CommandPath [0] : CommandPathIB
+		Status [1] : StatusIB
+		CommandRef [2, optional] : UNSIGNED INTEGER [ range 16-bits ]
+	}
+
+	EventStatusIB => STRUCTURE
+	{
+		Path [0] : EventPathIB
+		Status [1] : StatusIB
+	}
+
+	AttributeStatusIB => STRUCTURE
+	{
+		Path [0] : AttributePathIB
+		Status [1] : StatusIB
+	}
+
+	StatusIB => STRUCTURE
+	{
+		Status [0] : UNSIGNED INTEGER [ range 8-bits ]
+		ClusterStatus [1, optional] : UNSIGNED INTEGER [ range 8-bits ]
+	}
+
+	AttributeDataIB => STRUCTURE
+	{
+		DataVersion [0, optional] : UNSIGNED INTEGER [ range 32-bits ]
+		Path [1] : AttributePathIB
+		Data [2] : ANY [ nullable ]
+	}
+}

@@ -1,0 +1,112 @@
+﻿namespace Certificates
+{
+	certification-elements => STRUCTURE [ tag-order ]
+	{
+		format_version [0] : UNSIGNED INTEGER [ range 16-bits ]
+		vendor_id [1] : UNSIGNED INTEGER [ range 16-bits ]
+		product_id_array [2] : ARRAY [ length 1..100 ] OF UNSIGNED INTEGER [ range 16-bits ]
+		device_type_id [3] : UNSIGNED INTEGER [ range 32-bits ]
+		certificate_id [4] : STRING [ length 19 ]
+		security_level [5] : UNSIGNED INTEGER [ range 8-bits ]
+		security_information [6] : UNSIGNED INTEGER [ range 16-bits ]
+		version_number [7] : UNSIGNED INTEGER [ range 16-bits ]
+		certification_type [8] : UNSIGNED INTEGER [ range 8-bits]
+		dac_origin_vendor_id [9, optional] : UNSIGNED INTEGER [ range 16-bits ]
+		dac_origin_product_id [10, optional] : UNSIGNED INTEGER [ range 16-bits ]
+		authorized_paa_list [11, optional] : ARRAY [ length 1..10 ] OF OCTET STRING [length 20 ]
+	}
+
+	matter-certificate [anonymous] => STRUCTURE [tag-order]
+	{
+		serial-num [1] : OCTET STRING [ length 0..20 ],
+		sig-algo [2] : UNSIGNED INTEGER [ range 32-bit ],
+		issuer [3] : LIST [ length 1.. ] OF dn-attribute,
+		not-before [4] : UNSIGNED INTEGER [ range 32-bits ],
+		not-after [5] : UNSIGNED INTEGER [ range 32-bits ],
+		subject [6] : LIST [ length 1.. ] OF dn-attribute,
+		pub-key-algo [7] : UNSIGNED INTEGER [ range 32-bit ],
+		ec-curve-id [8] : UNSIGNED INTEGER [ range 32-bit ],
+		ec-pub-key [9] : OCTET STRING,
+		extensions [10] : LIST [ length 1.. ] OF extension,
+		signature [11] : OCTET STRING,
+	}
+
+	extension => CHOICE OF
+	{
+		basic-cnstr [1] : basic-constraints,
+		key-usage [2] : UNSIGNED INTEGER [ range 16-bits ],
+		extended-key-usage [3] : ARRAY [ length 1.. ] OF UNSIGNED INTEGER [ range 8-bits ],
+		subject-key-id [4] : OCTET STRING [ length 20 ],
+		authority-key-id [5] : OCTET STRING [ length 20 ],
+		future-extension [6] : OCTET STRING,
+	}
+
+	basic-constraints => STRUCTURE [tag-order]
+	{
+		is-ca [1] : BOOLEAN,
+		path-len-constraint [2, optional] : UNSIGNED INTEGER [ range 8-bits ],
+	}
+
+	attestation-elements => STRUCTURE [ tag-order ]
+	{
+		certification_declaration [1] : OCTET STRING,
+		attestation_nonce [2] : OCTET STRING [ length 32 ],
+		timestamp [3] : UNSIGNED INTEGER [ range 32-bits ],
+		firmware_information [4, optional] : OCTET STRING,
+	}
+
+	nocsr-elements => STRUCTURE [ tag-order ]
+	{
+		csr [1] : OCTET STRING,
+		CSRNonce [2] : OCTET STRING [ length 32 ],
+		vendor_reserved1 [3, optional] : OCTET STRING,
+		vendor_reserved2 [4, optional] : OCTET STRING,
+		vendor_reserved3 [5, optional] : OCTET STRING
+	}
+
+	dn-attribute => CHOICE OF
+	{
+		// Standard and Matter-specific DN attributes.
+		// Of these, all are encoded as UTF8String except domain-component,
+		// which is encoded as IA5String in X.509 form.
+		common-name [1] : STRING,
+		surname [2] : STRING,
+		serial-num [3] : STRING,
+		country-name [4] : STRING,
+		locality-name [5] : STRING,
+		state-or-province-name [6] : STRING,
+		org-name [7] : STRING,
+		org-unit-name [8] : STRING,
+		title [9] : STRING,
+		name [10] : STRING,
+		given-name [11] : STRING,
+		initials [12] : STRING,
+		gen-qualifier [13] : STRING,
+		dn-qualifier [14] : STRING,
+		pseudonym [15] : STRING,
+		domain-component [16] : STRING,
+		matter-node-id [17] : UNSIGNED INTEGER,
+		matter-firmware-signing-id [18] : UNSIGNED INTEGER,
+		matter-icac-id [19] : UNSIGNED INTEGER,
+		matter-rcac-id [20] : UNSIGNED INTEGER,
+		matter-fabric-id [21] : UNSIGNED INTEGER,
+		matter-noc-cat [22] : UNSIGNED INTEGER,
+		// Standard DN attributes when encoded as PrintableString in X.509 form
+		// NOTE: The tags for these SHALL be the base tags + 0x80.
+		common-name-ps [129] : STRING,
+		surname-ps [130] : STRING,
+		serial-num-ps [131] : STRING,
+		country-name-ps [132] : STRING,
+		locality-name-ps [133] : STRING,
+		state-or-province-name-ps [134] : STRING,
+		org-name-ps [135] : STRING,
+		org-unit-name-ps [136] : STRING,
+		title-ps [137] : STRING,
+		name-ps [138] : STRING,
+		given-name-ps [139] : STRING,
+		initials-ps [140] : STRING,
+		gen-qualifier-ps [141] : STRING,
+		dn-qualifier-ps [142] : STRING,
+		pseudonym-ps [143] : STRING,
+	}
+}

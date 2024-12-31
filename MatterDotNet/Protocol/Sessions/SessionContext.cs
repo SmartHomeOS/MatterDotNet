@@ -72,6 +72,7 @@ namespace MatterDotNet.Protocol.Sessions
             exchanges.TryRemove(exchange.ID, out _);
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Console.WriteLine("Closing Session " + LocalSessionID);

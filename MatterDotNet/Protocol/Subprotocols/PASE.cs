@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Messages.PASE;
+using MatterDotNet.Protocol.Cryptography;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
@@ -18,7 +19,7 @@ using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using System.Security.Cryptography;
 
-namespace MatterDotNet.Protocol.Cryptography
+namespace MatterDotNet.Protocol.Subprotocols
 {
     public class PASE(SessionContext unsecureSession)
     {
@@ -80,7 +81,8 @@ namespace MatterDotNet.Protocol.Cryptography
             SessionKeys = spake.Finish(req, resp, pake1.PA, pake2.PB);
             if (!SessionKeys.cB.SequenceEqual(pake2.CB))
                 throw new CryptographicException("Validators do not match");
-            Pake3 pake3 = new Pake3() {
+            Pake3 pake3 = new Pake3()
+            {
                 CA = SessionKeys.cA
             };
             Frame frame = new Frame(pake3, (byte)SecureOpCodes.PASEPake3);

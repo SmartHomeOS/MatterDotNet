@@ -13,6 +13,7 @@
 using MatterDotNet.Messages.CASE;
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.PKI;
+using MatterDotNet.Protocol.Cryptography;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
@@ -20,7 +21,7 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Security;
 using System.Security.Cryptography;
 
-namespace MatterDotNet.Protocol.Cryptography
+namespace MatterDotNet.Protocol.Subprotocols
 {
     /// <summary>
     /// Create CASE (certificate based) sessions
@@ -77,7 +78,7 @@ namespace MatterDotNet.Protocol.Cryptography
         }
 
         private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, ulong nodeId, (byte[] Public, byte[] Private) ephKeys, Exchange exchange)
-        { 
+        {
             PayloadWriter Msg2Bytes = new PayloadWriter(1024);
             Msg2.Serialize(Msg2Bytes);
             byte[] sharedSecret = Crypto.ECDH(ephKeys.Private, Msg2.ResponderEphPubKey);
@@ -163,7 +164,7 @@ namespace MatterDotNet.Protocol.Cryptography
 
             StatusPayload s3resp = (StatusPayload)resp.Message.Payload!;
             if (s3resp.GeneralCode != GeneralCode.SUCCESS)
-                throw new IOException("CASE step 3 failed with status: " + (SecureStatusCodes)s3resp.ProtocolCode);;
+                throw new IOException("CASE step 3 failed with status: " + (SecureStatusCodes)s3resp.ProtocolCode); ;
 
             byte[] transcriptSession = SpanUtil.Combine(Msg1Msg2Bytes, Msg3Bytes.GetPayload().Span);
             byte[] saltSession = SpanUtil.Combine(fabric.OperationalIdentityProtectionKey, Crypto.Hash(transcriptSession));
@@ -177,7 +178,7 @@ namespace MatterDotNet.Protocol.Cryptography
             Console.WriteLine("Created CASE session");
             return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
                                                 sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
-                                                sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(), 
+                                                sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
                                                 fabric.Commissioner.NodeID, nodeId, sharedSecret, tbeData2.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
         }
 

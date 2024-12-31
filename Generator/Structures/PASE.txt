@@ -1,0 +1,54 @@
+﻿namespace PASE
+{
+	Crypto_PBKDFParameterSet => STRUCTURE [ tag-order ]
+	{
+		iterations [1] : UNSIGNED INTEGER [ range 32-bits ],
+		salt [2] : OCTET STRING [ length 16..32 ],
+	}
+	// This struct was modified to add optional to 4-7. Very poor documentation.
+	session-parameter-struct => STRUCTURE [ tag-order ]
+	{
+		SessionIdleInterval [1, optional] : UNSIGNED INTEGER [ range 32-bits ],
+		SessionActiveInterval [2, optional] : UNSIGNED INTEGER [ range 32-bits ],
+		SessionActiveThreshold [3, optional] : UNSIGNED INTEGER [ range 16-bits ],
+		DataModelRevision [4, optional]] : UNSIGNED INTEGER [ range 16-bits ],
+		InteractionModelRevision [5, optional]] : UNSIGNED INTEGER [ range 16-bits ],
+		SpecificationVersion [6, optional]] : UNSIGNED INTEGER [ range 32-bits ],
+		MaxPathsPerInvoke [7, optional]] : UNSIGNED INTEGER [ range 16-bits ],
+	}
+
+	PBKDFParamReq-struct => STRUCTURE [ tag-order ]
+	{
+		initiatorRandom [1] : OCTET STRING [ length 32 ],
+		initiatorSessionId [2] : UNSIGNED INTEGER [ range 16-bits ],
+		passcodeId [3] : UNSIGNED INTEGER [ length 16-bits ],
+		hasPBKDFParameters [4] : BOOLEAN,
+		initiatorSessionParams [5, optional] : session-parameter-struct
+	}
+
+	// Tag 4 is not marked optional in the spec, but it's description indicates it is optional
+	PBKDFParamResp-struct => STRUCTURE [ tag-order ]
+	{
+		initiatorRandom [1] : OCTET STRING [ length 32 ],
+		responderRandom [2] : OCTET STRING [ length 32 ],
+		responderSessionId [3] : UNSIGNED INTEGER [ range 16-bits ],
+		pbkdf_parameters [4, optional] : Crypto_PBKDFParameterSet,
+		responderSessionParams [5, optional] : session-parameter-struct
+	}
+
+	pake-1-struct => STRUCTURE [ tag-order ]
+	{
+		pA [1] : OCTET STRING [ length CRYPTO_PUBLIC_KEY_SIZE_BYTES ],
+	}
+
+	pake-2-struct => STRUCTURE [ tag-order ]
+	{
+		pB [1] : OCTET STRING [ length CRYPTO_PUBLIC_KEY_SIZE_BYTES ],
+		cB [2] : OCTET STRING [ length CRYPTO_HASH_LEN_BYTES],
+	}
+
+	pake-3-struct => STRUCTURE [ tag-order ]
+	{
+		cA [1] : OCTET STRING [length CRYPTO_HASH_LEN_BYTES],
+	}
+}

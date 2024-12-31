@@ -14,9 +14,9 @@
 
 
 using MatterDotNet.Messages.InteractionModel;
-using MatterDotNet.Protocol;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Protocol.Subprotocols;
 using System.Data;
 
 namespace MatterDotNet.Clusters

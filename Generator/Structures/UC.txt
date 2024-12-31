@@ -1,0 +1,37 @@
+﻿namespace UserDirectedCommissioning
+{
+	IdentificationDeclaration-struct => STRUCTURE [ tag-order ]
+	{
+		VendorId [1, optional] : UNSIGNED INTEGER [ range 16-bits ],
+		ProductId [2, optional] : UNSIGNED INTEGER [ range 16-bits ],
+		DeviceName [3, optional] : STRING [ length 0..32 ],
+		DeviceType [4, optional] : UNSIGNED INTEGER [ range 32-bits ],
+		PairingInstruction [5, optional] : STRING [ length 0..32 ],
+		PairingHint [6, optional] : UNSIGNED INTEGER [ range 32-bits ],
+		RotatingDeviceId [7, optional] : STRING [ length 0..100 ].
+		Port [8, optional] : UNSIGNED INTEGER [ range 16-bits ],
+		TargetAppList [9, optional] : ARRAY OF
+		{
+			TargetApp [10, optional] : STRUCTURE [ tag-order ]
+			{
+				AppVendorId [11, optional] : UNSIGNED INTEGER [ range 16-bits ],
+				AppProductId [12, optional] : UNSIGNED INTEGER [ range 16-bits ],
+			},
+		},
+		NoPasscode [13, optional] : BOOLEAN,
+		CdUponPasscodeDialog [14, optional] : BOOLEAN,
+		CommissionerPasscode [15, optional] : BOOLEAN,
+		CommissionerPasscodeReady [16, optional] : BOOLEAN,
+		CancelPasscode [17, optional] : BOOLEAN
+	}
+
+	CommissionerDeclaration-struct => STRUCTURE [ tag-order ]
+	{
+		ErrorCode [1, optional] : UNSIGNED INTEGER [ range 16-bits ],
+		NeedsPasscode [2, optional] : BOOLEAN,
+		NoAppsFound [3, optional] : BOOLEAN,
+		PasscodeDialogDisplayed [4, optional] : BOOLEAN,
+		CommissionerPasscode [5, optional] : BOOLEAN,
+		QRCodeDisplayed [6, optional] : BOOLEAN
+	}
+}

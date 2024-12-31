@@ -23,9 +23,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Administrator Commissioning Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 1)]
     public class AdministratorCommissioningCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x003C;
+        internal const uint CLUSTER_ID = 0x003C;
 
         /// <summary>
         /// Administrator Commissioning Cluster
@@ -152,21 +153,21 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Window Status attribute
         /// </summary>
-        public async Task<CommissioningWindowStatusEnum> GetWindowStatus (SecureSession session) {
+        public async Task<CommissioningWindowStatusEnum> GetWindowStatus(SecureSession session) {
             return (CommissioningWindowStatusEnum)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Admin Fabric Index attribute
         /// </summary>
-        public async Task<byte?> GetAdminFabricIndex (SecureSession session) {
+        public async Task<byte?> GetAdminFabricIndex(SecureSession session) {
             return (byte?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Get the Admin Vendor Id attribute
         /// </summary>
-        public async Task<ushort?> GetAdminVendorId (SecureSession session) {
+        public async Task<ushort?> GetAdminVendorId(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
         }
         #endregion Attributes

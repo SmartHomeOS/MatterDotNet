@@ -26,6 +26,7 @@ namespace Generator
                 Directory.CreateDirectory($"outputs\\Clusters\\");
             XmlSerializer deserializer = new XmlSerializer(typeof(Cluster));
             IEnumerable<string> clusterxmls = Directory.EnumerateFiles("..\\..\\..\\Clusters");
+            StreamWriter clusterBase = new StreamWriter("outputs\\ClusterBase.cs");
             foreach (string clusterxml in clusterxmls)
             {
                 includes.Clear();
@@ -35,9 +36,11 @@ namespace Generator
                     Cluster? cluster = deserializer.Deserialize(File.OpenRead(clusterxml)) as Cluster;
                     if (cluster == null)
                         throw new IOException("Failed to parse cluster " + clusterxml);
+                    clusterBase.WriteLine($"                case {cluster.name.Replace(" ", "").Replace('/', '_')}.CLUSTER_ID:\n                    return new {cluster.name.Replace(" ", "").Replace('/', '_')}(endPoint);");
                     WriteClass(cluster);
                 }
             }
+            clusterBase.Close();
         }
 
         private static void WriteClass(Cluster cluster)
@@ -75,9 +78,10 @@ namespace Generator
             writer.WriteLine("    /// <summary>");
             writer.WriteLine($"    /// {cluster.name}");
             writer.WriteLine("    /// </summary>");
+            writer.WriteLine($"    [ClusterRevision(CLUSTER_ID, {cluster.revision})]");
             writer.WriteLine("    public class " + cluster.name.Replace(" ", "").Replace('/', '_') + " : ClusterBase");
             writer.WriteLine("    {");
-            writer.WriteLine("        private const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
+            writer.WriteLine("        internal const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
             writer.WriteLine();
             writer.WriteLine("        /// <summary>");
             writer.WriteLine($"        /// {cluster.name}");
@@ -143,7 +147,7 @@ namespace Generator
             if (cluster.commands != null && cluster.commands.Length > 0)
             {
                 includes.Add("MatterDotNet.Messages.InteractionModel");
-                includes.Add("MatterDotNet.Protocol");
+                includes.Add("MatterDotNet.Protocol.Subprotocols");
                 writer.WriteLine("        #region Payloads");
                 bool firstPayload = true;
                 foreach (var command in cluster.commands)
@@ -506,10 +510,10 @@ namespace Generator
             }
         }
 
-        private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, int id, int? from, int? to, string name, string structName, Cluster cluster, TextWriter writer)
+        private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, string id, int? from, int? to, string name, string structName, Cluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
-            if (id != -1 && type != "list")
+            if (id != "-1" && type != "list" && id != "i")
             {
                 if (name == GeneratorUtil.SanitizeName(structName))
                     writer.Write($"{totalIndent}{name}Field = ");
@@ -527,7 +531,7 @@ namespace Generator
                     writer.WriteLine(">();");
                     writer.WriteLine($"{totalIndent}    foreach (var item in (List<object>)fields[{id}]) {{");
                     writer.Write($"{totalIndent}        {name}.Add(");
-                    WriteFieldReader(false, false, entryType!, null, -1, null, null, "item", structName, cluster, writer);
+                    WriteFieldReader(false, false, entryType!, null, "-1", null, null, "item", structName, cluster, writer);
                     writer.WriteLine($"{totalIndent}    }}");
                     writer.WriteLine($"{totalIndent}}}");
                     return;
@@ -608,16 +612,16 @@ namespace Generator
                     writer.Write($"reader.GetDouble({id}");
                     break;
                 case "ref_IpAdr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4{(id == -1 ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "ref_Ipv4Adr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4{(id == -1 ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "ref_Ipv6Adr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16{(id == -1 ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "Hardware Address":
-                    writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == -1 ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "octstr":
                 case "ipv6pre":
@@ -631,7 +635,7 @@ namespace Generator
                     writer.Write(')');
                     if (!optional)
                         writer.Write('!');
-                    if (id == -1)
+                    if (id == "-1" || id == "i")
                         writer.WriteLine(");");
                     else
                         writer.WriteLine(';');
@@ -647,7 +651,7 @@ namespace Generator
                     writer.Write(')');
                     if (!optional)
                         writer.Write('!');
-                    if (id == -1)
+                    if (id == "-1" || id == "i")
                         writer.WriteLine(");");
                     else
                         writer.WriteLine(';');
@@ -658,20 +662,28 @@ namespace Generator
                         writer.Write($"({type})reader.GetUShort({id}");
                         if (optional)
                             writer.Write(", true");
-                        if (id == -1)
+                        if (id == "-1" || id == "i")
                             writer.WriteLine(")!.Value);");
                         else
                             writer.WriteLine(")!.Value;");
                     }
-                    else
-                        writer.WriteLine($"new {GeneratorUtil.SanitizeName(type)}({(id == -1 ? "(object[])item))" : "fields[{id}])")};");
+                    else {
+                        writer.Write($"new ");
+                        WriteType(type, entryType, writer);
+                        if (id == "-1")
+                            writer.WriteLine("((object[])item));");
+                        else if (id == "i")
+                            writer.WriteLine("(reader.GetStruct(i)!));");
+                        else
+                            writer.WriteLine($"fields[{id}]);");
+                    }
                     return;
             }
             if (optional)
                 writer.Write(", true)");
             else
                 writer.Write(")!.Value");
-            if (id == -1)
+            if (id == "-1" || id == "i")
                 writer.WriteLine(");");
             else
                 writer.WriteLine(';');
@@ -875,7 +887,7 @@ namespace Generator
             writer.WriteLine($"            internal {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             foreach (clusterDataTypesStructField field in structType.field)
-                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, field.name, structType.name, cluster, writer);
+                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id.ToString(), field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, field.name, structType.name, cluster, writer);
 
             writer.WriteLine("            }");
             foreach (clusterDataTypesStructField field in structType.field)
@@ -1010,10 +1022,25 @@ namespace Generator
                 WriteType(attribute.type, attribute.entry?.type, writer);
                 if (attribute.quality?.nullable == true)
                     writer.Write('?');
-                writer.WriteLine("> Get" + attribute.name + " (SecureSession session) {");
-                writer.Write("            return ");
+                writer.WriteLine("> Get" + attribute.name + "(SecureSession session) {");
+                if (attribute.type != "list")
+                    writer.Write("            return ");
                 if (HasStruct(cluster, attribute.type))
                     writer.Write($"new {GeneratorUtil.SanitizeName(attribute.type)}((object[])(await GetAttribute(session, " + Convert.ToUInt16(attribute.id, 16) + "))!)");
+                else if (attribute.type == "list")
+                {
+                    writer.Write("            List<");
+                    WriteType(attribute.entry!.type, null, writer);
+                    writer.Write("> list = new List<");
+                    WriteType(attribute.entry!.type, null, writer);
+                    writer.WriteLine(">();");
+                    writer.WriteLine($"            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, {Convert.ToUInt16(attribute.id, 16)}))!);");
+                    writer.WriteLine("            for (int i = 0; i < reader.Count; i++)");
+                    writer.Write("                list.Add(");
+                    WriteFieldReader(false, false, attribute.entry!.type, null, "i", attribute.constraint?.from, attribute.constraint?.to, "", "", cluster, writer);
+                    writer.Write("            return list");
+                    hasDefault = false;
+                }
                 else
                 {
                     writer.Write('(');

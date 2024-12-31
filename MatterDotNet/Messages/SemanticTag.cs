@@ -23,6 +23,21 @@ namespace MatterDotNet.Messages
         /// <inheritdoc />
         public SemanticTag() {}
 
+        /// <summary>
+        /// Parse attribute data into a Semantic Tag
+        /// </summary>
+        /// <param name="fields"></param>
+        [SetsRequiredMembers]
+        public SemanticTag(object[] fields)
+        {
+            FieldReader reader = new FieldReader(fields);
+            MfgCode = reader.GetUShort(0, true);
+            NamespaceID = reader.GetByte(1)!.Value;
+            Tag = reader.GetByte(2)!.Value;
+            if (reader.Has(3))
+                Label = reader.GetString(3);
+        }
+
         /// <inheritdoc />
         [SetsRequiredMembers]
         public SemanticTag(Memory<byte> data) : this(new TLVReader(data)) {}

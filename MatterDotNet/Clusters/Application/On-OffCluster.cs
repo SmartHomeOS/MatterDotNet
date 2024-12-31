@@ -23,9 +23,10 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// On/Off Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 6)]
     public class On_OffCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x0006;
+        internal const uint CLUSTER_ID = 0x0006;
 
         /// <summary>
         /// On/Off Cluster
@@ -234,21 +235,21 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the On Off attribute
         /// </summary>
-        public async Task<bool> GetOnOff (SecureSession session) {
+        public async Task<bool> GetOnOff(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 0) ?? false;
         }
 
         /// <summary>
         /// Get the Global Scene Control attribute
         /// </summary>
-        public async Task<bool> GetGlobalSceneControl (SecureSession session) {
+        public async Task<bool> GetGlobalSceneControl(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 16384) ?? true;
         }
 
         /// <summary>
         /// Get the On Time attribute
         /// </summary>
-        public async Task<ushort> GetOnTime (SecureSession session) {
+        public async Task<ushort> GetOnTime(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 16385) ?? 0;
         }
 
@@ -262,7 +263,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Off Wait Time attribute
         /// </summary>
-        public async Task<ushort> GetOffWaitTime (SecureSession session) {
+        public async Task<ushort> GetOffWaitTime(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 16386) ?? 0;
         }
 
@@ -276,7 +277,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Start Up On Off attribute
         /// </summary>
-        public async Task<StartUpOnOffEnum?> GetStartUpOnOff (SecureSession session) {
+        public async Task<StartUpOnOffEnum?> GetStartUpOnOff(SecureSession session) {
             return (StartUpOnOffEnum?)await GetEnumAttribute(session, 16387, true);
         }
 

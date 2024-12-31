@@ -26,9 +26,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// General Diagnostics Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class GeneralDiagnosticsCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x0033;
+        internal const uint CLUSTER_ID = 0x0033;
 
         /// <summary>
         /// General Diagnostics Cluster
@@ -388,63 +389,79 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Network Interfaces attribute
         /// </summary>
-        public async Task<List<NetworkInterface>> GetNetworkInterfaces (SecureSession session) {
-            return (List<NetworkInterface>)(dynamic?)(await GetAttribute(session, 0))!;
+        public async Task<List<NetworkInterface>> GetNetworkInterfaces(SecureSession session) {
+            List<NetworkInterface> list = new List<NetworkInterface>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new NetworkInterface(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
         /// Get the Reboot Count attribute
         /// </summary>
-        public async Task<ushort> GetRebootCount (SecureSession session) {
+        public async Task<ushort> GetRebootCount(SecureSession session) {
             return (ushort)(dynamic?)(await GetAttribute(session, 1))!;
         }
 
         /// <summary>
         /// Get the Up Time attribute
         /// </summary>
-        public async Task<ulong> GetUpTime (SecureSession session) {
+        public async Task<ulong> GetUpTime(SecureSession session) {
             return (ulong)(dynamic?)(await GetAttribute(session, 2))!;
         }
 
         /// <summary>
         /// Get the Total Operational Hours attribute
         /// </summary>
-        public async Task<uint> GetTotalOperationalHours (SecureSession session) {
+        public async Task<uint> GetTotalOperationalHours(SecureSession session) {
             return (uint)(dynamic?)(await GetAttribute(session, 3))!;
         }
 
         /// <summary>
         /// Get the Boot Reason attribute
         /// </summary>
-        public async Task<BootReasonEnum> GetBootReason (SecureSession session) {
+        public async Task<BootReasonEnum> GetBootReason(SecureSession session) {
             return (BootReasonEnum)await GetEnumAttribute(session, 4);
         }
 
         /// <summary>
         /// Get the Active Hardware Faults attribute
         /// </summary>
-        public async Task<List<HardwareFaultEnum>> GetActiveHardwareFaults (SecureSession session) {
-            return (List<HardwareFaultEnum>)(dynamic?)(await GetAttribute(session, 5))!;
+        public async Task<List<HardwareFaultEnum>> GetActiveHardwareFaults(SecureSession session) {
+            List<HardwareFaultEnum> list = new List<HardwareFaultEnum>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add((HardwareFaultEnum)reader.GetUShort(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Active Radio Faults attribute
         /// </summary>
-        public async Task<List<RadioFaultEnum>> GetActiveRadioFaults (SecureSession session) {
-            return (List<RadioFaultEnum>)(dynamic?)(await GetAttribute(session, 6))!;
+        public async Task<List<RadioFaultEnum>> GetActiveRadioFaults(SecureSession session) {
+            List<RadioFaultEnum> list = new List<RadioFaultEnum>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add((RadioFaultEnum)reader.GetUShort(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Active Network Faults attribute
         /// </summary>
-        public async Task<List<NetworkFaultEnum>> GetActiveNetworkFaults (SecureSession session) {
-            return (List<NetworkFaultEnum>)(dynamic?)(await GetAttribute(session, 7))!;
+        public async Task<List<NetworkFaultEnum>> GetActiveNetworkFaults(SecureSession session) {
+            List<NetworkFaultEnum> list = new List<NetworkFaultEnum>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add((NetworkFaultEnum)reader.GetUShort(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Test Event Triggers Enabled attribute
         /// </summary>
-        public async Task<bool> GetTestEventTriggersEnabled (SecureSession session) {
+        public async Task<bool> GetTestEventTriggersEnabled(SecureSession session) {
             return (bool)(dynamic?)(await GetAttribute(session, 8))!;
         }
         #endregion Attributes

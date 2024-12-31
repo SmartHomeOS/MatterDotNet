@@ -22,9 +22,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Access Control Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 1)]
     public class AccessControlCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x001F;
+        internal const uint CLUSTER_ID = 0x001F;
 
         /// <summary>
         /// Access Control Cluster
@@ -195,8 +196,12 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the ACL attribute
         /// </summary>
-        public async Task<List<AccessControlEntry>> GetACL (SecureSession session) {
-            return (List<AccessControlEntry>)(dynamic?)(await GetAttribute(session, 0))!;
+        public async Task<List<AccessControlEntry>> GetACL(SecureSession session) {
+            List<AccessControlEntry> list = new List<AccessControlEntry>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new AccessControlEntry(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
@@ -209,8 +214,12 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Extension attribute
         /// </summary>
-        public async Task<List<AccessControlExtension>> GetExtension (SecureSession session) {
-            return (List<AccessControlExtension>)(dynamic?)(await GetAttribute(session, 1))!;
+        public async Task<List<AccessControlExtension>> GetExtension(SecureSession session) {
+            List<AccessControlExtension> list = new List<AccessControlExtension>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new AccessControlExtension(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
@@ -223,21 +232,21 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Subjects Per Access Control Entry attribute
         /// </summary>
-        public async Task<ushort> GetSubjectsPerAccessControlEntry (SecureSession session) {
+        public async Task<ushort> GetSubjectsPerAccessControlEntry(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 4;
         }
 
         /// <summary>
         /// Get the Targets Per Access Control Entry attribute
         /// </summary>
-        public async Task<ushort> GetTargetsPerAccessControlEntry (SecureSession session) {
+        public async Task<ushort> GetTargetsPerAccessControlEntry(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 3;
         }
 
         /// <summary>
         /// Get the Access Control Entries Per Fabric attribute
         /// </summary>
-        public async Task<ushort> GetAccessControlEntriesPerFabric (SecureSession session) {
+        public async Task<ushort> GetAccessControlEntriesPerFabric(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 4;
         }
         #endregion Attributes

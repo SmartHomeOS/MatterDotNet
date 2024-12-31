@@ -24,9 +24,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Group Key Management Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class GroupKeyManagementCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x003F;
+        internal const uint CLUSTER_ID = 0x003F;
 
         /// <summary>
         /// Group Key Management Cluster
@@ -302,35 +303,43 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Group Key Map attribute
         /// </summary>
-        public async Task<List<GroupKeyMap>> GetGroupKeyMap (SecureSession session) {
-            return (List<GroupKeyMap>?)(dynamic?)await GetAttribute(session, 0) ?? new List<GroupKeyMap>();
+        public async Task<List<GroupKeyMap>> GetGroupKeyMap(SecureSession session) {
+            List<GroupKeyMap> list = new List<GroupKeyMap>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new GroupKeyMap(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
         /// Set the Group Key Map attribute
         /// </summary>
-        public async Task SetGroupKeyMap (SecureSession session, List<GroupKeyMap>? value) {
-            await SetAttribute(session, 0, value ?? new List<GroupKeyMap>());
+        public async Task SetGroupKeyMap (SecureSession session, List<GroupKeyMap> value) {
+            await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Group Table attribute
         /// </summary>
-        public async Task<List<GroupInfoMap>> GetGroupTable (SecureSession session) {
-            return (List<GroupInfoMap>?)(dynamic?)await GetAttribute(session, 1) ?? new List<GroupInfoMap>();
+        public async Task<List<GroupInfoMap>> GetGroupTable(SecureSession session) {
+            List<GroupInfoMap> list = new List<GroupInfoMap>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new GroupInfoMap(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
         /// Get the Max Groups Per Fabric attribute
         /// </summary>
-        public async Task<ushort> GetMaxGroupsPerFabric (SecureSession session) {
+        public async Task<ushort> GetMaxGroupsPerFabric(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0;
         }
 
         /// <summary>
         /// Get the Max Group Keys Per Fabric attribute
         /// </summary>
-        public async Task<ushort> GetMaxGroupKeysPerFabric (SecureSession session) {
+        public async Task<ushort> GetMaxGroupKeysPerFabric(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 1;
         }
         #endregion Attributes

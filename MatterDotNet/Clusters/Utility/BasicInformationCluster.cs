@@ -22,9 +22,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Basic Information Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class BasicInformationCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x0028;
+        internal const uint CLUSTER_ID = 0x0028;
 
         /// <summary>
         /// Basic Information Cluster
@@ -199,42 +200,42 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Data Model Revision attribute
         /// </summary>
-        public async Task<ushort> GetDataModelRevision (SecureSession session) {
+        public async Task<ushort> GetDataModelRevision(SecureSession session) {
             return (ushort)(dynamic?)(await GetAttribute(session, 0))!;
         }
 
         /// <summary>
         /// Get the Vendor Name attribute
         /// </summary>
-        public async Task<string> GetVendorName (SecureSession session) {
+        public async Task<string> GetVendorName(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 1))!;
         }
 
         /// <summary>
         /// Get the Vendor ID attribute
         /// </summary>
-        public async Task<ushort> GetVendorID (SecureSession session) {
+        public async Task<ushort> GetVendorID(SecureSession session) {
             return (ushort)(dynamic?)(await GetAttribute(session, 2))!;
         }
 
         /// <summary>
         /// Get the Product Name attribute
         /// </summary>
-        public async Task<string> GetProductName (SecureSession session) {
+        public async Task<string> GetProductName(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 3))!;
         }
 
         /// <summary>
         /// Get the Product ID attribute
         /// </summary>
-        public async Task<ushort> GetProductID (SecureSession session) {
+        public async Task<ushort> GetProductID(SecureSession session) {
             return (ushort)(dynamic?)(await GetAttribute(session, 4))!;
         }
 
         /// <summary>
         /// Get the Node Label attribute
         /// </summary>
-        public async Task<string> GetNodeLabel (SecureSession session) {
+        public async Task<string> GetNodeLabel(SecureSession session) {
             return (string?)(dynamic?)await GetAttribute(session, 5) ?? "";
         }
 
@@ -248,7 +249,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Location attribute
         /// </summary>
-        public async Task<string> GetLocation (SecureSession session) {
+        public async Task<string> GetLocation(SecureSession session) {
             return (string?)(dynamic?)await GetAttribute(session, 6) ?? "XX";
         }
 
@@ -262,70 +263,70 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Hardware Version attribute
         /// </summary>
-        public async Task<ushort> GetHardwareVersion (SecureSession session) {
+        public async Task<ushort> GetHardwareVersion(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0;
         }
 
         /// <summary>
         /// Get the Hardware Version String attribute
         /// </summary>
-        public async Task<string> GetHardwareVersionString (SecureSession session) {
+        public async Task<string> GetHardwareVersionString(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 8))!;
         }
 
         /// <summary>
         /// Get the Software Version attribute
         /// </summary>
-        public async Task<uint> GetSoftwareVersion (SecureSession session) {
+        public async Task<uint> GetSoftwareVersion(SecureSession session) {
             return (uint?)(dynamic?)await GetAttribute(session, 9) ?? 0;
         }
 
         /// <summary>
         /// Get the Software Version String attribute
         /// </summary>
-        public async Task<string> GetSoftwareVersionString (SecureSession session) {
+        public async Task<string> GetSoftwareVersionString(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 10))!;
         }
 
         /// <summary>
         /// Get the Manufacturing Date attribute
         /// </summary>
-        public async Task<string> GetManufacturingDate (SecureSession session) {
+        public async Task<string> GetManufacturingDate(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 11))!;
         }
 
         /// <summary>
         /// Get the Part Number attribute
         /// </summary>
-        public async Task<string> GetPartNumber (SecureSession session) {
+        public async Task<string> GetPartNumber(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 12))!;
         }
 
         /// <summary>
         /// Get the Product URL attribute
         /// </summary>
-        public async Task<string> GetProductURL (SecureSession session) {
+        public async Task<string> GetProductURL(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 13))!;
         }
 
         /// <summary>
         /// Get the Product Label attribute
         /// </summary>
-        public async Task<string> GetProductLabel (SecureSession session) {
+        public async Task<string> GetProductLabel(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 14))!;
         }
 
         /// <summary>
         /// Get the Serial Number attribute
         /// </summary>
-        public async Task<string> GetSerialNumber (SecureSession session) {
+        public async Task<string> GetSerialNumber(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 15))!;
         }
 
         /// <summary>
         /// Get the Local Config Disabled attribute
         /// </summary>
-        public async Task<bool> GetLocalConfigDisabled (SecureSession session) {
+        public async Task<bool> GetLocalConfigDisabled(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 16) ?? false;
         }
 
@@ -339,42 +340,42 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Reachable attribute
         /// </summary>
-        public async Task<bool> GetReachable (SecureSession session) {
+        public async Task<bool> GetReachable(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 17) ?? true;
         }
 
         /// <summary>
         /// Get the Unique ID attribute
         /// </summary>
-        public async Task<string> GetUniqueID (SecureSession session) {
+        public async Task<string> GetUniqueID(SecureSession session) {
             return (string)(dynamic?)(await GetAttribute(session, 18))!;
         }
 
         /// <summary>
         /// Get the Capability Minima attribute
         /// </summary>
-        public async Task<CapabilityMinima> GetCapabilityMinima (SecureSession session) {
+        public async Task<CapabilityMinima> GetCapabilityMinima(SecureSession session) {
             return new CapabilityMinima((object[])(await GetAttribute(session, 19))!);
         }
 
         /// <summary>
         /// Get the Product Appearance attribute
         /// </summary>
-        public async Task<ProductAppearance> GetProductAppearance (SecureSession session) {
+        public async Task<ProductAppearance> GetProductAppearance(SecureSession session) {
             return new ProductAppearance((object[])(await GetAttribute(session, 20))!);
         }
 
         /// <summary>
         /// Get the Specification Version attribute
         /// </summary>
-        public async Task<uint> GetSpecificationVersion (SecureSession session) {
+        public async Task<uint> GetSpecificationVersion(SecureSession session) {
             return (uint?)(dynamic?)await GetAttribute(session, 21) ?? 0;
         }
 
         /// <summary>
         /// Get the Max Paths Per Invoke attribute
         /// </summary>
-        public async Task<ushort> GetMaxPathsPerInvoke (SecureSession session) {
+        public async Task<ushort> GetMaxPathsPerInvoke(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 22) ?? 1;
         }
         #endregion Attributes

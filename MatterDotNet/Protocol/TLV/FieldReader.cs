@@ -12,158 +12,159 @@
 
 namespace MatterDotNet.Protocol.Parsers
 {
-    public class FieldReader(object[] fields)
+    public class FieldReader(IList<object> fields)
     {
+        public int Count { get { return fields.Count; } }
         public byte? GetByte(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is byte value)
+            if (fields[(int)tagNumber] is byte value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type byte but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type byte but received {fields[(int)tagNumber].GetType()}");
         }
         public sbyte? GetSByte(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is sbyte value)
+            if (fields[(int)tagNumber] is sbyte value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type sbyte but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type sbyte but received {fields[(int)tagNumber].GetType()}");
         }
         public bool? GetBool(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is bool value)
+            if (fields[(int)tagNumber] is bool value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type bool but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type bool but received {fields[(int)tagNumber].GetType()}");
         }
         public short? GetShort(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is sbyte smallerVal)
+            if (fields[(int)tagNumber] is sbyte smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is short value)
+            if (fields[(int)tagNumber] is short value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type short but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type short but received {fields[(int)tagNumber].GetType()}");
         }
 
         public ushort? GetUShort(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is byte smallerVal)
+            if (fields[(int)tagNumber] is byte smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is ushort value)
+            if (fields[(int)tagNumber] is ushort value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type ushort but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type ushort but received {fields[(int)tagNumber].GetType()}");
         }
 
         public int? GetInt(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is sbyte smallestVal)
+            if (fields[(int)tagNumber] is sbyte smallestVal)
                 return smallestVal;
-            if (fields[tagNumber] is short smallerVal)
+            if (fields[(int)tagNumber] is short smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is int value)
+            if (fields[(int)tagNumber] is int value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type int but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type int but received {fields[(int)tagNumber].GetType()}");
         }
 
         public uint? GetUInt(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is byte smallestVal)
+            if (fields[(int)tagNumber] is byte smallestVal)
                 return smallestVal;
-            if (fields[tagNumber] is ushort smallerVal)
+            if (fields[(int)tagNumber] is ushort smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is uint value)
+            if (fields[(int)tagNumber] is uint value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type uint but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type uint but received {fields[(int)tagNumber].GetType()}");
         }
 
         public long? GetLong(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is sbyte smallestVal)
+            if (fields[(int)tagNumber] is sbyte smallestVal)
                 return smallestVal;
-            if (fields[tagNumber] is short smallerVal)
+            if (fields[(int)tagNumber] is short smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is int smallVal)
+            if (fields[(int)tagNumber] is int smallVal)
                 return smallVal;
-            if (fields[tagNumber] is long value)
+            if (fields[(int)tagNumber] is long value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type long but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type long but received {fields[(int)tagNumber].GetType()}");
         }
 
         public ulong? GetULong(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is byte smallestVal)
+            if (fields[(int)tagNumber] is byte smallestVal)
                 return smallestVal;
-            if (fields[tagNumber] is ushort smallerVal)
+            if (fields[(int)tagNumber] is ushort smallerVal)
                 return smallerVal;
-            if (fields[tagNumber] is uint smallVal)
+            if (fields[(int)tagNumber] is uint smallVal)
                 return smallVal;
-            if (fields[tagNumber] is ulong value)
+            if (fields[(int)tagNumber] is ulong value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type ulong but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type ulong but received {fields[(int)tagNumber].GetType()}");
         }
 
         public float? GetFloat(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is float value)
+            if (fields[(int)tagNumber] is float value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type float but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type float but received {fields[(int)tagNumber].GetType()}");
         }
 
         public double? GetDouble(long tagNumber, bool nullable = false)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is double value)
+            if (fields[(int)tagNumber] is double value)
                 return value;
-            throw new InvalidDataException($"Tag {tagNumber}: Expected type double but received {fields[tagNumber].GetType()}");
+            throw new InvalidDataException($"Tag {tagNumber}: Expected type double but received {fields[(int)tagNumber].GetType()}");
         }
 
         public string? GetString(long tagNumber, bool nullable = false, int maxLength = int.MaxValue, int minLength = 0)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is not string value)
-                throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {fields[tagNumber].GetType()}");
+            if (fields[(int)tagNumber] is not string value)
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {fields[(int)tagNumber].GetType()}");
             if (value.Length > maxLength)
                 throw new InvalidDataException($"Constraint Violation! Max length is {maxLength} but received {value.Length}");
             if (value.Length < minLength)
@@ -173,17 +174,31 @@ namespace MatterDotNet.Protocol.Parsers
 
         public byte[]? GetBytes(long tagNumber, bool nullable = false, int maxLength = int.MaxValue, int minLength = 0)
         {
-            if (fields.Length <= tagNumber)
+            if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[tagNumber] == null && nullable)
+            if (fields[(int)tagNumber] == null && nullable)
                 return null;
-            if (fields[tagNumber] is not byte[] value)
-                throw new InvalidDataException($"Tag {tagNumber}: Expected type byte[] but received {fields[tagNumber].GetType()}");
+            if (fields[(int)tagNumber] is not byte[] value)
+                throw new InvalidDataException($"Tag {tagNumber}: Expected type byte[] but received {fields[(int)tagNumber].GetType()}");
             if (value.Length > maxLength)
                 throw new InvalidDataException($"Constraint Violation! Max length is {maxLength} but received {value.Length}");
             if (value.Length < minLength)
                 throw new InvalidDataException($"Constraint Violation! Min length is {minLength} but received {value.Length}");
             return value;
+        }
+
+        public object[]? GetStruct(int tagNumber, bool nullable = false)
+        {
+            if (fields.Count <= tagNumber)
+                throw new InvalidDataException("Tag " + tagNumber + " not present");
+            if (fields[(int)tagNumber] == null && nullable)
+                return null;
+            return (object[])fields[tagNumber];
+        }
+
+        internal bool Has(int tagNumber)
+        {
+            return tagNumber < fields.Count;
         }
     }
 }

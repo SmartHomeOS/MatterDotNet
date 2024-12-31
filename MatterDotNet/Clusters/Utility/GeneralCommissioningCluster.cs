@@ -24,9 +24,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// General Commissioning Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 1)]
     public class GeneralCommissioningCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x0030;
+        internal const uint CLUSTER_ID = 0x0030;
 
         /// <summary>
         /// General Commissioning Cluster
@@ -205,7 +206,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Breadcrumb attribute
         /// </summary>
-        public async Task<ulong> GetBreadcrumb (SecureSession session) {
+        public async Task<ulong> GetBreadcrumb(SecureSession session) {
             return (ulong?)(dynamic?)await GetAttribute(session, 0) ?? 0;
         }
 
@@ -219,28 +220,28 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Basic Commissioning Info attribute
         /// </summary>
-        public async Task<BasicCommissioningInfo> GetBasicCommissioningInfo (SecureSession session) {
+        public async Task<BasicCommissioningInfo> GetBasicCommissioningInfo(SecureSession session) {
             return new BasicCommissioningInfo((object[])(await GetAttribute(session, 1))!);
         }
 
         /// <summary>
         /// Get the Regulatory Config attribute
         /// </summary>
-        public async Task<RegulatoryLocationTypeEnum> GetRegulatoryConfig (SecureSession session) {
+        public async Task<RegulatoryLocationTypeEnum> GetRegulatoryConfig(SecureSession session) {
             return (RegulatoryLocationTypeEnum)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Location Capability attribute
         /// </summary>
-        public async Task<RegulatoryLocationTypeEnum> GetLocationCapability (SecureSession session) {
+        public async Task<RegulatoryLocationTypeEnum> GetLocationCapability(SecureSession session) {
             return (RegulatoryLocationTypeEnum?)await GetEnumAttribute(session, 3) ?? RegulatoryLocationTypeEnum.IndoorOutdoor;
         }
 
         /// <summary>
         /// Get the Supports Concurrent Connection attribute
         /// </summary>
-        public async Task<bool> GetSupportsConcurrentConnection (SecureSession session) {
+        public async Task<bool> GetSupportsConcurrentConnection(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
         }
         #endregion Attributes

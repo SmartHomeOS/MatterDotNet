@@ -13,6 +13,8 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 
+using MatterDotNet.Clusters.Application;
+using MatterDotNet.Clusters.Utility;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
@@ -215,6 +217,35 @@ namespace MatterDotNet.Clusters
                     throw new InvalidOperationException("The received request cannot be handled due to the current operational state of the device");
                 default:
                     return false;
+            }
+        }
+
+        public static ClusterBase Create(uint clusterId, ushort endPoint)
+        {
+            switch (clusterId)
+            {
+                case AccessControlCluster.CLUSTER_ID:
+                    return new AccessControlCluster(endPoint);
+                case AdministratorCommissioningCluster.CLUSTER_ID:
+                    return new AdministratorCommissioningCluster(endPoint);
+                case BasicInformationCluster.CLUSTER_ID:
+                    return new BasicInformationCluster(endPoint);
+                case DescriptorCluster.CLUSTER_ID:
+                    return new DescriptorCluster(endPoint);
+                case GeneralDiagnosticsCluster.CLUSTER_ID:
+                    return new GeneralDiagnosticsCluster(endPoint);
+                case GeneralCommissioningCluster.CLUSTER_ID:
+                    return new GeneralCommissioningCluster(endPoint);
+                case GroupKeyManagementCluster.CLUSTER_ID:
+                    return new GroupKeyManagementCluster(endPoint);
+                case IdentifyCluster.CLUSTER_ID:
+                    return new IdentifyCluster(endPoint);
+                case On_OffCluster.CLUSTER_ID:
+                    return new On_OffCluster(endPoint);
+                case NodeOperationalCredentialsCluster.CLUSTER_ID:
+                    return new NodeOperationalCredentialsCluster(endPoint);
+                default:
+                    return new UnknownCluster(clusterId, endPoint);
             }
         }
     }

@@ -23,9 +23,10 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Descriptor Cluster
     /// </summary>
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class DescriptorCluster : ClusterBase
     {
-        private const uint CLUSTER_ID = 0x001D;
+        internal const uint CLUSTER_ID = 0x001D;
 
         /// <summary>
         /// Descriptor Cluster
@@ -92,36 +93,56 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Device Type List attribute
         /// </summary>
-        public async Task<List<DeviceType>> GetDeviceTypeList (SecureSession session) {
-            return (List<DeviceType>)(dynamic?)(await GetAttribute(session, 0))!;
+        public async Task<List<DeviceType>> GetDeviceTypeList(SecureSession session) {
+            List<DeviceType> list = new List<DeviceType>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new DeviceType(reader.GetStruct(i)!));
+            return list;
         }
 
         /// <summary>
         /// Get the Server List attribute
         /// </summary>
-        public async Task<List<uint>> GetServerList (SecureSession session) {
-            return (List<uint>?)(dynamic?)await GetAttribute(session, 1) ?? new List<uint>();
+        public async Task<List<uint>> GetServerList(SecureSession session) {
+            List<uint> list = new List<uint>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(reader.GetUInt(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Client List attribute
         /// </summary>
-        public async Task<List<uint>> GetClientList (SecureSession session) {
-            return (List<uint>?)(dynamic?)await GetAttribute(session, 2) ?? new List<uint>();
+        public async Task<List<uint>> GetClientList(SecureSession session) {
+            List<uint> list = new List<uint>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(reader.GetUInt(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Parts List attribute
         /// </summary>
-        public async Task<List<ushort>> GetPartsList (SecureSession session) {
-            return (List<ushort>?)(dynamic?)await GetAttribute(session, 3) ?? new List<ushort>();
+        public async Task<List<ushort>> GetPartsList(SecureSession session) {
+            List<ushort> list = new List<ushort>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(reader.GetUShort(i)!.Value);
+            return list;
         }
 
         /// <summary>
         /// Get the Tag List attribute
         /// </summary>
-        public async Task<List<SemanticTag>> GetTagList (SecureSession session) {
-            return (List<SemanticTag>)(dynamic?)(await GetAttribute(session, 4))!;
+        public async Task<List<SemanticTag>> GetTagList(SecureSession session) {
+            List<SemanticTag> list = new List<SemanticTag>();
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 4))!);
+            for (int i = 0; i < reader.Count; i++)
+                list.Add(new SemanticTag(reader.GetStruct(i)!));
+            return list;
         }
         #endregion Attributes
     }

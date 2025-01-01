@@ -12,13 +12,14 @@
 
 using MatterDotNet.Security;
 
-namespace MatterDotNet
+namespace MatterDotNet.OperationalDiscovery
 {
     public class PayloadParser
     {
         [Flags]
         public enum DiscoveryCapabilities
         {
+            UNKNOWN = 0x0,
             RESERVED = 0x1,
             BLE = 0x2,
             IP = 0x4,
@@ -31,17 +32,18 @@ namespace MatterDotNet
             RESERVED = 3
         }
 
-        public DiscoveryCapabilities Capabiilities { get; set; }
-        public FlowType Flow {  get; set; }
+        public DiscoveryCapabilities Capabilities { get; set; }
+        public FlowType Flow { get; set; }
         public ushort VendorID { get; set; }
         public ushort ProductID { get; set; }
-        public ushort Discriminator {  get; set; }
+        public ushort Discriminator { get; set; }
         public uint Passcode { get; set; }
         public byte DiscriminatorLength { get; set; }
+        public DeviceTypeEnum DeviceType { get; set; }
 
         public override string ToString()
         {
-            return $"Vendor: {VendorID}, Product: {ProductID}, Passcode: {Passcode}, Discriminator: {Discriminator:X}, Flow: {Flow}, Caps: {Capabiilities}";
+            return $"Vendor: {VendorID}, Product: {ProductID}, Passcode: {Passcode}, Discriminator: {Discriminator:X}, Flow: {Flow}, Caps: {Capabilities}";
         }
 
         private PayloadParser() { }
@@ -55,7 +57,7 @@ namespace MatterDotNet
             ProductID = (ushort)readBits(data, 19, 16);
 
             Flow = (FlowType)readBits(data, 35, 2);
-            Capabiilities = (DiscoveryCapabilities)readBits(data, 37, 8);
+            Capabilities = (DiscoveryCapabilities)readBits(data, 37, 8);
             DiscriminatorLength = 12;
             Discriminator = (ushort)readBits(data, 45, DiscriminatorLength);
             Passcode = readBits(data, 57, 27);
@@ -68,7 +70,7 @@ namespace MatterDotNet
         {
             if (!QRCode.StartsWith("MT:"))
                 throw new ArgumentException("Invalid QR Code");
-           return new PayloadParser(QRCode);
+            return new PayloadParser(QRCode);
         }
 
         public static PayloadParser FromPIN(string pin)
@@ -82,7 +84,7 @@ namespace MatterDotNet
                 throw new ArgumentException("Pin Checksum Invalid: Should be " + computedChecksum);
 
             byte leading = byte.Parse(pin.Substring(0, 1));
-            int version = ((leading & 0x8) == 0) ? 0 : 1;
+            int version = (leading & 0x8) == 0 ? 0 : 1;
             bool vidpid = (leading & 0x4) == 0x4;
             ret.Discriminator = (ushort)((leading & 0x3) << 2);
             ushort group1 = ushort.Parse(pin.Substring(1, 5));
@@ -143,7 +145,7 @@ namespace MatterDotNet
             int currentIndex = index;
             for (int bitsRead = 0; bitsRead < numberOfBitsToRead; bitsRead++)
             {
-                if ((buf[currentIndex / 8] & (1 << (currentIndex % 8))) != 0)
+                if ((buf[currentIndex / 8] & 1 << currentIndex % 8) != 0)
                     dest |= (uint)(1 << bitsRead);
                 currentIndex++;
             }

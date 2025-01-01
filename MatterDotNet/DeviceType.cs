@@ -20,6 +20,10 @@ namespace MatterDotNet
     public enum DeviceTypeEnum : uint
     {
         /// <summary>
+        /// Unknown Device Type
+        /// </summary>
+        Unknown = 0x0000,
+        /// <summary>
         /// Aggregator Type
         /// </summary>
         Aggregator = 0x000E,

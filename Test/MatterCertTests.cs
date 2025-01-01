@@ -77,7 +77,7 @@ namespace Test
         [Test]
         public void NOCSigning()
         {
-            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1, []);
+            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1, RandomNumberGenerator.GetBytes(16));
             ECDsa key = ECDsa.Create();
             CertificateRequest req = new CertificateRequest("CN=Test", key, HashAlgorithmName.SHA256);
             OperationalCertificate noc = fabric.Sign(req);

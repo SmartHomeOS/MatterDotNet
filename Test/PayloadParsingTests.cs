@@ -10,7 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet;
+using MatterDotNet.OperationalDiscovery;
 
 namespace Test
 {
@@ -30,7 +30,7 @@ namespace Test
         }
 
         [Test]
-        public void PIN_TestValues()
+        public void PIN_TestValuesLong()
         {
             string PIN = "641295075300001000018";
             PayloadParser parser = PayloadParser.FromPIN(PIN);
@@ -38,6 +38,18 @@ namespace Test
             Assert.That(parser.VendorID, Is.EqualTo(1), "Invalid Vendor ID");
             Assert.That(parser.ProductID, Is.EqualTo(1), "Invalid Product ID");
             Assert.That(parser.Passcode, Is.EqualTo(12345679), "Invalid Passcode");
+            Assert.That(parser.DiscriminatorLength, Is.EqualTo(4), "Invalid Discriminator Length");
+        }
+
+        [Test]
+        public void PIN_TestValuesShort()
+        {
+            string PIN = "00362159269";
+            PayloadParser parser = PayloadParser.FromPIN(PIN);
+            Assert.That(parser.Discriminator, Is.EqualTo(0x0));
+            Assert.That(parser.VendorID, Is.EqualTo(0), "Vendor ID should not exist");
+            Assert.That(parser.ProductID, Is.EqualTo(0), "Product ID should not exist");
+            Assert.That(parser.Passcode, Is.EqualTo(97095205), "Invalid Passcode");
             Assert.That(parser.DiscriminatorLength, Is.EqualTo(4), "Invalid Discriminator Length");
         }
 
@@ -50,7 +62,7 @@ namespace Test
             Assert.That(parser.VendorID, Is.EqualTo(0xfff1), "Invalid Vendor ID");
             Assert.That(parser.ProductID, Is.EqualTo(0x8000), "Invalid Product ID");
             Assert.That(parser.Passcode, Is.EqualTo(20202021), "Invalid Passcode");
-            Assert.That(parser.Capabiilities, Is.EqualTo(PayloadParser.DiscoveryCapabilities.BLE), "Invalid Capabilities");
+            Assert.That(parser.Capabilities, Is.EqualTo(PayloadParser.DiscoveryCapabilities.BLE), "Invalid Capabilities");
             Assert.That(parser.Flow, Is.EqualTo(PayloadParser.FlowType.STANDARD), "Invalid Capabilities");
             Assert.That(parser.DiscriminatorLength, Is.EqualTo(12), "Invalid Discriminator Length");
         }

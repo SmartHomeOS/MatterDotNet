@@ -1,4 +1,4 @@
-﻿// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -106,8 +106,8 @@ namespace MatterDotNet.Protocol.Connection
         public async Task SendAck(SessionContext? session, ushort exchange, uint counter, bool initiator)
         {
             Frame ack = new Frame(null, (byte)SecureOpCodes.MRPStandaloneAcknowledgement);
-            ack.SessionID = session?.RemoteSessionID ?? 0;
-            ack.Counter = session!.GetSessionCounter();
+            ack.SessionID = session!.RemoteSessionID;
+            ack.Counter = session.GetSessionCounter();
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
             if (initiator)

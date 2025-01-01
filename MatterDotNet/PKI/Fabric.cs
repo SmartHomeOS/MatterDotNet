@@ -1,4 +1,4 @@
-﻿// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -13,7 +13,6 @@
 using MatterDotNet.Protocol.Cryptography;
 using System.Buffers.Binary;
 using System.Formats.Asn1;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -30,6 +29,8 @@ namespace MatterDotNet.PKI
         {
             if (fabricId == 0)
                 throw new ArgumentException("Invalid Fabric ID");
+            if (ipk.Length != 16)
+                throw new ArgumentException("Epoch Key must be 16 bytes");
             this.RCAC = rcac;
             this.FabricID = fabricId;
             EpochKey = ipk;
@@ -54,20 +55,7 @@ namespace MatterDotNet.PKI
         {
             this.cert = cert;
             EpochKey = ipk;
-            foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
-            {
-                switch (dn.GetSingleElementType().Value)
-                {
-                    case OID_RCAC:
-                            if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong rcac))
-                                RCAC = rcac;
-                            break;
-                        case OID_FabricID:
-                            if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong fabric))
-                                FabricID = fabric;
-                            break;
-                }
-            }
+            ParseCert();
             byte[] fabricIDBytes = new byte[8];
             BinaryPrimitives.WriteUInt64BigEndian(fabricIDBytes, FabricID);
             CompressedFabricID = Crypto.KDF(PublicKey.AsSpan(1), fabricIDBytes, COMPRESSED_FABRIC_INFO, 64);
@@ -170,6 +158,15 @@ namespace MatterDotNet.PKI
             if (nodes.ContainsKey(nodeId))
                 return nodes[nodeId];
             return null;
+        }
+
+        public IEnumerable<OperationalCertificate> GetNodes()
+        {
+            foreach (OperationalCertificate node in nodes.Values)
+            {
+                if (node != Commissioner)
+                    yield return node;
+            }
         }
 
         public byte[] ComputeDestinationID(byte[] random, ulong nodeId)

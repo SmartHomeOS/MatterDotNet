@@ -22,7 +22,7 @@ namespace MatterDotNet.Clusters
 
         public override string ToString()
         {
-            return $"Unknown Cluster: 0x{cluster:X2}";
+            return $"Unknown Cluster: 0x{cluster:X4}";
         }
     }
 }

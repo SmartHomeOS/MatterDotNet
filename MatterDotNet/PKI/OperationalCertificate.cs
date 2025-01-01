@@ -1,4 +1,4 @@
-﻿// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,7 @@ namespace MatterDotNet.PKI
             ParseCert();
         }
 
-        private void ParseCert()
+        protected void ParseCert()
         {
             foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
             {
@@ -243,6 +243,10 @@ namespace MatterDotNet.PKI
             return attrs;
         }
 
+        /// <summary>
+        /// Convert an operational certificate into a matter certificate
+        /// </summary>
+        /// <returns></returns>
         public MatterCertificate ToMatterCertificate()
         {
             List<Extension> extensions = new List<Extension>();
@@ -280,6 +284,10 @@ namespace MatterDotNet.PKI
             };
         }
 
+        /// <summary>
+        /// Convert an operational certificate into a matter certificate (in byte[] form)
+        /// </summary>
+        /// <returns></returns>
         public byte[] GetMatterCertBytes()
         {
             PayloadWriter payload = new PayloadWriter(600);
@@ -292,13 +300,11 @@ namespace MatterDotNet.PKI
             return cert;
         }
 
-        public byte[]? GetPrivateKey()
-        {
-            if (!cert.HasPrivateKey)
-                return null;
-            return cert.GetECDsaPrivateKey()?.ExportParameters(true).D;
-        }
-
+        /// <summary>
+        /// Compute an ECDsa Signature
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public byte[]? SignData(byte[] message)
         {
             if (!cert.HasPrivateKey)
@@ -306,31 +312,46 @@ namespace MatterDotNet.PKI
             return cert.GetECDsaPrivateKey()?.SignData(message, HashAlgorithmName.SHA256);
         }
 
+        /// <summary>
+        /// Verify an ECDsa Signature
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="signature"></param>
+        /// <returns></returns>
         public bool VerifyData(byte[] message, byte[] signature)
         {
             return cert.GetECDsaPublicKey()?.VerifyData(message, signature, HashAlgorithmName.SHA256) ?? false;
         }
 
-        public string IssuerName { get; set; } = string.Empty;
+        public string IssuerName { get; private set; } = string.Empty;
 
-        public string CommonName { get; set; } = string.Empty;
+        public string CommonName { get; private set; } = string.Empty;
 
-        public ulong NodeID { get; set; }
+        public ulong NodeID { get; private set; }
 
-        public ulong FirmwareSigningID { get; set; }
+        public ulong FirmwareSigningID { get; private set; }
 
-        public ulong ICAC { get; set; }
+        public ulong ICAC { get; private set; }
 
-        public ulong RCAC { get; set; }
+        public ulong RCAC { get; protected set; }
 
-        public ulong FabricID { get; set; }
+        public ulong FabricID { get; protected set; }
 
-        public List<CASEAuthenticatedTag> Cats { get; set; } = [];
+        public List<CASEAuthenticatedTag> Cats { get; private set; } = [];
 
-        public uint VendorID { get; set; }
+        /// <summary>
+        /// Node Vendor ID
+        /// </summary>
+        public uint VendorID { get; private set; }
 
-        public uint ProductID { get; set; }
+        /// <summary>
+        /// Node Product ID
+        /// </summary>
+        public uint ProductID { get; private set; }
 
+        /// <summary>
+        /// Public ECDsa Key
+        /// </summary>
         public byte[] PublicKey { get { return cert.GetPublicKey(); } }
     }
 }

@@ -36,7 +36,8 @@ namespace Generator
                     Cluster? cluster = deserializer.Deserialize(File.OpenRead(clusterxml)) as Cluster;
                     if (cluster == null)
                         throw new IOException("Failed to parse cluster " + clusterxml);
-                    clusterBase.WriteLine($"                case {cluster.name.Replace(" ", "").Replace('/', '_')}.CLUSTER_ID:\n                    return new {cluster.name.Replace(" ", "").Replace('/', '_')}(endPoint);");
+                    if (!string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
+                        clusterBase.WriteLine($"                case {cluster.name.Replace(" ", "").Replace('/', '_')}.CLUSTER_ID:\n                    return new {cluster.name.Replace(" ", "").Replace('/', '_')}(endPoint);");
                     WriteClass(cluster);
                 }
             }
@@ -71,24 +72,30 @@ namespace Generator
         private static void WriteClass(Cluster cluster, TextWriter writer)
         {
             includes.Add("MatterDotNet.Protocol.Parsers");
-            includes.Add("MatterDotNet.Protocol.Payloads");
             includes.Add("MatterDotNet.Protocol.Sessions");
             writer.WriteLine();
             writer.WriteLine($"namespace MatterDotNet.Clusters.{GeneratorUtil.SanitizeName(cluster.classification.role) ?? "Misc"}\n{{");
             writer.WriteLine("    /// <summary>");
             writer.WriteLine($"    /// {cluster.name}");
             writer.WriteLine("    /// </summary>");
-            writer.WriteLine($"    [ClusterRevision(CLUSTER_ID, {cluster.revision})]");
-            writer.WriteLine("    public class " + cluster.name.Replace(" ", "").Replace('/', '_') + " : ClusterBase");
+            if (!string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
+                writer.WriteLine($"    [ClusterRevision(CLUSTER_ID, {cluster.revision})]");
+            writer.WriteLine("    public class " + GeneratorUtil.SanitizeClassName(cluster.name) + (string.IsNullOrEmpty(cluster.classification.baseCluster) ? " : ClusterBase" : $" : {GeneratorUtil.SanitizeClassName(cluster.classification.baseCluster)}Cluster"));
             writer.WriteLine("    {");
-            writer.WriteLine("        internal const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
+            if (!string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
+                writer.WriteLine("        internal const uint CLUSTER_ID = " + cluster.clusterIds.clusterId.id + ";");
             writer.WriteLine();
             writer.WriteLine("        /// <summary>");
             writer.WriteLine($"        /// {cluster.name}");
             writer.WriteLine("        /// </summary>");
-            writer.WriteLine("        public " + cluster.name.Replace(" ", "").Replace('/', '_') + "(ushort endPoint) : base(CLUSTER_ID, endPoint) { }");
+            if (string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
+                writer.WriteLine("        public " + GeneratorUtil.SanitizeClassName(cluster.name) + "(uint cluster, ushort endPoint) : base(cluster, endPoint) { }");
+            else
+                writer.WriteLine("        public " + GeneratorUtil.SanitizeClassName(cluster.name) + "(ushort endPoint) : base(CLUSTER_ID, endPoint) { }");
+            if (string.IsNullOrEmpty(cluster.classification.baseCluster) && !string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
+                writer.WriteLine($"        /// <inheritdoc />\n        protected {GeneratorUtil.SanitizeClassName(cluster.name)}(uint cluster, ushort endPoint) : base(cluster, endPoint) {{ }}");
             writer.WriteLine();
-            if (cluster.dataTypes.@enum != null || (cluster.features != null && cluster.features.Length > 0))
+            if (cluster.dataTypes?.@enum != null || (cluster.features != null && cluster.features.Length > 0))
             {
                 writer.WriteLine("        #region Enums");
                 bool firstEnum=true;
@@ -97,7 +104,7 @@ namespace Generator
                     firstEnum = false;
                     WriteFeatures(cluster.features, writer);
                 }
-                if (cluster.dataTypes.@enum != null)
+                if (cluster.dataTypes?.@enum != null)
                 {
                     foreach (clusterDataTypesEnum enumType in cluster.dataTypes.@enum)
                     {
@@ -110,7 +117,7 @@ namespace Generator
                         WriteEnum(enumType, writer);
                     }
                 }
-                if (cluster.dataTypes.bitmap != null)
+                if (cluster.dataTypes?.bitmap != null)
                 {
                     foreach (clusterDataTypesBitfield bitmapType in cluster.dataTypes.bitmap)
                     {
@@ -126,9 +133,10 @@ namespace Generator
                 writer.WriteLine("        #endregion Enums");
                 writer.WriteLine();
             }
-            if (cluster.dataTypes.@struct != null)
+            if (cluster.dataTypes?.@struct != null)
             {
                 includes.Add("System.Diagnostics.CodeAnalysis");
+                includes.Add("MatterDotNet.Protocol.Payloads");
                 writer.WriteLine("        #region Records");
                 bool firstRecord = true;
                 foreach (clusterDataTypesStruct structType in cluster.dataTypes.@struct)
@@ -154,6 +162,7 @@ namespace Generator
                 {
                     if (command.field == null)
                         continue;
+                    includes.Add("MatterDotNet.Protocol.Payloads");
                     if (firstPayload)
                         firstPayload = false;
                     else
@@ -187,6 +196,7 @@ namespace Generator
                 }
                 writer.WriteLine("        #endregion Attributes");
             }
+            writer.WriteLine($"\n        /// <inheritdoc />\n        public override string ToString() {{\n            return \"{cluster.name}\";\n        }}");
             writer.WriteLine("    }");
             writer.Write("}");
             writer.Flush();
@@ -221,7 +231,7 @@ namespace Generator
                     if (field.type.EndsWith("Enum"))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
-                        writer.WriteLine(" = " + SanitizeDefault(field.@default, "") + ";");
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default, field.type) + ";");
                 }
                 else
                     writer.WriteLine();
@@ -234,8 +244,8 @@ namespace Generator
                 {
                     if (field.type == null || field.disallowConform != null) //Reserved/removed fields
                         continue;
-                    int? from = null;
-                    int? to = null;
+                    long? from = null;
+                    long? to = null;
                     if (field.constraint != null)
                     {
                         switch (field.constraint.type)
@@ -243,19 +253,21 @@ namespace Generator
                             case "min":
                             case "minCount":
                             case "minLength":
-                                if (int.TryParse(field.constraint.value, out int fromVal))
+                                if (long.TryParse(field.constraint.value, out long fromVal))
                                     from = fromVal;
                                 break;
                             case "max":
                             case "maxCount":
                             case "maxLength":
-                                if (int.TryParse(field.constraint.value, out int toVal))
+                                if (long.TryParse(field.constraint.value, out long toVal))
                                     to = toVal;
                                 break;
                             case "between":
                             case "lengthBetween":
-                                to = field.constraint.to;
-                                from = field.constraint.from;
+                                if (long.TryParse(field.constraint.to, out long parsedTo))
+                                    to = parsedTo;
+                                if (long.TryParse(field.constraint.from, out long parsedFrom))
+                                    from = parsedFrom;
                                 break;
                             case "desc":
                                 break;
@@ -271,7 +283,7 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteStructType(bool optional, bool nullable, string type, string? entryType, int id, int? from, int? to, string name, Cluster cluster, TextWriter writer)
+        private static void WriteStructType(bool optional, bool nullable, string type, string? entryType, int id, long? from, long? to, string name, Cluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
             if (optional)
@@ -356,6 +368,7 @@ namespace Generator
                     break;
                 case "uint8":
                 case "enum8":
+                case "map8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -371,6 +384,7 @@ namespace Generator
                         writer.WriteLine(");");
                     return;
                 case "uint16":
+                case "map16":
                 case "enum16":
                 case "group-id":
                 case "endpoint-no":
@@ -389,6 +403,7 @@ namespace Generator
                     return;
                 case "uint24":
                 case "uint32":
+                case "map32":
                 case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
@@ -441,6 +456,7 @@ namespace Generator
                 case "uint48":
                 case "uint56":
                 case "uint64":
+                case "map64":
                 case "epoch-us":
                 case "fabric-id":
                 case "node-id":
@@ -506,7 +522,7 @@ namespace Generator
                 writer.WriteLine(");");
         }
 
-        private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, string id, int? from, int? to, string name, string structName, Cluster cluster, TextWriter writer)
+        private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, string id, long? from, long? to, string name, string structName, Cluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
             if (id != "-1" && type != "list" && id != "i")
@@ -558,6 +574,7 @@ namespace Generator
                     break;
                 case "uint8":
                 case "enum8":
+                case "map8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -566,6 +583,7 @@ namespace Generator
                     break;
                 case "uint16":
                 case "enum16":
+                case "map16":
                 case "group-id":
                 case "endpoint-no":
                 case "vendor-id":
@@ -575,6 +593,7 @@ namespace Generator
                     break;
                 case "uint24":
                 case "uint32":
+                case "map32":
                 case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
@@ -589,6 +608,7 @@ namespace Generator
                 case "uint48":
                 case "uint56":
                 case "uint64":
+                case "map64":
                 case "epoch-us":
                 case "fabric-id":
                 case "node-id":
@@ -913,8 +933,15 @@ namespace Generator
             writer.WriteLine($"            internal {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             foreach (clusterDataTypesStructField field in structType.field)
-                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id.ToString(), field.constraint?.fromSpecified == true ? field.constraint.from : null, field.constraint?.toSpecified == true ? field.constraint.to : null, field.name, structType.name, cluster, writer);
-
+            {
+                long? to = null;
+                long? from = null;
+                if (field.constraint?.toSpecified == true && long.TryParse(field.constraint.to, out long toVal))
+                    to = toVal;
+                if (field.constraint?.fromSpecified == true && long.TryParse(field.constraint.from, out long fromVal))
+                    from = fromVal;
+                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id.ToString(), from, to, field.name, structType.name, cluster, writer);
+            }
             writer.WriteLine("            }");
             foreach (clusterDataTypesStructField field in structType.field)
             {
@@ -938,7 +965,7 @@ namespace Generator
                     if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
-                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, "") + ";");
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, field.type) + ";");
                 }
                 else
                     writer.WriteLine();
@@ -947,8 +974,8 @@ namespace Generator
             writer.WriteLine("                writer.StartStructure(structNumber);");
             foreach (clusterDataTypesStructField field in structType.field)
             {
-                int? from = null;
-                int? to = null;
+                long? from = null;
+                long? to = null;
                 if (field.constraint != null)
                 {
                     switch (field.constraint.type)
@@ -956,19 +983,21 @@ namespace Generator
                         case "min":
                         case "minCount":
                         case "minLength":
-                            if (int.TryParse(field.constraint.value, out int fromVal))
+                            if (long.TryParse(field.constraint.value, out long fromVal))
                                 from = fromVal;
                             break;
                         case "max":
                         case "maxCount":
                         case "maxLength":
-                            if (int.TryParse(field.constraint.value, out int toVal))
+                            if (long.TryParse(field.constraint.value, out long toVal))
                                 to = toVal;
                             break;
                         case "between":
                         case "lengthBetween":
-                            to = field.constraint.to;
-                            from = field.constraint.from;
+                            if (long.TryParse(field.constraint.from, out long parsedFrom))
+                                from = parsedFrom;
+                            if (long.TryParse(field.constraint.to, out long parsedTo))
+                                to = parsedTo;
                             break;
                         case "desc":
                             break;
@@ -1029,7 +1058,7 @@ namespace Generator
             foreach (clusterFeature item in features)
             {
                 writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
-                writer.WriteLine("            " + item.name + " = " + (1 << item.bit) + ",");
+                writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + (1 << item.bit) + ",");
             }
             writer.WriteLine("        }");
         }
@@ -1041,7 +1070,7 @@ namespace Generator
                 hasDefault = false;
             if (hasDefault && HasBitmap(cluster, attribute.type) && !HasBitmapValue(cluster, attribute.type, attribute.@default!))
                 hasDefault = false;
-            if (attribute.access.read)
+            if (attribute?.access?.read == true)
             {
                 writer.WriteLine($"        /// <summary>\n        /// Get the {GeneratorUtil.FieldNameToComment(attribute.name)} attribute\n        /// </summary>");
                 writer.Write("        public async Task<");
@@ -1063,7 +1092,13 @@ namespace Generator
                     writer.WriteLine($"            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, {Convert.ToUInt16(attribute.id, 16)}))!);");
                     writer.WriteLine("            for (int i = 0; i < reader.Count; i++)");
                     writer.Write("                list.Add(");
-                    WriteFieldReader(false, false, attribute.entry!.type, null, "i", attribute.constraint?.from, attribute.constraint?.to, "", "", cluster, writer);
+                    long? from = null;
+                    long? to = null;
+                    if (attribute.constraint?.fromSpecified == true && long.TryParse(attribute.constraint.from, out long fromVal))
+                        from = fromVal;
+                    if (attribute.constraint?.toSpecified == true && long.TryParse(attribute.constraint.to, out long toVal))
+                        to = toVal;
+                    WriteFieldReader(false, false, attribute.entry!.type, null, "i", from, to, "", "", cluster, writer);
                     writer.Write("            return list");
                     hasDefault = false;
                 }
@@ -1085,7 +1120,7 @@ namespace Generator
                     if (attribute.quality?.nullable == true)
                         writer.Write(", true");
                     writer.Write(')');
-                    if (!HasEnum(cluster, attribute.type) && (attribute.quality?.nullable != true && !hasDefault))
+                    if (!HasEnum(cluster, attribute.type) && !HasBitmap(cluster, attribute.type) && (attribute.quality?.nullable != true && !hasDefault))
                         writer.Write(")!");
                 }
 
@@ -1100,7 +1135,7 @@ namespace Generator
                     writer.WriteLine(";");
                 writer.WriteLine("        }");
             }
-            if (attribute.access.write)
+            if (attribute?.access?.write == true)
             {
                 if (attribute.access.read)
                     writer.WriteLine();
@@ -1134,6 +1169,7 @@ namespace Generator
             {
                 case "uint8":
                 case "enum8":
+                case "map8":
                 case "tag":
                 case "namespace":
                 case "fabric-idx":
@@ -1141,6 +1177,7 @@ namespace Generator
                     writer.Write("byte");
                     break;
                 case "uint16":
+                case "map16":
                 case "enum16":
                 case "group-id":
                 case "endpoint-no":
@@ -1154,6 +1191,7 @@ namespace Generator
                     break;
                 case "uint24":
                 case "uint32":
+                case "map32":
                 case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
@@ -1176,6 +1214,7 @@ namespace Generator
                 case "uint48":
                 case "uint56":
                 case "uint64":
+                case "map64":
                 case "epoch-us":
                 case "fabric-id":
                 case "node-id":
@@ -1263,8 +1302,12 @@ namespace Generator
                     sw.Write("()");
                     return sb.ToString();
                 }
+                else if (type?.Equals("string", StringComparison.InvariantCultureIgnoreCase) == true)
+                    return "\"\"";
                 return "[]";
             }
+            if (value.StartsWith("0x"))
+                return value.Split(' ')[0];
             if (value.StartsWith('"'))
                 return value;
             else
@@ -1276,6 +1319,8 @@ namespace Generator
             if (value.Equals("MS", StringComparison.InvariantCultureIgnoreCase))
                 return false;
             if (value.Equals("desc", StringComparison.InvariantCultureIgnoreCase))
+                return false;
+            if (value == "-")
                 return false;
             return true;
         }

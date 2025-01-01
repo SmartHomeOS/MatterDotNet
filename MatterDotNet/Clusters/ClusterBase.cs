@@ -220,6 +220,21 @@ namespace MatterDotNet.Clusters
             }
         }
 
+        /// <summary>
+        /// Returns the human readable name for the cluster
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return this.GetType().Name;
+        }
+
+        /// <summary>
+        /// Create a cluster for the given cluster ID and end point
+        /// </summary>
+        /// <param name="clusterId"></param>
+        /// <param name="endPoint"></param>
+        /// <returns></returns>
         public static ClusterBase Create(uint clusterId, ushort endPoint)
         {
             switch (clusterId)
@@ -230,6 +245,10 @@ namespace MatterDotNet.Clusters
                     return new AdministratorCommissioningCluster(endPoint);
                 case BasicInformationCluster.CLUSTER_ID:
                     return new BasicInformationCluster(endPoint);
+                case BridgedDeviceBasicInformationCluster.CLUSTER_ID:
+                    return new BridgedDeviceBasicInformationCluster(endPoint);
+                case ColorControlCluster.CLUSTER_ID:
+                    return new ColorControlCluster(endPoint);
                 case DescriptorCluster.CLUSTER_ID:
                     return new DescriptorCluster(endPoint);
                 case GeneralDiagnosticsCluster.CLUSTER_ID:
@@ -238,8 +257,16 @@ namespace MatterDotNet.Clusters
                     return new GeneralCommissioningCluster(endPoint);
                 case GroupKeyManagementCluster.CLUSTER_ID:
                     return new GroupKeyManagementCluster(endPoint);
+                case GroupsCluster.CLUSTER_ID:
+                    return new GroupsCluster(endPoint);
                 case IdentifyCluster.CLUSTER_ID:
                     return new IdentifyCluster(endPoint);
+                case FixedLabelCluster.CLUSTER_ID:
+                    return new FixedLabelCluster(endPoint);
+                case UserLabelCluster.CLUSTER_ID:
+                    return new UserLabelCluster(endPoint);
+                case LevelControlCluster.CLUSTER_ID:
+                    return new LevelControlCluster(endPoint);
                 case On_OffCluster.CLUSTER_ID:
                     return new On_OffCluster(endPoint);
                 case NodeOperationalCredentialsCluster.CLUSTER_ID:

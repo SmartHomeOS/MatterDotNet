@@ -33,6 +33,8 @@ namespace MatterDotNet.Clusters.Utility
         /// General Commissioning Cluster
         /// </summary>
         public GeneralCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected GeneralCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -245,5 +247,10 @@ namespace MatterDotNet.Clusters.Utility
             return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "General Commissioning Cluster";
+        }
     }
 }

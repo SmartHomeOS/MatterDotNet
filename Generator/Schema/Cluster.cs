@@ -310,6 +310,7 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterClassification
     {
+        private string baseClusterField;
 
         private string hierarchyField;
 
@@ -318,6 +319,20 @@ namespace Generator.Schema
         private string picsCodeField;
 
         private string scopeField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string baseCluster
+        {
+            get
+            {
+                return this.baseClusterField;
+            }
+            set
+            {
+                this.baseClusterField = value;
+            }
+        }
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -1036,8 +1051,8 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterDataTypesStructFieldConstraint
     {
-        private int toField;
-        private int fromField;
+        private string toField;
+        private string fromField;
         private bool fromFieldSpecified;
         private bool toFieldSpecified;
 
@@ -1049,7 +1064,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int from
+        public string from
         {
             get
             {
@@ -1077,7 +1092,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int to
+        public string to
         {
             get
             {
@@ -1647,11 +1662,11 @@ namespace Generator.Schema
 
         private string valueField;
 
-        private int fromField;
+        private string fromField;
 
         private bool fromFieldSpecified;
 
-        private int toField;
+        private string toField;
 
         private bool toFieldSpecified;
 
@@ -1685,7 +1700,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int from
+        public string from
         {
             get
             {
@@ -1713,7 +1728,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int to
+        public string to
         {
             get
             {
@@ -2153,11 +2168,11 @@ namespace Generator.Schema
 
         private string valueField;
 
-        private int fromField;
+        private string fromField;
 
         private bool fromFieldSpecified;
 
-        private int toField;
+        private string toField;
 
         private bool toFieldSpecified;
 
@@ -2191,7 +2206,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int from
+        public string from
         {
             get
             {
@@ -2219,7 +2234,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int to
+        public string to
         {
             get
             {

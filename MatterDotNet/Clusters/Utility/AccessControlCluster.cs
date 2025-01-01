@@ -31,6 +31,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Access Control Cluster
         /// </summary>
         public AccessControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected AccessControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -250,5 +252,10 @@ namespace MatterDotNet.Clusters.Utility
             return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 4;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Access Control Cluster";
+        }
     }
 }

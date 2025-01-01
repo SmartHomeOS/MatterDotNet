@@ -32,6 +32,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Descriptor Cluster
         /// </summary>
         public DescriptorCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected DescriptorCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -145,5 +147,10 @@ namespace MatterDotNet.Clusters.Utility
             return list;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Descriptor Cluster";
+        }
     }
 }

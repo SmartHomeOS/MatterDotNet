@@ -32,6 +32,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Administrator Commissioning Cluster
         /// </summary>
         public AdministratorCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected AdministratorCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -171,5 +173,10 @@ namespace MatterDotNet.Clusters.Utility
             return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Administrator Commissioning Cluster";
+        }
     }
 }

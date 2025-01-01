@@ -32,6 +32,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Identify Cluster
         /// </summary>
         public IdentifyCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected IdentifyCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -171,5 +173,10 @@ namespace MatterDotNet.Clusters.Utility
             return (IdentifyTypeEnum)await GetEnumAttribute(session, 1);
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Identify Cluster";
+        }
     }
 }

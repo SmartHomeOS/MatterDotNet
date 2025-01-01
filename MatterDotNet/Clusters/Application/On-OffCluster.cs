@@ -32,6 +32,8 @@ namespace MatterDotNet.Clusters.Application
         /// On/Off Cluster
         /// </summary>
         public On_OffCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected On_OffCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -288,5 +290,10 @@ namespace MatterDotNet.Clusters.Application
             await SetAttribute(session, 16387, value, true);
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "On/Off Cluster";
+        }
     }
 }

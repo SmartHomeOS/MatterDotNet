@@ -26,6 +26,11 @@ namespace Generator
             {
                 if (c == ' ' || c == '-')
                     cap = true;
+                else if (c == '/')
+                {
+                    cap = true;
+                    ret.Append('_');
+                }
                 else if (cap)
                 {
                     ret.Append(char.ToUpper(c));
@@ -35,6 +40,11 @@ namespace Generator
                     ret.Append(c);
             }
             return ret.ToString();
+        }
+
+        public static string SanitizeClassName(string name)
+        {
+            return name.Replace(" ", "").Replace('/', '_').Replace("-", "");
         }
 
         public static string FieldNameToComment(string name)

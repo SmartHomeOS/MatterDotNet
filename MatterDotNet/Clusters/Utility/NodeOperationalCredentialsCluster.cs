@@ -33,6 +33,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Node Operational Credentials Cluster
         /// </summary>
         public NodeOperationalCredentialsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected NodeOperationalCredentialsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -454,8 +456,7 @@ namespace MatterDotNet.Clusters.Utility
             List<byte[]> list = new List<byte[]>();
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 4))!);
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetBytes(i, false, 0, 0
-)!);
+                list.Add(reader.GetBytes(i, false)!);
             return list;
         }
 
@@ -466,5 +467,10 @@ namespace MatterDotNet.Clusters.Utility
             return (byte?)(dynamic?)await GetAttribute(session, 5) ?? 0;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Node Operational Credentials Cluster";
+        }
     }
 }

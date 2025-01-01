@@ -35,6 +35,8 @@ namespace MatterDotNet.Clusters.Utility
         /// General Diagnostics Cluster
         /// </summary>
         public GeneralDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected GeneralDiagnosticsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -465,5 +467,10 @@ namespace MatterDotNet.Clusters.Utility
             return (bool)(dynamic?)(await GetAttribute(session, 8))!;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "General Diagnostics Cluster";
+        }
     }
 }

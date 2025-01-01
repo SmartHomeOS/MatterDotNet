@@ -33,6 +33,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Group Key Management Cluster
         /// </summary>
         public GroupKeyManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected GroupKeyManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -343,5 +345,10 @@ namespace MatterDotNet.Clusters.Utility
             return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 1;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Group Key Management Cluster";
+        }
     }
 }

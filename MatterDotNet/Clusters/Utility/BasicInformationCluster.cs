@@ -31,6 +31,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Basic Information Cluster
         /// </summary>
         public BasicInformationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected BasicInformationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -379,5 +381,10 @@ namespace MatterDotNet.Clusters.Utility
             return (ushort?)(dynamic?)await GetAttribute(session, 22) ?? 1;
         }
         #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Basic Information Cluster";
+        }
     }
 }

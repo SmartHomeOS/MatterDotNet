@@ -263,6 +263,7 @@ namespace Generator
                                     to = toVal;
                                 break;
                             case "between":
+                            case "countBetween":
                             case "lengthBetween":
                                 if (long.TryParse(field.constraint.to, out long parsedTo))
                                     to = parsedTo;
@@ -285,6 +286,7 @@ namespace Generator
 
         private static void WriteStructType(bool optional, bool nullable, string type, string? entryType, int id, long? from, long? to, string name, Cluster cluster, TextWriter writer)
         {
+            bool unsigned = false;
             string totalIndent = "                ";
             if (optional)
             {
@@ -378,11 +380,8 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", byte.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
-                    return;
+                    unsigned = true;
+                    break;
                 case "uint16":
                 case "map16":
                 case "enum16":
@@ -396,15 +395,11 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", ushort.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
-                    return;
+                    unsigned = true;
+                    break;
                 case "uint24":
                 case "uint32":
                 case "map32":
-                case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -417,36 +412,77 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", uint.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
+                    unsigned = true;
+                    break;
+                case "epoch-s":
+                    includes.Add("MatterDotNet.Util");
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.Write($"{totalIndent}writer.WriteUInt({id}, TimeUtil.ToEpochSeconds({name}");
+                    if (nullable && !optional)
+                        writer.Write("!.Value)");
                     else
-                        writer.WriteLine(");");
-                    return;
-                case "elapsed-s":
-                    writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}.TotalSeconds");
+                        writer.Write(")");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", uint.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
+                    unsigned = true;
+                    break;
+                case "elapsed-s":
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}");
+                    if (nullable && !optional)
+                        writer.Write("!.Value.TotalSeconds");
                     else
-                        writer.WriteLine(");");
-                    return;
-                case "ref_DataTypeSystemTimeUs":
-                case "ref_DataTypeSystemTimeMs":
-                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}{(type == "ref_DataTypeSystemTimeMs" ? ".TotalMilliseconds" : ".TotalMicroseconds")}");
+                        writer.Write(".TotalSeconds");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", uint.MaxValue");
+                    unsigned = true;
+                    break;
+                case "epoch-us":
+                    includes.Add("MatterDotNet.Util");
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, TimeUtil.ToEpochUS({name}");
+                    if (nullable && !optional)
+                        writer.Write("!.Value)");
+                    else
+                        writer.Write(")");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", ulong.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
+                    unsigned = true;
+                    break;
+                case "ref_DataTypeSystemTimeUs":
+                case "ref_DataTypeSystemTimeMs":
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
+                    if (nullable && !optional)
+                        writer.Write("!.Value");
+                    if (type == "ref_DataTypeSystemTimeMs")
+                        writer.Write(".TotalMilliseconds");
                     else
-                        writer.WriteLine(");");
-                    return;
+                        writer.Write(".TotalMicroseconds");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", ulong.MaxValue");
+                    unsigned = true;
+                    break;
                 case "ref_DataTypePosixMs":
-                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}.ToUnixTimeMilliseconds()");
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
+                    if (nullable && !optional)
+                        writer.Write("!.Value.ToUnixTimeMilliseconds()");
+                    else
+                        writer.Write(".ToUnixTimeMilliseconds()");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
@@ -457,7 +493,6 @@ namespace Generator
                 case "uint56":
                 case "uint64":
                 case "map64":
-                case "epoch-us":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -486,9 +521,13 @@ namespace Generator
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
                     return;
                 case "Hardware Address":
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
                     return;
                 case "devtype-id":
@@ -513,10 +552,14 @@ namespace Generator
                     if (HasEnum(cluster, type) || HasBitmap(cluster, type))
                         writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {(optional || nullable ? "(ushort?)" : "(ushort)")}{name});");
                     else
+                    {
+                        if (nullable && !optional)
+                            writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                         writer.WriteLine($"{totalIndent}{name}.Serialize(writer, {id});");
+                    }
                     return;
             }
-            if (from != null)
+            if (from != null && (!unsigned || from != 0))
                 writer.WriteLine($", {from.Value});");
             else
                 writer.WriteLine(");");
@@ -532,7 +575,8 @@ namespace Generator
                 else
                     writer.Write($"{totalIndent}{name} = ");
             }
-            bool extraClose = (id == "-1" || id == "i");
+            bool extraOutsideClose = (id == "-1" || id == "i");
+            bool extraInsideClose = false;
             switch (type)
             {
                 case "array":
@@ -594,7 +638,6 @@ namespace Generator
                 case "uint24":
                 case "uint32":
                 case "map32":
-                case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -609,7 +652,6 @@ namespace Generator
                 case "uint56":
                 case "uint64":
                 case "map64":
-                case "epoch-us":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -635,21 +677,31 @@ namespace Generator
                 case "Hardware Address":
                     writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
+                case "epoch-s":
+                    includes.Add("MatterDotNet.Util");
+                    writer.Write($"TimeUtil.FromEpochSeconds(reader.GetUInt({id}");
+                    extraInsideClose = true;
+                    break;
                 case "elapsed-s":
-                    writer.WriteLine($"TimeSpan.FromSeconds(reader.GetUInt({id}");
-                    extraClose = true;
+                    writer.Write($"TimeSpan.FromSeconds(reader.GetUInt({id}");
+                    extraInsideClose = true;
+                    break;
+                case "epoch-us":
+                    includes.Add("MatterDotNet.Util");
+                    writer.Write($"TimeUtil.FromEpochUS(reader.GetULong({id}");
+                    extraInsideClose = true;
                     break;
                 case "ref_DataTypeSystemTimeUs":
-                    writer.WriteLine($"TimeSpan.FromMicroseconds(reader.GetULong({id}");
-                    extraClose = true;
+                    writer.Write($"TimeSpan.FromMicroseconds(reader.GetULong({id}");
+                    extraInsideClose = true;
                     break;
                 case "ref_DataTypeSystemTimeMs":
-                    writer.WriteLine($"TimeSpan.FromMilliseconds(reader.GetULong({id}");
-                    extraClose = true;
+                    writer.Write($"TimeSpan.FromMilliseconds(reader.GetULong({id}");
+                    extraInsideClose = true;
                     break;
                 case "ref_DataTypePosixMs":
-                    writer.WriteLine($"DateTimeOffset.FromUnixTimeMilliseconds(reader.GetULong({id}");
-                    extraClose = true;
+                    writer.Write($"DateTimeOffset.FromUnixTimeMilliseconds(reader.GetULong({id}");
+                    extraInsideClose = true;
                     break;
                 case "devtype-id":
                     writer.Write($"(DeviceTypeEnum)reader.GetUInt({id}");
@@ -716,14 +768,20 @@ namespace Generator
                     }
                     return;
             }
-            if (optional)
+            if (extraInsideClose && (optional || nullable))
+            {
+                extraOutsideClose = true;
+                extraInsideClose = false;
+            }
+            if (extraInsideClose)
+                writer.Write(")");
+            if (optional || nullable)
                 writer.Write(", true)");
             else
                 writer.Write(")!.Value");
-            if (extraClose)
-                writer.WriteLine(");");
-            else
-                writer.WriteLine(';');
+            if (extraOutsideClose)
+                writer.Write(")");
+            writer.WriteLine(';');
         }
 
         private static bool HasEnum(Cluster cluster, string name)
@@ -1192,7 +1250,6 @@ namespace Generator
                 case "uint24":
                 case "uint32":
                 case "map32":
-                case "epoch-s":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -1210,12 +1267,16 @@ namespace Generator
                 case "ref_DataTypePosixMs":
                     writer.Write("DateTimeOffset");
                     break;
+                case "epoch-s":
+                case "epoch-us":
+                    includes.Add("MatterDotNet.Util");
+                    writer.Write("DateTime");
+                    break;
                 case "uint40":
                 case "uint48":
                 case "uint56":
                 case "uint64":
                 case "map64":
-                case "epoch-us":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -1310,8 +1371,9 @@ namespace Generator
                 return value.Split(' ')[0];
             if (value.StartsWith('"'))
                 return value;
-            else
-                return value.ToLowerInvariant();
+            if (value == "0" && (type == "epoch-s" || type == "epoch-us"))
+                return "TimeUtil.EPOCH";
+            return value.ToLowerInvariant();
         }
 
         private static bool DefaultValid(string value)

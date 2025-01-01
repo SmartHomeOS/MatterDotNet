@@ -177,8 +177,8 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             internal AccessControlTarget(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Cluster = reader.GetUInt(0)!.Value;
-                Endpoint = reader.GetUShort(1)!.Value;
+                Cluster = reader.GetUInt(0, true);
+                Endpoint = reader.GetUShort(1, true);
                 DeviceType = (DeviceTypeEnum)reader.GetUInt(2)!.Value;
             }
             public required uint? Cluster { get; set; }

@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Utility
@@ -144,32 +145,41 @@ namespace MatterDotNet.Clusters.Utility
                 GroupKeySetID = reader.GetUShort(0)!.Value;
                 GroupKeySecurityPolicy = (GroupKeySecurityPolicyEnum)reader.GetUShort(1)!.Value;
                 EpochKey0 = reader.GetBytes(2, false)!;
-                EpochStartTime0 = reader.GetULong(3)!.Value;
+                EpochStartTime0 = TimeUtil.FromEpochUS(reader.GetULong(3, true));
                 EpochKey1 = reader.GetBytes(4, false)!;
-                EpochStartTime1 = reader.GetULong(5)!.Value;
+                EpochStartTime1 = TimeUtil.FromEpochUS(reader.GetULong(5, true));
                 EpochKey2 = reader.GetBytes(6, false)!;
-                EpochStartTime2 = reader.GetULong(7)!.Value;
+                EpochStartTime2 = TimeUtil.FromEpochUS(reader.GetULong(7, true));
                 GroupKeyMulticastPolicy = (GroupKeyMulticastPolicyEnum)reader.GetUShort(8, true)!.Value;
             }
             public required ushort GroupKeySetID { get; set; }
             public required GroupKeySecurityPolicyEnum GroupKeySecurityPolicy { get; set; }
             public required byte[]? EpochKey0 { get; set; }
-            public required ulong? EpochStartTime0 { get; set; }
+            public required DateTime? EpochStartTime0 { get; set; }
             public required byte[]? EpochKey1 { get; set; }
-            public required ulong? EpochStartTime1 { get; set; }
+            public required DateTime? EpochStartTime1 { get; set; }
             public required byte[]? EpochKey2 { get; set; }
-            public required ulong? EpochStartTime2 { get; set; }
+            public required DateTime? EpochStartTime2 { get; set; }
             public GroupKeyMulticastPolicyEnum? GroupKeyMulticastPolicy { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
                 writer.WriteUShort(1, (ushort)GroupKeySecurityPolicy);
                 writer.WriteBytes(2, EpochKey0, 16);
-                writer.WriteULong(3, EpochStartTime0);
+                if (!EpochStartTime0.HasValue)
+                    writer.WriteNull(3);
+                else
+                    writer.WriteULong(3, TimeUtil.ToEpochUS(EpochStartTime0!.Value));
                 writer.WriteBytes(4, EpochKey1, 16);
-                writer.WriteULong(5, EpochStartTime1);
+                if (!EpochStartTime1.HasValue)
+                    writer.WriteNull(5);
+                else
+                    writer.WriteULong(5, TimeUtil.ToEpochUS(EpochStartTime1!.Value));
                 writer.WriteBytes(6, EpochKey2, 16);
-                writer.WriteULong(7, EpochStartTime2);
+                if (!EpochStartTime2.HasValue)
+                    writer.WriteNull(7);
+                else
+                    writer.WriteULong(7, TimeUtil.ToEpochUS(EpochStartTime2!.Value));
                 if (GroupKeyMulticastPolicy != null)
                     writer.WriteUShort(8, (ushort?)GroupKeyMulticastPolicy);
                 writer.EndContainer();

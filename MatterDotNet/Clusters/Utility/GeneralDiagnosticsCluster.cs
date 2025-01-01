@@ -227,8 +227,8 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 Name = reader.GetString(0, false)!;
                 IsOperational = reader.GetBool(1)!.Value;
-                OffPremiseServicesReachableIPv4 = reader.GetBool(2)!.Value;
-                OffPremiseServicesReachableIPv6 = reader.GetBool(3)!.Value;
+                OffPremiseServicesReachableIPv4 = reader.GetBool(2, true);
+                OffPremiseServicesReachableIPv6 = reader.GetBool(3, true);
                 HardwareAddress = new PhysicalAddress(reader.GetBytes(4, false, 8, 6)!);
                 {
                     IPv4Addresses = new List<IPAddress>();

@@ -123,14 +123,14 @@ namespace MatterDotNet.Clusters
         /// <param name="attribute"></param>
         /// <param name="nullable"></param>
         /// <returns></returns>
-        protected async Task<uint> GetEnumAttribute(SecureSession session, ushort attribute, bool nullable = false)
+        protected async Task<uint?> GetEnumAttribute(SecureSession session, ushort attribute, bool nullable = false)
         {
             object? value = await GetAttribute(session, attribute, nullable);
             if (value is byte byteVal)
                 return byteVal;
             if (value is ushort shortVal)
                 return shortVal;
-            return (uint)value!;
+            return (uint?)value!;
         }
 
         /// <summary>
@@ -271,6 +271,9 @@ namespace MatterDotNet.Clusters
                     return new On_OffCluster(endPoint);
                 case NodeOperationalCredentialsCluster.CLUSTER_ID:
                     return new NodeOperationalCredentialsCluster(endPoint);
+                case TimeSynchronizationCluster.CLUSTER_ID:
+                    return new TimeSynchronizationCluster(endPoint);
+
                 default:
                     return new UnknownCluster(clusterId, endPoint);
             }

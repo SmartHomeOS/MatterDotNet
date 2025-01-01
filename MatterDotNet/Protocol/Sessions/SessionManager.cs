@@ -33,6 +33,8 @@ namespace MatterDotNet.Protocol.Sessions
 
         internal static SessionContext GetUnsecureSession(IConnection connection, bool initiator)
         {
+            if (sessions.TryGetValue(0, out SessionContext? existing))
+                return existing;
             SessionContext ctx = new SessionContext(connection, initiator, 0, 0, 0, 0, new MessageState());
             sessions.TryAdd(0, ctx);
             return ctx;

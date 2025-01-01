@@ -72,12 +72,13 @@ namespace Test
             tlv.Serialize(new TLVWriter(output));
             Assert.That(nocTLV, Is.EqualTo(output.GetPayload().Span.ToArray()).AsCollection);
             Assert.That(cert.PublicKey, Is.EqualTo(tlv.EcPubKey));
+            Assert.That(control.NotBefore, Is.EqualTo(tlv.NotBefore));
         }
 
         [Test]
         public void NOCSigning()
         {
-            Fabric fabric = new Fabric((ulong)Random.Shared.NextInt64(), 0x1, RandomNumberGenerator.GetBytes(16));
+            Fabric fabric = new Fabric("Test Fabric", 0x1, RandomNumberGenerator.GetBytes(16));
             ECDsa key = ECDsa.Create();
             CertificateRequest req = new CertificateRequest("CN=Test", key, HashAlgorithmName.SHA256);
             OperationalCertificate noc = fabric.Sign(req);

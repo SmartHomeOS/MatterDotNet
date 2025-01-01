@@ -25,14 +25,15 @@ namespace MatterDotNet.PKI
         
         private Dictionary<ulong, OperationalCertificate> nodes = new Dictionary<ulong, OperationalCertificate>();
 
-        public Fabric(ulong rcac, ulong fabricId, byte[] ipk) : base()
+        public Fabric(string fabricName, ulong fabricId, byte[] ipk) : base()
         {
             if (fabricId == 0)
                 throw new ArgumentException("Invalid Fabric ID");
             if (ipk.Length != 16)
                 throw new ArgumentException("Epoch Key must be 16 bytes");
-            this.RCAC = rcac;
+            this.RCAC = (ulong)Random.Shared.NextInt64();
             this.FabricID = fabricId;
+            this.CommonName = fabricName;
             EpochKey = ipk;
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
             builder.Add(OID_RCAC, $"{RCAC:X16}", UniversalTagNumber.UTF8String);
@@ -45,17 +46,17 @@ namespace MatterDotNet.PKI
             req.CertificateExtensions.Add(subjectKeyIdentifier);
             req.CertificateExtensions.Add(X509AuthorityKeyIdentifierExtension.CreateFromSubjectKeyIdentifier(subjectKeyIdentifier));
             this.cert = req.CreateSelfSigned(DateTime.Now.Subtract(TimeSpan.FromSeconds(30)), DateTime.Now.AddYears(10));
-            byte[] fabricIDBytes = new byte[8];
-            BinaryPrimitives.WriteUInt64BigEndian(fabricIDBytes, FabricID);
-            CompressedFabricID = Crypto.KDF(PublicKey.AsSpan(1), fabricIDBytes, COMPRESSED_FABRIC_INFO, 64);
-            OperationalIdentityProtectionKey = Crypto.KDF(EpochKey, CompressedFabricID, Encoding.ASCII.GetBytes("GroupKey v1.0"), Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+            GenerateIDs();
         }
 
-        protected Fabric(X509Certificate2 cert, byte[] ipk)
+        protected Fabric(X509Certificate2 cert, byte[] ipk) : base(cert)
         {
-            this.cert = cert;
             EpochKey = ipk;
-            ParseCert();
+            GenerateIDs();
+        }
+
+        private void GenerateIDs()
+        {
             byte[] fabricIDBytes = new byte[8];
             BinaryPrimitives.WriteUInt64BigEndian(fabricIDBytes, FabricID);
             CompressedFabricID = Crypto.KDF(PublicKey.AsSpan(1), fabricIDBytes, COMPRESSED_FABRIC_INFO, 64);
@@ -179,9 +180,9 @@ namespace MatterDotNet.PKI
             return Crypto.HMAC(OperationalIdentityProtectionKey, message);
         }
 
-        public byte[] CompressedFabricID { get; init; }
+        public byte[] CompressedFabricID { get; set; }
         public OperationalCertificate? Commissioner { get; private set; }
-        public byte[] OperationalIdentityProtectionKey { get; init; }
+        public byte[] OperationalIdentityProtectionKey { get; set; }
         public byte[] EpochKey { get; init; }
     }
 }

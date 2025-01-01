@@ -12,6 +12,7 @@
 
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Util;
 using System.Formats.Asn1;
 using System.Globalization;
 using System.Numerics;
@@ -275,8 +276,8 @@ namespace MatterDotNet.PKI
                 SigAlgo = 0x1,
                 EcPubKey = cert.GetPublicKey(),
                 SerialNum = cert.SerialNumberBytes.ToArray(),
-                NotBefore = (uint)((DateTimeOffset)cert.NotBefore - EPOCH).ToUnixTimeSeconds(),
-                NotAfter = (uint)((DateTimeOffset)cert.NotAfter - EPOCH).ToUnixTimeSeconds(),
+                NotBefore = TimeUtil.ToEpochSeconds(cert.NotBefore),
+                NotAfter = TimeUtil.ToEpochSeconds(cert.NotAfter),
                 Signature = GetSignature(),
                 Extensions = extensions,
                 Issuer = GetDNs(cert.IssuerName),
@@ -325,7 +326,7 @@ namespace MatterDotNet.PKI
 
         public string IssuerName { get; private set; } = string.Empty;
 
-        public string CommonName { get; private set; } = string.Empty;
+        public string CommonName { get; protected set; } = string.Empty;
 
         public ulong NodeID { get; private set; }
 

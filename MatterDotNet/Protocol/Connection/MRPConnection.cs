@@ -39,7 +39,7 @@ namespace MatterDotNet.Protocol.Connection
 
         public MRPConnection(IPEndPoint ep)
         {
-            client = new UdpClient(AddressFamily.InterNetwork);
+            client = new UdpClient(ep.AddressFamily);
             client.Connect(ep);
             Task.Factory.StartNew(Run);
         }

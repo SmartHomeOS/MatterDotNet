@@ -295,8 +295,8 @@ namespace MatterDotNet.Clusters.Utility
         /// Time Snapshot Response - Reply from server
         /// </summary>
         public struct TimeSnapshotResponse() {
-            public required ulong SystemTimeMs { get; set; }
-            public required ulong? PosixTimeMs { get; set; } = null;
+            public required TimeSpan SystemTimeMs { get; set; }
+            public required DateTimeOffset? PosixTimeMs { get; set; } = null;
         }
 
         private record PayloadTestRequestPayload : TLVPayload {
@@ -341,8 +341,8 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new TimeSnapshotResponse() {
-                SystemTimeMs = (ulong)GetField(resp, 0),
-                PosixTimeMs = (ulong)GetField(resp, 1),
+                SystemTimeMs = (TimeSpan.FromMilliseconds((ulong)GetField(resp, 0))),
+                PosixTimeMs = (DateTimeOffset.FromUnixTimeMilliseconds((long)(ulong)GetField(resp, 1))),
             };
         }
 

@@ -18,6 +18,7 @@ namespace Generator
         {
             Directory.CreateDirectory("outputs");
             ClusterGenerator.Generate();
+            DeviceTypeGenerator.Generate();
             foreach (string file in Directory.EnumerateFiles("..\\..\\..\\Structures"))
             {
                 Tag[] structs;

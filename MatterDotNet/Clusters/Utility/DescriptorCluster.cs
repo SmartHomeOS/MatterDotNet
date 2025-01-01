@@ -54,14 +54,14 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             internal DeviceType(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                DeviceTypeField = reader.GetUInt(0)!.Value;
+                DeviceTypeField = (DeviceTypeEnum)reader.GetUInt(0)!.Value;
                 Revision = reader.GetUShort(1)!.Value;
             }
-            public required uint DeviceTypeField { get; set; }
+            public required DeviceTypeEnum DeviceTypeField { get; set; }
             public required ushort Revision { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, DeviceTypeField);
+                writer.WriteUInt(0, (uint)DeviceTypeField);
                 writer.WriteUShort(1, Revision, ushort.MaxValue, 1);
                 writer.EndContainer();
             }

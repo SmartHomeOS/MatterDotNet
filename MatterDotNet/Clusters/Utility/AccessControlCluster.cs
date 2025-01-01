@@ -177,16 +177,16 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 Cluster = reader.GetUInt(0)!.Value;
                 Endpoint = reader.GetUShort(1)!.Value;
-                DeviceType = reader.GetUInt(2)!.Value;
+                DeviceType = (DeviceTypeEnum)reader.GetUInt(2)!.Value;
             }
             public required uint? Cluster { get; set; }
             public required ushort? Endpoint { get; set; }
-            public required uint? DeviceType { get; set; }
+            public required DeviceTypeEnum? DeviceType { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, Cluster);
                 writer.WriteUShort(1, Endpoint);
-                writer.WriteUInt(2, DeviceType);
+                writer.WriteUInt(2, (uint?)DeviceType);
                 writer.EndContainer();
             }
         }

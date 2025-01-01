@@ -190,7 +190,7 @@ namespace MatterDotNet.Clusters.Utility
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Finish);
-                writer.WriteUShort(1, (ushort)PrimaryColor);
+                writer.WriteUShort(1, (ushort?)PrimaryColor);
                 writer.EndContainer();
             }
         }

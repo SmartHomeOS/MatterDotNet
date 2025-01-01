@@ -297,7 +297,7 @@ namespace Generator
                     writer.WriteLine($"{totalIndent}}}");
                     if (nullable)
                         writer.WriteLine($"{totalIndent}else\n{totalIndent}    writer.WriteNull({id});");
-                    break;
+                    return;
                 case "list":
                     if (optional || nullable)
                         writer.WriteLine($"{totalIndent}if ({name} != null)");
@@ -313,20 +313,16 @@ namespace Generator
                     writer.WriteLine($"{totalIndent}}}");
                     if (nullable)
                         writer.WriteLine($"{totalIndent}else\n{totalIndent}    writer.WriteNull({id});");
-                    break;
+                    return;
                 case "bool":
                     writer.WriteLine($"{totalIndent}writer.WriteBool({id}, {name});");
-                    break;
+                    return;
                 case "int8":
                     writer.Write($"{totalIndent}writer.WriteSByte({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", sbyte.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "int16":
                 case "temperature":
@@ -335,10 +331,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", short.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "int24":
                 case "int32":
@@ -347,10 +339,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", int.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "int40":
                 case "int48":
@@ -365,10 +353,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", long.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "uint8":
                 case "enum8":
@@ -385,7 +369,7 @@ namespace Generator
                         writer.WriteLine($", {from.Value});");
                     else
                         writer.WriteLine(");");
-                    break;
+                    return;
                 case "uint16":
                 case "enum16":
                 case "group-id":
@@ -402,12 +386,10 @@ namespace Generator
                         writer.WriteLine($", {from.Value});");
                     else
                         writer.WriteLine(");");
-                    break;
+                    return;
                 case "uint24":
                 case "uint32":
                 case "epoch-s":
-                case "elapsed-s":
-                case "devtype-id":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -424,15 +406,42 @@ namespace Generator
                         writer.WriteLine($", {from.Value});");
                     else
                         writer.WriteLine(");");
+                    return;
+                case "elapsed-s":
+                    writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}.TotalSeconds");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", uint.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
+                    return;
+                case "ref_DataTypeSystemTimeUs":
+                case "ref_DataTypeSystemTimeMs":
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}{(type == "ref_DataTypeSystemTimeMs" ? ".TotalMilliseconds" : ".TotalMicroseconds")}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", ulong.MaxValue");
+                    if (from != null && from != 0)
+                        writer.WriteLine($", {from.Value});");
+                    else
+                        writer.WriteLine(");");
+                    return;
+                case "ref_DataTypePosixMs":
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}.ToUnixTimeMilliseconds()");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", ulong.MaxValue");
                     break;
                 case "uint40":
                 case "uint48":
                 case "uint56":
                 case "uint64":
                 case "epoch-us":
-                case "ref_DataTypePosixMs":
-                case "systime-us":
-                case "ref_DataTypeSystemTimeMs":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -443,10 +452,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
                         writer.Write(", ulong.MaxValue");
-                    if (from != null && from != 0)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "single":
                     writer.Write($"{totalIndent}writer.WriteFloat({id}, {name}");
@@ -454,10 +459,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", float.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "double":
                     writer.Write($"{totalIndent}writer.WriteDouble({id}, {name}");
@@ -465,19 +466,18 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", double.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
-                    break;
+                    return;
                 case "Hardware Address":
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
-                    break;
+                    return;
+                case "devtype-id":
+                    writer.WriteLine($"{totalIndent}writer.WriteUInt({id}, {(optional || nullable ? "(uint?)" : "(uint)")}{name});");
+                    return;
                 case "octstr":
                 case "ipv6pre":
                     writer.Write($"{totalIndent}writer.WriteBytes({id}, {name}");
@@ -485,10 +485,6 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", int.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 case "string":
                     writer.Write($"{totalIndent}writer.WriteString({id}, {name}");
@@ -496,18 +492,18 @@ namespace Generator
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", int.MaxValue");
-                    if (from != null)
-                        writer.WriteLine($", {from.Value});");
-                    else
-                        writer.WriteLine(");");
                     break;
                 default:
                     if (HasEnum(cluster, type) || HasBitmap(cluster, type))
-                        writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, (ushort){name});");
+                        writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {(optional || nullable ? "(ushort?)" : "(ushort)")}{name});");
                     else
                         writer.WriteLine($"{totalIndent}{name}.Serialize(writer, {id});");
-                    break;
+                    return;
             }
+            if (from != null)
+                writer.WriteLine($", {from.Value});");
+            else
+                writer.WriteLine(");");
         }
 
         private static void WriteFieldReader(bool optional, bool nullable, string type, string? entryType, string id, int? from, int? to, string name, string structName, Cluster cluster, TextWriter writer)
@@ -520,6 +516,7 @@ namespace Generator
                 else
                     writer.Write($"{totalIndent}{name} = ");
             }
+            bool extraClose = (id == "-1" || id == "i");
             switch (type)
             {
                 case "array":
@@ -579,8 +576,6 @@ namespace Generator
                 case "uint24":
                 case "uint32":
                 case "epoch-s":
-                case "elapsed-s":
-                case "devtype-id":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -595,9 +590,6 @@ namespace Generator
                 case "uint56":
                 case "uint64":
                 case "epoch-us":
-                case "ref_DataTypePosixMs":
-                case "systime-us":
-                case "ref_DataTypeSystemTimeMs":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -622,6 +614,31 @@ namespace Generator
                     return;
                 case "Hardware Address":
                     writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
+                    return;
+                case "elapsed-s":
+                    writer.WriteLine($"TimeSpan.FromSeconds(reader.GetUInt({id}");
+                    extraClose = true;
+                    break;
+                case "ref_DataTypeSystemTimeUs":
+                    writer.WriteLine($"TimeSpan.FromMicroseconds(reader.GetULong({id}");
+                    extraClose = true;
+                    break;
+                case "ref_DataTypeSystemTimeMs":
+                    writer.WriteLine($"TimeSpan.FromMilliseconds(reader.GetULong({id}");
+                    extraClose = true;
+                    break;
+                case "ref_DataTypePosixMs":
+                    writer.WriteLine($"DateTimeOffset.FromUnixTimeMilliseconds(reader.GetULong({id}");
+                    extraClose = true;
+                    break;
+                case "devtype-id":
+                    writer.Write($"(DeviceTypeEnum)reader.GetUInt({id}");
+                    if (optional)
+                        writer.Write(", true");
+                    if (id == "-1" || id == "i")
+                        writer.WriteLine(")!.Value);");
+                    else
+                        writer.WriteLine(")!.Value;");
                     return;
                 case "octstr":
                 case "ipv6pre":
@@ -683,7 +700,7 @@ namespace Generator
                 writer.Write(", true)");
             else
                 writer.Write(")!.Value");
-            if (id == "-1" || id == "i")
+            if (extraClose)
                 writer.WriteLine(");");
             else
                 writer.WriteLine(';');
@@ -857,7 +874,16 @@ namespace Generator
                             {
                                 if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                                     writer.Write(")(byte");
-                                writer.WriteLine($")GetField(resp, {field.id}),");
+                                if (field.type == "elapsed-s")
+                                    writer.WriteLine($".FromSeconds((uint)GetField(resp, {field.id}))),");
+                                else if (field.type == "ref_DataTypeSystemTimeUs")
+                                    writer.WriteLine($".FromMicroseconds((ulong)GetField(resp, {field.id}))),");
+                                else if (field.type == "ref_DataTypeSystemTimeMs")
+                                    writer.WriteLine($".FromMilliseconds((ulong)GetField(resp, {field.id}))),");
+                                else if (field.type == "ref_DataTypePosixMs")
+                                    writer.WriteLine($".FromUnixTimeMilliseconds((long)(ulong)GetField(resp, {field.id}))),");
+                                else
+                                    writer.WriteLine($")GetField(resp, {field.id}),");
                             }
                         }
                         writer.WriteLine("            };");
@@ -1123,11 +1149,12 @@ namespace Generator
                 case "percent100ths":
                     writer.Write("ushort");
                     break;
+                case "devtype-id":
+                    writer.Write("DeviceTypeEnum");
+                    break;
                 case "uint24":
                 case "uint32":
                 case "epoch-s":
-                case "elapsed-s":
-                case "devtype-id":
                 case "cluster-id":
                 case "attrib-id":
                 case "field-id":
@@ -1137,14 +1164,19 @@ namespace Generator
                 case "data-ver":
                     writer.Write("uint");
                     break;
+                case "elapsed-s":
+                case "ref_DataTypeSystemTimeUs":
+                case "ref_DataTypeSystemTimeMs":
+                    writer.Write("TimeSpan");
+                    break;
+                case "ref_DataTypePosixMs":
+                    writer.Write("DateTimeOffset");
+                    break;
                 case "uint40":
                 case "uint48":
                 case "uint56":
                 case "uint64":
                 case "epoch-us":
-                case "ref_DataTypePosixMs":
-                case "systime-us":
-                case "ref_DataTypeSystemTimeMs":
                 case "fabric-id":
                 case "node-id":
                 case "EUI64":
@@ -1207,6 +1239,9 @@ namespace Generator
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("SemanticTag");
                     break;
+                case "tod":
+                case "date":
+                    throw new NotImplementedException();
                 default:
                     writer.Write(GeneratorUtil.SanitizeName(type));
                     break;

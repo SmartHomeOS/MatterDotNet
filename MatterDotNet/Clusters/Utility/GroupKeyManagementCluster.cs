@@ -169,7 +169,7 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteBytes(6, EpochKey2, 16);
                 writer.WriteULong(7, EpochStartTime2);
                 if (GroupKeyMulticastPolicy != null)
-                    writer.WriteUShort(8, (ushort)GroupKeyMulticastPolicy);
+                    writer.WriteUShort(8, (ushort?)GroupKeyMulticastPolicy);
                 writer.EndContainer();
             }
         }

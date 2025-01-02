@@ -35,6 +35,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Label
         /// </summary>
         public record Label : TLVPayload {
+            /// <summary>
+            /// Label
+            /// </summary>
+            public Label() { }
+
             [SetsRequiredMembers]
             internal Label(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

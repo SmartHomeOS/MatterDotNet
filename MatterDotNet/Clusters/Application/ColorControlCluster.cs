@@ -44,7 +44,7 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Supports color specification via hue/saturation.
             /// </summary>
-            HueSaturation = 1,
+            Hue_Saturation = 1,
             /// <summary>
             /// Enhanced hue is supported.
             /// </summary>

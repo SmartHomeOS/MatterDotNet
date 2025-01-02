@@ -312,13 +312,6 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Min Level attribute
-        /// </summary>
-        public async Task<byte> GetMinLevel2(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 0;
-        }
-
-        /// <summary>
         /// Get the Max Level attribute
         /// </summary>
         public async Task<byte> GetMaxLevel(SecureSession session) {

@@ -185,6 +185,11 @@ namespace MatterDotNet.Clusters.Utility
         /// DST Offset
         /// </summary>
         public record DSTOffset : TLVPayload {
+            /// <summary>
+            /// DST Offset
+            /// </summary>
+            public DSTOffset() { }
+
             [SetsRequiredMembers]
             internal DSTOffset(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -211,6 +216,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Fabric Scoped Trusted Time Source
         /// </summary>
         public record FabricScopedTrustedTimeSource : TLVPayload {
+            /// <summary>
+            /// Fabric Scoped Trusted Time Source
+            /// </summary>
+            public FabricScopedTrustedTimeSource() { }
+
             [SetsRequiredMembers]
             internal FabricScopedTrustedTimeSource(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -231,6 +241,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Time Zone
         /// </summary>
         public record TimeZone : TLVPayload {
+            /// <summary>
+            /// Time Zone
+            /// </summary>
+            public TimeZone() { }
+
             [SetsRequiredMembers]
             internal TimeZone(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -255,6 +270,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Trusted Time Source
         /// </summary>
         public record TrustedTimeSource : TLVPayload {
+            /// <summary>
+            /// Trusted Time Source
+            /// </summary>
+            public TrustedTimeSource() { }
+
             [SetsRequiredMembers]
             internal TrustedTimeSource(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

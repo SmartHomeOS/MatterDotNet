@@ -83,6 +83,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Group Info Map
         /// </summary>
         public record GroupInfoMap : TLVPayload {
+            /// <summary>
+            /// Group Info Map
+            /// </summary>
+            public GroupInfoMap() { }
+
             [SetsRequiredMembers]
             internal GroupInfoMap(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -119,6 +124,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Group Key Map
         /// </summary>
         public record GroupKeyMap : TLVPayload {
+            /// <summary>
+            /// Group Key Map
+            /// </summary>
+            public GroupKeyMap() { }
+
             [SetsRequiredMembers]
             internal GroupKeyMap(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -139,6 +149,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Group Key Set
         /// </summary>
         public record GroupKeySet : TLVPayload {
+            /// <summary>
+            /// Group Key Set
+            /// </summary>
+            public GroupKeySet() { }
+
             [SetsRequiredMembers]
             internal GroupKeySet(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

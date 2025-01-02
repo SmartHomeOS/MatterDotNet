@@ -161,6 +161,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Capability Minima
         /// </summary>
         public record CapabilityMinima : TLVPayload {
+            /// <summary>
+            /// Capability Minima
+            /// </summary>
+            public CapabilityMinima() { }
+
             [SetsRequiredMembers]
             internal CapabilityMinima(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -181,6 +186,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Product Appearance
         /// </summary>
         public record ProductAppearance : TLVPayload {
+            /// <summary>
+            /// Product Appearance
+            /// </summary>
+            public ProductAppearance() { }
+
             [SetsRequiredMembers]
             internal ProductAppearance(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

@@ -25,6 +25,34 @@ namespace MatterDotNet.Util
         public static DateTime EPOCH { get { return FromEpochSeconds(0)!.Value; } }
 
         /// <summary>
+        /// Returns the latest date
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static DateTime Max(DateTime a, DateTime b)
+        {
+            if (a < b)
+                return b;
+            else
+                return a;
+        }
+
+        /// <summary>
+        /// Returns the earliest date
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static DateTime Min(DateTime a, DateTime b)
+        {
+            if (a < b)
+                return a;
+            else
+                return b;
+        }
+
+        /// <summary>
         /// Convert a DateTime to Epoch Seconds
         /// </summary>
         /// <param name="date"></param>

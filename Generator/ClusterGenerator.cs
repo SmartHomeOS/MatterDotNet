@@ -147,7 +147,7 @@ namespace Generator
                         firstRecord = false;
                     else
                         writer.WriteLine();
-                    WriteStruct(structType, cluster, writer);
+                    WriteRecord(structType, cluster, writer);
                 }
                 writer.WriteLine("        #endregion Records");
                 writer.WriteLine();
@@ -983,11 +983,12 @@ namespace Generator
             return null;
         }
 
-        private static void WriteStruct(clusterDataTypesStruct structType, Cluster cluster, TextWriter writer)
+        private static void WriteRecord(clusterDataTypesStruct structType, Cluster cluster, TextWriter writer)
         {
             writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(structType.name)}\n        /// </summary>");
-            writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {\n            [SetsRequiredMembers]");
-            
+            writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {");
+            writer.WriteLine($"            /// <summary>\n            /// {GeneratorUtil.FieldNameToComment(structType.name)}\n            /// </summary>");
+            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}() {{ }}\n\n            [SetsRequiredMembers]");
             writer.WriteLine($"            internal {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             foreach (clusterDataTypesStructField field in structType.field)

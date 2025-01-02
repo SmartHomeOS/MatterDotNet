@@ -222,6 +222,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Network Interface
         /// </summary>
         public record NetworkInterface : TLVPayload {
+            /// <summary>
+            /// Network Interface
+            /// </summary>
+            public NetworkInterface() { }
+
             [SetsRequiredMembers]
             internal NetworkInterface(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

@@ -103,6 +103,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Access Control Entry
         /// </summary>
         public record AccessControlEntry : TLVPayload {
+            /// <summary>
+            /// Access Control Entry
+            /// </summary>
+            public AccessControlEntry() { }
+
             [SetsRequiredMembers]
             internal AccessControlEntry(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -157,6 +162,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Access Control Extension
         /// </summary>
         public record AccessControlExtension : TLVPayload {
+            /// <summary>
+            /// Access Control Extension
+            /// </summary>
+            public AccessControlExtension() { }
+
             [SetsRequiredMembers]
             internal AccessControlExtension(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -174,6 +184,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Access Control Target
         /// </summary>
         public record AccessControlTarget : TLVPayload {
+            /// <summary>
+            /// Access Control Target
+            /// </summary>
+            public AccessControlTarget() { }
+
             [SetsRequiredMembers]
             internal AccessControlTarget(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

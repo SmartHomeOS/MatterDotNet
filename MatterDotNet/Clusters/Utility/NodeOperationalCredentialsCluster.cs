@@ -111,6 +111,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Fabric Descriptor
         /// </summary>
         public record FabricDescriptor : TLVPayload {
+            /// <summary>
+            /// Fabric Descriptor
+            /// </summary>
+            public FabricDescriptor() { }
+
             [SetsRequiredMembers]
             internal FabricDescriptor(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
@@ -140,6 +145,11 @@ namespace MatterDotNet.Clusters.Utility
         /// NOC
         /// </summary>
         public record NOC : TLVPayload {
+            /// <summary>
+            /// NOC
+            /// </summary>
+            public NOC() { }
+
             [SetsRequiredMembers]
             internal NOC(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

@@ -87,6 +87,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Basic Commissioning Info
         /// </summary>
         public record BasicCommissioningInfo : TLVPayload {
+            /// <summary>
+            /// Basic Commissioning Info
+            /// </summary>
+            public BasicCommissioningInfo() { }
+
             [SetsRequiredMembers]
             internal BasicCommissioningInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

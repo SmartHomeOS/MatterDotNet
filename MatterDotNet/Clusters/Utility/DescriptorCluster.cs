@@ -53,6 +53,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Device Type
         /// </summary>
         public record DeviceType : TLVPayload {
+            /// <summary>
+            /// Device Type
+            /// </summary>
+            public DeviceType() { }
+
             [SetsRequiredMembers]
             internal DeviceType(object[] fields) {
                 FieldReader reader = new FieldReader(fields);

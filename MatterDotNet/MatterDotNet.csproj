@@ -39,4 +39,8 @@
     <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="TinyDNS" Version="0.9.0" />
+  </ItemGroup>
+
 </Project>

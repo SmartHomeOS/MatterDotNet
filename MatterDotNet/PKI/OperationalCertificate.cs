@@ -10,6 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.DCL;
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Util;
@@ -110,18 +111,24 @@ namespace MatterDotNet.PKI
             }
         }
 
-        public bool VerifyChain(byte[] intermediateCert, OperationalCertificate rootCert)
+        public bool VerifyChain(byte[] intermediateCert, DCLClient dcl, VerificationLevel level)
         {
+            if (level == VerificationLevel.AnyDevice)
+                return true;
             X509Chain chain = new X509Chain();
             #if NET9_0_OR_GREATER
                 chain.ChainPolicy.ExtraStore.Add(X509CertificateLoader.LoadCertificate(intermediateCert));
             #else
                 chain.ChainPolicy.ExtraStore.Add(new X509Certificate2(intermediateCert));
             #endif
-            chain.ChainPolicy.CustomTrustStore.Add(rootCert.cert);
+            chain.ChainPolicy.CustomTrustStore.AddRange(dcl.TrustStore);
+            if (level == VerificationLevel.CertifiedDevicesOrCHIPTest)
+                chain.ChainPolicy.CustomTrustStore.Add(dcl.CHIPTestPAA);
             chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
             chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-            return chain.Build(cert);
+            bool valid = chain.Build(cert);
+
+            return valid;
         }
 
         public bool VerifyChain(OperationalCertificate rootCert)

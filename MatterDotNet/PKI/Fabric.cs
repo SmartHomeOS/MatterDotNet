@@ -85,6 +85,12 @@ namespace MatterDotNet.PKI
             return ret;
         }
 
+        public OperationalCertificate CreateCommissioner()
+        {
+            var keyPair = Crypto.GenerateKeypair();
+            return CreateCommissioner(keyPair.Public, keyPair.Private);
+        }
+
         public OperationalCertificate CreateCommissioner(byte[] publicKey, byte[] privateKey)
         {
             ulong nodeId = (ulong)(0xbaddeed2 + nodes.Count);

@@ -658,10 +658,57 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class attributeMandatoryConform
+    {
+
+        private attributeMandatoryConformCondition conditionField;
+
+        /// <remarks/>
+        public attributeMandatoryConformCondition condition
+        {
+            get
+            {
+                return this.conditionField;
+            }
+            set
+            {
+                this.conditionField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class attributeMandatoryConformCondition
+    {
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class clusterDataTypesBitfieldItem
     {
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private int bitField;
 
@@ -670,7 +717,7 @@ namespace Generator.Schema
         private string summaryField;
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {
@@ -732,7 +779,7 @@ namespace Generator.Schema
     public partial class clusterDataTypesEnumItem
     {
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private string valueField;
 
@@ -741,7 +788,7 @@ namespace Generator.Schema
         private string summaryField;
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {
@@ -863,7 +910,7 @@ namespace Generator.Schema
 
         private clusterDataTypesStructFieldQuality qualityField;
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private clusterDataTypesStructFieldConstraint constraintField;
 
@@ -915,7 +962,7 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {
@@ -1198,7 +1245,7 @@ namespace Generator.Schema
 
         private clusterAttributeQuality qualityField;
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private clusterAttributeConstraint constraintField;
 
@@ -1252,7 +1299,7 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {
@@ -1438,7 +1485,7 @@ namespace Generator.Schema
 
         private string readPrivilegeField;
 
-        private bool writeField;
+        private string writeField;
 
         private string writePrivilegeField;
 
@@ -1476,7 +1523,7 @@ namespace Generator.Schema
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public bool write
+        public string write
         {
             get
             {
@@ -1765,7 +1812,7 @@ namespace Generator.Schema
 
         private clusterCommandAccess accessField;
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private clusterCommandField[] fieldField;
 
@@ -1804,7 +1851,7 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {
@@ -1992,7 +2039,7 @@ namespace Generator.Schema
 
         private object optionalConformField;
 
-        private object mandatoryConformField;
+        private attributeMandatoryConform mandatoryConformField;
 
         private object disallowConformField;
 
@@ -2048,7 +2095,7 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        public object mandatoryConform
+        public attributeMandatoryConform mandatoryConform
         {
             get
             {

@@ -22,6 +22,8 @@ namespace Generator
                 name = name.Substring(0, name.Length - 6);
             bool cap = true;
             StringBuilder ret = new StringBuilder(name.Length);
+            if (name.Length > 0 && Char.IsNumber(name[0]))
+                ret.Append('_');
             foreach (char c in name)
             {
                 if (c == ' ' || c == '-')
@@ -61,7 +63,7 @@ namespace Generator
 
                 ret.Append(name[i]);
             }
-            return ret.ToString();
+            return ret.ToString().Replace("Wi Fi", "WiFi");
         }
     }
 }

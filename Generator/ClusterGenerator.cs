@@ -37,7 +37,7 @@ namespace Generator
                     if (cluster == null)
                         throw new IOException("Failed to parse cluster " + clusterxml);
                     if (!string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
-                        clusterBase.WriteLine($"                case {cluster.name.Replace(" ", "").Replace('/', '_')}.CLUSTER_ID:\n                    return new {cluster.name.Replace(" ", "").Replace('/', '_')}(endPoint);");
+                        clusterBase.WriteLine($"                case {GeneratorUtil.SanitizeClassName(cluster.name)}.CLUSTER_ID:\n                    return new {GeneratorUtil.SanitizeClassName(cluster.name)}(endPoint);");
                     WriteClass(cluster);
                 }
             }
@@ -95,7 +95,7 @@ namespace Generator
             if (string.IsNullOrEmpty(cluster.classification.baseCluster) && !string.IsNullOrEmpty(cluster.clusterIds.clusterId.id))
                 writer.WriteLine($"        /// <inheritdoc />\n        protected {GeneratorUtil.SanitizeClassName(cluster.name)}(uint cluster, ushort endPoint) : base(cluster, endPoint) {{ }}");
             writer.WriteLine();
-            if (cluster.dataTypes?.@enum != null || (cluster.features != null && cluster.features.Length > 0))
+            if (cluster.dataTypes?.@enum != null || cluster.dataTypes?.bitmap != null || (cluster.features != null && cluster.features.Length > 0))
             {
                 writer.WriteLine("        #region Enums");
                 bool firstEnum=true;
@@ -174,7 +174,7 @@ namespace Generator
                 WriteCommands(cluster, writer);
             }
 
-            if (cluster.attributes.Length > 0 || (cluster.features != null && cluster.features.Length > 0))
+            if ((cluster.attributes != null && cluster.attributes.Length > 0) || (cluster.features != null && cluster.features.Length > 0))
             {
                 writer.WriteLine("        #region Attributes");
                 bool firstAttribute = true;
@@ -183,15 +183,18 @@ namespace Generator
                     firstAttribute = false;
                     WriteFeatureFunctions(writer);
                 }
-                foreach (var attribute in cluster.attributes)
+                if (cluster.attributes != null && cluster.attributes.Length > 0)
                 {
-                    if (attribute.type != null)
+                    foreach (var attribute in cluster.attributes)
                     {
-                        if (firstAttribute)
-                            firstAttribute = false;
-                        else
-                            writer.WriteLine();
-                        WriteAttribute(cluster, attribute, writer);
+                        if (attribute.type != null && attribute?.mandatoryConform?.condition?.name != "Zigbee")
+                        {
+                            if (firstAttribute)
+                                firstAttribute = false;
+                            else
+                                writer.WriteLine();
+                            WriteAttribute(cluster, attribute, writer);
+                        }
                     }
                 }
                 writer.WriteLine("        #endregion Attributes");
@@ -231,7 +234,7 @@ namespace Generator
                     if (field.type.EndsWith("Enum"))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
-                        writer.WriteLine(" = " + SanitizeDefault(field.@default, field.type) + ";");
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default, field.type, field.entry?.type) + ";");
                 }
                 else
                     writer.WriteLine();
@@ -375,6 +378,7 @@ namespace Generator
                 case "namespace":
                 case "fabric-idx":
                 case "action-id":
+                case "percent":
                     writer.Write($"{totalIndent}writer.WriteByte({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -521,11 +525,13 @@ namespace Generator
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
+                case "ipv6adr":
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
                     return;
                 case "Hardware Address":
+                case "hwadr":
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
@@ -623,6 +629,7 @@ namespace Generator
                 case "namespace":
                 case "fabric-idx":
                 case "action-id":
+                case "percent":
                     writer.Write($"reader.GetByte({id}");
                     break;
                 case "uint16":
@@ -672,9 +679,11 @@ namespace Generator
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "ref_Ipv6Adr":
+                case "ipv6adr":
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "Hardware Address":
+                case "hwadr":
                     writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
                     return;
                 case "epoch-s":
@@ -764,7 +773,7 @@ namespace Generator
                         else if (id == "i")
                             writer.WriteLine("(reader.GetStruct(i)!));");
                         else
-                            writer.WriteLine($"fields[{id}]);");
+                            writer.WriteLine($"((object[])fields[{id}]);");
                     }
                     return;
             }
@@ -786,7 +795,7 @@ namespace Generator
 
         private static bool HasEnum(Cluster cluster, string name)
         {
-            if (cluster.dataTypes.@enum == null)
+            if (cluster.dataTypes?.@enum == null)
                 return false;
             foreach (clusterDataTypesEnum enumType in cluster.dataTypes.@enum)
             {
@@ -798,7 +807,7 @@ namespace Generator
 
         private static bool HasEnumValue(Cluster cluster, string name, string value)
         {
-            if (cluster.dataTypes.@enum == null)
+            if (cluster.dataTypes?.@enum == null)
                 return false;
             foreach (clusterDataTypesEnum enumType in cluster.dataTypes.@enum)
             {
@@ -816,7 +825,7 @@ namespace Generator
 
         private static bool HasBitmap(Cluster cluster, string name)
         {
-            if (cluster.dataTypes.bitmap == null)
+            if (cluster.dataTypes?.bitmap == null)
                 return false;
             foreach (clusterDataTypesBitfield bitfieldType in cluster.dataTypes.bitmap)
             {
@@ -828,7 +837,7 @@ namespace Generator
 
         private static bool HasBitmapValue(Cluster cluster, string name, string value)
         {
-            if (cluster.dataTypes.bitmap == null)
+            if (cluster.dataTypes?.bitmap == null)
                 return false;
             foreach (clusterDataTypesBitfield bitfieldType in cluster.dataTypes.bitmap)
             {
@@ -846,7 +855,7 @@ namespace Generator
 
         private static bool HasStruct(Cluster cluster, string name)
         {
-            if (cluster.dataTypes.@struct == null)
+            if (cluster.dataTypes?.@struct == null)
                 return false;
             foreach (clusterDataTypesStruct structType in cluster.dataTypes.@struct)
             {
@@ -1024,7 +1033,7 @@ namespace Generator
                     if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
-                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, field.type) + ";");
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, field.type, field.entry?.type) + ";");
                 }
                 else
                     writer.WriteLine();
@@ -1079,9 +1088,12 @@ namespace Generator
             writer.WriteLine("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " {");
             foreach (clusterDataTypesEnumItem item in enumType.item)
             {
-                if (item.summary != null)
-                    writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
-                writer.WriteLine("            " + item.name + " = " + item.value + ",");
+                if (!string.IsNullOrWhiteSpace(item.value))
+                {
+                    if (item.summary != null)
+                        writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                    writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + item.value + ",");
+                }
             }
             writer.WriteLine("        }");
         }
@@ -1097,7 +1109,7 @@ namespace Generator
             {
                 if (item.summary != null)
                     writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
-                writer.WriteLine("            " + item.name + " = " + (1<<item.bit) + ",");
+                writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + (1<<item.bit) + ",");
             }
             writer.WriteLine("        }");
         }
@@ -1194,7 +1206,7 @@ namespace Generator
                     writer.WriteLine(";");
                 writer.WriteLine("        }");
             }
-            if (attribute?.access?.write == true)
+            if (attribute?.access?.write == "true" || attribute?.access?.write == "optional")
             {
                 if (attribute.access.read)
                     writer.WriteLine();
@@ -1233,6 +1245,7 @@ namespace Generator
                 case "namespace":
                 case "fabric-idx":
                 case "action-id":
+                case "percent":
                     writer.Write("byte");
                     break;
                 case "uint16":
@@ -1317,10 +1330,12 @@ namespace Generator
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
                 case "ref_Ipv6Adr":
+                case "ipv6adr":
                     includes.Add("System.Net");
                     writer.Write("IPAddress");
                     break;
                 case "Hardware Address":
+                case "hwadr": //This is the most non-standard standard i've ever worked with
                     includes.Add("System.Net.NetworkInformation");
                     writer.Write("PhysicalAddress");
                     break;
@@ -1349,7 +1364,7 @@ namespace Generator
             }
         }
 
-        private static string SanitizeDefault(string value, string? type = null, string? listType = null)
+        private static string SanitizeDefault(string value, string? type, string? listType)
         {
             if (value == "\"")
                 return "\"\"";
@@ -1374,6 +1389,8 @@ namespace Generator
                 return value;
             if (value == "0" && (type == "epoch-s" || type == "epoch-us"))
                 return "TimeUtil.EPOCH";
+            if (type == "elapsed-s")
+                return $"TimeSpan.FromSeconds({value})";
             return value.ToLowerInvariant();
         }
 
@@ -1384,6 +1401,8 @@ namespace Generator
             if (value.Equals("desc", StringComparison.InvariantCultureIgnoreCase))
                 return false;
             if (value == "-")
+                return false;
+            if (value == "PhysicalMinLevel" || value == "PhysicalMaxLevel")
                 return false;
             return true;
         }

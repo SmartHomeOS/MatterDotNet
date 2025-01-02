@@ -243,16 +243,48 @@ namespace MatterDotNet.Clusters
                     return new AccessControlCluster(endPoint);
                 case AdministratorCommissioningCluster.CLUSTER_ID:
                     return new AdministratorCommissioningCluster(endPoint);
+                case AirQualityCluster.CLUSTER_ID:
+                    return new AirQualityCluster(endPoint);
+                case ApplicationBasicCluster.CLUSTER_ID:
+                    return new ApplicationBasicCluster(endPoint);
+                case ApplicationLauncherCluster.CLUSTER_ID:
+                    return new ApplicationLauncherCluster(endPoint);
+                case AudioOutputCluster.CLUSTER_ID:
+                    return new AudioOutputCluster(endPoint);
+                case BallastConfigurationCluster.CLUSTER_ID:
+                    return new BallastConfigurationCluster(endPoint);
                 case BasicInformationCluster.CLUSTER_ID:
                     return new BasicInformationCluster(endPoint);
+                case BindingCluster.CLUSTER_ID:
+                    return new BindingCluster(endPoint);
+                case BooleanStateCluster.CLUSTER_ID:
+                    return new BooleanStateCluster(endPoint);
+                case BooleanStateConfigurationCluster.CLUSTER_ID:
+                    return new BooleanStateConfigurationCluster(endPoint);
+                case ActionsCluster.CLUSTER_ID:
+                    return new ActionsCluster(endPoint);
                 case BridgedDeviceBasicInformationCluster.CLUSTER_ID:
                     return new BridgedDeviceBasicInformationCluster(endPoint);
                 case ColorControlCluster.CLUSTER_ID:
                     return new ColorControlCluster(endPoint);
+                case ConcentrationMeasurementClusters.CLUSTER_ID:
+                    return new ConcentrationMeasurementClusters(endPoint);
                 case DescriptorCluster.CLUSTER_ID:
                     return new DescriptorCluster(endPoint);
+                case EthernetNetworkDiagnosticsCluster.CLUSTER_ID:
+                    return new EthernetNetworkDiagnosticsCluster(endPoint);
                 case GeneralDiagnosticsCluster.CLUSTER_ID:
                     return new GeneralDiagnosticsCluster(endPoint);
+                case SoftwareDiagnosticsCluster.CLUSTER_ID:
+                    return new SoftwareDiagnosticsCluster(endPoint);
+                case ThreadNetworkDiagnosticsCluster.CLUSTER_ID:
+                    return new ThreadNetworkDiagnosticsCluster(endPoint);
+                case WiFiNetworkDiagnosticsCluster.CLUSTER_ID:
+                    return new WiFiNetworkDiagnosticsCluster(endPoint);
+                case FanControlCluster.CLUSTER_ID:
+                    return new FanControlCluster(endPoint);
+                case FlowMeasurementCluster.CLUSTER_ID:
+                    return new FlowMeasurementCluster(endPoint);
                 case GeneralCommissioningCluster.CLUSTER_ID:
                     return new GeneralCommissioningCluster(endPoint);
                 case GroupKeyManagementCluster.CLUSTER_ID:
@@ -261,19 +293,32 @@ namespace MatterDotNet.Clusters
                     return new GroupsCluster(endPoint);
                 case IdentifyCluster.CLUSTER_ID:
                     return new IdentifyCluster(endPoint);
+                case IlluminanceMeasurementCluster.CLUSTER_ID:
+                    return new IlluminanceMeasurementCluster(endPoint);
                 case FixedLabelCluster.CLUSTER_ID:
                     return new FixedLabelCluster(endPoint);
                 case UserLabelCluster.CLUSTER_ID:
                     return new UserLabelCluster(endPoint);
                 case LevelControlCluster.CLUSTER_ID:
                     return new LevelControlCluster(endPoint);
+                case LowPowerCluster.CLUSTER_ID:
+                    return new LowPowerCluster(endPoint);
+                case NetworkCommissioningCluster.CLUSTER_ID:
+                    return new NetworkCommissioningCluster(endPoint);
+                case OccupancySensingCluster.CLUSTER_ID:
+                    return new OccupancySensingCluster(endPoint);
                 case On_OffCluster.CLUSTER_ID:
                     return new On_OffCluster(endPoint);
                 case NodeOperationalCredentialsCluster.CLUSTER_ID:
                     return new NodeOperationalCredentialsCluster(endPoint);
+                case SwitchCluster.CLUSTER_ID:
+                    return new SwitchCluster(endPoint);
                 case TimeSynchronizationCluster.CLUSTER_ID:
                     return new TimeSynchronizationCluster(endPoint);
-
+                case WakeOnLANCluster.CLUSTER_ID:
+                    return new WakeOnLANCluster(endPoint);
+                case WaterContentMeasurementClusters.CLUSTER_ID:
+                    return new WaterContentMeasurementClusters(endPoint);
                 default:
                     return new UnknownCluster(clusterId, endPoint);
             }

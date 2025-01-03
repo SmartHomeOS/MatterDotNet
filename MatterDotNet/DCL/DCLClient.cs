@@ -20,7 +20,8 @@ namespace MatterDotNet.DCL
     /// </summary>
     public class DCLClient
     {
-        const string DefaultEndPoint = "https://on.test-net.dcl.csa-iot.org";
+        const string DefaultTestEndPoint = "https://on.test-net.dcl.csa-iot.org";
+        const string DefaultProductionEndPoint = "https://on.dcl.csa-iot.org/";
 
         /// <summary>
         /// Matter PAA Trust Store
@@ -59,7 +60,7 @@ namespace MatterDotNet.DCL
         private static async Task<X509Certificate2Collection> GetCertificates(CancellationToken token = default)
         {
             HttpClient client = new HttpClient();
-            Certificates? certs = (Certificates?)await client.GetFromJsonAsync(DefaultEndPoint + "/dcl/pki/certificates", typeof(Certificates), token);
+            Certificates? certs = (Certificates?)await client.GetFromJsonAsync(DefaultProductionEndPoint + "/dcl/pki/certificates", typeof(Certificates), token);
             X509Certificate2Collection collection = new X509Certificate2Collection();
             if (certs == null)
                 return collection;

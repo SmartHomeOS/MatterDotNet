@@ -20,6 +20,8 @@ namespace MatterDotNet.Protocol.Sessions
 {
     public class SessionContext : IDisposable
     {
+        private const int MSG_COUNTER_WINDOW_SIZE = 32;
+
         public bool Initiator { get; init; }
         public ulong InitiatorNodeID { get; init; }
         public ushort LocalSessionID { get; init; }
@@ -64,6 +66,64 @@ namespace MatterDotNet.Protocol.Sessions
             if (!exchanges.TryAdd(exchangeId, ret))
                 return CreateExchange(); //Handle rare race condition
             return ret;
+        }
+
+        internal bool ProcessFrame(Frame frame)
+        {
+            MessageState state = PeerMessageCtr;
+            if (!state.Initialized)
+            {
+                state.Initialized = true;
+                state.CounterWindow = uint.MaxValue;
+                state.MaxMessageCounter = frame.Counter;
+            }
+            else if (frame.Counter > state.MaxMessageCounter)
+            {
+                int offset = (int)Math.Min(frame.Counter - state.MaxMessageCounter, MSG_COUNTER_WINDOW_SIZE);
+                state.MaxMessageCounter = frame.Counter;
+                state.CounterWindow <<= offset;
+                if (offset < MSG_COUNTER_WINDOW_SIZE)
+                    state.CounterWindow |= (uint)(1 << (int)offset - 1);
+            }
+            else if (frame.Counter == state.MaxMessageCounter)
+            {
+                Console.WriteLine("DROPPED DUPLICATE <repeated last>: " + frame);
+                return false;
+            }
+            else
+            {
+                uint offset = (state.MaxMessageCounter - frame.Counter);
+                if (offset > MSG_COUNTER_WINDOW_SIZE)
+                {
+                    if (HandleBehindWindow(ref state, frame))
+                        return false;
+                }
+                else
+                {
+                    if ((state.CounterWindow & (uint)(1 << (int)offset - 1)) != 0x0)
+                    {
+                        Console.WriteLine("DROPPED DUPLICATE <within window>: " + frame);
+                        return false;
+                    }
+                    else
+                        state.CounterWindow |= (uint)(1 << (int)offset - 1);
+                }
+            }
+            PeerMessageCtr = state;
+            if (frame.Message.Protocol == ProtocolType.SecureChannel && (SecureOpCodes?)frame.Message.OpCode == SecureOpCodes.MRPStandaloneAcknowledgement)
+                return true; //Standalone Ack
+            if (exchanges.TryGetValue(frame.Message.ExchangeID, out Exchange? exchange))
+                exchange.Messages.Writer.TryWrite(frame);
+            else
+                Console.WriteLine("Unknown Exchange " + frame.Message.ExchangeID);
+            return true;
+        }
+
+        internal virtual bool HandleBehindWindow(ref MessageState state, Frame frame)
+        {
+            state.MaxMessageCounter = frame.Counter;
+            state.CounterWindow = uint.MaxValue;
+            return false;
         }
 
         internal async Task DeleteExchange(Exchange exchange)

@@ -12,20 +12,21 @@
 
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Flags;
+using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Sessions
 {
     internal class Exchange : IDisposable
     {
-        private const int MSG_COUNTER_WINDOW_SIZE = 32;
-
         public ushort ID { get; init; }
         public SessionContext Session {get; init;}
+        internal Channel<Frame> Messages { get; init;}
         
         internal Exchange(SessionContext session, ushort id)
         {
             Session = session;
             ID = id;
+            Messages = Channel.CreateBounded<Frame>(10);
         }
 
         public async Task SendFrame(Frame frame, bool reliable = true)
@@ -38,62 +39,9 @@ namespace MatterDotNet.Protocol.Sessions
             await Session.Connection.SendFrame(this, frame, reliable);
         }
 
-        public async Task<Frame> Read()
+        public async Task<Frame> Read(CancellationToken token = default)
         {
-            Frame? frame = null;
-            while (frame == null)
-            {
-                frame = await Session.Connection.Read();
-                MessageState state = Session.PeerMessageCtr;
-                if (!state.Initialized)
-                {
-                    state.Initialized = true;
-                    state.CounterWindow = uint.MaxValue;
-                    state.MaxMessageCounter = frame.Counter;
-                }
-                else if (frame.Counter > state.MaxMessageCounter)
-                {
-                    int offset = (int)Math.Min(frame.Counter - state.MaxMessageCounter, MSG_COUNTER_WINDOW_SIZE);
-                    state.MaxMessageCounter = frame.Counter;
-                    state.CounterWindow <<= offset;
-                    if (offset < MSG_COUNTER_WINDOW_SIZE)
-                        state.CounterWindow |= (uint)(1 << (int)offset - 1);
-                }
-                else if (frame.Counter == state.MaxMessageCounter)
-                {
-                    Console.WriteLine("DROPPED DUPLICATE: " + frame);
-                    frame = null;
-                }
-                else
-                {
-                    uint offset = (state.MaxMessageCounter - frame.Counter);
-                    if (offset > MSG_COUNTER_WINDOW_SIZE)
-                    {
-                        if (Session is SecureSession)
-                        {
-                            Console.WriteLine("DROPPED DUPLICATE <behind window>: " + frame);
-                            frame = null;
-                        }
-                        else
-                        {
-                            state.MaxMessageCounter = frame.Counter;
-                            state.CounterWindow = uint.MaxValue;
-                        }
-                    }
-                    else
-                    {
-                        if ((state.CounterWindow & (uint)(1 << (int)offset - 1)) != 0x0)
-                        {
-                            Console.WriteLine("DROPPED DUPLICATE <within window>: " + frame);
-                            frame = null;
-                        }
-                        else
-                            state.CounterWindow |= (uint)(1 << (int)offset - 1);
-                    }
-                }
-                Session.PeerMessageCtr = state;
-            }
-            return frame;
+            return await Messages.Reader.ReadAsync(token);
         }
 
         /// <inheritdoc />

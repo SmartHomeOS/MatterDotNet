@@ -12,6 +12,7 @@
 
 using MatterDotNet.Protocol.Connection;
 using MatterDotNet.Protocol.Cryptography;
+using MatterDotNet.Protocol.Payloads;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 
@@ -47,6 +48,12 @@ namespace MatterDotNet.Protocol.Sessions
                 Span<byte> rnd = CTR_DRBG.Generate(ref working_state, 28);
                 localMessageCtr = BinaryPrimitives.ReadUInt32LittleEndian(rnd) + 1;
             }
+        }
+
+        internal override bool HandleBehindWindow(ref MessageState state, Frame frame)
+        {
+            Console.WriteLine("DROPPED DUPLICATE <behind window>: " + frame);
+            return true;
         }
 
         internal override uint GetSessionCounter()

@@ -24,7 +24,6 @@ namespace MatterDotNet.Protocol.Connection
         TcpClient client;
         NetworkStream stream;
         CancellationTokenSource cts = new CancellationTokenSource();
-        Channel<Frame> channel = Channel.CreateUnbounded<Frame>();
         public TCPConnection(IPEndPoint destination)
         {
             client = new TcpClient();
@@ -43,11 +42,6 @@ namespace MatterDotNet.Protocol.Connection
             exchange.Session.Timestamp = DateTime.Now;
         }
 
-        public async Task<Frame> Read()
-        {
-            return await channel.Reader.ReadAsync();
-        }
-
         public async Task Run()
         { 
             byte[] len = new byte[4];
@@ -58,13 +52,18 @@ namespace MatterDotNet.Protocol.Connection
                 await stream.ReadExactlyAsync(len);
                 frameLen = BinaryPrimitives.ReadInt32LittleEndian(len);
                 await stream.ReadExactlyAsync(data.Slice(0, frameLen));
-                Console.WriteLine("READ: " + Convert.ToHexString(data.Slice(0, frameLen).Span));
                 Frame frame = new Frame(data.Slice(0, frameLen).Span);
-                channel.Writer.TryWrite(frame);
-                if (frame.SessionID != 0)
-                    SessionManager.SessionActive(frame.SessionID);
+                Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " Received: " + frame.ToString());
+                SessionContext? session = SessionManager.GetSession(frame.SessionID);
+                if (session == null)
+                {
+                    Console.WriteLine("Unknown Session: " + frame.SessionID);
+                    continue;
+                }
+                session.ProcessFrame(frame);
+                session.Timestamp = DateTime.Now;
+                session.LastActive = DateTime.Now;
             }
-            channel.Writer.Complete();
         }
 
         public void Dispose()

@@ -32,7 +32,6 @@ namespace MatterDotNet.Protocol.Connection
 
         ConcurrentDictionary<(ushort, ushort), Retransmission> Retransmissions = new ConcurrentDictionary<(ushort, ushort), Retransmission>();
         ConcurrentDictionary<ushort, uint> AckTable = new ConcurrentDictionary<ushort, uint>();
-        Channel<Frame> channel = Channel.CreateUnbounded<Frame>();
         CancellationTokenSource cts = new CancellationTokenSource();
 
         UdpClient client;
@@ -70,7 +69,7 @@ namespace MatterDotNet.Protocol.Connection
                     }
                 }
             }
-            Console.WriteLine("SENT: " + frame.ToString());
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " SENT: " + frame.ToString());
             await client.SendAsync(writer.GetPayload());
             exchange.Session.Timestamp = DateTime.Now;
             while (reliable)
@@ -111,20 +110,20 @@ namespace MatterDotNet.Protocol.Connection
             ack.Message.ExchangeID = exchange;
             ack.Message.Flags = ExchangeFlags.Acknowledgement;
             if (initiator)
+            {
+                ack.Flags |= MessageFlags.SourceNodeID;
                 ack.Message.Flags |= ExchangeFlags.Initiator;
+            }
+            else
+                ack.Flags |= MessageFlags.DestinationNodeID;
             ack.Message.AckCounter = counter;
             ack.Message.Protocol = Payloads.ProtocolType.SecureChannel;
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             ack.Serialize(writer, session!);
             if (AckTable.TryGetValue(exchange, out uint ctr) && ctr == counter)
                 AckTable.TryRemove(exchange, out _);
-            Console.WriteLine("Sent standalone ack: " + ack.ToString());
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " Sent standalone ack: " + ack.ToString());
             await client.SendAsync(writer.GetPayload());
-        }
-
-        public async Task<Frame> Read()
-        {
-            return await channel.Reader.ReadAsync();
         }
 
         public async Task Run()
@@ -135,10 +134,20 @@ namespace MatterDotNet.Protocol.Connection
                 {
                     UdpReceiveResult result = await client.ReceiveAsync();
                     Frame frame = new Frame(result.Buffer);
+                    if (!frame.Valid)
+                    {
+                        Console.WriteLine("Invalid frame received");
+                        continue;
+                    }
+                    SessionContext? session = SessionManager.GetSession(frame.SessionID);
+                    bool ack = false;
                     if ((frame.Message.Flags & ExchangeFlags.Reliability) == ExchangeFlags.Reliability)
                     {
                         if (!AckTable.TryAdd(frame.Message.ExchangeID, frame.Counter))
-                            await SendAck(SessionManager.GetSession(frame.SessionID), frame.Message.ExchangeID, frame.Counter, (frame.Message.Flags & ExchangeFlags.Initiator) == 0);
+                        {
+                            ack = true;
+                            await SendAck(session, frame.Message.ExchangeID, frame.Counter, (frame.Message.Flags & ExchangeFlags.Initiator) == 0);
+                        }
                     }
                     if ((frame.Message.Flags & ExchangeFlags.Acknowledgement) == ExchangeFlags.Acknowledgement)
                     {
@@ -148,19 +157,22 @@ namespace MatterDotNet.Protocol.Connection
                             transmission.Ack.Release();
                         }
                     }
-                    if (frame.SessionID != 0)
-                        SessionManager.SessionActive(frame.SessionID);
-                    Console.WriteLine("Received: " + frame.ToString());
-                    channel.Writer.TryWrite(frame);
+                    Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " Received: " + frame.ToString());
+                    if (session == null)
+                    {
+                        Console.WriteLine("Unknown Session: " + frame.SessionID);
+                        continue;
+                    }
+                    if (!session.ProcessFrame(frame) && !ack)
+                        await SendAck(session, frame.Message.ExchangeID, frame.Counter, (frame.Message.Flags & ExchangeFlags.Initiator) == 0);
+
+                    session.Timestamp = DateTime.Now;
+                    session.LastActive = DateTime.Now;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-                channel.Writer.Complete();
             }
         }
 

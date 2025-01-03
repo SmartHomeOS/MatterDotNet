@@ -107,14 +107,5 @@ namespace MatterDotNet.Protocol.Sessions
             param.SpecificationVersion = 0;
             return param;
         }
-
-        internal static void SessionActive(ushort sessionID)
-        {
-            if (sessions.TryGetValue(sessionID, out SessionContext? context))
-            {
-                context.Timestamp = DateTime.Now;
-                context.LastActive = DateTime.Now;
-            }
-        }
     }
 }

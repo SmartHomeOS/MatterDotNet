@@ -65,15 +65,15 @@ namespace MatterDotNet.Protocol.Payloads
                 {
                     PayloadWriter secureStream = new PayloadWriter(temp);
                     Message.Serialize(secureStream);
-                    SecureSession? secureContext = session as SecureSession;
+                    SecureSession secureContext = (SecureSession)session;
                     Span<byte> nonce = new byte[Crypto.NONCE_LENGTH_BYTES];
                     stream.GetPayload().Span.Slice(3, 5).CopyTo(nonce);
                     if ((Security & SecurityFlags.GroupSession) == SecurityFlags.GroupSession)
                         BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), SourceNodeID);
-                    else if (!secureContext!.PASE)
+                    else if (!secureContext.PASE)
                         BinaryPrimitives.WriteUInt64LittleEndian(nonce.Slice(5, 8), session.Initiator ? session.InitiatorNodeID : session.ResponderNodeID);
 
-                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(secureContext!.Initiator ? secureContext.I2RKey : secureContext.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
+                    ReadOnlySpan<byte> mic = Crypto.AEAD_GenerateEncrypt(secureContext.Initiator ? secureContext.I2RKey : secureContext.R2IKey, secureStream.GetPayload().Span, stream.GetPayload().Span, nonce);
                     stream.Write(secureStream);
                     stream.Write(mic);
                     if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)

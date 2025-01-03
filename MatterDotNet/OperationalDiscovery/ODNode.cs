@@ -30,6 +30,6 @@ namespace MatterDotNet.OperationalDiscovery
         public uint Vendor { get; set; }
         public uint Product {  get; set; }
         public ushort Descriminator { get; set; }
-        public bool Commissionable { get; set; }
+        public CommissioningMode CommissioningMode { get; set; }
     }
 }

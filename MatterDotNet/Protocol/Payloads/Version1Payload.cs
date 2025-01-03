@@ -32,7 +32,24 @@ namespace MatterDotNet.Protocol.Payloads
 
         public override string ToString()
         {
-            return $"[Flags: {Flags}, Proto: {Protocol}, Op: {OpCode}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
+            return $"[Flags: {Flags}, Proto: {Protocol}, Op: {GetOp(Protocol, OpCode)}, Exchange: {ExchangeID}, Ack: {AckCounter}, Content: {Payload}]";
+        }
+
+        private string GetOp(ProtocolType protocol, byte opCode)
+        {
+            switch (protocol)
+            {
+                case ProtocolType.SecureChannel:
+                    return ((SecureOpCodes)opCode).ToString();
+                case ProtocolType.InteractionModel:
+                    return ((IMOpCodes)opCode).ToString();
+                case ProtocolType.BDX:
+                    return ((BDXOpCodes)opCode).ToString();
+                case ProtocolType.UserDirectedCommissioning:
+                    return ((UDCOpCodes)opCode).ToString();
+                default:
+                    return opCode.ToString();
+            }
         }
 
         public Version1Payload(IPayload? payload, byte opCode)

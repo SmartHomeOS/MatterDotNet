@@ -72,6 +72,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             BigIntegerPoint pA = spake.PAKEValues_Initiator(passcode, (int)paramResp.Pbkdf_parameters!.Iterations, paramResp.Pbkdf_parameters!.Salt);
             Pake1 pk1 = new Pake1() { PA = pA.ToBytes(false) };
             Frame frame = new Frame(pk1, (byte)SecureOpCodes.PASEPake1);
+            frame.Flags |= MessageFlags.SourceNodeID;
             return frame;
         }
 
@@ -86,6 +87,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 CA = SessionKeys.cA
             };
             Frame frame = new Frame(pake3, (byte)SecureOpCodes.PASEPake3);
+            frame.Flags |= MessageFlags.SourceNodeID;
             return frame;
         }
 
@@ -100,6 +102,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             };
 
             Frame frame = new Frame(req, (byte)SecureOpCodes.PBKDFParamRequest);
+            frame.Flags |= MessageFlags.SourceNodeID;
             return frame;
         }
     }

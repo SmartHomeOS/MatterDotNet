@@ -80,7 +80,7 @@ namespace MatterDotNet.Protocol.Parsers
         public void EndContainer()
         {
             while (type != ElementType.EndOfContainer && type != ElementType.None)
-                GetAny(tagNumber);
+                GetAny(tagNumber, true);
             if (type != ElementType.EndOfContainer)
                 throw new InvalidDataException("End structure was not found");
             ReadTag();

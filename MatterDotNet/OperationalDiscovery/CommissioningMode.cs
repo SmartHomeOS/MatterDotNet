@@ -13,26 +13,21 @@
 namespace MatterDotNet.OperationalDiscovery
 {
     /// <summary>
-    /// Supported node IP transport
+    /// Device Commissioning Mode
     /// </summary>
-    [Flags]
-    public enum SupportedTransportMode
+    public enum CommissioningMode
     {
         /// <summary>
-        /// MRP Only
+        /// Device cannot be commissioined
         /// </summary>
         None = 0,
         /// <summary>
-        /// Deprecated
+        /// Device is in Basic Commissioning Mode
         /// </summary>
-        Reserved = 1,
+        Basic = 1,
         /// <summary>
-        /// TCP in Client Mode
+        /// Device is in Dynamic Commissioning Mode (with dynamically generated PIN)
         /// </summary>
-        TCPClient = 2,
-        /// <summary>
-        /// TCP in Server Mode
-        /// </summary>
-        TCPServer = 4
+        Dynamic = 2,
     }
 }

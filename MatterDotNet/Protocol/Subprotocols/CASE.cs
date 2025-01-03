@@ -15,6 +15,7 @@ using MatterDotNet.Messages.Certificates;
 using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Cryptography;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
@@ -67,6 +68,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 };
 
                 Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
+                sigma1.Flags |= MessageFlags.SourceNodeID;
                 await exchange.SendFrame(sigma1);
                 resp = await exchange.Read();
                 if (resp.Message.Payload is StatusPayload error)
@@ -159,7 +161,9 @@ namespace MatterDotNet.Protocol.Subprotocols
             PayloadWriter Msg3Bytes = new PayloadWriter(1024);
             Msg3.Serialize(Msg3Bytes);
 
-            await exchange.SendFrame(new Frame(Msg3, (byte)SecureOpCodes.CASESigma3));
+            Frame sigma3 = new Frame(Msg3, (byte)SecureOpCodes.CASESigma3);
+            sigma3.Flags |= MessageFlags.SourceNodeID;
+            await exchange.SendFrame(sigma3);
             Frame? resp = await exchange.Read();
 
             StatusPayload s3resp = (StatusPayload)resp.Message.Payload!;
@@ -211,6 +215,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 };
 
                 Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
+                sigma1.Flags |= MessageFlags.SourceNodeID;
                 await exchange.SendFrame(sigma1);
                 resp = await exchange.Read();
 

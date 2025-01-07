@@ -106,7 +106,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             IPV6Failed = 10,
             /// <summary>
-            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +<->+ IP interfaces
+            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces
             /// </summary>
             IPBindFailed = 11,
             /// <summary>
@@ -116,7 +116,7 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Wi Fi Band
+        /// WiFi Band
         /// </summary>
         public enum WiFiBandEnum {
             /// <summary>
@@ -173,7 +173,7 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Wi Fi Security Bitmap
+        /// WiFi Security Bitmap
         /// </summary>
         [Flags]
         public enum WiFiSecurityBitmap {
@@ -271,11 +271,11 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Wi Fi Interface Scan Result
+        /// WiFi Interface Scan Result
         /// </summary>
         public record WiFiInterfaceScanResult : TLVPayload {
             /// <summary>
-            /// Wi Fi Interface Scan Result
+            /// WiFi Interface Scan Result
             /// </summary>
             public WiFiInterfaceScanResult() { }
 
@@ -438,7 +438,7 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Add Or Update Wi Fi Network
+        /// Add Or Update WiFi Network
         /// </summary>
         public async Task<NetworkConfigResponse?> AddOrUpdateWiFiNetwork(SecureSession session, byte[] SSID, byte[] Credentials, ulong? Breadcrumb) {
             AddOrUpdateWiFiNetworkPayload requestFields = new AddOrUpdateWiFiNetworkPayload() {
@@ -620,7 +620,7 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Get the Supported Wi Fi Bands attribute
+        /// Get the Supported WiFi Bands attribute
         /// </summary>
         public async Task<List<WiFiBandEnum>> GetSupportedWiFiBands(SecureSession session) {
             List<WiFiBandEnum> list = new List<WiFiBandEnum>();

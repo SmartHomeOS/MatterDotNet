@@ -100,27 +100,27 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             White = 14,
             /// <summary>
-            /// Typical hardware "Nickel" color.
+            /// Typical hardware &quot;Nickel&quot; color.
             /// </summary>
             Nickel = 15,
             /// <summary>
-            /// Typical hardware "Chrome" color.
+            /// Typical hardware &quot;Chrome&quot; color.
             /// </summary>
             Chrome = 16,
             /// <summary>
-            /// Typical hardware "Brass" color.
+            /// Typical hardware &quot;Brass&quot; color.
             /// </summary>
             Brass = 17,
             /// <summary>
-            /// Typical hardware "Copper" color.
+            /// Typical hardware &quot;Copper&quot; color.
             /// </summary>
             Copper = 18,
             /// <summary>
-            /// Typical hardware "Silver" color.
+            /// Typical hardware &quot;Silver&quot; color.
             /// </summary>
             Silver = 19,
             /// <summary>
-            /// Typical hardware "Gold" color.
+            /// Typical hardware &quot;Gold&quot; color.
             /// </summary>
             Gold = 20,
         }

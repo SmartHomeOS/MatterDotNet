@@ -61,9 +61,38 @@ namespace Generator
                 if (char.IsUpper(name[i]) && i > 0 && (i + 1 != name.Length) && (!char.IsUpper(name[i+1]) || (!char.IsUpper(name[i-1]))))
                     ret.Append(' ');
 
-                ret.Append(name[i]);
+                if (name[i] == '>')
+                    ret.Append("&gt;");
+                else if (name[i] == '<')
+                    ret.Append("&lt;");
+                else if (name[i] == '&')
+                    ret.Append("&amp;");
+                else if (name[i] == '"')
+                    ret.Append("&quot;");
+                else
+                    ret.Append(name[i]);
             }
             return ret.ToString().Replace("Wi Fi", "WiFi");
+        }
+
+        internal static string SanitizeComment(string summary)
+        {
+            summary = summary.Replace("Wi Fi", "WiFi");
+            StringBuilder ret = new StringBuilder(summary.Length);
+            foreach (char c in summary)
+            {
+                if (c == '>')
+                    ret.Append("&gt;");
+                else if (c == '<')
+                    ret.Append("&lt;");
+                else if (c == '&')
+                    ret.Append("&amp;");
+                else if (c == '"')
+                    ret.Append("&quot;");
+                else
+                    ret.Append(c);
+            }
+            return ret.ToString().Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>");
         }
     }
 }

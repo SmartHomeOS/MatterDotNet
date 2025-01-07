@@ -70,7 +70,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             NoTimeGranularity = 0,
             /// <summary>
-            /// This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now > 5 seconds.
+            /// This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now &gt; 5 seconds.
             /// </summary>
             MinutesGranularity = 1,
             /// <summary>
@@ -148,7 +148,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             MixedNTPNTS = 13,
             /// <summary>
-            /// Time synchronization comes from a vendor cloud-based source (e.g. "Date" header in authenticated HTTPS connection).
+            /// Time synchronization comes from a vendor cloud-based source (e.g. &quot;Date&quot; header in authenticated HTTPS connection).
             /// </summary>
             CloudSource = 14,
             /// <summary>

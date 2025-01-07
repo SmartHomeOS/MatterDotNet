@@ -117,37 +117,37 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Wi Fi Version
+        /// WiFi Version
         /// </summary>
         public enum WiFiVersionEnum {
             /// <summary>
             /// Indicate the network interface is currently using 802.11a against the wireless access point.
             /// </summary>
-            a = 0,
+            A = 0,
             /// <summary>
             /// Indicate the network interface is currently using 802.11b against the wireless access point.
             /// </summary>
-            b = 1,
+            B = 1,
             /// <summary>
             /// Indicate the network interface is currently using 802.11g against the wireless access point.
             /// </summary>
-            g = 2,
+            G = 2,
             /// <summary>
             /// Indicate the network interface is currently using 802.11n against the wireless access point.
             /// </summary>
-            n = 3,
+            N = 3,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ac against the wireless access point.
             /// </summary>
-            ac = 4,
+            Ac = 4,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ax against the wireless access point.
             /// </summary>
-            ax = 5,
+            Ax = 5,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ah against the wireless access point.
             /// </summary>
-            ah = 6,
+            Ah = 6,
         }
         #endregion Enums
 
@@ -201,7 +201,7 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Get the Wi Fi Version attribute
+        /// Get the WiFi Version attribute
         /// </summary>
         public async Task<WiFiVersionEnum?> GetWiFiVersion(SecureSession session) {
             return (WiFiVersionEnum?)await GetEnumAttribute(session, 2, true);

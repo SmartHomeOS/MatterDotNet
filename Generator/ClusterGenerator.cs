@@ -299,22 +299,6 @@ namespace Generator
             }
             switch (type)
             {
-                case "array":
-                    if (optional || nullable)
-                        writer.WriteLine($"{totalIndent}if ({name} != null)");
-                    writer.WriteLine($"{totalIndent}{{");
-                    if (from != null || to != null)
-                        writer.WriteLine($"{totalIndent}    Constrain({name}, {from ?? 0}{(to == null ? "" : $", {to}")});");
-                    writer.WriteLine($"{totalIndent}    writer.StartArray({id});");
-                    writer.WriteLine($"{totalIndent}    foreach (var item in {name}) {{");
-                    writer.Write("        ");
-                    WriteStructType(false, false, entryType!, null, -1, null, null, "item", cluster, writer);
-                    writer.WriteLine($"{totalIndent}    }}");
-                    writer.WriteLine($"{totalIndent}    writer.EndContainer();");
-                    writer.WriteLine($"{totalIndent}}}");
-                    if (nullable)
-                        writer.WriteLine($"{totalIndent}else\n{totalIndent}    writer.WriteNull({id});");
-                    return;
                 case "list":
                     if (optional || nullable)
                         writer.WriteLine($"{totalIndent}if ({name} != null)");
@@ -1091,7 +1075,7 @@ namespace Generator
                 if (!string.IsNullOrWhiteSpace(item.value))
                 {
                     if (item.summary != null)
-                        writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                        writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                     writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + item.value + ",");
                 }
             }
@@ -1108,7 +1092,7 @@ namespace Generator
             foreach (clusterDataTypesBitfieldItem item in enumType.bitfield)
             {
                 if (item.summary != null)
-                    writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                    writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                 writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + (1<<item.bit) + ",");
             }
             writer.WriteLine("        }");
@@ -1128,7 +1112,7 @@ namespace Generator
             writer.WriteLine("        public enum Feature {");
             foreach (clusterFeature item in features)
             {
-                writer.WriteLine("            /// <summary>\n            /// " + item.summary.Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>") + "\n            /// </summary>");
+                writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                 writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + (1 << item.bit) + ",");
             }
             writer.WriteLine("        }");

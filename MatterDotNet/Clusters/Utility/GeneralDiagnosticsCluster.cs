@@ -336,7 +336,7 @@ namespace MatterDotNet.Clusters.Utility
                 EnableKey = EnableKey,
                 EventTrigger = EventTrigger,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -344,7 +344,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Time Snapshot
         /// </summary>
         public async Task<TimeSnapshotResponse?> TimeSnapshot(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
             if (!ValidateResponse(resp))
                 return null;
             return new TimeSnapshotResponse() {
@@ -362,7 +362,7 @@ namespace MatterDotNet.Clusters.Utility
                 Value = Value,
                 Count = Count,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PayloadTestResponse() {

@@ -42,7 +42,7 @@ namespace MatterDotNet.Clusters.Application
         /// Sleep
         /// </summary>
         public async Task<bool> Sleep(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
             return ValidateResponse(resp);
         }
         #endregion Commands

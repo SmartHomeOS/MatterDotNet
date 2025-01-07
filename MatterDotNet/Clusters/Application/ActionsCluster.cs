@@ -428,7 +428,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -441,7 +441,7 @@ namespace MatterDotNet.Clusters.Application
                 InvokeID = InvokeID,
                 TransitionTime = TransitionTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -453,7 +453,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -466,7 +466,7 @@ namespace MatterDotNet.Clusters.Application
                 InvokeID = InvokeID,
                 Duration = Duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -478,7 +478,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -490,7 +490,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -503,7 +503,7 @@ namespace MatterDotNet.Clusters.Application
                 InvokeID = InvokeID,
                 Duration = Duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -515,7 +515,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -527,7 +527,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -540,7 +540,7 @@ namespace MatterDotNet.Clusters.Application
                 InvokeID = InvokeID,
                 Duration = Duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -552,7 +552,7 @@ namespace MatterDotNet.Clusters.Application
                 ActionID = ActionID,
                 InvokeID = InvokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -565,7 +565,7 @@ namespace MatterDotNet.Clusters.Application
                 InvokeID = InvokeID,
                 Duration = Duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

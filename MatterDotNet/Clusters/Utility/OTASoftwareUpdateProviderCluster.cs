@@ -194,7 +194,7 @@ namespace MatterDotNet.Clusters.Utility
                 RequestorCanConsent = RequestorCanConsent,
                 MetadataForProvider = MetadataForProvider,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new QueryImageResponse() {
@@ -217,7 +217,7 @@ namespace MatterDotNet.Clusters.Utility
                 UpdateToken = UpdateToken,
                 NewVersion = NewVersion,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ApplyUpdateResponse() {
@@ -234,7 +234,7 @@ namespace MatterDotNet.Clusters.Utility
                 UpdateToken = UpdateToken,
                 SoftwareVersion = SoftwareVersion,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

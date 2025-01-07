@@ -393,7 +393,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -407,7 +407,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -422,7 +422,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -436,7 +436,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -450,7 +450,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -465,7 +465,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -480,7 +480,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -495,7 +495,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -509,7 +509,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -524,7 +524,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -538,7 +538,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -553,7 +553,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -567,7 +567,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x41, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x41, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -582,7 +582,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x42, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x42, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -597,7 +597,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x43, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x43, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -614,7 +614,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x44, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x44, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -626,7 +626,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x47, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x47, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -642,7 +642,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x4B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x4B, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -659,7 +659,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x4C, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x4C, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

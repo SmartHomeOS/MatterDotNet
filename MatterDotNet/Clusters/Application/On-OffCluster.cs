@@ -110,7 +110,7 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             On = 1,
             /// <summary>
-            /// If the previous value of the OnOff attribute is                     equal to FALSE, set the OnOff attribute to TRUE.                     If the previous value of the OnOff attribute is                     equal to TRUE, set the OnOff attribute to FALSE                     (toggle).
+            /// If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle).
             /// </summary>
             Toggle = 2,
         }
@@ -158,7 +158,7 @@ namespace MatterDotNet.Clusters.Application
         /// Off
         /// </summary>
         public async Task<bool> Off(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
             return ValidateResponse(resp);
         }
 
@@ -166,7 +166,7 @@ namespace MatterDotNet.Clusters.Application
         /// On
         /// </summary>
         public async Task<bool> On(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
             return ValidateResponse(resp);
         }
 
@@ -174,7 +174,7 @@ namespace MatterDotNet.Clusters.Application
         /// Toggle
         /// </summary>
         public async Task<bool> Toggle(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
             return ValidateResponse(resp);
         }
 
@@ -186,7 +186,7 @@ namespace MatterDotNet.Clusters.Application
                 EffectIdentifier = EffectIdentifier,
                 EffectVariant = EffectVariant,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -194,7 +194,7 @@ namespace MatterDotNet.Clusters.Application
         /// On With Recall Global Scene
         /// </summary>
         public async Task<bool> OnWithRecallGlobalScene(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x41);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x41);
             return ValidateResponse(resp);
         }
 
@@ -207,7 +207,7 @@ namespace MatterDotNet.Clusters.Application
                 OnTime = OnTime,
                 OffWaitTime = OffWaitTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x42, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x42, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

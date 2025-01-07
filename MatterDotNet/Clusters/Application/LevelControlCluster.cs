@@ -50,7 +50,7 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             Lighting = 2,
             /// <summary>
-            /// Supports frequency attributes and behavior.                                                     The Pulse Width Modulation cluster was created                                                     for frequency control.
+            /// Supports frequency attributes and behavior. The Pulse Width Modulation cluster was created for frequency control.
             /// </summary>
             Frequency = 4,
         }
@@ -179,7 +179,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -193,7 +193,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -208,7 +208,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -220,7 +220,7 @@ namespace MatterDotNet.Clusters.Application
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -228,7 +228,7 @@ namespace MatterDotNet.Clusters.Application
         /// Move To Level With On Off
         /// </summary>
         public async Task<bool> MoveToLevelWithOnOff(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
             return ValidateResponse(resp);
         }
 
@@ -236,7 +236,7 @@ namespace MatterDotNet.Clusters.Application
         /// Move With On Off
         /// </summary>
         public async Task<bool> MoveWithOnOff(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x05);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05);
             return ValidateResponse(resp);
         }
 
@@ -244,7 +244,7 @@ namespace MatterDotNet.Clusters.Application
         /// Step With On Off
         /// </summary>
         public async Task<bool> StepWithOnOff(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06);
             return ValidateResponse(resp);
         }
 
@@ -252,7 +252,7 @@ namespace MatterDotNet.Clusters.Application
         /// Stop With On Off
         /// </summary>
         public async Task<bool> StopWithOnOff(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07);
             return ValidateResponse(resp);
         }
 
@@ -263,7 +263,7 @@ namespace MatterDotNet.Clusters.Application
             MoveToClosestFrequencyPayload requestFields = new MoveToClosestFrequencyPayload() {
                 Frequency = Frequency,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

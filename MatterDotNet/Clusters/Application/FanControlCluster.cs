@@ -218,7 +218,7 @@ namespace MatterDotNet.Clusters.Application
                 Wrap = Wrap,
                 LowestOff = LowestOff,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -124,7 +124,7 @@ namespace MatterDotNet.Clusters.Application
             SelectOutputPayload requestFields = new SelectOutputPayload() {
                 Index = Index,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -136,7 +136,7 @@ namespace MatterDotNet.Clusters.Application
                 Index = Index,
                 Name = Name,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

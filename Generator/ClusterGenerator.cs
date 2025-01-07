@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Generator.Schema;
+using MatterDotNet;
 using System.Collections.Immutable;
 using System.Text;
 using System.Xml.Serialization;
@@ -262,7 +263,9 @@ namespace Generator
                             case "max":
                             case "maxCount":
                             case "maxLength":
-                                if (long.TryParse(field.constraint.value, out long toVal))
+                                if (field.constraint.value == "RESP_MAX Constant Type")
+                                    to = Constants.RESP_MAX;
+                                else if (long.TryParse(field.constraint.value, out long toVal))
                                     to = toVal;
                                 break;
                             case "between":
@@ -395,6 +398,7 @@ namespace Generator
                 case "command-id":
                 case "trans-id":
                 case "data-ver":
+                case "AlarmBitmap":
                     writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -420,7 +424,7 @@ namespace Generator
                 case "elapsed-s":
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
-                    writer.Write($"{totalIndent}writer.WriteUInt({id}, {name}");
+                    writer.Write($"{totalIndent}writer.WriteUInt({id}, (uint){name}");
                     if (nullable && !optional)
                         writer.Write("!.Value.TotalSeconds");
                     else
@@ -636,6 +640,7 @@ namespace Generator
                 case "command-id":
                 case "trans-id":
                 case "data-ver":
+                case "AlarmBitmap":
                     writer.Write($"reader.GetUInt({id}");
                     break;
                 case "uint40":
@@ -677,7 +682,7 @@ namespace Generator
                     break;
                 case "elapsed-s":
                     writer.Write($"TimeSpan.FromSeconds(reader.GetUInt({id}");
-                    extraInsideClose = true;
+                    extraOutsideClose = true;
                     break;
                 case "epoch-us":
                     includes.Add("MatterDotNet.Util");
@@ -900,25 +905,25 @@ namespace Generator
                         }
                         writer.WriteLine("            };");
                         if (cmd.access.timed)
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ", requestFields);");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ", requestFields);");
                         else
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ", requestFields);");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.id + ", requestFields);");
                     }
                     else
                     {
                         if (cmd.response == "N")
                         {
                             if (cmd.access.timed)
-                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ");");
+                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ");");
                             else
-                                writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                                writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, cluster, " + cmd.id + ");");
                         }
                         else
                         {
                             if (cmd.access.timed)
-                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, " + cmd.id + ");");
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ");");
                             else
-                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, " + cmd.id + ");");
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.id + ");");
                         }
                     }
                     if (response == null)
@@ -1255,6 +1260,7 @@ namespace Generator
                 case "command-id":
                 case "trans-id":
                 case "data-ver":
+                case "AlarmBitmap":
                     writer.Write("uint");
                     break;
                 case "elapsed-s":

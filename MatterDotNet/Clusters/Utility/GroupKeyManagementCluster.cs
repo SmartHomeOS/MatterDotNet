@@ -260,7 +260,7 @@ namespace MatterDotNet.Clusters.Utility
             KeySetWriteCommandPayload requestFields = new KeySetWriteCommandPayload() {
                 GroupKeySet = GroupKeySet,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -271,7 +271,7 @@ namespace MatterDotNet.Clusters.Utility
             KeySetReadCommandPayload requestFields = new KeySetReadCommandPayload() {
                 GroupKeySetID = GroupKeySetID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadResponseCommand() {
@@ -286,7 +286,7 @@ namespace MatterDotNet.Clusters.Utility
             KeySetRemoveCommandPayload requestFields = new KeySetRemoveCommandPayload() {
                 GroupKeySetID = GroupKeySetID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -296,7 +296,7 @@ namespace MatterDotNet.Clusters.Utility
         public async Task<KeySetReadAllIndicesResponseCommand?> KeySetReadAllIndicesCommand(SecureSession session) {
             KeySetReadAllIndicesCommandPayload requestFields = new KeySetReadAllIndicesCommandPayload() {
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadAllIndicesResponseCommand() {

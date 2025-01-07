@@ -296,7 +296,7 @@ namespace MatterDotNet.Clusters.Utility
             AttestationRequestPayload requestFields = new AttestationRequestPayload() {
                 AttestationNonce = AttestationNonce,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new AttestationResponse() {
@@ -312,7 +312,7 @@ namespace MatterDotNet.Clusters.Utility
             CertificateChainRequestPayload requestFields = new CertificateChainRequestPayload() {
                 CertificateType = CertificateType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new CertificateChainResponse() {
@@ -328,7 +328,7 @@ namespace MatterDotNet.Clusters.Utility
                 CSRNonce = CSRNonce,
                 IsForUpdateNOC = IsForUpdateNOC,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new CSRResponse() {
@@ -348,7 +348,7 @@ namespace MatterDotNet.Clusters.Utility
                 CaseAdminSubject = CaseAdminSubject,
                 AdminVendorId = AdminVendorId,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -366,7 +366,7 @@ namespace MatterDotNet.Clusters.Utility
                 NOCValue = NOCValue,
                 ICACValue = ICACValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -383,7 +383,7 @@ namespace MatterDotNet.Clusters.Utility
             UpdateFabricLabelPayload requestFields = new UpdateFabricLabelPayload() {
                 Label = Label,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -400,7 +400,7 @@ namespace MatterDotNet.Clusters.Utility
             RemoveFabricPayload requestFields = new RemoveFabricPayload() {
                 FabricIndex = FabricIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -417,7 +417,7 @@ namespace MatterDotNet.Clusters.Utility
             AddTrustedRootCertificatePayload requestFields = new AddTrustedRootCertificatePayload() {
                 RootCACertificate = RootCACertificate,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

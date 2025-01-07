@@ -158,7 +158,7 @@ namespace MatterDotNet.Clusters.Utility
                 GroupID = GroupID,
                 GroupName = GroupName,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new AddGroupResponse() {
@@ -174,7 +174,7 @@ namespace MatterDotNet.Clusters.Utility
             ViewGroupPayload requestFields = new ViewGroupPayload() {
                 GroupID = GroupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ViewGroupResponse() {
@@ -191,7 +191,7 @@ namespace MatterDotNet.Clusters.Utility
             GetGroupMembershipPayload requestFields = new GetGroupMembershipPayload() {
                 GroupList = GroupList,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetGroupMembershipResponse() {
@@ -207,7 +207,7 @@ namespace MatterDotNet.Clusters.Utility
             RemoveGroupPayload requestFields = new RemoveGroupPayload() {
                 GroupID = GroupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveGroupResponse() {
@@ -220,7 +220,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Remove All Groups
         /// </summary>
         public async Task<bool> RemoveAllGroups(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
             return ValidateResponse(resp);
         }
 
@@ -232,7 +232,7 @@ namespace MatterDotNet.Clusters.Utility
                 GroupID = GroupID,
                 GroupName = GroupName,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

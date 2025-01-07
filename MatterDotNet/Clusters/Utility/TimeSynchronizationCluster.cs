@@ -380,7 +380,7 @@ namespace MatterDotNet.Clusters.Utility
                 Granularity = Granularity,
                 TimeSource = TimeSource,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -391,7 +391,7 @@ namespace MatterDotNet.Clusters.Utility
             SetTrustedTimeSourcePayload requestFields = new SetTrustedTimeSourcePayload() {
                 TrustedTimeSource = TrustedTimeSource,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -402,7 +402,7 @@ namespace MatterDotNet.Clusters.Utility
             SetTimeZonePayload requestFields = new SetTimeZonePayload() {
                 TimeZone = TimeZone,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetTimeZoneResponse() {
@@ -417,7 +417,7 @@ namespace MatterDotNet.Clusters.Utility
             SetDSTOffsetPayload requestFields = new SetDSTOffsetPayload() {
                 DSTOffset = DSTOffset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -428,7 +428,7 @@ namespace MatterDotNet.Clusters.Utility
             SetDefaultNTPPayload requestFields = new SetDefaultNTPPayload() {
                 DefaultNTP = DefaultNTP,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -426,7 +426,7 @@ namespace MatterDotNet.Clusters.Utility
                 SSID = SSID,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ScanNetworksResponse() {
@@ -446,7 +446,7 @@ namespace MatterDotNet.Clusters.Utility
                 Credentials = Credentials,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -464,7 +464,7 @@ namespace MatterDotNet.Clusters.Utility
                 OperationalDataset = OperationalDataset,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -482,7 +482,7 @@ namespace MatterDotNet.Clusters.Utility
                 NetworkID = NetworkID,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -500,7 +500,7 @@ namespace MatterDotNet.Clusters.Utility
                 NetworkID = NetworkID,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ConnectNetworkResponse() {
@@ -519,7 +519,7 @@ namespace MatterDotNet.Clusters.Utility
                 NetworkIndex = NetworkIndex,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {

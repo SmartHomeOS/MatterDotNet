@@ -105,7 +105,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Reset Counts
         /// </summary>
         public async Task<bool> ResetCounts(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
             return ValidateResponse(resp);
         }
         #endregion Commands

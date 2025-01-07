@@ -79,8 +79,18 @@ namespace Generator
         {
             summary = summary.Replace("Wi Fi", "WiFi");
             StringBuilder ret = new StringBuilder(summary.Length);
+            bool space = false;
             foreach (char c in summary)
             {
+                if (c == ' ')
+                {
+                    if (space)
+                        continue;
+                    else
+                        space = true;
+                }
+                else
+                    space = false;
                 if (c == '>')
                     ret.Append("&gt;");
                 else if (c == '<')
@@ -89,7 +99,7 @@ namespace Generator
                     ret.Append("&amp;");
                 else if (c == '"')
                     ret.Append("&quot;");
-                else
+                else if (c != '\n' && c != '\r')
                     ret.Append(c);
             }
             return ret.ToString().Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>");

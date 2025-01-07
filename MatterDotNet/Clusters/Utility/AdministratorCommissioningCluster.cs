@@ -106,7 +106,7 @@ namespace MatterDotNet.Clusters.Utility
                 Iterations = Iterations,
                 Salt = Salt,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -117,7 +117,7 @@ namespace MatterDotNet.Clusters.Utility
             OpenBasicCommissioningWindowPayload requestFields = new OpenBasicCommissioningWindowPayload() {
                 CommissioningTimeout = CommissioningTimeout,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -125,7 +125,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Revoke Commissioning
         /// </summary>
         public async Task<bool> RevokeCommissioning(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, CLUSTER_ID, commandTimeoutMS, 0x02);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x02);
             return ValidateResponse(resp);
         }
         #endregion Commands

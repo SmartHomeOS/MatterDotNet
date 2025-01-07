@@ -45,7 +45,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             Blink = 0x00,
             /// <summary>
-            /// e.g., Colored light turns orange for 8 seconds;                            non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.
+            /// e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.
             /// </summary>
             ChannelChange = 0x0B,
             /// <summary>
@@ -57,7 +57,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             Okay = 0x02,
             /// <summary>
-            /// Complete the current effect sequence before                            terminating. e.g., if in the middle of a breathe effect (as above),                            first complete the current 1s breathe effect and then terminate the                            effect.
+            /// Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect (as above), first complete the current 1s breathe effect and then terminate the effect.
             /// </summary>
             FinishEffect = 0xFE,
             /// <summary>
@@ -98,7 +98,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             Display = 0x04,
             /// <summary>
-            /// Presentation will be conveyed by actuator functionality                              such as through a window blind operation or in-wall relay.
+            /// Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay.
             /// </summary>
             Actuator = 0x05,
         }
@@ -134,7 +134,7 @@ namespace MatterDotNet.Clusters.Utility
             IdentifyPayload requestFields = new IdentifyPayload() {
                 IdentifyTime = IdentifyTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -146,7 +146,7 @@ namespace MatterDotNet.Clusters.Utility
                 EffectIdentifier = EffectIdentifier,
                 EffectVariant = EffectVariant,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

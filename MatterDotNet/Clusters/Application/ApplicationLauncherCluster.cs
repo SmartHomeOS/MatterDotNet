@@ -169,7 +169,7 @@ namespace MatterDotNet.Clusters.Application
                 Application = Application,
                 Data = Data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
@@ -185,7 +185,7 @@ namespace MatterDotNet.Clusters.Application
             StopAppPayload requestFields = new StopAppPayload() {
                 Application = Application,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
@@ -201,7 +201,7 @@ namespace MatterDotNet.Clusters.Application
             HideAppPayload requestFields = new HideAppPayload() {
                 Application = Application,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {

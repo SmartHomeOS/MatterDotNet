@@ -50,7 +50,7 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             UpdateAvailable = 1,
             /// <summary>
-            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available,                                    which contains an update that needs to be applied urgently.
+            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.
             /// </summary>
             UrgentUpdateAvailable = 2,
         }
@@ -183,7 +183,7 @@ namespace MatterDotNet.Clusters.Utility
                 MetadataForNode = MetadataForNode,
                 Endpoint = Endpoint,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

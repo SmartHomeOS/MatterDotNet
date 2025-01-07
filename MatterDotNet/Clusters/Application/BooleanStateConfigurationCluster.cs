@@ -114,7 +114,7 @@ namespace MatterDotNet.Clusters.Application
             SuppressAlarmPayload requestFields = new SuppressAlarmPayload() {
                 AlarmsToSuppress = AlarmsToSuppress,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -125,7 +125,7 @@ namespace MatterDotNet.Clusters.Application
             EnableDisableAlarmPayload requestFields = new EnableDisableAlarmPayload() {
                 AlarmsToEnableDisable = AlarmsToEnableDisable,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

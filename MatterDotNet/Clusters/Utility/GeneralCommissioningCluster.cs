@@ -168,7 +168,7 @@ namespace MatterDotNet.Clusters.Utility
                 ExpiryLengthSeconds = ExpiryLengthSeconds,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ArmFailSafeResponse() {
@@ -186,7 +186,7 @@ namespace MatterDotNet.Clusters.Utility
                 CountryCode = CountryCode,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetRegulatoryConfigResponse() {
@@ -199,7 +199,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Commissioning Complete
         /// </summary>
         public async Task<CommissioningCompleteResponse?> CommissioningComplete(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, CLUSTER_ID, 0x04);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
             if (!ValidateResponse(resp))
                 return null;
             return new CommissioningCompleteResponse() {

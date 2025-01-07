@@ -80,7 +80,13 @@ namespace MatterDotNet.OperationalDiscovery
             else
                 instance = "_S" + discriminator.ToString();
             string domain = instance + "._sub._matterc._udp.local";
-            List<Message> results = await mdns.ResolveQuery(domain, false, DNSRecordType.PTR);
+            List<Message> results = [];
+            for (int i = 0; i < 10; i++)
+            {
+                results = await mdns.ResolveQuery(domain, false, DNSRecordType.PTR);
+                if (results.Count > 0)
+                    break;
+            }
             foreach (Message msg in results)
             {
                 foreach (ResourceRecord record in msg.Answers)
@@ -185,7 +191,8 @@ namespace MatterDotNet.OperationalDiscovery
                             node.Product = product;
                         break;
                     case "CM":
-                        node.Commissionable = kv[1] == "1";
+                        if (byte.TryParse(kv[1], out byte mode))
+                            node.CommissioningMode = (CommissioningMode)mode;
                         break;
                     case "D":
                         if (ushort.TryParse(kv[1], out ushort descriminator))

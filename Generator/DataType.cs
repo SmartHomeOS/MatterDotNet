@@ -19,6 +19,7 @@ namespace Generator
         Boolean,
         Bytes,
         Choice,
+        Enum,
         FloatingPoint,
         Integer,
         List,

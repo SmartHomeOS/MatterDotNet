@@ -103,6 +103,12 @@ namespace Generator
                         else
                             writer.WriteLine($"{totalIndent}{child.Name} = reader.GetULong({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
                         break;
+                    case DataType.Enum:
+                        if (child.LengthBytes == 1)
+                            writer.WriteLine($"{totalIndent}{child.Name} = ({child.ReferenceName})reader.GetByte({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
+                        else
+                            writer.WriteLine($"{totalIndent}{child.Name} = ({child.ReferenceName})reader.GetUShort({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
+                        break;
                     case DataType.FloatingPoint:
                         if (child.LengthBytes == 4)
                             writer.WriteLine($"{totalIndent}{child.Name} = reader.GetFloat({child.TagNumber}{(child.Nullable ? ", true)" : ")")}{(!child.Nullable && !child.Optional ? "!.Value;" : ";")}");
@@ -230,6 +236,12 @@ namespace Generator
                             writer.WriteLine($"{totalIndent}writer.WriteUInt({child.TagNumber}, {child.Name});");
                         else
                             writer.WriteLine($"{totalIndent}writer.WriteULong({child.TagNumber}, {child.Name});");
+                        break;
+                    case DataType.Enum:
+                        if (child.LengthBytes == 1)
+                            writer.WriteLine($"{totalIndent}writer.WriteByte({child.TagNumber}, (byte){child.Name});");
+                        else
+                            writer.WriteLine($"{totalIndent}writer.WriteUShort({child.TagNumber}, (ushort){child.Name});");
                         break;
                     case DataType.FloatingPoint:
                         if (child.LengthBytes == 4)
@@ -362,6 +374,7 @@ namespace Generator
                 case DataType.Null:
                     throw new InvalidDataException("type of " + tag.Name + " is null");
                 case DataType.Reference:
+                case DataType.Enum:
                     return tag.ReferenceName!;
                 case DataType.String:
                     return "string";

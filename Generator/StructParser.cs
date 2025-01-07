@@ -146,6 +146,15 @@ namespace Generator
                     tag.Type = DataType.FloatingPoint;
                     tag.LengthBytes = 8;
                     break;
+                case "PERCENT100THS":
+                    tag.Type = DataType.UnsignedInteger;
+                    tag.LengthBytes = 2;
+                    break;
+                case "MEASUREMENTTYPEENUM":
+                    tag.Type = DataType.Enum;
+                    tag.LengthBytes = 2;
+                    tag.ReferenceName = "MeasurementType";
+                    break;
                 default:
                     tag.Type = DataType.Reference;
                     tag.ReferenceName = GeneratorUtil.SanitizeName(typeParts[0]);

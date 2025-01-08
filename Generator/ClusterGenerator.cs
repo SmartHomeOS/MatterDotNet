@@ -220,6 +220,8 @@ namespace Generator
             {
                 if (field.type == null || field.disallowConform != null) //Reserved/removed fields
                     continue;
+                if (field.type == "enum8" && field.name == "Status")
+                    field.type = "status";
                 writer.Write("            public ");
                 if (field.optionalConform == null)
                     writer.Write("required ");
@@ -227,9 +229,9 @@ namespace Generator
                 if (field.optionalConform != null || field.quality?.nullable == true)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(command.name))
-                    writer.Write(" " + field.name + "Field { get; set; }");
+                    writer.Write(" " + GeneratorUtil.SanitizeName(field.name) + "Field { get; set; }");
                 else
-                    writer.Write(" " + field.name + " { get; set; }");
+                    writer.Write(" " + GeneratorUtil.SanitizeName(field.name) + " { get; set; }");
                 if (field.@default != null && DefaultValid(field.@default))
                 {
                     if (field.type.EndsWith("Enum"))
@@ -250,6 +252,8 @@ namespace Generator
                         continue;
                     long? from = null;
                     long? to = null;
+                    if (field.type == "max 254")
+                            to = 254;
                     if (field.constraint != null)
                     {
                         switch (field.constraint.type)
@@ -275,6 +279,10 @@ namespace Generator
                                     to = parsedTo;
                                 if (long.TryParse(field.constraint.from, out long parsedFrom))
                                     from = parsedFrom;
+                                break;
+                            case "allowed":
+                                if (long.TryParse(field.constraint.value, out long parsedAllowed))
+                                    to = parsedAllowed;
                                 break;
                             case "desc":
                                 break;
@@ -350,7 +358,7 @@ namespace Generator
                 case "int64":
                 case "power-mW":
                 case "amperage-mA":
-                case "voltage-mW":
+                case "voltage-mV":
                 case "energy-mWh":
                     writer.Write($"{totalIndent}writer.WriteLong({id}, {name}");
                     if (to != null)
@@ -358,6 +366,7 @@ namespace Generator
                     else if (from != null)
                         writer.Write(", long.MaxValue");
                     break;
+                case "max 254":
                 case "uint8":
                 case "enum8":
                 case "map8":
@@ -392,7 +401,7 @@ namespace Generator
                 case "uint32":
                 case "map32":
                 case "cluster-id":
-                case "attrib-id":
+                case "attribute-id":
                 case "field-id":
                 case "event-id":
                 case "command-id":
@@ -411,7 +420,7 @@ namespace Generator
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.Write($"{totalIndent}writer.WriteUInt({id}, TimeUtil.ToEpochSeconds({name}");
-                    if (nullable && !optional)
+                    if (nullable || optional)
                         writer.Write("!.Value)");
                     else
                         writer.Write(")");
@@ -425,7 +434,7 @@ namespace Generator
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.Write($"{totalIndent}writer.WriteUInt({id}, (uint){name}");
-                    if (nullable && !optional)
+                    if (nullable || !optional)
                         writer.Write("!.Value.TotalSeconds");
                     else
                         writer.Write(".TotalSeconds");
@@ -440,7 +449,7 @@ namespace Generator
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.Write($"{totalIndent}writer.WriteULong({id}, TimeUtil.ToEpochUS({name}");
-                    if (nullable && !optional)
+                    if (nullable || optional)
                         writer.Write("!.Value)");
                     else
                         writer.Write(")");
@@ -452,12 +461,14 @@ namespace Generator
                     break;
                 case "ref_DataTypeSystemTimeUs":
                 case "ref_DataTypeSystemTimeMs":
+                case "systime-ms":
+                case "systime-us":
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
-                    writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
-                    if (nullable && !optional)
+                    writer.Write($"{totalIndent}writer.WriteULong({id}, (ulong){name}");
+                    if (nullable || optional)
                         writer.Write("!.Value");
-                    if (type == "ref_DataTypeSystemTimeMs")
+                    if (type == "ref_DataTypeSystemTimeMs" || type == "systime-ms")
                         writer.Write(".TotalMilliseconds");
                     else
                         writer.Write(".TotalMicroseconds");
@@ -471,7 +482,7 @@ namespace Generator
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
-                    if (nullable && !optional)
+                    if (nullable || optional)
                         writer.Write("!.Value.ToUnixTimeMilliseconds()");
                     else
                         writer.Write(".ToUnixTimeMilliseconds()");
@@ -490,6 +501,7 @@ namespace Generator
                 case "EUI64":
                 case "event-no":
                 case "SubjectID":
+                case "subject-id":
                     writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -543,7 +555,9 @@ namespace Generator
                         writer.Write(", int.MaxValue");
                     break;
                 default:
-                    if (HasEnum(cluster, type) || HasBitmap(cluster, type))
+                    if (type == "status")
+                        writer.WriteLine($"{totalIndent}writer.WriteByte({id}, {(optional || nullable ? "(byte?)" : "(byte)")}{name});");
+                    else if (HasEnum(cluster, type) || HasBitmap(cluster, type) || type == "ref_CharacteristicEnum" || type == "ref_MeasurementTypeEnum")
                         writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {(optional || nullable ? "(ushort?)" : "(ushort)")}{name});");
                     else
                     {
@@ -606,10 +620,11 @@ namespace Generator
                 case "int64":
                 case "power-mW":
                 case "amperage-mA":
-                case "voltage-mW":
+                case "voltage-mV":
                 case "energy-mWh":
                     writer.Write($"reader.GetLong({id}");
                     break;
+                case "max 254":
                 case "uint8":
                 case "enum8":
                 case "map8":
@@ -634,7 +649,7 @@ namespace Generator
                 case "uint32":
                 case "map32":
                 case "cluster-id":
-                case "attrib-id":
+                case "attribute-id":
                 case "field-id":
                 case "event-id":
                 case "command-id":
@@ -653,6 +668,7 @@ namespace Generator
                 case "EUI64":
                 case "event-no":
                 case "SubjectID":
+                case "subject-id":
                     writer.Write($"reader.GetULong({id}");
                     break;
                 case "single":
@@ -690,11 +706,13 @@ namespace Generator
                     extraInsideClose = true;
                     break;
                 case "ref_DataTypeSystemTimeUs":
-                    writer.Write($"TimeSpan.FromMicroseconds(reader.GetULong({id}");
+                case "systime-us":
+                    writer.Write($"TimeUtil.FromMicros(reader.GetULong({id}");
                     extraInsideClose = true;
                     break;
                 case "ref_DataTypeSystemTimeMs":
-                    writer.Write($"TimeSpan.FromMilliseconds(reader.GetULong({id}");
+                case "systime-ms":
+                    writer.Write($"TimeUtil.FromMillis(reader.GetULong({id}");
                     extraInsideClose = true;
                     break;
                 case "ref_DataTypePosixMs":
@@ -744,9 +762,17 @@ namespace Generator
                         writer.WriteLine(';');
                     return;
                 default:
-                    if (HasEnum(cluster, type) || HasBitmap(cluster, type))
+                    if (HasEnum(cluster, type) || HasBitmap(cluster, type) || type == "status" || type == "ref_CharacteristicEnum" || type == "ref_MeasurementTypeEnum")
                     {
-                        writer.Write($"({type})reader.GetUShort({id}");
+                        if (type == "ref_CharacteristicEnum")
+                            type = "MediaPlaybackCluster.CharacteristicEnum";
+                        else if (type == "ref_MeasurementTypeEnum")
+                            type = "MeasurementType";
+                        
+                        if (type == "status")
+                            writer.Write($"(IMStatusCode)reader.GetByte({id}");
+                        else
+                            writer.Write($"({GeneratorUtil.SanitizeName(type)})reader.GetUShort({id}");
                         if (optional)
                             writer.Write(", true");
                         if (id == "-1" || id == "i")
@@ -938,7 +964,7 @@ namespace Generator
                         writer.WriteLine("            return new " + GeneratorUtil.SanitizeName(response.name) + "() {");
                         foreach (var field in response.field)
                         {
-                            writer.Write("                " + field.name + " = (");
+                            writer.Write("                " + GeneratorUtil.SanitizeName(field.name) + " = (");
                             WriteType(field.type, field.entry?.type, writer);
                             if (field.optionalConform != null)
                             {
@@ -948,13 +974,13 @@ namespace Generator
                             }
                             else
                             {
-                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
+                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type) || field.type == "status")
                                     writer.Write(")(byte");
                                 if (field.type == "elapsed-s")
                                     writer.WriteLine($".FromSeconds((uint)GetField(resp, {field.id}))),");
-                                else if (field.type == "ref_DataTypeSystemTimeUs")
+                                else if (field.type == "ref_DataTypeSystemTimeUs" || field.type == "systime-us")
                                     writer.WriteLine($".FromMicroseconds((ulong)GetField(resp, {field.id}))),");
-                                else if (field.type == "ref_DataTypeSystemTimeMs")
+                                else if (field.type == "ref_DataTypeSystemTimeMs" || field.type == "systime-ms")
                                     writer.WriteLine($".FromMilliseconds((ulong)GetField(resp, {field.id}))),");
                                 else if (field.type == "ref_DataTypePosixMs")
                                     writer.WriteLine($".FromUnixTimeMilliseconds((long)(ulong)GetField(resp, {field.id}))),");
@@ -993,6 +1019,8 @@ namespace Generator
             {
                 long? to = null;
                 long? from = null;
+                if (field.type == null)
+                    continue;
                 if (field.constraint?.toSpecified == true && long.TryParse(field.constraint.to, out long toVal))
                     to = toVal;
                 if (field.constraint?.fromSpecified == true && long.TryParse(field.constraint.from, out long fromVal))
@@ -1002,6 +1030,8 @@ namespace Generator
             writer.WriteLine("            }");
             foreach (clusterDataTypesStructField field in structType.field)
             {
+                if (field.type == null)
+                    continue;
                 bool hasDefault = field.@default != null && DefaultValid(field.@default);
                 if (hasDefault && HasEnum(cluster, field.type) && !HasEnumValue(cluster, field.type, field.@default!))
                     hasDefault = false;
@@ -1033,6 +1063,8 @@ namespace Generator
             {
                 long? from = null;
                 long? to = null;
+                if (field.type == null)
+                    continue;
                 if (field.constraint != null)
                 {
                     switch (field.constraint.type)
@@ -1227,6 +1259,7 @@ namespace Generator
         {
             switch (type)
             {
+                case "max 254":
                 case "uint8":
                 case "enum8":
                 case "map8":
@@ -1254,7 +1287,7 @@ namespace Generator
                 case "uint32":
                 case "map32":
                 case "cluster-id":
-                case "attrib-id":
+                case "attribute-id":
                 case "field-id":
                 case "event-id":
                 case "command-id":
@@ -1264,6 +1297,8 @@ namespace Generator
                     writer.Write("uint");
                     break;
                 case "elapsed-s":
+                case "systime-ms":
+                case "systime-us":
                 case "ref_DataTypeSystemTimeUs":
                 case "ref_DataTypeSystemTimeMs":
                     writer.Write("TimeSpan");
@@ -1286,6 +1321,7 @@ namespace Generator
                 case "EUI64":
                 case "event-no":
                 case "SubjectID":
+                case "subject-id":
                     writer.Write("ulong");
                     break;
                 case "int8":
@@ -1305,7 +1341,7 @@ namespace Generator
                 case "int64":
                 case "power-mW":
                 case "amperage-mA":
-                case "voltage-mW":
+                case "voltage-mV":
                 case "energy-mWh":
                     writer.Write("long");
                     break;
@@ -1345,9 +1381,27 @@ namespace Generator
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("SemanticTag");
                     break;
+                case "ref_MeasurementAccuracyStruct":
+                    includes.Add("MatterDotNet.Messages");
+                    writer.Write("MeasurementAccuracy");
+                    break;
+                case "ref_MeasurementTypeEnum":
+                    includes.Add("MatterDotNet.Messages");
+                    writer.Write("MeasurementType");
+                    break;
                 case "tod":
                 case "date":
                     throw new NotImplementedException();
+                case "ref_AdditionalInfoStruct":
+                    writer.Write("ContentLauncherCluster.AdditionalInfo");
+                    break;
+                case "ref_CharacteristicEnum":
+                    writer.Write("MediaPlaybackCluster.CharacteristicEnum");
+                    break;
+                case "status":
+                    includes.Add("MatterDotNet.Protocol.Payloads.Status");
+                    writer.Write("IMStatusCode");
+                    break;
                 default:
                     writer.Write(GeneratorUtil.SanitizeName(type));
                     break;
@@ -1358,7 +1412,7 @@ namespace Generator
         {
             if (value == "\"")
                 return "\"\"";
-            if (value == "empty")
+            if (value == "empty" || (type == "list" && value == "0"))
             {
                 if (type == "list")
                 {
@@ -1380,7 +1434,15 @@ namespace Generator
             if (value == "0" && (type == "epoch-s" || type == "epoch-us"))
                 return "TimeUtil.EPOCH";
             if (type == "elapsed-s")
+            {
+                if (value.EndsWith('s'))
+                    value = value.Substring(0, value.Length - 1);
                 return $"TimeSpan.FromSeconds({value})";
+            }
+            if (type == "bool")
+                return (value == "1") ? "true" : "false";
+            if (type == "status" && value == "SUCCESS")
+                return "IMStatusCode.SUCCESS";
             return value.ToLowerInvariant();
         }
 

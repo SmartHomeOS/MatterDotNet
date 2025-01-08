@@ -73,7 +73,7 @@ namespace MatterDotNet.Util
         }
 
         /// <summary>
-        /// Convert a DateTime to Epoch Seconds
+        /// Convert an Epoch Seconds to DateTime
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
@@ -86,7 +86,7 @@ namespace MatterDotNet.Util
         }
 
         /// <summary>
-        /// Convert a DateTime to Epoch uS
+        /// Convert an Epoch uS to DateTime
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
@@ -96,6 +96,30 @@ namespace MatterDotNet.Util
                 return null;
             long unix = (long)(date / 1000) + EPOCH_S;
             return DateTimeOffset.FromUnixTimeSeconds(unix).DateTime;
+        }
+
+        /// <summary>
+        /// Convert a TimeSpan ulong in ms to a TimeSpan
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static TimeSpan? FromMillis(ulong? timespan)
+        {
+            if (timespan == null)
+                return null;
+            return TimeSpan.FromMilliseconds(timespan.Value);
+        }
+
+        /// <summary>
+        /// Convert a TimeSpan ulong in us to a TimeSpan
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static TimeSpan? FromMicros(ulong? timespan)
+        {
+            if (timespan == null)
+                return null;
+            return TimeSpan.FromMilliseconds(timespan.Value);
         }
     }
 }

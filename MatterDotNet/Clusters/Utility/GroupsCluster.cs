@@ -15,6 +15,7 @@
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
@@ -75,7 +76,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Add Group Response - Reply from server
         /// </summary>
         public struct AddGroupResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
         }
 
@@ -92,7 +93,7 @@ namespace MatterDotNet.Clusters.Utility
         /// View Group Response - Reply from server
         /// </summary>
         public struct ViewGroupResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required string GroupName { get; set; }
         }
@@ -133,7 +134,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Remove Group Response - Reply from server
         /// </summary>
         public struct RemoveGroupResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
         }
 
@@ -162,7 +163,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new AddGroupResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
             };
         }
@@ -178,7 +179,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new ViewGroupResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 GroupName = (string)GetField(resp, 2),
             };
@@ -211,7 +212,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveGroupResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
             };
         }

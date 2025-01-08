@@ -434,7 +434,7 @@ namespace Generator
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
                     writer.Write($"{totalIndent}writer.WriteUInt({id}, (uint){name}");
-                    if (nullable || !optional)
+                    if (nullable || optional)
                         writer.Write("!.Value.TotalSeconds");
                     else
                         writer.Write(".TotalSeconds");
@@ -1440,7 +1440,7 @@ namespace Generator
                 return $"TimeSpan.FromSeconds({value})";
             }
             if (type == "bool")
-                return (value == "1") ? "true" : "false";
+                return (value == "1" || value.Equals("true", StringComparison.InvariantCultureIgnoreCase)) ? "true" : "false";
             if (type == "status" && value == "SUCCESS")
                 return "IMStatusCode.SUCCESS";
             return value.ToLowerInvariant();

@@ -15,6 +15,7 @@
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
@@ -259,7 +260,7 @@ namespace MatterDotNet.Clusters.Application
         /// Add Scene Response - Reply from server
         /// </summary>
         public struct AddSceneResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
         }
@@ -279,7 +280,7 @@ namespace MatterDotNet.Clusters.Application
         /// View Scene Response - Reply from server
         /// </summary>
         public struct ViewSceneResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
             public required uint TransitionTime { get; set; }
@@ -302,7 +303,7 @@ namespace MatterDotNet.Clusters.Application
         /// Remove Scene Response - Reply from server
         /// </summary>
         public struct RemoveSceneResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
         }
@@ -320,7 +321,7 @@ namespace MatterDotNet.Clusters.Application
         /// Remove All Scenes Response - Reply from server
         /// </summary>
         public struct RemoveAllScenesResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
         }
 
@@ -339,7 +340,7 @@ namespace MatterDotNet.Clusters.Application
         /// Store Scene Response - Reply from server
         /// </summary>
         public struct StoreSceneResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
         }
@@ -371,7 +372,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get Scene Membership Response - Reply from server
         /// </summary>
         public struct GetSceneMembershipResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required byte? Capacity { get; set; }
             public required ushort GroupID { get; set; }
             public required List<byte> SceneList { get; set; }
@@ -398,7 +399,7 @@ namespace MatterDotNet.Clusters.Application
         /// Copy Scene Response - Reply from server
         /// </summary>
         public struct CopySceneResponse() {
-            public required byte Status { get; set; }
+            public required IMStatusCode Status { get; set; }
             public required ushort GroupIdentifierFrom { get; set; }
             public required byte SceneIdentifierFrom { get; set; }
         }
@@ -420,7 +421,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new AddSceneResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 SceneID = (byte)GetField(resp, 2),
             };
@@ -438,7 +439,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new ViewSceneResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 SceneID = (byte)GetField(resp, 2),
                 TransitionTime = (uint)GetField(resp, 3),
@@ -459,7 +460,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveSceneResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 SceneID = (byte)GetField(resp, 2),
             };
@@ -476,7 +477,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveAllScenesResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
             };
         }
@@ -493,7 +494,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new StoreSceneResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 SceneID = (byte)GetField(resp, 2),
             };
@@ -523,7 +524,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new GetSceneMembershipResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 Capacity = (byte)GetField(resp, 1),
                 GroupID = (ushort)GetField(resp, 2),
                 SceneList = (List<byte>)GetField(resp, 3),
@@ -545,7 +546,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new CopySceneResponse() {
-                Status = (byte)GetField(resp, 0),
+                Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupIdentifierFrom = (ushort)GetField(resp, 1),
                 SceneIdentifierFrom = (byte)GetField(resp, 2),
             };

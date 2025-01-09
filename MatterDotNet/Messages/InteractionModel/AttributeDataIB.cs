@@ -18,6 +18,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.InteractionModel
 {
+    /// <summary>
+    /// Attribute Data IB Payload
+    /// </summary>
     public record AttributeDataIB : TLVPayload
     {
         /// <inheritdoc />

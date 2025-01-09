@@ -138,11 +138,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Allowed Vendor List attribute
         /// </summary>
-        public async Task<List<ushort>> GetAllowedVendorList(SecureSession session) {
-            List<ushort> list = new List<ushort>();
+        public async Task<ushort[]> GetAllowedVendorList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
+            ushort[] list = new ushort[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetUShort(i)!.Value);
+                list[i] = reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes

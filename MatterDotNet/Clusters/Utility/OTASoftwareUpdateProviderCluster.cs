@@ -104,7 +104,7 @@ namespace MatterDotNet.Clusters.Utility
             public required ushort VendorID { get; set; }
             public required ushort ProductID { get; set; }
             public required uint SoftwareVersion { get; set; }
-            public required List<DownloadProtocolEnum> ProtocolsSupported { get; set; }
+            public required DownloadProtocolEnum[] ProtocolsSupported { get; set; }
             public ushort? HardwareVersion { get; set; }
             public string? Location { get; set; }
             public bool? RequestorCanConsent { get; set; } = false;
@@ -116,7 +116,7 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteUInt(2, SoftwareVersion);
                 {
                     Constrain(ProtocolsSupported, 0, 8);
-                    writer.StartList(3);
+                    writer.StartArray(3);
                     foreach (var item in ProtocolsSupported) {
                         writer.WriteUShort(-1, (ushort)item);
                     }
@@ -183,7 +183,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Query Image
         /// </summary>
-        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort VendorID, ushort ProductID, uint SoftwareVersion, List<DownloadProtocolEnum> ProtocolsSupported, ushort? HardwareVersion, string? Location, bool? RequestorCanConsent, byte[]? MetadataForProvider) {
+        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort VendorID, ushort ProductID, uint SoftwareVersion, DownloadProtocolEnum[] ProtocolsSupported, ushort? HardwareVersion, string? Location, bool? RequestorCanConsent, byte[]? MetadataForProvider) {
             QueryImagePayload requestFields = new QueryImagePayload() {
                 VendorID = VendorID,
                 ProductID = ProductID,

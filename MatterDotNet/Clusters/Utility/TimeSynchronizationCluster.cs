@@ -323,12 +323,12 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         private record SetTimeZonePayload : TLVPayload {
-            public required List<TimeZone> TimeZone { get; set; }
+            public required TimeZone[] TimeZone { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
                     Constrain(TimeZone, 1, 2);
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in TimeZone) {
                         item.Serialize(writer, -1);
                     }
@@ -346,11 +346,11 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         private record SetDSTOffsetPayload : TLVPayload {
-            public required List<DSTOffset> DSTOffset { get; set; }
+            public required DSTOffset[] DSTOffset { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in DSTOffset) {
                         item.Serialize(writer, -1);
                     }
@@ -398,7 +398,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set Time Zone
         /// </summary>
-        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, List<TimeZone> TimeZone) {
+        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZone[] TimeZone) {
             SetTimeZonePayload requestFields = new SetTimeZonePayload() {
                 TimeZone = TimeZone,
             };
@@ -413,7 +413,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set DST Offset
         /// </summary>
-        public async Task<bool> SetDSTOffset(SecureSession session, List<DSTOffset> DSTOffset) {
+        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffset[] DSTOffset) {
             SetDSTOffsetPayload requestFields = new SetDSTOffsetPayload() {
                 DSTOffset = DSTOffset,
             };
@@ -493,22 +493,22 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Time Zone attribute
         /// </summary>
-        public async Task<List<TimeZone>> GetTimeZone(SecureSession session) {
-            List<TimeZone> list = new List<TimeZone>();
+        public async Task<TimeZone[]> GetTimeZone(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            TimeZone[] list = new TimeZone[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new TimeZone(reader.GetStruct(i)!));
+                list[i] = new TimeZone(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the DST Offset attribute
         /// </summary>
-        public async Task<List<DSTOffset>> GetDSTOffset(SecureSession session) {
-            List<DSTOffset> list = new List<DSTOffset>();
+        public async Task<DSTOffset[]> GetDSTOffset(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
+            DSTOffset[] list = new DSTOffset[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new DSTOffset(reader.GetStruct(i)!));
+                list[i] = new DSTOffset(reader.GetStruct(i)!);
             return list;
         }
 

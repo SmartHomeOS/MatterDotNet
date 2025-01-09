@@ -130,19 +130,19 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 ClusterID = reader.GetUInt(0)!.Value;
                 {
-                    AttributeValueList = new List<AttributeValuePair>();
-                    foreach (var item in (List<object>)fields[1]) {
-                        AttributeValueList.Add(new AttributeValuePair((object[])item));
+                    AttributeValueList = new AttributeValuePair[((object[])fields[1]).Length];
+                    for (int i = 0; i < AttributeValueList.Length; i++) {
+                        AttributeValueList[i] = new AttributeValuePair((object[])fields[-1]);
                     }
                 }
             }
             public required uint ClusterID { get; set; }
-            public required List<AttributeValuePair> AttributeValueList { get; set; }
+            public required AttributeValuePair[] AttributeValueList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, ClusterID);
                 {
-                    writer.StartList(1);
+                    writer.StartArray(1);
                     foreach (var item in AttributeValueList) {
                         item.Serialize(writer, -1);
                     }
@@ -169,9 +169,9 @@ namespace MatterDotNet.Clusters.Application
                 SceneName = reader.GetString(2, false)!;
                 SceneTransitionTime = reader.GetUInt(3)!.Value;
                 {
-                    ExtensionFields = new List<ExtensionFieldSet>();
-                    foreach (var item in (List<object>)fields[4]) {
-                        ExtensionFields.Add(new ExtensionFieldSet((object[])item));
+                    ExtensionFields = new ExtensionFieldSet[((object[])fields[4]).Length];
+                    for (int i = 0; i < ExtensionFields.Length; i++) {
+                        ExtensionFields[i] = new ExtensionFieldSet((object[])fields[-1]);
                     }
                 }
             }
@@ -179,7 +179,7 @@ namespace MatterDotNet.Clusters.Application
             public required byte SceneID { get; set; }
             public required string SceneName { get; set; }
             public required uint SceneTransitionTime { get; set; } = 0;
-            public required List<ExtensionFieldSet> ExtensionFields { get; set; } = new List<ExtensionFieldSet>();
+            public required ExtensionFieldSet[] ExtensionFields { get; set; } = Array.Empty<ExtensionFieldSet>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, SceneGroupID);
@@ -187,7 +187,7 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteString(2, SceneName, 16);
                 writer.WriteUInt(3, SceneTransitionTime, 60000000);
                 {
-                    writer.StartList(4);
+                    writer.StartArray(4);
                     foreach (var item in ExtensionFields) {
                         item.Serialize(writer, -1);
                     }
@@ -238,7 +238,7 @@ namespace MatterDotNet.Clusters.Application
             public required byte SceneID { get; set; }
             public required uint TransitionTime { get; set; }
             public required string SceneName { get; set; }
-            public required List<ExtensionFieldSet> ExtensionFieldSetStructs { get; set; }
+            public required ExtensionFieldSet[] ExtensionFieldSetStructs { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
@@ -246,7 +246,7 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUInt(2, TransitionTime, 60000000);
                 writer.WriteString(3, SceneName, 16);
                 {
-                    writer.StartList(4);
+                    writer.StartArray(4);
                     foreach (var item in ExtensionFieldSetStructs) {
                         item.Serialize(writer, -1);
                     }
@@ -285,7 +285,7 @@ namespace MatterDotNet.Clusters.Application
             public required byte SceneID { get; set; }
             public required uint TransitionTime { get; set; }
             public required string SceneName { get; set; }
-            public required List<ExtensionFieldSet> ExtensionFieldSetStructs { get; set; }
+            public required ExtensionFieldSet[] ExtensionFieldSetStructs { get; set; }
         }
 
         private record RemoveScenePayload : TLVPayload {
@@ -375,7 +375,7 @@ namespace MatterDotNet.Clusters.Application
             public required IMStatusCode Status { get; set; }
             public required byte? Capacity { get; set; }
             public required ushort GroupID { get; set; }
-            public required List<byte> SceneList { get; set; }
+            public required byte[] SceneList { get; set; }
         }
 
         private record CopyScenePayload : TLVPayload {
@@ -409,7 +409,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add Scene
         /// </summary>
-        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort GroupID, byte SceneID, uint TransitionTime, string SceneName, List<ExtensionFieldSet> ExtensionFieldSetStructs) {
+        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort GroupID, byte SceneID, uint TransitionTime, string SceneName, ExtensionFieldSet[] ExtensionFieldSetStructs) {
             AddScenePayload requestFields = new AddScenePayload() {
                 GroupID = GroupID,
                 SceneID = SceneID,
@@ -444,7 +444,7 @@ namespace MatterDotNet.Clusters.Application
                 SceneID = (byte)GetField(resp, 2),
                 TransitionTime = (uint)GetField(resp, 3),
                 SceneName = (string)GetField(resp, 4),
-                ExtensionFieldSetStructs = (List<ExtensionFieldSet>)GetField(resp, 5),
+                ExtensionFieldSetStructs = (ExtensionFieldSet[])GetField(resp, 5),
             };
         }
 
@@ -527,7 +527,7 @@ namespace MatterDotNet.Clusters.Application
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
                 Capacity = (byte)GetField(resp, 1),
                 GroupID = (ushort)GetField(resp, 2),
-                SceneList = (List<byte>)GetField(resp, 3),
+                SceneList = (byte[])GetField(resp, 3),
             };
         }
 
@@ -592,11 +592,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Fabric Scene Info attribute
         /// </summary>
-        public async Task<List<SceneInfo>> GetFabricSceneInfo(SecureSession session) {
-            List<SceneInfo> list = new List<SceneInfo>();
+        public async Task<SceneInfo[]> GetFabricSceneInfo(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
+            SceneInfo[] list = new SceneInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new SceneInfo(reader.GetStruct(i)!));
+                list[i] = new SceneInfo(reader.GetStruct(i)!);
             return list;
         }
         #endregion Attributes

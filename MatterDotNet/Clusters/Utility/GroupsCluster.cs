@@ -99,11 +99,11 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         private record GetGroupMembershipPayload : TLVPayload {
-            public required List<ushort> GroupList { get; set; }
+            public required ushort[] GroupList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in GroupList) {
                         writer.WriteUShort(-1, item);
                     }
@@ -118,7 +118,7 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         public struct GetGroupMembershipResponse() {
             public required byte? Capacity { get; set; }
-            public required List<ushort> GroupList { get; set; }
+            public required ushort[] GroupList { get; set; }
         }
 
         private record RemoveGroupPayload : TLVPayload {
@@ -188,7 +188,7 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get Group Membership
         /// </summary>
-        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, List<ushort> GroupList) {
+        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, ushort[] GroupList) {
             GetGroupMembershipPayload requestFields = new GetGroupMembershipPayload() {
                 GroupList = GroupList,
             };
@@ -197,7 +197,7 @@ namespace MatterDotNet.Clusters.Utility
                 return null;
             return new GetGroupMembershipResponse() {
                 Capacity = (byte)GetField(resp, 0),
-                GroupList = (List<ushort>)GetField(resp, 1),
+                GroupList = (ushort[])GetField(resp, 1),
             };
         }
 

@@ -50,11 +50,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Supported Locales attribute
         /// </summary>
-        public async Task<List<string>> GetSupportedLocales(SecureSession session) {
-            List<string> list = new List<string>();
+        public async Task<string[]> GetSupportedLocales(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetString(i, false)!);
+                list[i] = reader.GetString(i, false)!;
             return list;
         }
         #endregion Attributes

@@ -223,11 +223,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Replacement Product List attribute
         /// </summary>
-        public async Task<List<ReplacementProduct>> GetReplacementProductList(SecureSession session) {
-            List<ReplacementProduct> list = new List<ReplacementProduct>();
+        public async Task<ReplacementProduct[]> GetReplacementProductList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            ReplacementProduct[] list = new ReplacementProduct[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new ReplacementProduct(reader.GetStruct(i)!));
+                list[i] = new ReplacementProduct(reader.GetStruct(i)!);
             return list;
         }
         #endregion Attributes

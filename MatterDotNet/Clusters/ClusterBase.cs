@@ -63,6 +63,12 @@ namespace MatterDotNet.Clusters
             return fields[fieldNumber];
         }
 
+        public async Task<List<ushort>?> GetAttributeList(SecureSession session)
+        {
+            object ret = (await GetAttribute(session, 0xFFFB))!;
+            return (List<ushort>?)ret;
+        }
+
         /// <summary>
         /// Gets a required field from an Invoke Response
         /// </summary>
@@ -89,12 +95,10 @@ namespace MatterDotNet.Clusters
         /// <exception cref="ConstraintException"></exception>
         protected async Task<object?> GetAttribute(SecureSession session, ushort attribute, bool nullable = false)
         {
-            AttributeReportIB report = await InteractionManager.GetAttribute(session, endPoint, cluster, attribute);
-            if (!ValidateResponse(report))
-                throw new IOException("Failed to query feature map");
-            if (!nullable && report.AttributeData!.Data == null)
+            object? data = await InteractionManager.GetAttribute(session, endPoint, cluster, attribute);
+            if (!nullable && data == null)
                 throw new ConstraintException("Attribute " + attribute + " was null");
-            return report.AttributeData!.Data;
+            return data;
         }
 
         /// <summary>
@@ -111,9 +115,7 @@ namespace MatterDotNet.Clusters
         {
             if (!nullable && value == null)
                 throw new ConstraintException("Attribute " + attribute + " was null");
-            AttributeStatusIB result = await InteractionManager.SetAttribute(session, endPoint, cluster, attribute, value);
-            if (!ValidateResponse(result))
-                throw new IOException("Failed to query feature map");
+            await InteractionManager.SetAttribute(session, endPoint, cluster, attribute, value);
         }
 
         /// <summary>
@@ -141,83 +143,7 @@ namespace MatterDotNet.Clusters
         /// <exception cref="InvalidDataException"></exception>
         protected bool ValidateResponse(InvokeResponseIB resp)
         {
-            if (resp.Status == null)
-            {
-                if (resp.Command?.CommandFields != null)
-                    return true;
-                throw new InvalidDataException("Response received without status");
-            }
-            return ValidateStatus((IMStatusCode)resp.Status.Status.Status);
-        }
-
-        /// <summary>
-        /// Validates a response and throws an exception if it's an error status
-        /// </summary>
-        /// <param name="resp"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidDataException"></exception>
-        protected bool ValidateResponse(AttributeStatusIB resp)
-        {
-            if (resp.Status == null)
-                throw new InvalidDataException("Response received without status");
-
-            return ValidateStatus((IMStatusCode)resp.Status.Status);
-        }
-
-        /// <summary>
-        /// Validates a response and throws an exception if it's an error status
-        /// </summary>
-        /// <param name="resp"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidDataException"></exception>
-        protected bool ValidateResponse(AttributeReportIB resp)
-        {
-            if (resp.AttributeStatus == null)
-            {
-                if (resp.AttributeData != null)
-                    return true;
-                throw new InvalidDataException("Response received without status");
-            }
-            return ValidateStatus((IMStatusCode)resp.AttributeStatus.Status.Status);
-        }
-
-        private bool ValidateStatus(IMStatusCode status)
-        {
-            switch (status)
-            {
-                case IMStatusCode.SUCCESS:
-                    return true;
-                case IMStatusCode.FAILURE:
-                    return false;
-                case IMStatusCode.UNSUPPORTED_ACCESS:
-                    throw new UnauthorizedAccessException("Unsupported / Unauthorized Access");
-                case IMStatusCode.UNSUPPORTED_ENDPOINT:
-                    throw new InvalidOperationException("Endpoint " + endPoint + " is not supported");
-                case IMStatusCode.INVALID_ACTION:
-                    throw new DataException("Invalid Action");
-                case IMStatusCode.UNSUPPORTED_COMMAND:
-                    throw new DataException("Command ID not supported on this cluster");
-                case IMStatusCode.INVALID_COMMAND:
-                    throw new DataException("Invalid Command Payload");
-                case IMStatusCode.CONSTRAINT_ERROR:
-                    throw new DataException("Data constraint violated");
-                case IMStatusCode.RESOURCE_EXHAUSTED:
-                    throw new InsufficientMemoryException("Resource exhausted");
-                case IMStatusCode.DATA_VERSION_MISMATCH:
-                    throw new DataException("Data version mismatch");
-                case IMStatusCode.TIMEOUT:
-                    throw new TimeoutException();
-                case IMStatusCode.BUSY:
-                    throw new IOException("Resource Busy");
-                case IMStatusCode.UNSUPPORTED_CLUSTER:
-                    throw new DataException("Unsupported Cluster");
-                case IMStatusCode.FAILSAFE_REQUIRED:
-                    throw new InvalidOperationException("Failsafe required");
-                case IMStatusCode.INVALID_IN_STATE:
-                    throw new InvalidOperationException("The received request cannot be handled due to the current operational state of the device");
-                default:
-                    return false;
-            }
+            return InteractionManager.ValidateResponse(resp, endPoint);
         }
 
         /// <summary>

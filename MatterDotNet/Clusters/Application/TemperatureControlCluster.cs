@@ -143,11 +143,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Supported Temperature Levels attribute
         /// </summary>
-        public async Task<List<string>> GetSupportedTemperatureLevels(SecureSession session) {
-            List<string> list = new List<string>();
+        public async Task<string[]> GetSupportedTemperatureLevels(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetString(i, false)!);
+                list[i] = reader.GetString(i, false)!;
             return list;
         }
         #endregion Attributes

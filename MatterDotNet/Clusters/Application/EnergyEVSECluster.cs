@@ -268,20 +268,20 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 DayOfWeekForSequence = (TargetDayOfWeekBitmap)reader.GetUShort(0)!.Value;
                 {
-                    ChargingTargets = new List<ChargingTarget>();
-                    foreach (var item in (List<object>)fields[1]) {
-                        ChargingTargets.Add(new ChargingTarget((object[])item));
+                    ChargingTargets = new ChargingTarget[((object[])fields[1]).Length];
+                    for (int i = 0; i < ChargingTargets.Length; i++) {
+                        ChargingTargets[i] = new ChargingTarget((object[])fields[-1]);
                     }
                 }
             }
             public required TargetDayOfWeekBitmap DayOfWeekForSequence { get; set; }
-            public required List<ChargingTarget> ChargingTargets { get; set; }
+            public required ChargingTarget[] ChargingTargets { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)DayOfWeekForSequence);
                 {
                     Constrain(ChargingTargets, 0, 10);
-                    writer.StartList(1);
+                    writer.StartArray(1);
                     foreach (var item in ChargingTargets) {
                         item.Serialize(writer, -1);
                     }
@@ -327,7 +327,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get Targets Response - Reply from server
         /// </summary>
         public struct GetTargetsResponse() {
-            public required List<ChargingTargetSchedule> ChargingTargetSchedules { get; set; }
+            public required ChargingTargetSchedule[] ChargingTargetSchedules { get; set; }
         }
 
         private record EnableChargingPayload : TLVPayload {
@@ -361,12 +361,12 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record SetTargetsPayload : TLVPayload {
-            public required List<ChargingTargetSchedule> ChargingTargetSchedules { get; set; }
+            public required ChargingTargetSchedule[] ChargingTargetSchedules { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
                     Constrain(ChargingTargetSchedules, 0, 7);
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in ChargingTargetSchedules) {
                         item.Serialize(writer, -1);
                     }
@@ -422,7 +422,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Targets
         /// </summary>
-        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, List<ChargingTargetSchedule> ChargingTargetSchedules) {
+        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, ChargingTargetSchedule[] ChargingTargetSchedules) {
             SetTargetsPayload requestFields = new SetTargetsPayload() {
                 ChargingTargetSchedules = ChargingTargetSchedules,
             };
@@ -438,7 +438,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new GetTargetsResponse() {
-                ChargingTargetSchedules = (List<ChargingTargetSchedule>)GetField(resp, 0),
+                ChargingTargetSchedules = (ChargingTargetSchedule[])GetField(resp, 0),
             };
         }
 

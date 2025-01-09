@@ -192,18 +192,18 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Default OTA Providers attribute
         /// </summary>
-        public async Task<List<ProviderLocation>> GetDefaultOTAProviders(SecureSession session) {
-            List<ProviderLocation> list = new List<ProviderLocation>();
+        public async Task<ProviderLocation[]> GetDefaultOTAProviders(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            ProviderLocation[] list = new ProviderLocation[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new ProviderLocation(reader.GetStruct(i)!));
+                list[i] = new ProviderLocation(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Default OTA Providers attribute
         /// </summary>
-        public async Task SetDefaultOTAProviders (SecureSession session, List<ProviderLocation> value) {
+        public async Task SetDefaultOTAProviders (SecureSession session, ProviderLocation[] value) {
             await SetAttribute(session, 0, value);
         }
 

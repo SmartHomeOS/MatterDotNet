@@ -12,7 +12,10 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Messages.InteractionModel;
+using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Protocol.Subprotocols;
 
 namespace MatterDotNet.Clusters.Application
 {
@@ -20,7 +23,7 @@ namespace MatterDotNet.Clusters.Application
     /// Refrigerator Alarm Cluster
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class RefrigeratorAlarmCluster : AlarmBaseCluster<RefrigeratorAlarmCluster.AlarmBitmap>
+    public class RefrigeratorAlarmCluster : AlarmBaseCluster
     {
         internal const uint CLUSTER_ID = 0x0057;
 
@@ -34,7 +37,7 @@ namespace MatterDotNet.Clusters.Application
         /// Supported Features
         /// </summary>
         [Flags]
-        public new enum Feature {
+        public enum Feature {
             /// <summary>
             /// Supports the ability to reset alarms
             /// </summary>
@@ -53,13 +56,19 @@ namespace MatterDotNet.Clusters.Application
         }
         #endregion Enums
 
+        #region Payloads
+        #endregion Payloads
+
+        #region Commands
+        #endregion Commands
+
         #region Attributes
         /// <summary>
         /// Features supported by this cluster
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public new async Task<Feature> GetSupportedFeatures(SecureSession session)
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
         {
             return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
         }

@@ -93,22 +93,22 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 GroupId = reader.GetUShort(1)!.Value;
                 {
-                    Endpoints = new List<ushort>();
-                    foreach (var item in (List<object>)fields[2]) {
-                        Endpoints.Add(reader.GetUShort(-1)!.Value);
+                    Endpoints = new ushort[((object[])fields[2]).Length];
+                    for (int i = 0; i < Endpoints.Length; i++) {
+                        Endpoints[i] = reader.GetUShort(-1)!.Value;
                     }
                 }
                 GroupName = reader.GetString(3, true);
             }
             public required ushort GroupId { get; set; }
-            public required List<ushort> Endpoints { get; set; }
+            public required ushort[] Endpoints { get; set; }
             public string? GroupName { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
                 {
                     Constrain(Endpoints, 1);
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in Endpoints) {
                         writer.WriteUShort(-1, item);
                     }
@@ -248,7 +248,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Key Set Read All Indices Response  Command - Reply from server
         /// </summary>
         public struct KeySetReadAllIndicesResponseCommand() {
-            public required List<ushort> GroupKeySetIDs { get; set; }
+            public required ushort[] GroupKeySetIDs { get; set; }
         }
         #endregion Payloads
 
@@ -300,7 +300,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadAllIndicesResponseCommand() {
-                GroupKeySetIDs = (List<ushort>)GetField(resp, 0),
+                GroupKeySetIDs = (ushort[])GetField(resp, 0),
             };
         }
         #endregion Commands
@@ -330,29 +330,29 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Group Key Map attribute
         /// </summary>
-        public async Task<List<GroupKeyMap>> GetGroupKeyMap(SecureSession session) {
-            List<GroupKeyMap> list = new List<GroupKeyMap>();
+        public async Task<GroupKeyMap[]> GetGroupKeyMap(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            GroupKeyMap[] list = new GroupKeyMap[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new GroupKeyMap(reader.GetStruct(i)!));
+                list[i] = new GroupKeyMap(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Group Key Map attribute
         /// </summary>
-        public async Task SetGroupKeyMap (SecureSession session, List<GroupKeyMap> value) {
+        public async Task SetGroupKeyMap (SecureSession session, GroupKeyMap[] value) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Group Table attribute
         /// </summary>
-        public async Task<List<GroupInfoMap>> GetGroupTable(SecureSession session) {
-            List<GroupInfoMap> list = new List<GroupInfoMap>();
+        public async Task<GroupInfoMap[]> GetGroupTable(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            GroupInfoMap[] list = new GroupInfoMap[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new GroupInfoMap(reader.GetStruct(i)!));
+                list[i] = new GroupInfoMap(reader.GetStruct(i)!);
             return list;
         }
 

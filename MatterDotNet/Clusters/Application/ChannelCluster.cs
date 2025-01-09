@@ -339,15 +339,15 @@ namespace MatterDotNet.Clusters.Application
                 Subtitle = reader.GetString(5, true);
                 Description = reader.GetString(6, true);
                 {
-                    AudioLanguages = new List<string>();
-                    foreach (var item in (List<object>)fields[7]) {
-                        AudioLanguages.Add(reader.GetString(-1, false)!);
+                    AudioLanguages = new string[((object[])fields[7]).Length];
+                    for (int i = 0; i < AudioLanguages.Length; i++) {
+                        AudioLanguages[i] = reader.GetString(-1, false)!;
                     }
                 }
                 {
-                    Ratings = new List<string>();
-                    foreach (var item in (List<object>)fields[8]) {
-                        Ratings.Add(reader.GetString(-1, false)!);
+                    Ratings = new string[((object[])fields[8]).Length];
+                    for (int i = 0; i < Ratings.Length; i++) {
+                        Ratings[i] = reader.GetString(-1, false)!;
                     }
                 }
                 ThumbnailUrl = reader.GetString(9, true);
@@ -358,21 +358,21 @@ namespace MatterDotNet.Clusters.Application
                 RecordingFlag = (RecordingFlagBitmap)reader.GetUShort(14)!.Value;
                 SeriesInfo = new SeriesInfo((object[])fields[15]);
                 {
-                    CategoryList = new List<ProgramCategory>();
-                    foreach (var item in (List<object>)fields[16]) {
-                        CategoryList.Add(new ProgramCategory((object[])item));
+                    CategoryList = new ProgramCategory[((object[])fields[16]).Length];
+                    for (int i = 0; i < CategoryList.Length; i++) {
+                        CategoryList[i] = new ProgramCategory((object[])fields[-1]);
                     }
                 }
                 {
-                    CastList = new List<ProgramCast>();
-                    foreach (var item in (List<object>)fields[17]) {
-                        CastList.Add(new ProgramCast((object[])item));
+                    CastList = new ProgramCast[((object[])fields[17]).Length];
+                    for (int i = 0; i < CastList.Length; i++) {
+                        CastList[i] = new ProgramCast((object[])fields[-1]);
                     }
                 }
                 {
-                    ExternalIDList = new List<ContentLauncherCluster.AdditionalInfo>();
-                    foreach (var item in (List<object>)fields[18]) {
-                        ExternalIDList.Add(new ContentLauncherCluster.AdditionalInfo((object[])item));
+                    ExternalIDList = new ContentLauncherCluster.AdditionalInfo[((object[])fields[18]).Length];
+                    for (int i = 0; i < ExternalIDList.Length; i++) {
+                        ExternalIDList[i] = new ContentLauncherCluster.AdditionalInfo((object[])fields[-1]);
                     }
                 }
             }
@@ -383,8 +383,8 @@ namespace MatterDotNet.Clusters.Application
             public required string Title { get; set; }
             public string? Subtitle { get; set; } = "";
             public string? Description { get; set; } = "";
-            public List<string>? AudioLanguages { get; set; } = new List<string>();
-            public List<string>? Ratings { get; set; } = new List<string>();
+            public string[]? AudioLanguages { get; set; } = Array.Empty<string>();
+            public string[]? Ratings { get; set; } = Array.Empty<string>();
             public string? ThumbnailUrl { get; set; } = "";
             public string? PosterArtUrl { get; set; } = "";
             public string? DvbiUrl { get; set; } = "";
@@ -392,9 +392,9 @@ namespace MatterDotNet.Clusters.Application
             public string? ParentalGuidanceText { get; set; } = "";
             public required RecordingFlagBitmap RecordingFlag { get; set; }
             public SeriesInfo? SeriesInfo { get; set; } = null;
-            public List<ProgramCategory>? CategoryList { get; set; } = new List<ProgramCategory>();
-            public List<ProgramCast>? CastList { get; set; } = new List<ProgramCast>();
-            public List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList { get; set; } = new List<ContentLauncherCluster.AdditionalInfo>();
+            public ProgramCategory[]? CategoryList { get; set; } = Array.Empty<ProgramCategory>();
+            public ProgramCast[]? CastList { get; set; } = Array.Empty<ProgramCast>();
+            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Identifier, 255);
@@ -410,7 +410,7 @@ namespace MatterDotNet.Clusters.Application
                 if (AudioLanguages != null)
                 {
                     Constrain(AudioLanguages, 0, 10);
-                    writer.StartList(7);
+                    writer.StartArray(7);
                     foreach (var item in AudioLanguages) {
                         writer.WriteString(-1, item);
                     }
@@ -420,7 +420,7 @@ namespace MatterDotNet.Clusters.Application
                 if (Ratings != null)
                 {
                     Constrain(Ratings, 0, 255);
-                    writer.StartList(8);
+                    writer.StartArray(8);
                     foreach (var item in Ratings) {
                         writer.WriteString(-1, item);
                     }
@@ -443,7 +443,7 @@ namespace MatterDotNet.Clusters.Application
                 if (CategoryList != null)
                 {
                     Constrain(CategoryList, 0, 255);
-                    writer.StartList(16);
+                    writer.StartArray(16);
                     foreach (var item in CategoryList) {
                         item.Serialize(writer, -1);
                     }
@@ -453,7 +453,7 @@ namespace MatterDotNet.Clusters.Application
                 if (CastList != null)
                 {
                     Constrain(CastList, 0, 255);
-                    writer.StartList(17);
+                    writer.StartArray(17);
                     foreach (var item in CastList) {
                         item.Serialize(writer, -1);
                     }
@@ -463,7 +463,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
-                    writer.StartList(18);
+                    writer.StartArray(18);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
@@ -540,10 +540,10 @@ namespace MatterDotNet.Clusters.Application
         private record GetProgramGuidePayload : TLVPayload {
             public required DateTime StartTime { get; set; }
             public required DateTime EndTime { get; set; }
-            public List<ChannelInfo>? ChannelList { get; set; } = new List<ChannelInfo>();
+            public ChannelInfo[]? ChannelList { get; set; } = Array.Empty<ChannelInfo>();
             public PageToken? PageToken { get; set; } = null;
             public RecordingFlagBitmap? RecordingFlag { get; set; } = null;
-            public List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList { get; set; } = new List<ContentLauncherCluster.AdditionalInfo>();
+            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
             public byte[]? Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -553,7 +553,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ChannelList != null)
                 {
                     Constrain(ChannelList, 0, 255);
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in ChannelList) {
                         item.Serialize(writer, -1);
                     }
@@ -567,7 +567,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
-                    writer.StartList(6);
+                    writer.StartArray(6);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
@@ -584,13 +584,13 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public struct ProgramGuideResponse() {
             public required ChannelPaging Paging { get; set; }
-            public required List<Program> ProgramList { get; set; } = new List<Program>();
+            public required Program[] ProgramList { get; set; } = Array.Empty<Program>();
         }
 
         private record RecordProgramPayload : TLVPayload {
             public required string ProgramIdentifier { get; set; }
             public required bool ShouldRecordSeries { get; set; }
-            public List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList { get; set; } = new List<ContentLauncherCluster.AdditionalInfo>();
+            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
             public byte[]? Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -600,7 +600,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
@@ -615,7 +615,7 @@ namespace MatterDotNet.Clusters.Application
         private record CancelRecordProgramPayload : TLVPayload {
             public required string ProgramIdentifier { get; set; }
             public required bool ShouldRecordSeries { get; set; }
-            public List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList { get; set; } = new List<ContentLauncherCluster.AdditionalInfo>();
+            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
             public byte[]? Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -625,7 +625,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
@@ -681,7 +681,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get Program Guide
         /// </summary>
-        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime StartTime, DateTime EndTime, List<ChannelInfo>? ChannelList, PageToken? PageToken, RecordingFlagBitmap? RecordingFlag, List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList, byte[]? Data) {
+        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime StartTime, DateTime EndTime, ChannelInfo[]? ChannelList, PageToken? PageToken, RecordingFlagBitmap? RecordingFlag, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
             GetProgramGuidePayload requestFields = new GetProgramGuidePayload() {
                 StartTime = StartTime,
                 EndTime = EndTime,
@@ -696,14 +696,14 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new ProgramGuideResponse() {
                 Paging = (ChannelPaging)GetField(resp, 0),
-                ProgramList = (List<Program>)GetField(resp, 1),
+                ProgramList = (Program[])GetField(resp, 1),
             };
         }
 
         /// <summary>
         /// Record Program
         /// </summary>
-        public async Task<bool> RecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList, byte[]? Data) {
+        public async Task<bool> RecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
             RecordProgramPayload requestFields = new RecordProgramPayload() {
                 ProgramIdentifier = ProgramIdentifier,
                 ShouldRecordSeries = ShouldRecordSeries,
@@ -717,7 +717,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Cancel Record Program
         /// </summary>
-        public async Task<bool> CancelRecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, List<ContentLauncherCluster.AdditionalInfo>? ExternalIDList, byte[]? Data) {
+        public async Task<bool> CancelRecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
             CancelRecordProgramPayload requestFields = new CancelRecordProgramPayload() {
                 ProgramIdentifier = ProgramIdentifier,
                 ShouldRecordSeries = ShouldRecordSeries,
@@ -754,11 +754,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Channel List attribute
         /// </summary>
-        public async Task<List<ChannelInfo>> GetChannelList(SecureSession session) {
-            List<ChannelInfo> list = new List<ChannelInfo>();
+        public async Task<ChannelInfo[]> GetChannelList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            ChannelInfo[] list = new ChannelInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new ChannelInfo(reader.GetStruct(i)!));
+                list[i] = new ChannelInfo(reader.GetStruct(i)!);
             return list;
         }
 

@@ -12,13 +12,16 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Protocol.Parsers;
+using MatterDotNet.Protocol.Sessions;
+
 namespace MatterDotNet.Clusters.Application
 {
     /// <summary>
     /// Dishwasher Alarm Cluster
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class DishwasherAlarmCluster : AlarmBaseCluster<DishwasherAlarmCluster.AlarmBitmap>
+    public class DishwasherAlarmCluster : AlarmBaseCluster
     {
         internal const uint CLUSTER_ID = 0x005D;
 

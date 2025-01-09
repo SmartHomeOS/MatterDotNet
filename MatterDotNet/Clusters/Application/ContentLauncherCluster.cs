@@ -275,17 +275,17 @@ namespace MatterDotNet.Clusters.Application
             internal ContentSearch(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 {
-                    ParameterList = new List<Parameter>();
-                    foreach (var item in (List<object>)fields[0]) {
-                        ParameterList.Add(new Parameter((object[])item));
+                    ParameterList = new Parameter[((object[])fields[0]).Length];
+                    for (int i = 0; i < ParameterList.Length; i++) {
+                        ParameterList[i] = new Parameter((object[])fields[-1]);
                     }
                 }
             }
-            public required List<Parameter> ParameterList { get; set; } = new List<Parameter>();
+            public required Parameter[] ParameterList { get; set; } = Array.Empty<Parameter>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in ParameterList) {
                         item.Serialize(writer, -1);
                     }
@@ -338,15 +338,15 @@ namespace MatterDotNet.Clusters.Application
                 Type = (ParameterEnum)reader.GetUShort(0)!.Value;
                 Value = reader.GetString(1, false)!;
                 {
-                    ExternalIDList = new List<AdditionalInfo>();
-                    foreach (var item in (List<object>)fields[2]) {
-                        ExternalIDList.Add(new AdditionalInfo((object[])item));
+                    ExternalIDList = new AdditionalInfo[((object[])fields[2]).Length];
+                    for (int i = 0; i < ExternalIDList.Length; i++) {
+                        ExternalIDList[i] = new AdditionalInfo((object[])fields[-1]);
                     }
                 }
             }
             public required ParameterEnum Type { get; set; }
             public required string Value { get; set; }
-            public List<AdditionalInfo>? ExternalIDList { get; set; } = new List<AdditionalInfo>();
+            public AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<AdditionalInfo>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Type);
@@ -354,7 +354,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ExternalIDList != null)
                 if (ExternalIDList != null)
                 {
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
@@ -379,15 +379,15 @@ namespace MatterDotNet.Clusters.Application
                 PlaybackPosition = reader.GetULong(0, true);
                 TextTrack = new TrackPreference((object[])fields[1]);
                 {
-                    AudioTracks = new List<TrackPreference>();
-                    foreach (var item in (List<object>)fields[2]) {
-                        AudioTracks.Add(new TrackPreference((object[])item));
+                    AudioTracks = new TrackPreference[((object[])fields[2]).Length];
+                    for (int i = 0; i < AudioTracks.Length; i++) {
+                        AudioTracks[i] = new TrackPreference((object[])fields[-1]);
                     }
                 }
             }
             public required ulong? PlaybackPosition { get; set; }
             public required TrackPreference? TextTrack { get; set; }
-            public required List<TrackPreference>? AudioTracks { get; set; }
+            public required TrackPreference[]? AudioTracks { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(0, PlaybackPosition);
@@ -397,7 +397,7 @@ namespace MatterDotNet.Clusters.Application
                     TextTrack.Serialize(writer, 1);
                 if (AudioTracks != null)
                 {
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in AudioTracks) {
                         item.Serialize(writer, -1);
                     }
@@ -454,15 +454,15 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 LanguageCode = reader.GetString(0, false)!;
                 {
-                    Characteristics = new List<MediaPlaybackCluster.CharacteristicEnum>();
-                    foreach (var item in (List<object>)fields[1]) {
-                        Characteristics.Add((MediaPlaybackCluster.CharacteristicEnum)reader.GetUShort(-1)!.Value);
+                    Characteristics = new MediaPlaybackCluster.CharacteristicEnum[((object[])fields[1]).Length];
+                    for (int i = 0; i < Characteristics.Length; i++) {
+                        Characteristics[i] = (MediaPlaybackCluster.CharacteristicEnum)reader.GetUShort(-1)!.Value;
                     }
                 }
                 AudioOutputIndex = reader.GetByte(2, true);
             }
             public required string LanguageCode { get; set; }
-            public List<MediaPlaybackCluster.CharacteristicEnum>? Characteristics { get; set; } = null;
+            public MediaPlaybackCluster.CharacteristicEnum[]? Characteristics { get; set; } = null;
             public required byte? AudioOutputIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -470,7 +470,7 @@ namespace MatterDotNet.Clusters.Application
                 if (Characteristics != null)
                 if (Characteristics != null)
                 {
-                    writer.StartList(1);
+                    writer.StartArray(1);
                     foreach (var item in Characteristics) {
                         writer.WriteUShort(-1, (ushort)item);
                     }
@@ -598,11 +598,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Accept Header attribute
         /// </summary>
-        public async Task<List<string>> GetAcceptHeader(SecureSession session) {
-            List<string> list = new List<string>();
+        public async Task<string[]> GetAcceptHeader(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetString(i, false)!);
+                list[i] = reader.GetString(i, false)!;
             return list;
         }
 

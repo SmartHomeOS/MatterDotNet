@@ -236,26 +236,26 @@ namespace MatterDotNet.Clusters.Utility
                 OffPremiseServicesReachableIPv6 = reader.GetBool(3, true);
                 HardwareAddress = new PhysicalAddress(reader.GetBytes(4, false, 8, 6)!);
                 {
-                    IPv4Addresses = new List<IPAddress>();
-                    foreach (var item in (List<object>)fields[5]) {
-                        IPv4Addresses.Add(new IPAddress(reader.GetBytes(-1, false, 4, 4)!));
+                    IPv4Addresses = new IPAddress[((object[])fields[5]).Length];
+                    for (int i = 0; i < IPv4Addresses.Length; i++) {
+                        IPv4Addresses[i] = new IPAddress(reader.GetBytes(-1, false, 4, 4)!);;
                     }
                 }
                 {
-                    IPv6Addresses = new List<IPAddress>();
-                    foreach (var item in (List<object>)fields[6]) {
-                        IPv6Addresses.Add(new IPAddress(reader.GetBytes(-1, false, 16, 16)!));
+                    IPv6Addresses = new IPAddress[((object[])fields[6]).Length];
+                    for (int i = 0; i < IPv6Addresses.Length; i++) {
+                        IPv6Addresses[i] = new IPAddress(reader.GetBytes(-1, false, 16, 16)!);;
                     }
                 }
                 Type = (InterfaceTypeEnum)reader.GetUShort(7)!.Value;
             }
             public required string Name { get; set; }
             public required bool IsOperational { get; set; }
-            public required bool? OffPremiseServicesReachableIPv4 { get; set; } = null;
-            public required bool? OffPremiseServicesReachableIPv6 { get; set; } = null;
+            public required bool? OffPremiseServicesReachableIPv4 { get; set; } = false;
+            public required bool? OffPremiseServicesReachableIPv6 { get; set; } = false;
             public required PhysicalAddress HardwareAddress { get; set; }
-            public required List<IPAddress> IPv4Addresses { get; set; }
-            public required List<IPAddress> IPv6Addresses { get; set; }
+            public required IPAddress[] IPv4Addresses { get; set; }
+            public required IPAddress[] IPv6Addresses { get; set; }
             public required InterfaceTypeEnum Type { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -266,7 +266,7 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteBytes(4, HardwareAddress.GetAddressBytes());
                 {
                     Constrain(IPv4Addresses, 0, 4);
-                    writer.StartList(5);
+                    writer.StartArray(5);
                     foreach (var item in IPv4Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
                     }
@@ -274,7 +274,7 @@ namespace MatterDotNet.Clusters.Utility
                 }
                 {
                     Constrain(IPv6Addresses, 0, 8);
-                    writer.StartList(6);
+                    writer.StartArray(6);
                     foreach (var item in IPv6Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
                     }
@@ -396,11 +396,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Network Interfaces attribute
         /// </summary>
-        public async Task<List<NetworkInterface>> GetNetworkInterfaces(SecureSession session) {
-            List<NetworkInterface> list = new List<NetworkInterface>();
+        public async Task<NetworkInterface[]> GetNetworkInterfaces(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            NetworkInterface[] list = new NetworkInterface[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new NetworkInterface(reader.GetStruct(i)!));
+                list[i] = new NetworkInterface(reader.GetStruct(i)!);
             return list;
         }
 
@@ -435,33 +435,33 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Active Hardware Faults attribute
         /// </summary>
-        public async Task<List<HardwareFaultEnum>> GetActiveHardwareFaults(SecureSession session) {
-            List<HardwareFaultEnum> list = new List<HardwareFaultEnum>();
+        public async Task<HardwareFaultEnum[]> GetActiveHardwareFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            HardwareFaultEnum[] list = new HardwareFaultEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((HardwareFaultEnum)reader.GetUShort(i)!.Value);
+                list[i] = (HardwareFaultEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Active Radio Faults attribute
         /// </summary>
-        public async Task<List<RadioFaultEnum>> GetActiveRadioFaults(SecureSession session) {
-            List<RadioFaultEnum> list = new List<RadioFaultEnum>();
+        public async Task<RadioFaultEnum[]> GetActiveRadioFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
+            RadioFaultEnum[] list = new RadioFaultEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((RadioFaultEnum)reader.GetUShort(i)!.Value);
+                list[i] = (RadioFaultEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Active Network Faults attribute
         /// </summary>
-        public async Task<List<NetworkFaultEnum>> GetActiveNetworkFaults(SecureSession session) {
-            List<NetworkFaultEnum> list = new List<NetworkFaultEnum>();
+        public async Task<NetworkFaultEnum[]> GetActiveNetworkFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
+            NetworkFaultEnum[] list = new NetworkFaultEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((NetworkFaultEnum)reader.GetUShort(i)!.Value);
+                list[i] = (NetworkFaultEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 

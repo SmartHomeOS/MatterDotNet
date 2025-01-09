@@ -114,29 +114,29 @@ namespace MatterDotNet.Clusters.Utility
                 Privilege = (AccessControlEntryPrivilegeEnum)reader.GetUShort(1)!.Value;
                 AuthMode = (AccessControlEntryAuthModeEnum)reader.GetUShort(2)!.Value;
                 {
-                    Subjects = new List<ulong>();
-                    foreach (var item in (List<object>)fields[3]) {
-                        Subjects.Add(reader.GetULong(-1)!.Value);
+                    Subjects = new ulong[((object[])fields[3]).Length];
+                    for (int i = 0; i < Subjects.Length; i++) {
+                        Subjects[i] = reader.GetULong(-1)!.Value;
                     }
                 }
                 {
-                    Targets = new List<AccessControlTarget>();
-                    foreach (var item in (List<object>)fields[4]) {
-                        Targets.Add(new AccessControlTarget((object[])item));
+                    Targets = new AccessControlTarget[((object[])fields[4]).Length];
+                    for (int i = 0; i < Targets.Length; i++) {
+                        Targets[i] = new AccessControlTarget((object[])fields[-1]);
                     }
                 }
             }
             public required AccessControlEntryPrivilegeEnum Privilege { get; set; }
             public required AccessControlEntryAuthModeEnum AuthMode { get; set; }
-            public required List<ulong>? Subjects { get; set; }
-            public required List<AccessControlTarget>? Targets { get; set; }
+            public required ulong[]? Subjects { get; set; }
+            public required AccessControlTarget[]? Targets { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, (ushort)Privilege);
                 writer.WriteUShort(2, (ushort)AuthMode);
                 if (Subjects != null)
                 {
-                    writer.StartList(3);
+                    writer.StartArray(3);
                     foreach (var item in Subjects) {
                         writer.WriteULong(-1, item);
                     }
@@ -146,7 +146,7 @@ namespace MatterDotNet.Clusters.Utility
                     writer.WriteNull(3);
                 if (Targets != null)
                 {
-                    writer.StartList(4);
+                    writer.StartArray(4);
                     foreach (var item in Targets) {
                         item.Serialize(writer, -1);
                     }
@@ -213,36 +213,36 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the ACL attribute
         /// </summary>
-        public async Task<List<AccessControlEntry>> GetACL(SecureSession session) {
-            List<AccessControlEntry> list = new List<AccessControlEntry>();
+        public async Task<AccessControlEntry[]> GetACL(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            AccessControlEntry[] list = new AccessControlEntry[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new AccessControlEntry(reader.GetStruct(i)!));
+                list[i] = new AccessControlEntry(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the ACL attribute
         /// </summary>
-        public async Task SetACL (SecureSession session, List<AccessControlEntry> value) {
+        public async Task SetACL (SecureSession session, AccessControlEntry[] value) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Extension attribute
         /// </summary>
-        public async Task<List<AccessControlExtension>> GetExtension(SecureSession session) {
-            List<AccessControlExtension> list = new List<AccessControlExtension>();
+        public async Task<AccessControlExtension[]> GetExtension(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            AccessControlExtension[] list = new AccessControlExtension[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new AccessControlExtension(reader.GetStruct(i)!));
+                list[i] = new AccessControlExtension(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Extension attribute
         /// </summary>
-        public async Task SetExtension (SecureSession session, List<AccessControlExtension> value) {
+        public async Task SetExtension (SecureSession session, AccessControlExtension[] value) {
             await SetAttribute(session, 1, value);
         }
 

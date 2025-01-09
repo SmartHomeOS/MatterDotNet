@@ -143,7 +143,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Full Duplex attribute
         /// </summary>
         public async Task<bool?> GetFullDuplex(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (bool?)(dynamic?)await GetAttribute(session, 1, true) ?? false;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Carrier Detect attribute
         /// </summary>
         public async Task<bool?> GetCarrierDetect(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (bool?)(dynamic?)await GetAttribute(session, 7, true) ?? false;
         }
 
         /// <summary>

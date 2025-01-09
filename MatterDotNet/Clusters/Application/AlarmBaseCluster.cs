@@ -23,7 +23,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Alarm Base Cluster
     /// </summary>
-    public class AlarmBaseCluster<T> : ClusterBase where T : Enum
+    public class AlarmBaseCluster : ClusterBase
     {
 
         /// <summary>
@@ -45,24 +45,20 @@ namespace MatterDotNet.Clusters.Application
         #endregion Enums
 
         #region Payloads
-        private record ResetPayload : TLVPayload
-        {
-            public required T Alarms { get; set; } = (T)(dynamic)0;
-            internal override void Serialize(TLVWriter writer, long structNumber = -1)
-            {
+        private record ResetPayload : TLVPayload {
+            public required uint Alarms { get; set; } = 0;
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, (uint)(dynamic)Alarms);
+                writer.WriteUInt(0, Alarms);
                 writer.EndContainer();
             }
         }
 
-        private record ModifyEnabledAlarmsPayload : TLVPayload
-        {
-            public required T Mask { get; set; } = (T)(dynamic)0;
-            internal override void Serialize(TLVWriter writer, long structNumber = -1)
-            {
+        private record ModifyEnabledAlarmsPayload : TLVPayload {
+            public required uint Mask { get; set; } = 0;
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, (uint)(dynamic)Mask);
+                writer.WriteUInt(0, Mask);
                 writer.EndContainer();
             }
         }
@@ -72,10 +68,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Reset
         /// </summary>
-        public async Task<bool> Reset(SecureSession session, T Alarms)
-        {
-            ResetPayload requestFields = new ResetPayload()
-            {
+        public async Task<bool> Reset(SecureSession session, uint Alarms) {
+            ResetPayload requestFields = new ResetPayload() {
                 Alarms = Alarms,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
@@ -85,10 +79,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Modify Enabled Alarms
         /// </summary>
-        public async Task<bool> ModifyEnabledAlarms(SecureSession session, T Mask)
-        {
-            ModifyEnabledAlarmsPayload requestFields = new ModifyEnabledAlarmsPayload()
-            {
+        public async Task<bool> ModifyEnabledAlarms(SecureSession session, uint Mask) {
+            ModifyEnabledAlarmsPayload requestFields = new ModifyEnabledAlarmsPayload() {
                 Mask = Mask,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
@@ -121,29 +113,29 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Mask attribute
         /// </summary>
-        public async Task<T> GetMask(SecureSession session) {
-            return (T?)(dynamic?)await GetAttribute(session, 0) ?? (T)(dynamic)0;
+        public async Task<uint> GetMask(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 0) ?? 0;
         }
 
         /// <summary>
         /// Get the Latch attribute
         /// </summary>
-        public async Task<T> GetLatch(SecureSession session) {
-            return (T?)(dynamic?)await GetAttribute(session, 1) ?? (T)(dynamic)0;
+        public async Task<uint> GetLatch(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 1) ?? 0;
         }
 
         /// <summary>
         /// Get the State attribute
         /// </summary>
-        public async Task<T> GetState(SecureSession session) {
-            return (T?)(dynamic?)await GetAttribute(session, 2) ?? (T)(dynamic)0;
+        public async Task<uint> GetState(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 2) ?? 0;
         }
 
         /// <summary>
         /// Get the Supported attribute
         /// </summary>
-        public async Task<T> GetSupported(SecureSession session) {
-            return (T?)(dynamic?)await GetAttribute(session, 3) ?? (T)(dynamic)0;
+        public async Task<uint> GetSupported(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 3) ?? 0;
         }
         #endregion Attributes
 

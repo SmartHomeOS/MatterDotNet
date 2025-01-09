@@ -191,11 +191,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Input List attribute
         /// </summary>
-        public async Task<List<InputInfo>> GetInputList(SecureSession session) {
-            List<InputInfo> list = new List<InputInfo>();
+        public async Task<InputInfo[]> GetInputList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            InputInfo[] list = new InputInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new InputInfo(reader.GetStruct(i)!));
+                list[i] = new InputInfo(reader.GetStruct(i)!);
             return list;
         }
 

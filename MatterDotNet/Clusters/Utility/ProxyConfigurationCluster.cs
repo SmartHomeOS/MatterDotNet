@@ -49,19 +49,19 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 ProxyAllNodes = reader.GetBool(1)!.Value;
                 {
-                    SourceList = new List<ulong>();
-                    foreach (var item in (List<object>)fields[2]) {
-                        SourceList.Add(reader.GetULong(-1)!.Value);
+                    SourceList = new ulong[((object[])fields[2]).Length];
+                    for (int i = 0; i < SourceList.Length; i++) {
+                        SourceList[i] = reader.GetULong(-1)!.Value;
                     }
                 }
             }
             public required bool ProxyAllNodes { get; set; } = false;
-            public required List<ulong> SourceList { get; set; } = new List<ulong>();
+            public required ulong[] SourceList { get; set; } = Array.Empty<ulong>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBool(1, ProxyAllNodes);
                 {
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in SourceList) {
                         writer.WriteULong(-1, item);
                     }
@@ -76,18 +76,18 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Configuration List attribute
         /// </summary>
-        public async Task<List<Configuration>> GetConfigurationList(SecureSession session) {
-            List<Configuration> list = new List<Configuration>();
+        public async Task<Configuration[]> GetConfigurationList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            Configuration[] list = new Configuration[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Configuration(reader.GetStruct(i)!));
+                list[i] = new Configuration(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Configuration List attribute
         /// </summary>
-        public async Task SetConfigurationList (SecureSession session, List<Configuration> value) {
+        public async Task SetConfigurationList (SecureSession session, Configuration[] value) {
             await SetAttribute(session, 0, value);
         }
         #endregion Attributes

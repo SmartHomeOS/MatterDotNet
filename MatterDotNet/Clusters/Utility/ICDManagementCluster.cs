@@ -244,11 +244,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Registered Clients attribute
         /// </summary>
-        public async Task<List<MonitoringRegistration>> GetRegisteredClients(SecureSession session) {
-            List<MonitoringRegistration> list = new List<MonitoringRegistration>();
+        public async Task<MonitoringRegistration[]> GetRegisteredClients(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            MonitoringRegistration[] list = new MonitoringRegistration[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new MonitoringRegistration(reader.GetStruct(i)!));
+                list[i] = new MonitoringRegistration(reader.GetStruct(i)!);
             return list;
         }
 

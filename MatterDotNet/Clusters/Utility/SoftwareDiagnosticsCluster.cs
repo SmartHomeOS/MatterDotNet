@@ -127,11 +127,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Thread Metrics attribute
         /// </summary>
-        public async Task<List<ThreadMetrics>> GetThreadMetrics(SecureSession session) {
-            List<ThreadMetrics> list = new List<ThreadMetrics>();
+        public async Task<ThreadMetrics[]> GetThreadMetrics(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            ThreadMetrics[] list = new ThreadMetrics[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new ThreadMetrics(reader.GetStruct(i)!));
+                list[i] = new ThreadMetrics(reader.GetStruct(i)!);
             return list;
         }
 

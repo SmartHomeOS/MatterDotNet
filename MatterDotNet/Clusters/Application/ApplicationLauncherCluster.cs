@@ -236,11 +236,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Catalog List attribute
         /// </summary>
-        public async Task<List<ushort>> GetCatalogList(SecureSession session) {
-            List<ushort> list = new List<ushort>();
+        public async Task<ushort[]> GetCatalogList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            ushort[] list = new ushort[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetUShort(i)!.Value);
+                list[i] = reader.GetUShort(i)!.Value;
             return list;
         }
 

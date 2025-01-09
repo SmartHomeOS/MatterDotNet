@@ -72,18 +72,18 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Binding attribute
         /// </summary>
-        public async Task<List<Target>> GetBinding(SecureSession session) {
-            List<Target> list = new List<Target>();
+        public async Task<Target[]> GetBinding(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            Target[] list = new Target[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Target(reader.GetStruct(i)!));
+                list[i] = new Target(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Binding attribute
         /// </summary>
-        public async Task SetBinding (SecureSession session, List<Target> value) {
+        public async Task SetBinding (SecureSession session, Target[] value) {
             await SetAttribute(session, 0, value);
         }
         #endregion Attributes

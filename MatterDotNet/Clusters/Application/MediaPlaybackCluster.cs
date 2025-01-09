@@ -236,15 +236,15 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 LanguageCode = reader.GetString(0, false)!;
                 {
-                    Characteristics = new List<CharacteristicEnum>();
-                    foreach (var item in (List<object>)fields[1]) {
-                        Characteristics.Add((CharacteristicEnum)reader.GetUShort(-1)!.Value);
+                    Characteristics = new CharacteristicEnum[((object[])fields[1]).Length];
+                    for (int i = 0; i < Characteristics.Length; i++) {
+                        Characteristics[i] = (CharacteristicEnum)reader.GetUShort(-1)!.Value;
                     }
                 }
                 DisplayName = reader.GetString(2, true);
             }
             public required string LanguageCode { get; set; }
-            public List<CharacteristicEnum>? Characteristics { get; set; } = null;
+            public CharacteristicEnum[]? Characteristics { get; set; } = null;
             public string? DisplayName { get; set; } = null;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -252,7 +252,7 @@ namespace MatterDotNet.Clusters.Application
                 if (Characteristics != null)
                 if (Characteristics != null)
                 {
-                    writer.StartList(1);
+                    writer.StartArray(1);
                     foreach (var item in Characteristics) {
                         writer.WriteUShort(-1, (ushort)item);
                     }
@@ -639,11 +639,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Available Audio Tracks attribute
         /// </summary>
-        public async Task<List<Track>?> GetAvailableAudioTracks(SecureSession session) {
-            List<Track> list = new List<Track>();
+        public async Task<Track[]?> GetAvailableAudioTracks(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
+            Track[] list = new Track[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Track(reader.GetStruct(i)!));
+                list[i] = new Track(reader.GetStruct(i)!);
             return list;
         }
 
@@ -657,11 +657,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Available Text Tracks attribute
         /// </summary>
-        public async Task<List<Track>?> GetAvailableTextTracks(SecureSession session) {
-            List<Track> list = new List<Track>();
+        public async Task<Track[]?> GetAvailableTextTracks(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
+            Track[] list = new Track[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Track(reader.GetStruct(i)!));
+                list[i] = new Track(reader.GetStruct(i)!);
             return list;
         }
         #endregion Attributes

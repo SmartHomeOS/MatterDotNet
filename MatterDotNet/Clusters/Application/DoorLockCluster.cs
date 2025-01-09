@@ -1270,7 +1270,7 @@ namespace MatterDotNet.Clusters.Application
             public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.Available;
             public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
             public required CredentialRuleEnum? CredentialRule { get; set; } = CredentialRuleEnum.Single;
-            public required List<Credential>? Credentials { get; set; }
+            public required Credential[]? Credentials { get; set; }
             public required byte? CreatorFabricIndex { get; set; }
             public required byte? LastModifiedFabricIndex { get; set; }
             public required ushort? NextUserIndex { get; set; }
@@ -1754,7 +1754,7 @@ namespace MatterDotNet.Clusters.Application
                 UserStatus = (UserStatusEnum)(byte)GetField(resp, 3),
                 UserType = (UserTypeEnum)(byte)GetField(resp, 4),
                 CredentialRule = (CredentialRuleEnum)(byte)GetField(resp, 5),
-                Credentials = (List<Credential>)GetField(resp, 6),
+                Credentials = (Credential[])GetField(resp, 6),
                 CreatorFabricIndex = (byte)GetField(resp, 7),
                 LastModifiedFabricIndex = (byte)GetField(resp, 8),
                 NextUserIndex = (ushort)GetField(resp, 9),

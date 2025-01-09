@@ -410,22 +410,22 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Neighbor Table attribute
         /// </summary>
-        public async Task<List<NeighborTable>> GetNeighborTable(SecureSession session) {
-            List<NeighborTable> list = new List<NeighborTable>();
+        public async Task<NeighborTable[]> GetNeighborTable(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
+            NeighborTable[] list = new NeighborTable[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new NeighborTable(reader.GetStruct(i)!));
+                list[i] = new NeighborTable(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Route Table attribute
         /// </summary>
-        public async Task<List<RouteTable>> GetRouteTable(SecureSession session) {
-            List<RouteTable> list = new List<RouteTable>();
+        public async Task<RouteTable[]> GetRouteTable(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
+            RouteTable[] list = new RouteTable[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new RouteTable(reader.GetStruct(i)!));
+                list[i] = new RouteTable(reader.GetStruct(i)!);
             return list;
         }
 
@@ -803,11 +803,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Active Network Faults List attribute
         /// </summary>
-        public async Task<List<NetworkFaultEnum>> GetActiveNetworkFaultsList(SecureSession session) {
-            List<NetworkFaultEnum> list = new List<NetworkFaultEnum>();
+        public async Task<NetworkFaultEnum[]> GetActiveNetworkFaultsList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 62))!);
+            NetworkFaultEnum[] list = new NetworkFaultEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((NetworkFaultEnum)reader.GetUShort(i)!.Value);
+                list[i] = (NetworkFaultEnum)reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes

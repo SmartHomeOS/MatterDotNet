@@ -174,11 +174,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Supported Calendar Types attribute
         /// </summary>
-        public async Task<List<CalendarTypeEnum>> GetSupportedCalendarTypes(SecureSession session) {
-            List<CalendarTypeEnum> list = new List<CalendarTypeEnum>();
+        public async Task<CalendarTypeEnum[]> GetSupportedCalendarTypes(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
+            CalendarTypeEnum[] list = new CalendarTypeEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((CalendarTypeEnum)reader.GetUShort(i)!.Value);
+                list[i] = (CalendarTypeEnum)reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes

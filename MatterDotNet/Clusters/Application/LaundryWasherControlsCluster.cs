@@ -96,11 +96,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Spin Speeds attribute
         /// </summary>
-        public async Task<List<string>> GetSpinSpeeds(SecureSession session) {
-            List<string> list = new List<string>();
+        public async Task<string[]> GetSpinSpeeds(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetString(i, false)!);
+                list[i] = reader.GetString(i, false)!;
             return list;
         }
 
@@ -135,11 +135,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Supported Rinses attribute
         /// </summary>
-        public async Task<List<NumberOfRinsesEnum>> GetSupportedRinses(SecureSession session) {
-            List<NumberOfRinsesEnum> list = new List<NumberOfRinsesEnum>();
+        public async Task<NumberOfRinsesEnum[]> GetSupportedRinses(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            NumberOfRinsesEnum[] list = new NumberOfRinsesEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((NumberOfRinsesEnum)reader.GetUShort(i)!.Value);
+                list[i] = (NumberOfRinsesEnum)reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes

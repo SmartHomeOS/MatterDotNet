@@ -166,11 +166,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Output List attribute
         /// </summary>
-        public async Task<List<OutputInfo>> GetOutputList(SecureSession session) {
-            List<OutputInfo> list = new List<OutputInfo>();
+        public async Task<OutputInfo[]> GetOutputList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            OutputInfo[] list = new OutputInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new OutputInfo(reader.GetStruct(i)!));
+                list[i] = new OutputInfo(reader.GetStruct(i)!);
             return list;
         }
 

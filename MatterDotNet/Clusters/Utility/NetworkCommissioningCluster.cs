@@ -330,8 +330,8 @@ namespace MatterDotNet.Clusters.Utility
         public struct ScanNetworksResponse() {
             public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
-            public required List<WiFiInterfaceScanResult> WiFiScanResults { get; set; }
-            public required List<ThreadInterfaceScanResult> ThreadScanResults { get; set; }
+            public required WiFiInterfaceScanResult[] WiFiScanResults { get; set; }
+            public required ThreadInterfaceScanResult[] ThreadScanResults { get; set; }
         }
 
         private record AddOrUpdateWiFiNetworkPayload : TLVPayload {
@@ -432,8 +432,8 @@ namespace MatterDotNet.Clusters.Utility
             return new ScanNetworksResponse() {
                 NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
-                WiFiScanResults = (List<WiFiInterfaceScanResult>)GetField(resp, 2),
-                ThreadScanResults = (List<ThreadInterfaceScanResult>)GetField(resp, 3),
+                WiFiScanResults = (WiFiInterfaceScanResult[])GetField(resp, 2),
+                ThreadScanResults = (ThreadInterfaceScanResult[])GetField(resp, 3),
             };
         }
 
@@ -562,11 +562,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Networks attribute
         /// </summary>
-        public async Task<List<NetworkInfo>> GetNetworks(SecureSession session) {
-            List<NetworkInfo> list = new List<NetworkInfo>();
+        public async Task<NetworkInfo[]> GetNetworks(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            NetworkInfo[] list = new NetworkInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new NetworkInfo(reader.GetStruct(i)!));
+                list[i] = new NetworkInfo(reader.GetStruct(i)!);
             return list;
         }
 
@@ -622,11 +622,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Supported WiFi Bands attribute
         /// </summary>
-        public async Task<List<WiFiBandEnum>> GetSupportedWiFiBands(SecureSession session) {
-            List<WiFiBandEnum> list = new List<WiFiBandEnum>();
+        public async Task<WiFiBandEnum[]> GetSupportedWiFiBands(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
+            WiFiBandEnum[] list = new WiFiBandEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((WiFiBandEnum)reader.GetUShort(i)!.Value);
+                list[i] = (WiFiBandEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 

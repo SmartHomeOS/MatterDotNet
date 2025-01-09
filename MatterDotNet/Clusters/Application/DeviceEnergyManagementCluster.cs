@@ -355,9 +355,9 @@ namespace MatterDotNet.Clusters.Application
                 LatestEndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(5))!.Value;
                 IsPauseable = reader.GetBool(6)!.Value;
                 {
-                    Slots = new List<Slot>();
-                    foreach (var item in (List<object>)fields[7]) {
-                        Slots.Add(new Slot((object[])item));
+                    Slots = new Slot[((object[])fields[7]).Length];
+                    for (int i = 0; i < Slots.Length; i++) {
+                        Slots[i] = new Slot((object[])fields[-1]);
                     }
                 }
                 ForecastUpdateReason = (ForecastUpdateReasonEnum)reader.GetUShort(8)!.Value;
@@ -369,7 +369,7 @@ namespace MatterDotNet.Clusters.Application
             public required DateTime? EarliestStartTime { get; set; }
             public required DateTime LatestEndTime { get; set; }
             public required bool IsPauseable { get; set; }
-            public required List<Slot> Slots { get; set; }
+            public required Slot[] Slots { get; set; }
             public required ForecastUpdateReasonEnum ForecastUpdateReason { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -385,7 +385,7 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteBool(6, IsPauseable);
                 {
                     Constrain(Slots, 0, 10);
-                    writer.StartList(7);
+                    writer.StartArray(7);
                     foreach (var item in Slots) {
                         item.Serialize(writer, -1);
                     }
@@ -481,9 +481,9 @@ namespace MatterDotNet.Clusters.Application
                 MaxPower = reader.GetLong(11)!.Value;
                 NominalEnergy = reader.GetLong(12)!.Value;
                 {
-                    Costs = new List<Cost>();
-                    foreach (var item in (List<object>)fields[13]) {
-                        Costs.Add(new Cost((object[])item));
+                    Costs = new Cost[((object[])fields[13]).Length];
+                    for (int i = 0; i < Costs.Length; i++) {
+                        Costs[i] = new Cost((object[])fields[-1]);
                     }
                 }
                 MinPowerAdjustment = reader.GetLong(14)!.Value;
@@ -504,7 +504,7 @@ namespace MatterDotNet.Clusters.Application
             public required long MinPower { get; set; }
             public required long MaxPower { get; set; }
             public required long NominalEnergy { get; set; }
-            public List<Cost>? Costs { get; set; }
+            public Cost[]? Costs { get; set; }
             public required long MinPowerAdjustment { get; set; }
             public required long MaxPowerAdjustment { get; set; }
             public required TimeSpan MinDurationAdjustment { get; set; }
@@ -528,7 +528,7 @@ namespace MatterDotNet.Clusters.Application
                 if (Costs != null)
                 {
                     Constrain(Costs, 0, 5);
-                    writer.StartList(13);
+                    writer.StartArray(13);
                     foreach (var item in Costs) {
                         item.Serialize(writer, -1);
                     }
@@ -581,14 +581,14 @@ namespace MatterDotNet.Clusters.Application
 
         private record ModifyForecastRequestPayload : TLVPayload {
             public required uint ForecastId { get; set; }
-            public required List<SlotAdjustment> SlotAdjustments { get; set; }
+            public required SlotAdjustment[] SlotAdjustments { get; set; }
             public required AdjustmentCauseEnum Cause { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, ForecastId);
                 {
                     Constrain(SlotAdjustments, 0, 10);
-                    writer.StartList(1);
+                    writer.StartArray(1);
                     foreach (var item in SlotAdjustments) {
                         item.Serialize(writer, -1);
                     }
@@ -600,13 +600,13 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record RequestConstraintBasedForecastPayload : TLVPayload {
-            public required List<Constraints> Constraints { get; set; }
+            public required Constraints[] Constraints { get; set; }
             public required AdjustmentCauseEnum Cause { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
                     Constrain(Constraints, 0, 10);
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in Constraints) {
                         item.Serialize(writer, -1);
                     }
@@ -675,7 +675,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Modify Forecast Request
         /// </summary>
-        public async Task<bool> ModifyForecastRequest(SecureSession session, uint ForecastId, List<SlotAdjustment> SlotAdjustments, AdjustmentCauseEnum Cause) {
+        public async Task<bool> ModifyForecastRequest(SecureSession session, uint ForecastId, SlotAdjustment[] SlotAdjustments, AdjustmentCauseEnum Cause) {
             ModifyForecastRequestPayload requestFields = new ModifyForecastRequestPayload() {
                 ForecastId = ForecastId,
                 SlotAdjustments = SlotAdjustments,
@@ -688,7 +688,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Request Constraint Based Forecast
         /// </summary>
-        public async Task<bool> RequestConstraintBasedForecast(SecureSession session, List<Constraints> Constraints, AdjustmentCauseEnum Cause) {
+        public async Task<bool> RequestConstraintBasedForecast(SecureSession session, Constraints[] Constraints, AdjustmentCauseEnum Cause) {
             RequestConstraintBasedForecastPayload requestFields = new RequestConstraintBasedForecastPayload() {
                 Constraints = Constraints,
                 Cause = Cause,
@@ -766,11 +766,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Power Adjustment Capability attribute
         /// </summary>
-        public async Task<List<PowerAdjust>?> GetPowerAdjustmentCapability(SecureSession session) {
-            List<PowerAdjust> list = new List<PowerAdjust>();
+        public async Task<PowerAdjust[]?> GetPowerAdjustmentCapability(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            PowerAdjust[] list = new PowerAdjust[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new PowerAdjust(reader.GetStruct(i)!));
+                list[i] = new PowerAdjust(reader.GetStruct(i)!);
             return list;
         }
 

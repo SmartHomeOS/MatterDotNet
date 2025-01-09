@@ -34,11 +34,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Label List attribute
         /// </summary>
-        public async Task<List<Label>> GetLabelList(SecureSession session) {
-            List<Label> list = new List<Label>();
+        public async Task<Label[]> GetLabelList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            Label[] list = new Label[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Label(reader.GetStruct(i)!));
+                list[i] = new Label(reader.GetStruct(i)!);
             return list;
         }
         #endregion Attributes

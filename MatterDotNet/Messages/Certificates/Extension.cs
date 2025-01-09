@@ -18,6 +18,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Messages.Certificates
 {
+    /// <summary>
+    /// Extension Payload
+    /// </summary>
     public record Extension : TLVPayload
     {
         /// <inheritdoc />

@@ -242,21 +242,21 @@ namespace MatterDotNet.Clusters.Application
                 TimeWindowIndex = reader.GetUShort(0, true);
                 DayOfWeek = (DayOfWeekBitmapType)reader.GetUShort(1)!.Value;
                 {
-                    TimePeriod = new List<TimePeriodStructType>();
-                    foreach (var item in (List<object>)fields[2]) {
-                        TimePeriod.Add(new TimePeriodStructType((object[])item));
+                    TimePeriod = new TimePeriodStructType[((object[])fields[2]).Length];
+                    for (int i = 0; i < TimePeriod.Length; i++) {
+                        TimePeriod[i] = new TimePeriodStructType((object[])fields[-1]);
                     }
                 }
             }
             public required ushort? TimeWindowIndex { get; set; }
             public required DayOfWeekBitmapType DayOfWeek { get; set; }
-            public required List<TimePeriodStructType> TimePeriod { get; set; }
+            public required TimePeriodStructType[] TimePeriod { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, TimeWindowIndex);
                 writer.WriteUShort(1, (ushort)DayOfWeek);
                 {
-                    writer.StartList(2);
+                    writer.StartArray(2);
                     foreach (var item in TimePeriod) {
                         item.Serialize(writer, -1);
                     }
@@ -326,11 +326,11 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record AddBlockChannelsPayload : TLVPayload {
-            public required List<BlockChannel> Channels { get; set; }
+            public required BlockChannel[] Channels { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in Channels) {
                         item.Serialize(writer, -1);
                     }
@@ -341,11 +341,11 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record RemoveBlockChannelsPayload : TLVPayload {
-            public required List<ushort> ChannelIndexes { get; set; }
+            public required ushort[] ChannelIndexes { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in ChannelIndexes) {
                         writer.WriteUShort(-1, item);
                     }
@@ -356,11 +356,11 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record AddBlockApplicationsPayload : TLVPayload {
-            public required List<AppInfo> Applications { get; set; }
+            public required AppInfo[] Applications { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in Applications) {
                         item.Serialize(writer, -1);
                     }
@@ -371,11 +371,11 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record RemoveBlockApplicationsPayload : TLVPayload {
-            public required List<AppInfo> Applications { get; set; }
+            public required AppInfo[] Applications { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in Applications) {
                         item.Serialize(writer, -1);
                     }
@@ -395,11 +395,11 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record RemoveBlockContentTimeWindowPayload : TLVPayload {
-            public required List<ushort> TimeWindowIndexes { get; set; }
+            public required ushort[] TimeWindowIndexes { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    writer.StartList(0);
+                    writer.StartArray(0);
                     foreach (var item in TimeWindowIndexes) {
                         writer.WriteUShort(-1, item);
                     }
@@ -515,7 +515,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add Block Channels
         /// </summary>
-        public async Task<bool> AddBlockChannels(SecureSession session, List<BlockChannel> Channels) {
+        public async Task<bool> AddBlockChannels(SecureSession session, BlockChannel[] Channels) {
             AddBlockChannelsPayload requestFields = new AddBlockChannelsPayload() {
                 Channels = Channels,
             };
@@ -526,7 +526,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Remove Block Channels
         /// </summary>
-        public async Task<bool> RemoveBlockChannels(SecureSession session, List<ushort> ChannelIndexes) {
+        public async Task<bool> RemoveBlockChannels(SecureSession session, ushort[] ChannelIndexes) {
             RemoveBlockChannelsPayload requestFields = new RemoveBlockChannelsPayload() {
                 ChannelIndexes = ChannelIndexes,
             };
@@ -537,7 +537,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add Block Applications
         /// </summary>
-        public async Task<bool> AddBlockApplications(SecureSession session, List<AppInfo> Applications) {
+        public async Task<bool> AddBlockApplications(SecureSession session, AppInfo[] Applications) {
             AddBlockApplicationsPayload requestFields = new AddBlockApplicationsPayload() {
                 Applications = Applications,
             };
@@ -548,7 +548,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Remove Block Applications
         /// </summary>
-        public async Task<bool> RemoveBlockApplications(SecureSession session, List<AppInfo> Applications) {
+        public async Task<bool> RemoveBlockApplications(SecureSession session, AppInfo[] Applications) {
             RemoveBlockApplicationsPayload requestFields = new RemoveBlockApplicationsPayload() {
                 Applications = Applications,
             };
@@ -570,7 +570,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Remove Block Content Time Window
         /// </summary>
-        public async Task<bool> RemoveBlockContentTimeWindow(SecureSession session, List<ushort> TimeWindowIndexes) {
+        public async Task<bool> RemoveBlockContentTimeWindow(SecureSession session, ushort[] TimeWindowIndexes) {
             RemoveBlockContentTimeWindowPayload requestFields = new RemoveBlockContentTimeWindowPayload() {
                 TimeWindowIndexes = TimeWindowIndexes,
             };
@@ -611,11 +611,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the On Demand Ratings attribute
         /// </summary>
-        public async Task<List<RatingName>> GetOnDemandRatings(SecureSession session) {
-            List<RatingName> list = new List<RatingName>();
+        public async Task<RatingName[]> GetOnDemandRatings(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            RatingName[] list = new RatingName[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new RatingName(reader.GetStruct(i)!));
+                list[i] = new RatingName(reader.GetStruct(i)!);
             return list;
         }
 
@@ -629,11 +629,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Scheduled Content Ratings attribute
         /// </summary>
-        public async Task<List<RatingName>> GetScheduledContentRatings(SecureSession session) {
-            List<RatingName> list = new List<RatingName>();
+        public async Task<RatingName[]> GetScheduledContentRatings(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            RatingName[] list = new RatingName[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new RatingName(reader.GetStruct(i)!));
+                list[i] = new RatingName(reader.GetStruct(i)!);
             return list;
         }
 
@@ -668,33 +668,33 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Block Channel List attribute
         /// </summary>
-        public async Task<List<BlockChannel>> GetBlockChannelList(SecureSession session) {
-            List<BlockChannel> list = new List<BlockChannel>();
+        public async Task<BlockChannel[]> GetBlockChannelList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
+            BlockChannel[] list = new BlockChannel[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new BlockChannel(reader.GetStruct(i)!));
+                list[i] = new BlockChannel(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Block Application List attribute
         /// </summary>
-        public async Task<List<AppInfo>> GetBlockApplicationList(SecureSession session) {
-            List<AppInfo> list = new List<AppInfo>();
+        public async Task<AppInfo[]> GetBlockApplicationList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 9))!);
+            AppInfo[] list = new AppInfo[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new AppInfo(reader.GetStruct(i)!));
+                list[i] = new AppInfo(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Block Content Time Window attribute
         /// </summary>
-        public async Task<List<TimeWindow>> GetBlockContentTimeWindow(SecureSession session) {
-            List<TimeWindow> list = new List<TimeWindow>();
+        public async Task<TimeWindow[]> GetBlockContentTimeWindow(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
+            TimeWindow[] list = new TimeWindow[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new TimeWindow(reader.GetStruct(i)!));
+                list[i] = new TimeWindow(reader.GetStruct(i)!);
             return list;
         }
         #endregion Attributes

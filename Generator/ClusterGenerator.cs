@@ -310,13 +310,13 @@ namespace Generator
             }
             switch (type)
             {
-                case "list":
+                case "list": //Actually an array
                     if (optional || nullable)
                         writer.WriteLine($"{totalIndent}if ({name} != null)");
                     writer.WriteLine($"{totalIndent}{{");
                     if (from != null || to != null)
                         writer.WriteLine($"{totalIndent}    Constrain({name}, {from ?? 0}{(to == null ? "" : $", {to}")});");
-                    writer.WriteLine($"{totalIndent}    writer.StartList({id});");
+                    writer.WriteLine($"{totalIndent}    writer.StartArray({id});");
                     writer.WriteLine($"{totalIndent}    foreach (var item in {name}) {{");
                     writer.Write("        ");
                     WriteStructType(false, false, entryType!, null, -1, null, null, "item", cluster, writer);
@@ -583,20 +583,17 @@ namespace Generator
                 else
                     writer.Write($"{totalIndent}{name} = ");
             }
-            bool extraOutsideClose = (id == "-1" || id == "i");
-            bool extraInsideClose = false;
+            bool extraClose = false;
             switch (type)
             {
-                case "array":
-                    throw new NotImplementedException();
                 case "list":
                     writer.WriteLine($"{totalIndent}{{");
-                    writer.Write($"{totalIndent}    {name} = new List<");
+                    writer.Write($"{totalIndent}    {name} = new ");
                     WriteType(entryType!, null, writer);
-                    writer.WriteLine(">();");
-                    writer.WriteLine($"{totalIndent}    foreach (var item in (List<object>)fields[{id}]) {{");
-                    writer.Write($"{totalIndent}        {name}.Add(");
-                    WriteFieldReader(false, false, entryType!, null, "-1", null, null, "item", structName, cluster, writer);
+                    writer.WriteLine($"[((object[])fields[{id}]).Length];");
+                    writer.WriteLine($"{totalIndent}    for (int i = 0; i < {name}.Length; i++) {{");
+                    writer.Write($"{totalIndent}        {name}[i] = ");
+                    WriteFieldReader(false, false, entryType!, null, "-1", null, null, $"fields[{id}]", structName, cluster, writer);
                     writer.WriteLine($"{totalIndent}    }}");
                     writer.WriteLine($"{totalIndent}}}");
                     return;
@@ -678,55 +675,52 @@ namespace Generator
                     writer.Write($"reader.GetDouble({id}");
                     break;
                 case "ref_IpAdr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4)!);;");
                     return;
                 case "ref_Ipv4Adr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4)!);;");
                     return;
                 case "ref_Ipv6Adr":
                 case "ipv6adr":
-                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16)!);;");
                     return;
                 case "Hardware Address":
                 case "hwadr":
-                    writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6{(id == "-1" || id == "i" ? ")!))" : ")!)")};");
+                    writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6)!);");
                     return;
                 case "epoch-s":
                     includes.Add("MatterDotNet.Util");
                     writer.Write($"TimeUtil.FromEpochSeconds(reader.GetUInt({id}");
-                    extraInsideClose = true;
+                    extraClose = true;
                     break;
                 case "elapsed-s":
                     writer.Write($"TimeSpan.FromSeconds(reader.GetUInt({id}");
-                    extraOutsideClose = true;
+                    extraClose = true;
                     break;
                 case "epoch-us":
                     includes.Add("MatterDotNet.Util");
                     writer.Write($"TimeUtil.FromEpochUS(reader.GetULong({id}");
-                    extraInsideClose = true;
+                    extraClose = true;
                     break;
                 case "ref_DataTypeSystemTimeUs":
                 case "systime-us":
                     writer.Write($"TimeUtil.FromMicros(reader.GetULong({id}");
-                    extraInsideClose = true;
+                    extraClose = true;
                     break;
                 case "ref_DataTypeSystemTimeMs":
                 case "systime-ms":
                     writer.Write($"TimeUtil.FromMillis(reader.GetULong({id}");
-                    extraInsideClose = true;
+                    extraClose = true;
                     break;
                 case "ref_DataTypePosixMs":
                     writer.Write($"DateTimeOffset.FromUnixTimeMilliseconds(reader.GetULong({id}");
-                    extraInsideClose = true;
+                    extraClose = true;
                     break;
                 case "devtype-id":
                     writer.Write($"(DeviceTypeEnum)reader.GetUInt({id}");
                     if (optional)
                         writer.Write(", true");
-                    if (id == "-1" || id == "i")
-                        writer.WriteLine(")!.Value);");
-                    else
-                        writer.WriteLine(")!.Value;");
+                    writer.WriteLine(")!.Value;");
                     return;
                 case "octstr":
                 case "ipv6pre":
@@ -740,10 +734,7 @@ namespace Generator
                     writer.Write(')');
                     if (!optional)
                         writer.Write('!');
-                    if (id == "-1" || id == "i")
-                        writer.WriteLine(");");
-                    else
-                        writer.WriteLine(';');
+                    writer.WriteLine(';');
                     return;
                 case "string":
                     writer.Write($"reader.GetString({id}, {(optional ? "true" : "false")}");
@@ -756,10 +747,7 @@ namespace Generator
                     writer.Write(')');
                     if (!optional)
                         writer.Write('!');
-                    if (id == "-1" || id == "i")
-                        writer.WriteLine(");");
-                    else
-                        writer.WriteLine(';');
+                    writer.WriteLine(';');
                     return;
                 default:
                     if (HasEnum(cluster, type) || HasBitmap(cluster, type) || type == "status" || type == "ref_CharacteristicEnum" || type == "ref_MeasurementTypeEnum")
@@ -775,35 +763,26 @@ namespace Generator
                             writer.Write($"({GeneratorUtil.SanitizeName(type)})reader.GetUShort({id}");
                         if (optional)
                             writer.Write(", true");
-                        if (id == "-1" || id == "i")
-                            writer.WriteLine(")!.Value);");
-                        else
-                            writer.WriteLine(")!.Value;");
+                        writer.WriteLine(")!.Value;");
                     }
                     else {
                         writer.Write($"new ");
                         WriteType(type, entryType, writer);
-                        if (id == "-1")
-                            writer.WriteLine("((object[])item));");
-                        else if (id == "i")
-                            writer.WriteLine("(reader.GetStruct(i)!));");
+                        if (id == "i")
+                            writer.WriteLine("(reader.GetStruct(i)!);");
                         else
                             writer.WriteLine($"((object[])fields[{id}]);");
                     }
                     return;
             }
-            if (extraInsideClose && (optional || nullable))
-            {
-                extraOutsideClose = true;
-                extraInsideClose = false;
-            }
-            if (extraInsideClose)
+
+            if (extraClose && !(optional || nullable))
                 writer.Write(")");
             if (optional || nullable)
                 writer.Write(", true)");
             else
                 writer.Write(")!.Value");
-            if (extraOutsideClose)
+            if (extraClose && (optional || nullable))
                 writer.Write(")");
             writer.WriteLine(';');
         }
@@ -1176,14 +1155,16 @@ namespace Generator
                     writer.Write($"new {GeneratorUtil.SanitizeName(attribute.type)}((object[])(await GetAttribute(session, " + Convert.ToUInt16(attribute.id, 16) + "))!)");
                 else if (attribute.type == "list")
                 {
-                    writer.Write("            List<");
-                    WriteType(attribute.entry!.type, null, writer);
-                    writer.Write("> list = new List<");
-                    WriteType(attribute.entry!.type, null, writer);
-                    writer.WriteLine(">();");
                     writer.WriteLine($"            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, {Convert.ToUInt16(attribute.id, 16)}))!);");
+                    writer.Write("            ");
+                    WriteType(attribute.entry!.type, null, writer);
+                    writer.Write("[] list = new ");
+                    if (WriteType(attribute.entry!.type, null, writer, true))
+                        writer.WriteLine("reader.Count][];");
+                    else
+                        writer.WriteLine("[reader.Count];");
                     writer.WriteLine("            for (int i = 0; i < reader.Count; i++)");
-                    writer.Write("                list.Add(");
+                    writer.Write("                list[i] = ");
                     long? from = null;
                     long? to = null;
                     if (attribute.constraint?.fromSpecified == true && long.TryParse(attribute.constraint.from, out long fromVal))
@@ -1255,7 +1236,7 @@ namespace Generator
             }
         }
 
-        private static void WriteType(string type, string? entryType, TextWriter writer)
+        private static bool WriteType(string type, string? entryType, TextWriter writer, bool openIndex = false)
         {
             switch (type)
             {
@@ -1345,11 +1326,13 @@ namespace Generator
                 case "energy-mWh":
                     writer.Write("long");
                     break;
-                case "list":
-                    writer.Write("List<");
+                case "list": //Really an array
                     WriteType(entryType!, null, writer);
-                    writer.Write(">");
-                    break;
+                    if (openIndex)
+                        writer.Write("[");
+                    else
+                        writer.Write("[]");
+                    return true;
                 case "single":
                     writer.Write("float");
                     break;
@@ -1367,8 +1350,11 @@ namespace Generator
                     break;
                 case "octstr":
                 case "ipv6pre":
-                    writer.Write("byte[]");
-                    break;
+                    if (openIndex)
+                        writer.Write("byte[");
+                    else
+                        writer.Write("byte[]");
+                    return true;
                 case "bool":
                 case "Bool":
                 case "string":
@@ -1406,6 +1392,7 @@ namespace Generator
                     writer.Write(GeneratorUtil.SanitizeName(type));
                     break;
             }
+            return false;
         }
 
         private static string SanitizeDefault(string value, string? type, string? listType)
@@ -1418,9 +1405,9 @@ namespace Generator
                 {
                     StringBuilder sb = new StringBuilder();
                     StringWriter sw = new StringWriter(sb);
-                    sw.Write("new ");
-                    WriteType(type, listType, sw);
-                    sw.Write("()");
+                    sw.Write("Array.Empty<");
+                    WriteType(listType!, null, sw);
+                    sw.Write(">()");
                     return sb.ToString();
                 }
                 else if (type?.Equals("string", StringComparison.InvariantCultureIgnoreCase) == true)

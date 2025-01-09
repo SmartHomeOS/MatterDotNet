@@ -200,22 +200,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Accuracy attribute
         /// </summary>
-        public async Task<List<MeasurementAccuracy>> GetAccuracy(SecureSession session) {
-            List<MeasurementAccuracy> list = new List<MeasurementAccuracy>();
+        public async Task<MeasurementAccuracy[]> GetAccuracy(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
+            MeasurementAccuracy[] list = new MeasurementAccuracy[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new MeasurementAccuracy(reader.GetStruct(i)!));
+                list[i] = new MeasurementAccuracy(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Ranges attribute
         /// </summary>
-        public async Task<List<MeasurementRange>> GetRanges(SecureSession session) {
-            List<MeasurementRange> list = new List<MeasurementRange>();
+        public async Task<MeasurementRange[]> GetRanges(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            MeasurementRange[] list = new MeasurementRange[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new MeasurementRange(reader.GetStruct(i)!));
+                list[i] = new MeasurementRange(reader.GetStruct(i)!);
             return list;
         }
 
@@ -299,22 +299,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Harmonic Currents attribute
         /// </summary>
-        public async Task<List<HarmonicMeasurement>?> GetHarmonicCurrents(SecureSession session) {
-            List<HarmonicMeasurement> list = new List<HarmonicMeasurement>();
+        public async Task<HarmonicMeasurement[]?> GetHarmonicCurrents(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 15))!);
+            HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new HarmonicMeasurement(reader.GetStruct(i)!));
+                list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Harmonic Phases attribute
         /// </summary>
-        public async Task<List<HarmonicMeasurement>?> GetHarmonicPhases(SecureSession session) {
-            List<HarmonicMeasurement> list = new List<HarmonicMeasurement>();
+        public async Task<HarmonicMeasurement[]?> GetHarmonicPhases(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 16))!);
+            HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new HarmonicMeasurement(reader.GetStruct(i)!));
+                list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
             return list;
         }
 

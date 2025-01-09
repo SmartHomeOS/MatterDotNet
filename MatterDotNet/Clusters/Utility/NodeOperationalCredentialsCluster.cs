@@ -426,22 +426,22 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the NO Cs attribute
         /// </summary>
-        public async Task<List<NOC>> GetNOCs(SecureSession session) {
-            List<NOC> list = new List<NOC>();
+        public async Task<NOC[]> GetNOCs(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            NOC[] list = new NOC[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new NOC(reader.GetStruct(i)!));
+                list[i] = new NOC(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Fabrics attribute
         /// </summary>
-        public async Task<List<FabricDescriptor>> GetFabrics(SecureSession session) {
-            List<FabricDescriptor> list = new List<FabricDescriptor>();
+        public async Task<FabricDescriptor[]> GetFabrics(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            FabricDescriptor[] list = new FabricDescriptor[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new FabricDescriptor(reader.GetStruct(i)!));
+                list[i] = new FabricDescriptor(reader.GetStruct(i)!);
             return list;
         }
 
@@ -462,11 +462,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Trusted Root Certificates attribute
         /// </summary>
-        public async Task<List<byte[]>> GetTrustedRootCertificates(SecureSession session) {
-            List<byte[]> list = new List<byte[]>();
+        public async Task<byte[][]> GetTrustedRootCertificates(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 4))!);
+            byte[][] list = new byte[reader.Count][];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(reader.GetBytes(i, false)!);
+                list[i] = reader.GetBytes(i, false)!;
             return list;
         }
 

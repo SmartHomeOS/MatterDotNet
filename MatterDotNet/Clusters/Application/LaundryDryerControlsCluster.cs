@@ -60,11 +60,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Supported Dryness Levels attribute
         /// </summary>
-        public async Task<List<DrynessLevelEnum>> GetSupportedDrynessLevels(SecureSession session) {
-            List<DrynessLevelEnum> list = new List<DrynessLevelEnum>();
+        public async Task<DrynessLevelEnum[]> GetSupportedDrynessLevels(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            DrynessLevelEnum[] list = new DrynessLevelEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((DrynessLevelEnum)reader.GetUShort(i)!.Value);
+                list[i] = (DrynessLevelEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 

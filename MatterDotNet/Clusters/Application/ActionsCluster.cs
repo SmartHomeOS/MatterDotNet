@@ -235,16 +235,16 @@ namespace MatterDotNet.Clusters.Application
                 Name = reader.GetString(1, false)!;
                 Type = (EndpointListTypeEnum)reader.GetUShort(2)!.Value;
                 {
-                    Endpoints = new List<ushort>();
-                    foreach (var item in (List<object>)fields[3]) {
-                        Endpoints.Add(reader.GetUShort(-1)!.Value);
+                    Endpoints = new ushort[((object[])fields[3]).Length];
+                    for (int i = 0; i < Endpoints.Length; i++) {
+                        Endpoints[i] = reader.GetUShort(-1)!.Value;
                     }
                 }
             }
             public required ushort EndpointListID { get; set; }
             public required string Name { get; set; }
             public required EndpointListTypeEnum Type { get; set; }
-            public required List<ushort> Endpoints { get; set; }
+            public required ushort[] Endpoints { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, EndpointListID);
@@ -252,7 +252,7 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUShort(2, (ushort)Type);
                 {
                     Constrain(Endpoints, 0, 256);
-                    writer.StartList(3);
+                    writer.StartArray(3);
                     foreach (var item in Endpoints) {
                         writer.WriteUShort(-1, item);
                     }
@@ -574,22 +574,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Action List attribute
         /// </summary>
-        public async Task<List<Action>> GetActionList(SecureSession session) {
-            List<Action> list = new List<Action>();
+        public async Task<Action[]> GetActionList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            Action[] list = new Action[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Action(reader.GetStruct(i)!));
+                list[i] = new Action(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Endpoint Lists attribute
         /// </summary>
-        public async Task<List<EndpointList>> GetEndpointLists(SecureSession session) {
-            List<EndpointList> list = new List<EndpointList>();
+        public async Task<EndpointList[]> GetEndpointLists(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            EndpointList[] list = new EndpointList[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new EndpointList(reader.GetStruct(i)!));
+                list[i] = new EndpointList(reader.GetStruct(i)!);
             return list;
         }
 

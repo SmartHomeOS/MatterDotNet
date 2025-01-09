@@ -114,11 +114,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Energy Balances attribute
         /// </summary>
-        public async Task<List<Balance>> GetEnergyBalances(SecureSession session) {
-            List<Balance> list = new List<Balance>();
+        public async Task<Balance[]> GetEnergyBalances(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            Balance[] list = new Balance[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Balance(reader.GetStruct(i)!));
+                list[i] = new Balance(reader.GetStruct(i)!);
             return list;
         }
 
@@ -139,22 +139,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Energy Priorities attribute
         /// </summary>
-        public async Task<List<EnergyPriorityEnum>> GetEnergyPriorities(SecureSession session) {
-            List<EnergyPriorityEnum> list = new List<EnergyPriorityEnum>();
+        public async Task<EnergyPriorityEnum[]> GetEnergyPriorities(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
+            EnergyPriorityEnum[] list = new EnergyPriorityEnum[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add((EnergyPriorityEnum)reader.GetUShort(i)!.Value);
+                list[i] = (EnergyPriorityEnum)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Low Power Mode Sensitivities attribute
         /// </summary>
-        public async Task<List<Balance>> GetLowPowerModeSensitivities(SecureSession session) {
-            List<Balance> list = new List<Balance>();
+        public async Task<Balance[]> GetLowPowerModeSensitivities(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
+            Balance[] list = new Balance[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list.Add(new Balance(reader.GetStruct(i)!));
+                list[i] = new Balance(reader.GetStruct(i)!);
             return list;
         }
 

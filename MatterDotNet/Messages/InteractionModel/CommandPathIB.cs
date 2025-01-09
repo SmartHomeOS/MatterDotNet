@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public CommandPathIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required ushort Endpoint { get; set; } 
-        public required uint Cluster { get; set; } 
-        public required uint Command { get; set; } 
+        public required ushort Endpoint { get; set; }
+        public required uint Cluster { get; set; }
+        public required uint Command { get; set; }
 
         [SetsRequiredMembers]
         internal CommandPathIB(TLVReader reader, long structNumber = -1) {

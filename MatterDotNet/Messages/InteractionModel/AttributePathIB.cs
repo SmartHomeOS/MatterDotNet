@@ -27,13 +27,14 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public AttributePathIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public bool? EnableTagCompression { get; set; } 
-        public ulong? Node { get; set; } 
-        public ushort? Endpoint { get; set; } 
-        public uint? Cluster { get; set; } 
-        public uint? Attribute { get; set; } 
-        public ushort? ListIndex { get; set; } 
-        public uint? WildcardPathFlags { get; set; } 
+        public bool? EnableTagCompression { get; set; }
+        public ulong? Node { get; set; }
+        public ushort? Endpoint { get; set; }
+        public uint? Cluster { get; set; }
+        public uint? Attribute { get; set; }
+        public ushort? ListIndex { get; set; }
+        public bool HasListIndex { get; set; }
+        public uint? WildcardPathFlags { get; set; }
 
         [SetsRequiredMembers]
         internal AttributePathIB(TLVReader reader, long structNumber = -1) {
@@ -49,7 +50,10 @@ namespace MatterDotNet.Messages.InteractionModel
             if (reader.IsTag(4))
                 Attribute = reader.GetUInt(4);
             if (reader.IsTag(5))
+            {
+                HasListIndex = true;
                 ListIndex = reader.GetUShort(5, true);
+            }
             if (reader.IsTag(6))
                 WildcardPathFlags = reader.GetUInt(6);
             reader.EndContainer();
@@ -67,7 +71,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 writer.WriteUInt(3, Cluster);
             if (Attribute != null)
                 writer.WriteUInt(4, Attribute);
-            if (ListIndex != null)
+            if (HasListIndex)
                 writer.WriteUShort(5, ListIndex);
             if (WildcardPathFlags != null)
                 writer.WriteUInt(6, WildcardPathFlags);

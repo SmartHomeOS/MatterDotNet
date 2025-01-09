@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public DataVersionFilterIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required uint DataVersion { get; set; } 
-        public required AttributePathIB Path { get; set; } 
-        public required object Data { get; set; } 
+        public required uint DataVersion { get; set; }
+        public required AttributePathIB Path { get; set; }
+        public required object Data { get; set; }
 
         [SetsRequiredMembers]
         internal DataVersionFilterIB(TLVReader reader, long structNumber = -1) {

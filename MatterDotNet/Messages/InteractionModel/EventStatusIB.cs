@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public EventStatusIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required EventPathIB Path { get; set; } 
-        public required StatusIB Status { get; set; } 
+        public required EventPathIB Path { get; set; }
+        public required StatusIB Status { get; set; }
 
         [SetsRequiredMembers]
         internal EventStatusIB(TLVReader reader, long structNumber = -1) {

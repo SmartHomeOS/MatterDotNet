@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.PASE
         [SetsRequiredMembers]
         public Crypto_PBKDFParameterSet(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required uint Iterations { get; set; } 
-        public required byte[] Salt { get; set; } 
+        public required uint Iterations { get; set; }
+        public required byte[] Salt { get; set; }
 
         [SetsRequiredMembers]
         internal Crypto_PBKDFParameterSet(TLVReader reader, long structNumber = -1) {

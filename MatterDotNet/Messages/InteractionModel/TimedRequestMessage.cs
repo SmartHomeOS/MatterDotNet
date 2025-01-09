@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public TimedRequestMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required ushort Timeout { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required ushort Timeout { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal TimedRequestMessage(TLVReader reader, long structNumber = -1) {

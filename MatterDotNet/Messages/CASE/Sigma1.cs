@@ -28,13 +28,13 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma1(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] InitiatorRandom { get; set; } 
-        public required ushort InitiatorSessionId { get; set; } 
-        public required byte[] DestinationId { get; set; } 
-        public required byte[] InitiatorEphPubKey { get; set; } 
-        public SessionParameter? InitiatorSessionParams { get; set; } 
-        public byte[]? ResumptionId { get; set; } 
-        public byte[]? InitiatorResumeMIC { get; set; } 
+        public required byte[] InitiatorRandom { get; set; }
+        public required ushort InitiatorSessionId { get; set; }
+        public required byte[] DestinationId { get; set; }
+        public required byte[] InitiatorEphPubKey { get; set; }
+        public SessionParameter? InitiatorSessionParams { get; set; }
+        public byte[]? ResumptionId { get; set; }
+        public byte[]? InitiatorResumeMIC { get; set; }
 
         [SetsRequiredMembers]
         internal Sigma1(TLVReader reader, long structNumber = -1) {

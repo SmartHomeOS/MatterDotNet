@@ -27,17 +27,17 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public MatterCertificate(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] SerialNum { get; set; } 
-        public required ulong SigAlgo { get; set; } 
-        public required List<DnAttribute> Issuer { get; set; } 
-        public required uint NotBefore { get; set; } 
-        public required uint NotAfter { get; set; } 
-        public required List<DnAttribute> Subject { get; set; } 
-        public required ulong PubKeyAlgo { get; set; } 
-        public required ulong EcCurveId { get; set; } 
-        public required byte[] EcPubKey { get; set; } 
-        public required List<Extension> Extensions { get; set; } 
-        public required byte[] Signature { get; set; } 
+        public required byte[] SerialNum { get; set; }
+        public required ulong SigAlgo { get; set; }
+        public required List<DnAttribute> Issuer { get; set; }
+        public required uint NotBefore { get; set; }
+        public required uint NotAfter { get; set; }
+        public required List<DnAttribute> Subject { get; set; }
+        public required ulong PubKeyAlgo { get; set; }
+        public required ulong EcCurveId { get; set; }
+        public required byte[] EcPubKey { get; set; }
+        public required List<Extension> Extensions { get; set; }
+        public required byte[] Signature { get; set; }
 
         [SetsRequiredMembers]
         internal MatterCertificate(TLVReader reader, long structNumber = -1) {

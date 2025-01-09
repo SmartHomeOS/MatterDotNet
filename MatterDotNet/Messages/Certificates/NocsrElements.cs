@@ -27,11 +27,11 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public NocsrElements(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] Csr { get; set; } 
-        public required byte[] CSRNonce { get; set; } 
-        public byte[]? Vendor_reserved1 { get; set; } 
-        public byte[]? Vendor_reserved2 { get; set; } 
-        public byte[]? Vendor_reserved3 { get; set; } 
+        public required byte[] Csr { get; set; }
+        public required byte[] CSRNonce { get; set; }
+        public byte[]? Vendor_reserved1 { get; set; }
+        public byte[]? Vendor_reserved2 { get; set; }
+        public byte[]? Vendor_reserved3 { get; set; }
 
         [SetsRequiredMembers]
         internal NocsrElements(TLVReader reader, long structNumber = -1) {

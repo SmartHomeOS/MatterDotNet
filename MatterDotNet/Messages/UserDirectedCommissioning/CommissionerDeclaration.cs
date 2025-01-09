@@ -27,12 +27,12 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
         [SetsRequiredMembers]
         public CommissionerDeclaration(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public ushort? ErrorCode { get; set; } 
-        public bool? NeedsPasscode { get; set; } 
-        public bool? NoAppsFound { get; set; } 
-        public bool? PasscodeDialogDisplayed { get; set; } 
-        public bool? CommissionerPasscode { get; set; } 
-        public bool? QRCodeDisplayed { get; set; } 
+        public ushort? ErrorCode { get; set; }
+        public bool? NeedsPasscode { get; set; }
+        public bool? NoAppsFound { get; set; }
+        public bool? PasscodeDialogDisplayed { get; set; }
+        public bool? CommissionerPasscode { get; set; }
+        public bool? QRCodeDisplayed { get; set; }
 
         [SetsRequiredMembers]
         internal CommissionerDeclaration(TLVReader reader, long structNumber = -1) {

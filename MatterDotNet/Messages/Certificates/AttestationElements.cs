@@ -27,13 +27,13 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public AttestationElements(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] Certification_declaration { get; set; } 
-        public required byte[] Attestation_nonce { get; set; } 
-        public required uint Timestamp { get; set; } 
-        public byte[]? Firmware_information { get; set; } 
+        public required byte[] Certification_declaration { get; set; }
+        public required byte[] Attestation_nonce { get; set; }
+        public required uint Timestamp { get; set; }
+        public byte[]? Firmware_information { get; set; }
 
         [SetsRequiredMembers]
-        public AttestationElements(TLVReader reader, long structNumber = -1) {
+        internal AttestationElements(TLVReader reader, long structNumber = -1) {
             reader.StartStructure(structNumber);
             Certification_declaration = reader.GetBytes(1)!;
             Attestation_nonce = reader.GetBytes(2, false, 32, 32)!;

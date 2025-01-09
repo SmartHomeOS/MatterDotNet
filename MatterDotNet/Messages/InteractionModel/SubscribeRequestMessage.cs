@@ -27,15 +27,15 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public SubscribeRequestMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required bool KeepSubscriptions { get; set; } 
-        public required ulong MinIntervalFloor { get; set; } 
-        public required ulong MaxIntervalCeiling { get; set; } 
-        public AttributePathIB[]? AttributeRequests { get; set; } 
-        public EventPathIB[]? EventRequests { get; set; } 
-        public EventFilterIB[]? EventFilters { get; set; } 
-        public required bool FabricFiltered { get; set; } 
-        public required DataVersionFilterIB[] DataVersionFilters { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required bool KeepSubscriptions { get; set; }
+        public required ulong MinIntervalFloor { get; set; }
+        public required ulong MaxIntervalCeiling { get; set; }
+        public AttributePathIB[]? AttributeRequests { get; set; }
+        public EventPathIB[]? EventRequests { get; set; }
+        public EventFilterIB[]? EventFilters { get; set; }
+        public required bool FabricFiltered { get; set; }
+        public required DataVersionFilterIB[] DataVersionFilters { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal SubscribeRequestMessage(TLVReader reader, long structNumber = -1) {

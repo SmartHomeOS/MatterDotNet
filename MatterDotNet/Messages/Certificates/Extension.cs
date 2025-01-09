@@ -27,12 +27,12 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public Extension(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public BasicConstraints? BasicCnstr { get; set; } 
-        public ushort? KeyUsage { get; set; } 
-        public uint[]? ExtendedKeyUsage { get; set; } 
-        public byte[]? SubjectKeyId { get; set; } 
-        public byte[]? AuthorityKeyId { get; set; } 
-        public byte[]? FutureExtension { get; set; } 
+        public BasicConstraints? BasicCnstr { get; set; }
+        public ushort? KeyUsage { get; set; }
+        public uint[]? ExtendedKeyUsage { get; set; }
+        public byte[]? SubjectKeyId { get; set; }
+        public byte[]? AuthorityKeyId { get; set; }
+        public byte[]? FutureExtension { get; set; }
 
         [SetsRequiredMembers]
         internal Extension(TLVReader reader, long structNumber = -1) {

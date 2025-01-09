@@ -27,11 +27,11 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public EventPathIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public ulong? Node { get; set; } 
-        public ushort? Endpoint { get; set; } 
-        public uint? Cluster { get; set; } 
-        public uint? Event { get; set; } 
-        public bool? IsUrgent { get; set; } 
+        public ulong? Node { get; set; }
+        public ushort? Endpoint { get; set; }
+        public uint? Cluster { get; set; }
+        public uint? Event { get; set; }
+        public bool? IsUrgent { get; set; }
 
         [SetsRequiredMembers]
         internal EventPathIB(TLVReader reader, long structNumber = -1) {

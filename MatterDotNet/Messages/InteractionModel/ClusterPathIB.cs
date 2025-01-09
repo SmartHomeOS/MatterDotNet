@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public ClusterPathIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public ulong? Node { get; set; } 
-        public ushort? Endpoint { get; set; } 
-        public uint? Cluster { get; set; } 
+        public ulong? Node { get; set; }
+        public ushort? Endpoint { get; set; }
+        public uint? Cluster { get; set; }
 
         [SetsRequiredMembers]
         internal ClusterPathIB(TLVReader reader, long structNumber = -1) {

@@ -27,10 +27,10 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public InvokeRequestMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required bool SuppressResponse { get; set; } 
-        public required bool TimedRequest { get; set; } 
-        public required CommandDataIB[] InvokeRequests { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required bool SuppressResponse { get; set; }
+        public required bool TimedRequest { get; set; }
+        public required CommandDataIB[] InvokeRequests { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal InvokeRequestMessage(TLVReader reader, long structNumber = -1) {

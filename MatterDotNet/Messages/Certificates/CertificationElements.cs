@@ -27,18 +27,18 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public CertificationElements(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required ushort Format_version { get; set; } 
-        public required ushort Vendor_id { get; set; } 
-        public required uint[] Product_id_array { get; set; } 
-        public required uint Device_type_id { get; set; } 
-        public required string Certificate_id { get; set; } 
-        public required byte Security_level { get; set; } 
-        public required ushort Security_information { get; set; } 
-        public required ushort Version_number { get; set; } 
-        public required byte Certification_type { get; set; } 
-        public ushort? Dac_origin_vendor_id { get; set; } 
-        public ushort? Dac_origin_product_id { get; set; } 
-        public byte[][]? Authorized_paa_list { get; set; } 
+        public required ushort Format_version { get; set; }
+        public required ushort Vendor_id { get; set; }
+        public required uint[] Product_id_array { get; set; }
+        public required uint Device_type_id { get; set; }
+        public required string Certificate_id { get; set; }
+        public required byte Security_level { get; set; }
+        public required ushort Security_information { get; set; }
+        public required ushort Version_number { get; set; }
+        public required byte Certification_type { get; set; }
+        public ushort? Dac_origin_vendor_id { get; set; }
+        public ushort? Dac_origin_product_id { get; set; }
+        public byte[][]? Authorized_paa_list { get; set; }
 
         [SetsRequiredMembers]
         internal CertificationElements(TLVReader reader, long structNumber = -1) {

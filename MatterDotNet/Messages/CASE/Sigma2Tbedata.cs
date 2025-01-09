@@ -27,10 +27,10 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma2Tbedata(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResponderNOC { get; set; } 
-        public byte[]? ResponderICAC { get; set; } 
-        public required byte[] Signature { get; set; } 
-        public required byte[] ResumptionId { get; set; } 
+        public required byte[] ResponderNOC { get; set; }
+        public byte[]? ResponderICAC { get; set; }
+        public required byte[] Signature { get; set; }
+        public required byte[] ResumptionId { get; set; }
 
         [SetsRequiredMembers]
         internal Sigma2Tbedata(TLVReader reader, long structNumber = -1) {

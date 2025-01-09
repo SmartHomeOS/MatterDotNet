@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public InvokeResponseIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public CommandDataIB? Command { get; set; } 
-        public CommandStatusIB? Status { get; set; } 
+        public CommandDataIB? Command { get; set; }
+        public CommandStatusIB? Status { get; set; }
 
         [SetsRequiredMembers]
         internal InvokeResponseIB(TLVReader reader, long structNumber = -1) {

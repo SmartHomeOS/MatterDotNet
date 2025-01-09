@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public StatusIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte Status { get; set; } 
-        public byte? ClusterStatus { get; set; } 
+        public required byte Status { get; set; }
+        public byte? ClusterStatus { get; set; }
 
         [SetsRequiredMembers]
         internal StatusIB(TLVReader reader, long structNumber = -1) {

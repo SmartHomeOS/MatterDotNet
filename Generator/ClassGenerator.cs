@@ -41,7 +41,11 @@ namespace Generator
             foreach (Tag child in tag.Children)
             {
                 if (child.Type != DataType.Structure)
-                    writer.WriteLine($"{indent}    {(child.Optional? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }} ");
+                {
+                    writer.WriteLine($"{indent}    {(child.Optional ? "public" : "public required")} {GetType(child)}{((child.Nullable || child.Optional) ? "?" : "")} {child.Name} {{ get; set; }}");
+                    if (child.Optional && child.Nullable)
+                        writer.WriteLine($"{indent}    public bool Has{child.Name} {{ get; set; }}");
+                }
             }
             writer.WriteLine($"\n{indent}    [SetsRequiredMembers]\n{indent}    internal {tag.Name}(TLVReader reader, long structNumber = -1) {{");
             if (tag.Type == DataType.List)
@@ -54,6 +58,8 @@ namespace Generator
                 if (child.Optional)
                 {
                     writer.WriteLine($"{totalIndent}{((child.Parent?.Type == DataType.Choice && tag.Children.IndexOf(child) > 0) ? "else " : "")}if (reader.IsTag({child.TagNumber}))");
+                    if (child.Nullable)
+                        writer.WriteLine($"{totalIndent}{{\n{totalIndent}    Has{child.Name} = true;");
                     if (child.Type != DataType.List && child.Type != DataType.Array)
                         totalIndent += "    ";
                 }
@@ -161,6 +167,8 @@ namespace Generator
                         break;
 
                 }
+                if (child.Nullable && child.Optional)
+                    writer.WriteLine($"{totalIndent.Substring(0, totalIndent.Length - 4)}}}");
             }
             if (tag.Type != DataType.Choice)
                 writer.WriteLine($"{indent}        reader.EndContainer();");
@@ -172,10 +180,16 @@ namespace Generator
             foreach (Tag child in tag.Children)
             {
                 string totalIndent = $"{indent}        ";
-                if (child.Optional)
+                if (child.Optional && !child.Nullable)
                 {
                     writer.WriteLine($"{totalIndent}{((child.Parent?.Type == DataType.Choice && tag.Children.IndexOf(child) > 0) ? "else " : "")}if ({child.Name} != null)");
                     if (child.Type != DataType.List && child.Type != DataType.Array) 
+                        totalIndent += "    ";
+                }
+                if (child.Optional && child.Nullable)
+                {
+                    writer.WriteLine($"{totalIndent}{((child.Parent?.Type == DataType.Choice && tag.Children.IndexOf(child) > 0) ? "else " : "")}if (Has{child.Name})");
+                    if (child.Type != DataType.List && child.Type != DataType.Array)
                         totalIndent += "    ";
                 }
                 switch (child.Type)

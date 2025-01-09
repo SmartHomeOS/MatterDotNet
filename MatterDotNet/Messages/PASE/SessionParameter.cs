@@ -27,13 +27,13 @@ namespace MatterDotNet.Messages.PASE
         [SetsRequiredMembers]
         public SessionParameter(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public uint? SessionIdleInterval { get; set; } 
-        public uint? SessionActiveInterval { get; set; } 
-        public ushort? SessionActiveThreshold { get; set; } 
-        public ushort? DataModelRevision { get; set; } 
-        public ushort? InteractionModelRevision { get; set; } 
-        public uint? SpecificationVersion { get; set; } 
-        public ushort? MaxPathsPerInvoke { get; set; } 
+        public uint? SessionIdleInterval { get; set; }
+        public uint? SessionActiveInterval { get; set; }
+        public ushort? SessionActiveThreshold { get; set; }
+        public ushort? DataModelRevision { get; set; }
+        public ushort? InteractionModelRevision { get; set; }
+        public uint? SpecificationVersion { get; set; }
+        public ushort? MaxPathsPerInvoke { get; set; }
 
         [SetsRequiredMembers]
         internal SessionParameter(TLVReader reader, long structNumber = -1) {

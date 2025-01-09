@@ -27,12 +27,12 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public ReportDataMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public ulong? SubscriptionID { get; set; } 
-        public AttributeReportIB[]? AttributeReports { get; set; } 
-        public EventReportIB[]? EventReports { get; set; } 
-        public bool? MoreChunkedMessages { get; set; } 
-        public bool? SuppressResponse { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public ulong? SubscriptionID { get; set; }
+        public AttributeReportIB[]? AttributeReports { get; set; }
+        public EventReportIB[]? EventReports { get; set; }
+        public bool? MoreChunkedMessages { get; set; }
+        public bool? SuppressResponse { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal ReportDataMessage(TLVReader reader, long structNumber = -1) {

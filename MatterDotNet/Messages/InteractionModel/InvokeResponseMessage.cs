@@ -27,10 +27,10 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public InvokeResponseMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required bool SuppressResponse { get; set; } 
-        public required InvokeResponseIB[] InvokeResponses { get; set; } 
-        public bool? MoreChunkedMessages { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required bool SuppressResponse { get; set; }
+        public required InvokeResponseIB[] InvokeResponses { get; set; }
+        public bool? MoreChunkedMessages { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal InvokeResponseMessage(TLVReader reader, long structNumber = -1) {

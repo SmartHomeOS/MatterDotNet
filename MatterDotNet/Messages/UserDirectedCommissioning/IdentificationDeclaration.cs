@@ -36,8 +36,8 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
             [SetsRequiredMembers]
             public TargetApp(Memory<byte> data) : this(new TLVReader(data)) {}
 
-            public ushort? AppVendorId { get; set; } 
-            public ushort? AppProductId { get; set; } 
+            public ushort? AppVendorId { get; set; }
+            public ushort? AppProductId { get; set; }
 
             [SetsRequiredMembers]
             internal TargetApp(TLVReader reader, long structNumber = -1) {
@@ -58,20 +58,20 @@ namespace MatterDotNet.Messages.UserDirectedCommissioning
                 writer.EndContainer();
             }
         }
-        public ushort? VendorId { get; set; } 
-        public ushort? ProductId { get; set; } 
-        public string? DeviceName { get; set; } 
-        public uint? DeviceType { get; set; } 
-        public string? PairingInstruction { get; set; } 
-        public uint? PairingHint { get; set; } 
-        public string? RotatingDeviceId { get; set; } 
-        public ushort? Port { get; set; } 
-        public TargetApp[]? TargetAppList { get; set; } 
-        public bool? NoPasscode { get; set; } 
-        public bool? CdUponPasscodeDialog { get; set; } 
-        public bool? CommissionerPasscode { get; set; } 
-        public bool? CommissionerPasscodeReady { get; set; } 
-        public bool? CancelPasscode { get; set; } 
+        public ushort? VendorId { get; set; }
+        public ushort? ProductId { get; set; }
+        public string? DeviceName { get; set; }
+        public uint? DeviceType { get; set; }
+        public string? PairingInstruction { get; set; }
+        public uint? PairingHint { get; set; }
+        public string? RotatingDeviceId { get; set; }
+        public ushort? Port { get; set; }
+        public TargetApp[]? TargetAppList { get; set; }
+        public bool? NoPasscode { get; set; }
+        public bool? CdUponPasscodeDialog { get; set; }
+        public bool? CommissionerPasscode { get; set; }
+        public bool? CommissionerPasscodeReady { get; set; }
+        public bool? CancelPasscode { get; set; }
 
         [SetsRequiredMembers]
         internal IdentificationDeclaration(TLVReader reader, long structNumber = -1) {

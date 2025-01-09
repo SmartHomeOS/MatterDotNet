@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public WriteResponseMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required AttributeStatusIB[] WriteResponses { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required AttributeStatusIB[] WriteResponses { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal WriteResponseMessage(TLVReader reader, long structNumber = -1) {

@@ -27,11 +27,11 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public WriteRequestMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public bool? SuppressResponse { get; set; } 
-        public required bool TimedRequest { get; set; } 
-        public required AttributeDataIB[] WriteRequests { get; set; } 
-        public bool? MoreChunkedMessages { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public bool? SuppressResponse { get; set; }
+        public required bool TimedRequest { get; set; }
+        public required AttributeDataIB[] WriteRequests { get; set; }
+        public bool? MoreChunkedMessages { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal WriteRequestMessage(TLVReader reader, long structNumber = -1) {

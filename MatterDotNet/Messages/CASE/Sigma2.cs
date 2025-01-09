@@ -28,11 +28,11 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma2(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResponderRandom { get; set; } 
-        public required ushort ResponderSessionId { get; set; } 
-        public required byte[] ResponderEphPubKey { get; set; } 
-        public required byte[] Encrypted2 { get; set; } 
-        public SessionParameter? ResponderSessionParams { get; set; } 
+        public required byte[] ResponderRandom { get; set; }
+        public required ushort ResponderSessionId { get; set; }
+        public required byte[] ResponderEphPubKey { get; set; }
+        public required byte[] Encrypted2 { get; set; }
+        public SessionParameter? ResponderSessionParams { get; set; }
 
         [SetsRequiredMembers]
         internal Sigma2(TLVReader reader, long structNumber = -1) {

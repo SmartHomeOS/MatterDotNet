@@ -27,7 +27,7 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma3(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] Encrypted3 { get; set; } 
+        public required byte[] Encrypted3 { get; set; }
 
         [SetsRequiredMembers]
         internal Sigma3(TLVReader reader, long structNumber = -1) {

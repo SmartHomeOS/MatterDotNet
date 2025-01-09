@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public AttributeDataIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public uint? DataVersion { get; set; } 
-        public required AttributePathIB Path { get; set; } 
-        public required object? Data { get; set; } 
+        public uint? DataVersion { get; set; }
+        public required AttributePathIB Path { get; set; }
+        public required object? Data { get; set; }
 
         [SetsRequiredMembers]
         internal AttributeDataIB(TLVReader reader, long structNumber = -1) {

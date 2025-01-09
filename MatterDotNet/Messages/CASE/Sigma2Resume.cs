@@ -28,10 +28,10 @@ namespace MatterDotNet.Messages.CASE
         [SetsRequiredMembers]
         public Sigma2Resume(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] ResumptionId { get; set; } 
-        public required byte[] Sigma2ResumeMIC { get; set; } 
-        public required ushort ResponderSessionId { get; set; } 
-        public SessionParameter? ResponderSessionParams { get; set; } 
+        public required byte[] ResumptionId { get; set; }
+        public required byte[] Sigma2ResumeMIC { get; set; }
+        public required ushort ResponderSessionId { get; set; }
+        public SessionParameter? ResponderSessionParams { get; set; }
 
         [SetsRequiredMembers]
         internal Sigma2Resume(TLVReader reader, long structNumber = -1) {

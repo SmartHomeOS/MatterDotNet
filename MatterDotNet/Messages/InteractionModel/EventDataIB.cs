@@ -27,14 +27,14 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public EventDataIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required EventPathIB Path { get; set; } 
-        public required ulong EventNumber { get; set; } 
-        public required byte Priority { get; set; } 
-        public ulong? EpochTimestamp { get; set; } 
-        public ulong? SystemTimestamp { get; set; } 
-        public ulong? DeltaEpochTimestamp { get; set; } 
-        public ulong? DeltaSystemTimestamp { get; set; } 
-        public required object Data { get; set; } 
+        public required EventPathIB Path { get; set; }
+        public required ulong EventNumber { get; set; }
+        public required byte Priority { get; set; }
+        public ulong? EpochTimestamp { get; set; }
+        public ulong? SystemTimestamp { get; set; }
+        public ulong? DeltaEpochTimestamp { get; set; }
+        public ulong? DeltaSystemTimestamp { get; set; }
+        public required object Data { get; set; }
 
         [SetsRequiredMembers]
         internal EventDataIB(TLVReader reader, long structNumber = -1) {

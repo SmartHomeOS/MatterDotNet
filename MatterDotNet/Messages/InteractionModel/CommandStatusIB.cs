@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public CommandStatusIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required CommandPathIB CommandPath { get; set; } 
-        public required StatusIB Status { get; set; } 
-        public ushort? CommandRef { get; set; } 
+        public required CommandPathIB CommandPath { get; set; }
+        public required StatusIB Status { get; set; }
+        public ushort? CommandRef { get; set; }
 
         [SetsRequiredMembers]
         internal CommandStatusIB(TLVReader reader, long structNumber = -1) {

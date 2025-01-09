@@ -27,11 +27,11 @@ namespace MatterDotNet.Messages.PASE
         [SetsRequiredMembers]
         public PBKDFParamReq(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] InitiatorRandom { get; set; } 
-        public required ushort InitiatorSessionId { get; set; } 
-        public required ushort PasscodeId { get; set; } 
-        public required bool HasPBKDFParameters { get; set; } 
-        public SessionParameter? InitiatorSessionParams { get; set; } 
+        public required byte[] InitiatorRandom { get; set; }
+        public required ushort InitiatorSessionId { get; set; }
+        public required ushort PasscodeId { get; set; }
+        public required bool HasPBKDFParameters { get; set; }
+        public SessionParameter? InitiatorSessionParams { get; set; }
 
         [SetsRequiredMembers]
         internal PBKDFParamReq(TLVReader reader, long structNumber = -1) {

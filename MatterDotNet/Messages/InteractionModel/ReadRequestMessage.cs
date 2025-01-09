@@ -27,12 +27,12 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public ReadRequestMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public AttributePathIB[]? AttributeRequests { get; set; } 
-        public EventPathIB[]? EventRequests { get; set; } 
-        public EventFilterIB[]? EventFilters { get; set; } 
-        public required bool FabricFiltered { get; set; } 
-        public DataVersionFilterIB[]? DataVersionFilters { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public AttributePathIB[]? AttributeRequests { get; set; }
+        public EventPathIB[]? EventRequests { get; set; }
+        public EventFilterIB[]? EventFilters { get; set; }
+        public required bool FabricFiltered { get; set; }
+        public DataVersionFilterIB[]? DataVersionFilters { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal ReadRequestMessage(TLVReader reader, long structNumber = -1) {

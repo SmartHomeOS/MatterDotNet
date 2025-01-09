@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public EventFilterIB(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required ulong Node { get; set; } 
-        public required ulong EventMin { get; set; } 
+        public required ulong Node { get; set; }
+        public required ulong EventMin { get; set; }
 
         [SetsRequiredMembers]
         internal EventFilterIB(TLVReader reader, long structNumber = -1) {

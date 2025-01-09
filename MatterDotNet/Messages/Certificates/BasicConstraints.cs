@@ -27,8 +27,8 @@ namespace MatterDotNet.Messages.Certificates
         [SetsRequiredMembers]
         public BasicConstraints(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required bool IsCa { get; set; } 
-        public byte? PathLenConstraint { get; set; } 
+        public required bool IsCa { get; set; }
+        public byte? PathLenConstraint { get; set; }
 
         [SetsRequiredMembers]
         internal BasicConstraints(TLVReader reader, long structNumber = -1) {

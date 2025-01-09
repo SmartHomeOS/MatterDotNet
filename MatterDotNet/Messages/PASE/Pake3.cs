@@ -27,7 +27,7 @@ namespace MatterDotNet.Messages.PASE
         [SetsRequiredMembers]
         public Pake3(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required byte[] CA { get; set; } 
+        public required byte[] CA { get; set; }
 
         [SetsRequiredMembers]
         internal Pake3(TLVReader reader, long structNumber = -1) {

@@ -27,9 +27,9 @@ namespace MatterDotNet.Messages.InteractionModel
         [SetsRequiredMembers]
         public SubscribeResponseMessage(Memory<byte> data) : this(new TLVReader(data)) {}
 
-        public required uint SubscriptionID { get; set; } 
-        public required ushort MaxInterval { get; set; } 
-        public required byte InteractionModelRevision { get; set; } 
+        public required uint SubscriptionID { get; set; }
+        public required ushort MaxInterval { get; set; }
+        public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
         internal SubscribeResponseMessage(TLVReader reader, long structNumber = -1) {

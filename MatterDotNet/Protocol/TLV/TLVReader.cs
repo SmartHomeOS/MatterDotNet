@@ -91,7 +91,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (byte?)GetNull(tagNumber);
             if (type != ElementType.Byte)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type byte but received {type}");
             byte val = data.Span[offset++];
@@ -103,7 +103,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (sbyte?)GetNull(tagNumber);
             if (type != ElementType.SByte)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type sbyte but received {type}");
             sbyte val = (sbyte)data.Span[offset++];
@@ -115,7 +115,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (bool?)GetNull(tagNumber);
             if (type != ElementType.True && type != ElementType.False)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type bool but received {type}");
             bool val = (type == ElementType.True);
@@ -127,7 +127,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (short?)GetNull(tagNumber);
             if (type == ElementType.SByte)
                 return GetSByte(tagNumber, nullable);
             if (type != ElementType.Short)
@@ -143,7 +143,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (ushort?)GetNull(tagNumber);
             if (type == ElementType.Byte)
                 return GetByte(tagNumber, nullable);
             if (type != ElementType.UShort)
@@ -159,7 +159,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (int?)GetNull(tagNumber);
             if (type == ElementType.SByte)
                 return GetSByte(tagNumber, nullable);
             if (type == ElementType.Short)
@@ -177,7 +177,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (uint?)GetNull(tagNumber);
             if (type == ElementType.Byte)
                 return GetByte(tagNumber, nullable);
             if (type == ElementType.UShort)
@@ -195,7 +195,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (long?)GetNull(tagNumber);
             if (type == ElementType.SByte)
                 return GetSByte(tagNumber, nullable);
             if (type == ElementType.Short)
@@ -215,7 +215,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (ulong?)GetNull(tagNumber);
             if (type == ElementType.Byte)
                 return GetByte(tagNumber, nullable);
             if (type == ElementType.UShort)
@@ -235,7 +235,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (float?)GetNull(tagNumber);
             if (type != ElementType.Float)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type float but received {type}");
             float val = BinaryPrimitives.ReadSingleLittleEndian(data.Slice(offset, 4).Span);
@@ -249,7 +249,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (double?)GetNull(tagNumber);
             if (type != ElementType.Double)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type double but received {type}");
             double val = BinaryPrimitives.ReadDoubleLittleEndian(data.Slice(offset, 4).Span);
@@ -263,7 +263,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
-                return null;
+                return (string?)GetNull(tagNumber);
             if (type != ElementType.String8 && type != ElementType.String16 && type != ElementType.String32 && type != ElementType.String64)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type string but received {type}");
             if (length > max)
@@ -281,7 +281,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present. Current tag is " + this.tagNumber);
             if (type == ElementType.Null && nullable)
-                return null;
+                return (byte[]?)GetNull(tagNumber);
             if (type != ElementType.Bytes8 && type != ElementType.Bytes16 && type != ElementType.Bytes32 && type != ElementType.Bytes64)
                 throw new InvalidDataException($"Tag {tagNumber}: Expected type bytes but received {type}");
             if (length > max)
@@ -294,6 +294,14 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
+        public object? GetNull(long tagNumber)
+        {
+            if (!IsTag(tagNumber))
+                throw new InvalidDataException("Tag " + tagNumber + " not present");
+            ReadTag();
+            return null;
+        }
+
         public object? GetAny(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
@@ -301,7 +309,7 @@ namespace MatterDotNet.Protocol.Parsers
             if (type == ElementType.Null)
             {
                 if (nullable)
-                    return null;
+                    return GetNull(tagNumber);
                 else
                     throw new InvalidDataException($"Tag {tagNumber}: Expected not null but received {type}");
             }

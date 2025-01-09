@@ -12,13 +12,31 @@
 
 namespace MatterDotNet.Protocol.Payloads.Flags
 {
+    /// <summary>
+    /// Frame exchange flags
+    /// </summary>
     [Flags]
     public enum ExchangeFlags : byte
     {
+        /// <summary>
+        /// Sender is initiator
+        /// </summary>
         Initiator = 0x1,
+        /// <summary>
+        /// Acknowledgement counter present
+        /// </summary>
         Acknowledgement = 0x2,
+        /// <summary>
+        /// Reliability required
+        /// </summary>
         Reliability = 0x4,
+        /// <summary>
+        /// Secure extensions present
+        /// </summary>
         SecuredExtensions = 0x8,
+        /// <summary>
+        /// Vendor ID present
+        /// </summary>
         VendorPresent = 0x10,
     }
 }

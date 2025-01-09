@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads.OpCodes
 {
-    public enum BDXOpCodes
+    internal enum BDXOpCodes
     {
         SendInit = 0x01,
         SendAccept = 0x02,

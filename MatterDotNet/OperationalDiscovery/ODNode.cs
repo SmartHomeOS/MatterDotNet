@@ -16,20 +16,62 @@ using System.Net;
 
 namespace MatterDotNet.OperationalDiscovery
 {
+    /// <summary>
+    /// Operational Discovery Node
+    /// </summary>
     public record ODNode
     {
+        /// <summary>
+        /// Discovered IP Address
+        /// </summary>
         public IPAddress? Address { get; set; }
+        /// <summary>
+        /// Discovered Port
+        /// </summary>
         public ushort Port { get; set; }
+        /// <summary>
+        /// Idle Session Interval
+        /// </summary>
         public int IdleInterval { get; set; }
+        /// <summary>
+        /// Active Session Interval
+        /// </summary>
         public int ActiveInterval { get; set; }
+        /// <summary>
+        /// Active Threshold
+        /// </summary>
         public int ActiveThreshold { get; set; }
+        /// <summary>
+        /// Supported Transports
+        /// </summary>
         public SupportedTransportMode Transports { get; set; }
+        /// <summary>
+        /// Long Idle Time
+        /// </summary>
         public bool LongIdleTime { get; set; }
+        /// <summary>
+        /// Device Name
+        /// </summary>
         public string? DeviceName { get; set; }
+        /// <summary>
+        /// Device Type
+        /// </summary>
         public DeviceTypeEnum Type { get; set; }
+        /// <summary>
+        /// Vendor ID
+        /// </summary>
         public uint Vendor { get; set; }
+        /// <summary>
+        /// Product ID
+        /// </summary>
         public uint Product {  get; set; }
+        /// <summary>
+        /// Descriminator
+        /// </summary>
         public ushort Descriminator { get; set; }
+        /// <summary>
+        /// Current Commissioning Mode
+        /// </summary>
         public CommissioningMode CommissioningMode { get; set; }
     }
 }

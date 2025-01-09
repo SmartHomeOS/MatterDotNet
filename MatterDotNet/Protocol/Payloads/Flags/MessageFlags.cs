@@ -12,13 +12,31 @@
 
 namespace MatterDotNet.Protocol.Payloads.Flags
 {
+    /// <summary>
+    /// Frame message flags
+    /// </summary>
     [Flags]
     public enum MessageFlags : byte
     {
+        /// <summary>
+        /// Version 1 Payload (currently the only option)
+        /// </summary>
         Version1 = 0x00,
+        /// <summary>
+        /// Mask to expose version
+        /// </summary>
         VersionMask = 0xF0,
+        /// <summary>
+        /// Destination ID is a Node ID
+        /// </summary>
         DestinationNodeID = 0x01,
+        /// <summary>
+        /// Destination ID is a Group ID
+        /// </summary>
         DestinationGroupID = 0x02,
+        /// <summary>
+        /// Source Node ID is present
+        /// </summary>
         SourceNodeID = 0x04,
     }
 }

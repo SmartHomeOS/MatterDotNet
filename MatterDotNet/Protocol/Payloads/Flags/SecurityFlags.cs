@@ -12,14 +12,35 @@
 
 namespace MatterDotNet.Protocol.Payloads.Flags
 {
+    /// <summary>
+    /// Frame Security Flags present
+    /// </summary>
     [Flags]
     public enum SecurityFlags : byte
     {
+        /// <summary>
+        /// Session is unicast
+        /// </summary>
         UnicastSession = 0x0,
+        /// <summary>
+        /// Session is multicast
+        /// </summary>
         GroupSession = 0x1,
+        /// <summary>
+        /// Mask session type
+        /// </summary>
         SessionMask = 0x3,
+        /// <summary>
+        /// Message extensions present
+        /// </summary>
         MessageExtensions = 0x20,
+        /// <summary>
+        /// Message is a control message
+        /// </summary>
         ControlMessage = 0x40,
+        /// <summary>
+        /// Privacy encryption enabled
+        /// </summary>
         Privacy = 0x80,
     }
 }

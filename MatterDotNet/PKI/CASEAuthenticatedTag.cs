@@ -14,6 +14,9 @@
 
 namespace MatterDotNet.PKI
 {
+    /// <summary>
+    /// CASE Authenticated Tag Payload
+    /// </summary>
     public struct CASEAuthenticatedTag
     {
         public CASEAuthenticatedTag(uint val)

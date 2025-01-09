@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads.OpCodes
 {
-    public enum IMOpCodes
+    internal enum IMOpCodes
     {
         StatusResponse = 0x01,
         ReadRequest = 0x02,

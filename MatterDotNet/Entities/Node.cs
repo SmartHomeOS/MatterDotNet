@@ -54,10 +54,10 @@ namespace MatterDotNet.Entities
         /// </summary>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public Task<SecureSession> GetCASESession()
+        public async Task<SecureSession> GetCASESession()
         {
             using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.Address!, connection.Port), true))
-                return GetCASESession(session);
+                return await GetCASESession(session);
         }
         /// <summary>
         /// Get a secure session for the node
@@ -66,12 +66,12 @@ namespace MatterDotNet.Entities
         /// <exception cref="IOException"></exception>
         public async Task<SecureSession> GetCASESession(SessionContext session)
         {
-            CASE caseSession = new CASE(session);
+            CASE caseProtocol = new CASE(session);
             //TODO - Use OD session params
-            SecureSession? secSession = await caseSession.EstablishSecureSession(fabric, noc);
-            if (secSession == null)
+            SecureSession? caseSession = await caseProtocol.EstablishSecureSession(fabric, noc);
+            if (caseSession == null)
                 throw new IOException("CASE pairing failed");
-            return secSession;
+            return caseSession;
         }
 
         internal static Node CreateTemp(OperationalCertificate noc, Fabric fabric, ODNode opInfo)
@@ -98,12 +98,12 @@ namespace MatterDotNet.Entities
 
         internal static async Task Populate(SecureSession session, Node node)
         {
-            List<ushort> eps = await node.Root.GetCluster<DescriptorCluster>().GetPartsList(session);
+            ushort[] eps = await node.Root.GetCluster<DescriptorCluster>().GetPartsList(session);
             foreach (ushort index in eps)
                 node.Root.AddChild(new EndPoint(index, node));
             foreach (EndPoint child in node.Root.Children)
             {
-                List<ushort> childEps = await child.GetCluster<DescriptorCluster>().GetPartsList(session);
+                ushort[] childEps = await child.GetCluster<DescriptorCluster>().GetPartsList(session);
                 foreach (ushort childEp in childEps)
                 {
                     child.AddChild(node.Root.RemoveChild(childEp)!);

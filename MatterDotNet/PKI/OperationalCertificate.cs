@@ -22,8 +22,14 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace MatterDotNet.PKI
 {
+    /// <summary>
+    /// A Matter operational certificate (X509v3 with Matter DNs)
+    /// </summary>
     public class OperationalCertificate
     {
+        /// <summary>
+        /// The underlying X509 certificate
+        /// </summary>
         protected X509Certificate2 cert;
 
         internal const string OID_CommonName = "2.5.4.3";
@@ -46,8 +52,15 @@ namespace MatterDotNet.PKI
         internal const string OID_ServerAuth = "1.3.6.1.5.5.7.3.1";
         internal const string OID_ClientAuth = "1.3.6.1.5.5.7.3.2";
 
+        /// <summary>
+        /// Create a new operational certificate (cert must be set)
+        /// </summary>
         protected OperationalCertificate() { }
 
+        /// <summary>
+        /// Create a new operational certificate from a der encoded X509 certificate
+        /// </summary>
+        /// <param name="cert"></param>
         public OperationalCertificate(byte[] cert)
         {
             #if NET9_0_OR_GREATER
@@ -58,12 +71,19 @@ namespace MatterDotNet.PKI
             ParseCert();
         }
 
+        /// <summary>
+        /// Create a new operational certificate from the provided X509 certificate
+        /// </summary>
+        /// <param name="cert"></param>
         internal OperationalCertificate(X509Certificate2 cert)
         {
             this.cert = cert;
             ParseCert();
         }
 
+        /// <summary>
+        /// Parse the DNs in the provided certificate
+        /// </summary>
         protected void ParseCert()
         {
             foreach (X500RelativeDistinguishedName dn in cert.SubjectName.EnumerateRelativeDistinguishedNames(false))
@@ -142,17 +162,39 @@ namespace MatterDotNet.PKI
             }
         }
 
+        /// <summary>
+        /// Verify the certificate chains to the provided intermediate certificate and root PAA
+        /// </summary>
+        /// <param name="intermediateCert"></param>
+        /// <param name="dcl"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
         public bool VerifyChain(byte[] intermediateCert, DCLClient dcl, VerificationLevel level)
         {
             ArgumentNullException.ThrowIfNull(intermediateCert, nameof(intermediateCert));
+            ArgumentNullException.ThrowIfNull(dcl, nameof(dcl));
+            if (level == VerificationLevel.AnyDevice)
+                return true;
+            #if NET9_0_OR_GREATER
+                return VerifyChain(X509CertificateLoader.LoadCertificate(intermediateCert), dcl, level);
+            #else
+                return VerifyChain(new X509Certificate2(intermediateCert), dcl, level);
+            #endif
+        }
+
+        /// <summary>
+        /// Verify the certificate chains to the provided intermediate certificate and root PAA
+        /// </summary>
+        /// <param name="intermediateCert"></param>
+        /// <param name="dcl"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public bool VerifyChain(X509Certificate2 intermediateCert, DCLClient dcl, VerificationLevel level)
+        {
             if (level == VerificationLevel.AnyDevice)
                 return true;
             X509Chain chain = new X509Chain();
-            #if NET9_0_OR_GREATER
-                chain.ChainPolicy.ExtraStore.Add(X509CertificateLoader.LoadCertificate(intermediateCert));
-            #else
-                chain.ChainPolicy.ExtraStore.Add(new X509Certificate2(intermediateCert));
-            #endif
+            chain.ChainPolicy.ExtraStore.Add(intermediateCert);
             chain.ChainPolicy.CustomTrustStore.AddRange(dcl.TrustStore);
             if (level == VerificationLevel.CertifiedDevicesOrCHIPTest)
                 chain.ChainPolicy.CustomTrustStore.Add(dcl.CHIPTestPAA);
@@ -163,6 +205,11 @@ namespace MatterDotNet.PKI
             return valid;
         }
 
+        /// <summary>
+        /// Verify the certificate chains to the provided root certificate
+        /// </summary>
+        /// <param name="rootCert"></param>
+        /// <returns></returns>
         public bool VerifyChain(OperationalCertificate rootCert)
         {
             X509Chain chain = new X509Chain();

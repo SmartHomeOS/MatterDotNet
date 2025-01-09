@@ -16,7 +16,7 @@ using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
-    public struct BigIntegerPoint : IEquatable<BigIntegerPoint>
+    internal struct BigIntegerPoint : IEquatable<BigIntegerPoint>
     {
         public BigIntegerPoint() { }
         public BigIntegerPoint(BigInteger x, BigInteger y)
@@ -26,12 +26,23 @@ namespace MatterDotNet.Protocol.Cryptography
         }
         public BigIntegerPoint(byte[] x, byte[] y)
         {
+            ArgumentNullException.ThrowIfNull(x, nameof(x));
+            ArgumentNullException.ThrowIfNull(y, nameof(y));
             X = new BigInteger(x, true, true);
             Y = new BigInteger(y, true, true);
         }
 
-        public BigIntegerPoint(ECPoint ec) : this(ec.X, ec.Y) { }
+        /// <summary>
+        /// Create a BigIntegerPoint from a .Net ECPoint
+        /// </summary>
+        /// <param name="ec"></param>
+        public BigIntegerPoint(ECPoint ec) : this(ec.X!, ec.Y!) { }
 
+        /// <summary>
+        /// Create a big integer point from an ASN encoded byte array
+        /// </summary>
+        /// <param name="point"></param>
+        /// <exception cref="ArgumentException"></exception>
         public BigIntegerPoint(byte[] point)
         {
             switch (point[0])

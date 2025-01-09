@@ -98,12 +98,12 @@ namespace MatterDotNet.Entities
         /// <exception cref="IOException"></exception>
         /// <exception cref="CryptographicException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Node?> Commission(PayloadParser payload, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
+        public async Task<Node?> Commission(CommissioningPayload payload, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
         {
             SessionContext? unsecureSession = null;
             SecureSession? paseSecureSession = null;
             SecureSession? caseSecureSession = null;
-            if ((payload.Capabilities & PayloadParser.DiscoveryCapabilities.IP) != PayloadParser.DiscoveryCapabilities.IP && payload.Capabilities != PayloadParser.DiscoveryCapabilities.UNKNOWN)
+            if ((payload.Capabilities & CommissioningPayload.DiscoveryCapabilities.IP) != CommissioningPayload.DiscoveryCapabilities.IP && payload.Capabilities != CommissioningPayload.DiscoveryCapabilities.UNKNOWN)
                 throw new NotImplementedException("BLE Commissioning is not supported yet");
 
             // Discover the Node
@@ -153,7 +153,7 @@ namespace MatterDotNet.Entities
                             });
                         }
                     }
-                    await timeSync.SetTimeZone(paseSecureSession, zones);
+                    await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
                 }
                 catch (Exception) {
                     Console.WriteLine("Failed to update time sync cluster (likely doesn't exist)");

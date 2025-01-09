@@ -12,8 +12,15 @@
 
 namespace MatterDotNet.Protocol.Payloads
 {
+    /// <summary>
+    /// Class is serializable by the PayloadWriter
+    /// </summary>
     public interface IPayload
     {
+        /// <summary>
+        /// Serialize the class
+        /// </summary>
+        /// <param name="stream"></param>
         public void Serialize(PayloadWriter stream);
     }
 }

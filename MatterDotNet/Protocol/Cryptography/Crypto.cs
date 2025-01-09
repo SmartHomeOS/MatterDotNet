@@ -16,19 +16,58 @@ using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
+    /// <summary>
+    /// Crypto functions
+    /// </summary>
     public static class Crypto
     {
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int SYMMETRIC_KEY_LENGTH_BITS = 128;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int SYMMETRIC_KEY_LENGTH_BYTES = SYMMETRIC_KEY_LENGTH_BITS / 8;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int AEAD_MIC_LENGTH_BITS = 128;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int AEAD_MIC_LENGTH_BYTES = AEAD_MIC_LENGTH_BITS / 8;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int NONCE_LENGTH_BYTES = 13;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int HASH_LEN_BYTES = SHA256.HashSizeInBytes;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int HASH_LEN_BITS = SHA256.HashSizeInBits;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int GROUP_SIZE_BYTES = 32;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int GROUP_SIZE_BITS = GROUP_SIZE_BYTES * 8;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int PUBLIC_KEY_SIZE_BYTES = (2 * GROUP_SIZE_BYTES) + 1;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int W_SIZE_BYTES = GROUP_SIZE_BYTES + 8;
+        /// <summary>
+        /// Specification defined value
+        /// </summary>
         public const int W_SIZE_BITS = W_SIZE_BYTES * 8;
 
         /// <summary>
@@ -53,7 +92,6 @@ namespace MatterDotNet.Protocol.Cryptography
         /// </summary>
         /// <param name="key"></param>
         /// <param name="payload"></param>
-        /// <param name="mic"></param>
         /// <param name="additionalData"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>

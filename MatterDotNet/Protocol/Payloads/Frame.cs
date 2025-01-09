@@ -19,28 +19,56 @@ using System.Text;
 
 namespace MatterDotNet.Protocol.Payloads
 {
-    internal class Frame
+    /// <summary>
+    /// Protocol Frame
+    /// </summary>
+    public class Frame
     {
         internal const int MAX_SIZE = 1280;
         internal static readonly byte[] PRIVACY_INFO = Encoding.UTF8.GetBytes("PrivacyKey");
 
+        /// <summary>
+        /// Message Flags
+        /// </summary>
         public MessageFlags Flags { get; set; }
+        /// <summary>
+        /// Frame Session Number
+        /// </summary>
         public ushort SessionID { get; set; }
+        /// <summary>
+        /// Security Flags
+        /// </summary>
         public SecurityFlags Security { get; set; }
+        /// <summary>
+        /// Transmission Counter
+        /// </summary>
         public uint Counter { get; set; }
+        /// <summary>
+        /// Source Node ID
+        /// </summary>
         public ulong SourceNodeID { get; set; }
-        public ulong DestinationNodeID { get; set; }
+        /// <summary>
+        /// Destination NodeID or GroupID
+        /// </summary>
+        public ulong DestinationID { get; set; }
+        /// <summary>
+        /// Version1 Message
+        /// </summary>
         public Version1Payload Message { get; set; }
+        /// <summary>
+        /// Message is valid
+        /// </summary>
         public bool Valid { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             if (!Valid)
-                return $"Invalid Frame: [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Ctr: {Counter}]";
-            return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationNodeID}, Ctr: {Counter}, Message: {Message}";
+                return $"Invalid Frame: [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationID}, Ctr: {Counter}]";
+            return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationID}, Ctr: {Counter}, Message: {Message}";
         }
 
-        public void Serialize(PayloadWriter stream, SessionContext session)
+        internal void Serialize(PayloadWriter stream, SessionContext session)
         {
             stream.Write((byte)Flags);
             stream.Write(SessionID);
@@ -49,9 +77,9 @@ namespace MatterDotNet.Protocol.Payloads
             if ((Flags & MessageFlags.SourceNodeID) == MessageFlags.SourceNodeID)
                 stream.Write(SourceNodeID);
             if ((Flags & MessageFlags.DestinationNodeID) == MessageFlags.DestinationNodeID)
-                stream.Write(DestinationNodeID);
+                stream.Write(DestinationID);
             else if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationGroupID)
-                stream.Write(DestinationNodeID);
+                stream.Write(DestinationID);
 
             //Extensions not supported
             if (SessionID == 0)
@@ -93,13 +121,13 @@ namespace MatterDotNet.Protocol.Payloads
             }
         }
 
-        public Frame(IPayload? payload, byte opCode)
+        internal Frame(IPayload? payload, byte opCode)
         {
             Valid = true;
             Message = new Version1Payload(payload, opCode);
         }
 
-        public Frame(Span<byte> payload)
+        internal Frame(Span<byte> payload)
         {
             Valid = true;
             Flags = (MessageFlags)payload[0];
@@ -128,12 +156,12 @@ namespace MatterDotNet.Protocol.Payloads
             }
             if ((Flags & MessageFlags.DestinationNodeID) == MessageFlags.DestinationNodeID)
             {
-                DestinationNodeID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
+                DestinationID = BinaryPrimitives.ReadUInt64LittleEndian(slice.Slice(0, 8));
                 slice = slice.Slice(8);
             }
             else if ((Flags & MessageFlags.DestinationGroupID) == MessageFlags.DestinationGroupID)
             {
-                DestinationNodeID = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(0, 2));
+                DestinationID = BinaryPrimitives.ReadUInt16LittleEndian(slice.Slice(0, 2));
                 slice = slice.Slice(2);
             }
             if ((Security & SecurityFlags.MessageExtensions) == SecurityFlags.MessageExtensions)

@@ -12,7 +12,10 @@
 
 namespace MatterDotNet.Protocol.Payloads.OpCodes
 {
-    public enum UDCOpCodes
+    /// <summary>
+    /// User Directed Commissioning (UDC) OpCodes
+    /// </summary>
+    internal enum UDCOpCodes
     {
         /// <summary>
         /// The Identification Declaration message provides the DNSSD Instance Name of the commissionee requesting commissioning to the commissioner selected by the user. 

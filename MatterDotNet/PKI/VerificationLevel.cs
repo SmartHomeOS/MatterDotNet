@@ -14,10 +14,22 @@
 
 namespace MatterDotNet.PKI
 {
+    /// <summary>
+    /// The level of certificate verification requested
+    /// </summary>
     public enum VerificationLevel
     {
+        /// <summary>
+        /// Only official Matter certified devices
+        /// </summary>
         CertifiedDevicesOnly = 0x0,
+        /// <summary>
+        /// Matter certified devices and devices using the CHIP Tool Test Certificate
+        /// </summary>
         CertifiedDevicesOrCHIPTest = 0x1,
+        /// <summary>
+        /// Allow any device
+        /// </summary>
         AnyDevice = 0x2
     }
 }

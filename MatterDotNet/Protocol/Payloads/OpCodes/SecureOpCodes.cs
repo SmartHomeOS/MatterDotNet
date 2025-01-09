@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads.OpCodes
 {
-    public enum SecureOpCodes
+    internal enum SecureOpCodes
     {
         MsgCounterSyncReq = 0x00,
         MsgCounterSyncRsp = 0x01,

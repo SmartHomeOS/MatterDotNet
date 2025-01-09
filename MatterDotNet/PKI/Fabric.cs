@@ -21,12 +21,22 @@ using System.Text;
 
 namespace MatterDotNet.PKI
 {
+    /// <summary>
+    /// A Matter Fabric (PKI Store)
+    /// </summary>
     public class Fabric : OperationalCertificate
     {
         private static readonly byte[] COMPRESSED_FABRIC_INFO = new byte[] {0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63};
         
         private Dictionary<ulong, OperationalCertificate> nodes = new Dictionary<ulong, OperationalCertificate>();
 
+        /// <summary>
+        /// Create a new Fabric
+        /// </summary>
+        /// <param name="fabricName"></param>
+        /// <param name="fabricId"></param>
+        /// <param name="ipk"></param>
+        /// <exception cref="ArgumentException"></exception>
         [SetsRequiredMembers]
         public Fabric(string fabricName, ulong fabricId, byte[] ipk) : base()
         {
@@ -56,7 +66,7 @@ namespace MatterDotNet.PKI
         }
 
         [SetsRequiredMembers]
-        protected Fabric(X509Certificate2 cert, byte[] ipk) : base(cert)
+        internal Fabric(X509Certificate2 cert, byte[] ipk) : base(cert)
         {
             EpochKey = ipk;
             GenerateIDs();
@@ -70,6 +80,11 @@ namespace MatterDotNet.PKI
             OperationalIdentityProtectionKey = Crypto.KDF(EpochKey, CompressedFabricID, Encoding.ASCII.GetBytes("GroupKey v1.0"), Crypto.SYMMETRIC_KEY_LENGTH_BITS);
         }
 
+        /// <summary>
+        /// Sign a Certificate Signing Request
+        /// </summary>
+        /// <param name="nocsr"></param>
+        /// <returns></returns>
         public OperationalCertificate Sign(CertificateRequest nocsr)
         {
             ulong nodeId = (ulong)(0xbaddeed2 + nodes.Count);
@@ -89,14 +104,27 @@ namespace MatterDotNet.PKI
             return ret;
         }
 
+        /// <summary>
+        /// Add a commissioner to the fabric
+        /// </summary>
+        /// <returns></returns>
         public OperationalCertificate CreateCommissioner()
         {
             var keyPair = Crypto.GenerateKeypair();
             return CreateCommissioner(keyPair.Public, keyPair.Private);
         }
 
+        /// <summary>
+        /// Add a commissioner to the fabric
+        /// </summary>
+        /// <param name="publicKey"></param>
+        /// <param name="privateKey"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public OperationalCertificate CreateCommissioner(byte[] publicKey, byte[] privateKey)
         {
+            if (Commissioner != null)
+                throw new InvalidOperationException("Commissioner already exists");
             ulong nodeId = (ulong)(0xbaddeed2 + nodes.Count);
             ECDsa key = ECDsa.Create(new ECParameters() { Curve = ECCurve.NamedCurves.nistP256, D = privateKey, Q = new BigIntegerPoint(publicKey).ToECPoint()});
             X500DistinguishedNameBuilder builder = new X500DistinguishedNameBuilder();
@@ -115,6 +143,10 @@ namespace MatterDotNet.PKI
             return Commissioner;
         }
 
+        /// <summary>
+        /// Export the Fabric to a certificate collection
+        /// </summary>
+        /// <returns></returns>
         public X509Certificate2Collection Export()
         {
             X509Certificate2Collection collection = new X509Certificate2Collection();
@@ -129,6 +161,11 @@ namespace MatterDotNet.PKI
             return collection;
         }
 
+        /// <summary>
+        /// Export the fabric to a fabric and key file
+        /// </summary>
+        /// <param name="certPath"></param>
+        /// <param name="keyPath"></param>
         public void Export(string certPath, string keyPath)
         {
             X509Certificate2Collection collection = Export();
@@ -137,6 +174,12 @@ namespace MatterDotNet.PKI
             File.WriteAllBytes(keyPath, EpochKey);
         }
 
+        /// <summary>
+        /// Import a Fabric from a fabric and key file
+        /// </summary>
+        /// <param name="certPath"></param>
+        /// <param name="keyPath"></param>
+        /// <returns></returns>
         public static Fabric Import(string certPath, string keyPath)
         {
             #if NET9_0_OR_GREATER
@@ -157,11 +200,21 @@ namespace MatterDotNet.PKI
             return fabric;
         }
 
-        public bool ContainsNOC(ulong nodeId)
+        /// <summary>
+        /// Returns true if the fabric has a NOC for the provided node ID
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public bool HasNode(ulong nodeId)
         {
             return nodes.ContainsKey(nodeId);
         }
 
+        /// <summary>
+        /// Get the operational certificate for the provided node ID
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         public OperationalCertificate? GetNOC(ulong nodeId)
         {
             if (nodes.ContainsKey(nodeId))
@@ -169,6 +222,10 @@ namespace MatterDotNet.PKI
             return null;
         }
 
+        /// <summary>
+        /// Enumerate NOCs within the fabric
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<OperationalCertificate> GetNodes()
         {
             foreach (OperationalCertificate node in nodes.Values)
@@ -178,7 +235,7 @@ namespace MatterDotNet.PKI
             }
         }
 
-        public byte[] ComputeDestinationID(byte[] random, ulong nodeId)
+        internal byte[] ComputeDestinationID(byte[] random, ulong nodeId)
         {
             byte[] message = new byte[113];
             Array.Copy(random, message, 32);
@@ -188,9 +245,21 @@ namespace MatterDotNet.PKI
             return Crypto.HMAC(OperationalIdentityProtectionKey, message);
         }
 
+        /// <summary>
+        /// A compressed version of the fabric identifier
+        /// </summary>
         public required byte[] CompressedFabricID { get; set; }
+        /// <summary>
+        /// This node (the fabric commissioning node)
+        /// </summary>
         public OperationalCertificate? Commissioner { get; private set; }
+        /// <summary>
+        /// Derived IPK
+        /// </summary>
         public required byte[] OperationalIdentityProtectionKey { get; set; }
+        /// <summary>
+        /// Epoch Key (Epoch 0)
+        /// </summary>
         public required byte[] EpochKey { get; init; }
     }
 }

@@ -14,41 +14,99 @@ using MatterDotNet.Security;
 
 namespace MatterDotNet.OperationalDiscovery
 {
-    public class PayloadParser
+    /// <summary>
+    /// Parse Commissioning Payloads
+    /// </summary>
+    public class CommissioningPayload
     {
+        /// <summary>
+        /// Commissioning Transports Supported
+        /// </summary>
         [Flags]
         public enum DiscoveryCapabilities
         {
+            /// <summary>
+            /// Unknown
+            /// </summary>
             UNKNOWN = 0x0,
+            /// <summary>
+            /// Reserved (ignore)
+            /// </summary>
             RESERVED = 0x1,
+            /// <summary>
+            /// Bluetooth LE
+            /// </summary>
             BLE = 0x2,
+            /// <summary>
+            /// IP
+            /// </summary>
             IP = 0x4,
         }
+        /// <summary>
+        /// Commissioning Flow
+        /// </summary>
         public enum FlowType
         {
+            /// <summary>
+            /// Standard Flow
+            /// </summary>
             STANDARD = 0,
+            /// <summary>
+            /// User Intent
+            /// </summary>
             USER_INTENT = 1,
+            /// <summary>
+            /// Custom Flow (See instructions)
+            /// </summary>
             CUSTOM = 2,
+            /// <summary>
+            /// Reserved for later use
+            /// </summary>
             RESERVED = 3
         }
 
+        /// <summary>
+        /// Commissioning Transports Supported
+        /// </summary>
         public DiscoveryCapabilities Capabilities { get; set; }
+        /// <summary>
+        /// Commissioning Flow
+        /// </summary>
         public FlowType Flow { get; set; }
+        /// <summary>
+        /// Vendor ID Number (0 if unset)
+        /// </summary>
         public ushort VendorID { get; set; }
+        /// <summary>
+        /// Product ID Number (0 if unset)
+        /// </summary>
         public ushort ProductID { get; set; }
+        /// <summary>
+        /// Node Descriminator
+        /// </summary>
         public ushort Discriminator { get; set; }
+        /// <summary>
+        /// Commissioning Passcode
+        /// </summary>
         public uint Passcode { get; set; }
+        /// <summary>
+        /// Length of Discriminator (bits)
+        /// </summary>
         public byte DiscriminatorLength { get; set; }
+        /// <summary>
+        /// Device Type
+        /// </summary>
         public DeviceTypeEnum DeviceType { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"Vendor: {VendorID}, Product: {ProductID}, Passcode: {Passcode}, Discriminator: {Discriminator:X}, Flow: {Flow}, Caps: {Capabilities}";
         }
 
-        private PayloadParser() { }
+        private CommissioningPayload() { }
 
-        private PayloadParser(string QRCode)
+        private CommissioningPayload(string QRCode)
         {
             byte[] data = Decode(QRCode.Substring(3));
             uint version = readBits(data, 0, 3);
@@ -66,17 +124,29 @@ namespace MatterDotNet.OperationalDiscovery
                 throw new ArgumentException("Invalid QR Code");
         }
 
-        public static PayloadParser FromQR(string QRCode)
+        /// <summary>
+        /// Create a payload from a QR code starting with "MT:"
+        /// </summary>
+        /// <param name="QRCode"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static CommissioningPayload FromQR(string QRCode)
         {
             if (!QRCode.StartsWith("MT:"))
                 throw new ArgumentException("Invalid QR Code");
-            return new PayloadParser(QRCode);
+            return new CommissioningPayload(QRCode);
         }
 
-        public static PayloadParser FromPIN(string pin)
+        /// <summary>
+        /// Create a payload from a Pairing PIN
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static CommissioningPayload FromPIN(string pin)
         {
             pin = pin.Replace("-", "");
-            PayloadParser ret = new PayloadParser();
+            CommissioningPayload ret = new CommissioningPayload();
             if (pin.Length != 11 && pin.Length != 21)
                 throw new ArgumentException("Invalid PIN");
             int actualChecksum = int.Parse(pin.Substring(pin.Length == 11 ? 10 : 20, 1));
@@ -139,7 +209,7 @@ namespace MatterDotNet.OperationalDiscovery
         }
 
 
-        static uint readBits(byte[] buf, int index, int numberOfBitsToRead)
+        private static uint readBits(byte[] buf, int index, int numberOfBitsToRead)
         {
             uint dest = 0;
 

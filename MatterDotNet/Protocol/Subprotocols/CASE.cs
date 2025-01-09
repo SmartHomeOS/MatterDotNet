@@ -47,11 +47,10 @@ namespace MatterDotNet.Protocol.Subprotocols
         /// Establish a new session
         /// </summary>
         /// <param name="fabric"></param>
-        /// <param name="nodeId"></param>
-        /// <param name="IPKEpoch"></param>
+        /// <param name="noc"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession?> EstablishSecureSession(Fabric fabric, ulong nodeId, byte[] IPKEpoch)
+        public async Task<SecureSession?> EstablishSecureSession(Fabric fabric, OperationalCertificate noc)
         {
             Frame? resp = null;
             using (Exchange exchange = unsecureSession.CreateExchange())
@@ -62,7 +61,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 {
                     InitiatorRandom = initiatorRandom,
                     InitiatorSessionId = SessionManager.GetAvailableSessionID(),
-                    DestinationId = fabric.ComputeDestinationID(initiatorRandom, nodeId),
+                    DestinationId = fabric.ComputeDestinationID(initiatorRandom, noc.NodeID!.Value),
                     InitiatorEphPubKey = ephKeys.Public,
                     InitiatorSessionParams = SessionManager.GetDefaultSessionParams()
                 };
@@ -75,11 +74,11 @@ namespace MatterDotNet.Protocol.Subprotocols
                 {
                     throw new IOException("Failed to establish CASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
                 }
-                return await ProcessSigma2(Msg1, (Sigma2)resp.Message.Payload!, fabric, nodeId, ephKeys, exchange);
+                return await ProcessSigma2(Msg1, (Sigma2)resp.Message.Payload!, fabric, noc, ephKeys, exchange);
             }
         }
 
-        private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, ulong nodeId, (byte[] Public, byte[] Private) ephKeys, Exchange exchange)
+        private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, OperationalCertificate noc, (byte[] Public, byte[] Private) ephKeys, Exchange exchange)
         {
             PayloadWriter Msg2Bytes = new PayloadWriter(1024);
             Msg2.Serialize(Msg2Bytes);
@@ -100,15 +99,14 @@ namespace MatterDotNet.Protocol.Subprotocols
             Memory<byte> decrypted = Msg2.Encrypted2.AsMemory(0, Msg2.Encrypted2.Length - Crypto.AEAD_MIC_LENGTH_BYTES);
             Sigma2Tbedata tbeData2 = new Sigma2Tbedata(decrypted);
             MatterCertificate responderNOC = new MatterCertificate(tbeData2.ResponderNOC);
-            if (!responderNOC.Subject.Exists(a => a.MatterNodeId == nodeId) || !responderNOC.Subject.Exists(a => a.MatterFabricId == fabric.FabricID))
+            if (!responderNOC.Subject.Exists(a => a.MatterNodeId == noc.NodeID) || !responderNOC.Subject.Exists(a => a.MatterFabricId == fabric.FabricID))
             {
                 Console.WriteLine("Sigma2 wrong cert");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
                 await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
                 return null;
             }
-            OperationalCertificate responderCert = fabric.GetNOC(nodeId)!;
-            if (!responderNOC.EcPubKey.SequenceEqual(responderCert.PublicKey))
+            if (!responderNOC.EcPubKey.SequenceEqual(noc.PublicKey))
             {
                 Console.WriteLine("Sigma2 invalid certificate");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
@@ -123,7 +121,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             };
             PayloadWriter signatureBytes = new PayloadWriter(512);
             signature.Serialize(signatureBytes);
-            if (!responderCert.VerifyData(signatureBytes.GetPayload().ToArray(), tbeData2.Signature))
+            if (!noc.VerifyData(signatureBytes.GetPayload().ToArray(), tbeData2.Signature))
             {
                 Console.WriteLine("Sigma2 invalid signature");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
@@ -183,19 +181,19 @@ namespace MatterDotNet.Protocol.Subprotocols
             return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Msg2.ResponderSessionId,
                                                 sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
                                                 sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
-                                                fabric.Commissioner.NodeID, nodeId, sharedSecret, tbeData2.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
+                                                fabric.Commissioner.NodeID!.Value, noc.NodeID!.Value, sharedSecret, tbeData2.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
         }
 
         /// <summary>
         /// Resume an existing session
         /// </summary>
         /// <param name="fabric"></param>
-        /// <param name="nodeId"></param>
+        /// <param name="noc"></param>
         /// <param name="resumptionId"></param>
         /// <param name="sharedSecret"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession?> ResumeSecureSession(Fabric fabric, ulong nodeId, byte[] resumptionId, byte[] sharedSecret)
+        public async Task<SecureSession?> ResumeSecureSession(Fabric fabric, OperationalCertificate noc, byte[] resumptionId, byte[] sharedSecret)
         {
             Frame? resp = null;
             using (Exchange exchange = unsecureSession.CreateExchange())
@@ -207,7 +205,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 {
                     InitiatorRandom = initiatorRandom,
                     InitiatorSessionId = SessionManager.GetAvailableSessionID(),
-                    DestinationId = fabric.ComputeDestinationID(initiatorRandom, nodeId),
+                    DestinationId = fabric.ComputeDestinationID(initiatorRandom, noc.NodeID!.Value),
                     InitiatorEphPubKey = ephKeys.Public,
                     InitiatorSessionParams = SessionManager.GetDefaultSessionParams(),
                     ResumptionId = resumptionId,
@@ -224,7 +222,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 if (resp.Message.Payload is Sigma2 sigma2)
                 {
                     Console.WriteLine("Failed to establish CASE session. Peer falling back to full establishment");
-                    return await ProcessSigma2(Msg1, sigma2, fabric, nodeId, ephKeys, exchange);
+                    return await ProcessSigma2(Msg1, sigma2, fabric, noc, ephKeys, exchange);
                 }
                 Sigma2Resume Resume2Msg = (Sigma2Resume)resp.Message.Payload!;
                 byte[] S2RK = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, Resume2Msg.ResumptionId), S2RK_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
@@ -248,7 +246,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Resume2Msg.ResponderSessionId,
                                                     sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
                                                     sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
-                                                    fabric.Commissioner!.NodeID, nodeId, sharedSecret, Resume2Msg.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
+                                                    fabric.Commissioner!.NodeID!.Value, noc.NodeID!.Value, sharedSecret, Resume2Msg.ResumptionId, false, idleInterval, activeInterval, activeThreshold);
             }
         }
 

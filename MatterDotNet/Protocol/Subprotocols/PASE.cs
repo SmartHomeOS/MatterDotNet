@@ -96,7 +96,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             PBKDFParamReq req = new PBKDFParamReq()
             {
                 InitiatorRandom = RandomNumberGenerator.GetBytes(32),
-                InitiatorSessionId = (ushort)Random.Shared.Next(0, ushort.MaxValue),
+                InitiatorSessionId = SessionManager.GetAvailableSessionID(),
                 PasscodeId = 0,
                 HasPBKDFParameters = hasOnboardingPayload
             };

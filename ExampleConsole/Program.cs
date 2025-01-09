@@ -1,4 +1,4 @@
-﻿// MatterDotNet Copyright (C) 2024 
+﻿// MatterDotNet Copyright (C) 2025
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -10,13 +10,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.Entities;
+
 namespace ExampleConsole
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Coming Soon");
+            Controller controller = Controller.Load("fabric.fabric", "fabric.key");
+            await controller.Start();
+            Console.WriteLine(controller.ToString());
+
+            Console.ReadLine();
         }
     }
 }

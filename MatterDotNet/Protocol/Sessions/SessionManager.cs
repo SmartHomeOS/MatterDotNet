@@ -104,7 +104,7 @@ namespace MatterDotNet.Protocol.Sessions
             param.MaxPathsPerInvoke = 1;
             param.DataModelRevision = 17;
             param.InteractionModelRevision = Constants.MATTER_13_REVISION;
-            param.SpecificationVersion = 0;
+            param.SpecificationVersion = 0x01030000;
             return param;
         }
     }

@@ -25,13 +25,15 @@ namespace MatterDotNet.Entities
     /// </summary>
     public class Node
     {
-        private Fabric? fabric;
+        private Fabric fabric;
         private EndPoint root;
-        private OperationalCertificate? noc;
+        private OperationalCertificate noc;
         ODNode connection;
 
-        private Node(ODNode connection)
+        private Node(ODNode connection, Fabric fabric, OperationalCertificate noc)
         {
+            this.noc = noc;
+            this.fabric = fabric;
             this.root = new EndPoint(0);
             root.SetNode(this);
             this.connection = connection;
@@ -41,27 +43,40 @@ namespace MatterDotNet.Entities
         /// Root End Point
         /// </summary>
         public EndPoint Root { get { return root; } }
+
         /// <summary>
         /// Node ID
         /// </summary>
-        public ulong ID { get { return noc!.NodeID; } }
+        public ulong ID { get { return noc.NodeID!.Value; } }
 
         /// <summary>
         /// Get a secure session for the node
         /// </summary>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession> GetSession()
+        public Task<SecureSession> GetCASESession()
         {
             using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.Address!, connection.Port), true))
-            {
-                CASE caseSession = new CASE(session);
-                //TODO - Use OD session params
-                SecureSession? secSession = await caseSession.EstablishSecureSession(fabric!, noc!.NodeID, fabric!.EpochKey);
-                if (secSession == null)
-                    throw new IOException("CASE pairing failed");
-                return secSession;
-            }
+                return GetCASESession(session);
+        }
+        /// <summary>
+        /// Get a secure session for the node
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="IOException"></exception>
+        public async Task<SecureSession> GetCASESession(SessionContext session)
+        {
+            CASE caseSession = new CASE(session);
+            //TODO - Use OD session params
+            SecureSession? secSession = await caseSession.EstablishSecureSession(fabric, noc);
+            if (secSession == null)
+                throw new IOException("CASE pairing failed");
+            return secSession;
+        }
+
+        internal static Node CreateTemp(OperationalCertificate noc, Fabric fabric, ODNode opInfo)
+        {
+            return new Node(opInfo, fabric, noc);
         }
 
         internal static async Task<Node?> Enumerate(OperationalCertificate noc, Fabric fabric)
@@ -75,27 +90,13 @@ namespace MatterDotNet.Entities
 
         internal static async Task<Node> Enumerate(OperationalCertificate noc, Fabric fabric, ODNode opInfo)
         {
-            Node node = new Node(opInfo);
-            node.Provision(noc, fabric);
-            using (SecureSession session = await node.GetSession())
+            Node node = new Node(opInfo, fabric, noc);
+            using (SecureSession session = await node.GetCASESession())
                 await Populate(session, node);
             return node;
         }
 
-        internal static async Task<Node> Enumerate(SecureSession session, ODNode opInfo)
-        {
-            Node node = new Node(opInfo);
-            await Populate(session, node);
-            return node;
-        }
-
-        internal void Provision(OperationalCertificate noc, Fabric fabric)
-        {
-            this.noc = noc;
-            this.fabric = fabric;
-        }
-
-        private static async Task Populate(SecureSession session, Node node)
+        internal static async Task Populate(SecureSession session, Node node)
         {
             List<ushort> eps = await node.Root.GetCluster<DescriptorCluster>().GetPartsList(session);
             foreach (ushort index in eps)

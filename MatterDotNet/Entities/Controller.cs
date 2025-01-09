@@ -50,6 +50,7 @@ namespace MatterDotNet.Entities
         public Controller(uint fabricId, string fabricName = "MatterDotNot")
         {
             this.fabric = new Fabric(fabricName, fabricId, RandomNumberGenerator.GetBytes(16));
+            this.fabric.CreateCommissioner();
         }
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace MatterDotNet.Entities
             {
                 Node? node = await Node.Enumerate(noc, fabric);
                 if (node != null)
-                    nodes.Add(noc.NodeID, node);
+                    nodes.Add(noc.NodeID!.Value, node);
             }
         }
 
@@ -100,7 +101,8 @@ namespace MatterDotNet.Entities
         public async Task<Node?> Commission(PayloadParser payload, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
         {
             SessionContext? unsecureSession = null;
-            SecureSession? secureSession = null;
+            SecureSession? paseSecureSession = null;
+            SecureSession? caseSecureSession = null;
             if ((payload.Capabilities & PayloadParser.DiscoveryCapabilities.IP) != PayloadParser.DiscoveryCapabilities.IP && payload.Capabilities != PayloadParser.DiscoveryCapabilities.UNKNOWN)
                 throw new NotImplementedException("BLE Commissioning is not supported yet");
 
@@ -108,55 +110,39 @@ namespace MatterDotNet.Entities
             ODNode? commissionableNode = await DiscoveryService.Shared.Find(payload.VendorID, payload.ProductID, payload.Discriminator, payload.DiscriminatorLength == 12);
             if (commissionableNode == null)
                 return null;
+
             try
             {
                 // Establish PASE session
                 unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.Address!, commissionableNode.Port), true);
                 PASE pase = new PASE(unsecureSession);
-                secureSession = await pase.EstablishSecureSession(payload.Passcode);
-                if (secureSession == null)
+                paseSecureSession = await pase.EstablishSecureSession(payload.Passcode);
+                if (paseSecureSession == null)
                     throw new IOException("PASE pairing failed");
-
-                // Arm Fail Safe
+                
+                // Get Basic Commissioning Info
                 GeneralCommissioningCluster commissioning = new GeneralCommissioningCluster(0);
-                GeneralCommissioningCluster.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(secureSession, 60, 0);
+                GeneralCommissioningCluster.BasicCommissioningInfo basicInfo = await commissioning.GetBasicCommissioningInfo(paseSecureSession);
+                ushort expiration = Math.Min(Math.Max((ushort)90, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
+                
+                // Arm Fail Safe
+                GeneralCommissioningCluster.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42);
 
-                // Validate Device Attestation Certificate (DAC)
-                byte[] nonce = RandomNumberGenerator.GetBytes(32);
-                NodeOperationalCredentialsCluster operationalCredentials = new NodeOperationalCredentialsCluster(0);
-                NodeOperationalCredentialsCluster.AttestationResponse? resp = await operationalCredentials.AttestationRequest(secureSession, nonce);
-                NodeOperationalCredentialsCluster.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(secureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.DACCertificate);
-                NodeOperationalCredentialsCluster.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(secureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.PAICertificate);
-
-                OperationalCertificate dacMatter = new OperationalCertificate(dacResp.Value.Certificate);
-                if (verification != VerificationLevel.AnyDevice && !dacMatter.VerifyChain(paiResp.Value.Certificate, new DCLClient(), verification))
-                    throw new CryptographicException("Node has an invalid certificate chain");
-
-                // Validate device has private key
-                byte[] attestation_tbs = SpanUtil.Combine(resp.Value.AttestationElements, pase.GetAttestationChallenge());
-                if (!dacMatter.VerifyData(attestation_tbs, resp.Value.AttestationSignature))
-                    throw new CryptographicException("Node attestation was not signed");
-                TLVReader reader = new TLVReader(resp.Value.AttestationElements);
-                AttestationElements elements = new AttestationElements(reader);
-                if (!elements.Attestation_nonce.SequenceEqual(nonce))
-                    throw new CryptographicException("Node attempted to change attestation nonce");
-
-                //Enumerate node
-                Node node = await Node.Enumerate(secureSession, commissionableNode);
 
                 // Set regulatory information
-                await commissioning.SetRegulatoryConfig(secureSession, GeneralCommissioningCluster.RegulatoryLocationTypeEnum.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 0);
+                await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioningCluster.RegulatoryLocationTypeEnum.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
 
                 // Configure Date/Time
-                if (node.Root.HasCluster<TimeSynchronizationCluster>())
+                try
                 {
-                    TimeSynchronizationCluster timeSync = node.Root.GetCluster<TimeSynchronizationCluster>();
-                    bool success = await timeSync.SetUTCTime(secureSession, DateTime.UtcNow, TimeSynchronizationCluster.GranularityEnum.MillisecondsGranularity, TimeSynchronizationCluster.TimeSourceEnum.NonMatterNTP);
+                    TimeSynchronizationCluster timeSync = new TimeSynchronizationCluster(0);
+                    bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronizationCluster.GranularityEnum.MillisecondsGranularity, TimeSynchronizationCluster.TimeSourceEnum.NonMatterNTP);
                     if (!success)
                         Console.WriteLine("Failed to set UTC Time");
                     var rules = TimeZoneInfo.Local.GetAdjustmentRules();
                     List<TimeSynchronizationCluster.TimeZone> zones = new List<TimeSynchronizationCluster.TimeZone>();
-                    foreach (var rule in rules) {
+                    foreach (var rule in rules)
+                    {
                         if (rule.DateEnd > DateTime.Now)
                         {
                             zones.Add(new TimeSynchronizationCluster.TimeZone()
@@ -167,15 +153,40 @@ namespace MatterDotNet.Entities
                             });
                         }
                     }
-                    await timeSync.SetTimeZone(secureSession, zones);
+                    await timeSync.SetTimeZone(paseSecureSession, zones);
+                }
+                catch (Exception) {
+                    Console.WriteLine("Failed to update time sync cluster (likely doesn't exist)");
                 }
 
-                // Load fabric root CA
-                bool certAdded = await operationalCredentials.AddTrustedRootCertificate(secureSession, fabric.GetMatterCertBytes());
+                // Validate Device Attestation Certificate (DAC)
+                NodeOperationalCredentialsCluster operationalCredentials = new NodeOperationalCredentialsCluster(0);
+                NodeOperationalCredentialsCluster.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.DACCertificate);
+                NodeOperationalCredentialsCluster.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.PAICertificate);
+                
+                byte[] nonce = RandomNumberGenerator.GetBytes(32);
+                NodeOperationalCredentialsCluster.AttestationResponse? resp = await operationalCredentials.AttestationRequest(paseSecureSession, nonce);
+
+                OperationalCertificate dacMatter = new OperationalCertificate(dacResp.Value.Certificate);
+                if (verification != VerificationLevel.AnyDevice && !dacMatter.VerifyChain(paiResp.Value.Certificate, new DCLClient(), verification))
+                {
+                    dacMatter.Export("Failed.crt");
+                    new OperationalCertificate(paiResp.Value.Certificate).Export("PAI.crt");
+                    throw new CryptographicException("Node has an invalid certificate chain");
+                }
+
+                // Validate device has private key
+                byte[] attestation_tbs = SpanUtil.Combine(resp.Value.AttestationElements, pase.GetAttestationChallenge());
+                if (!dacMatter.VerifyData(attestation_tbs, resp.Value.AttestationSignature))
+                    throw new CryptographicException("Node attestation was not signed");
+                TLVReader reader = new TLVReader(resp.Value.AttestationElements);
+                AttestationElements elements = new AttestationElements(reader);
+                if (!elements.Attestation_nonce.SequenceEqual(nonce))
+                    throw new CryptographicException("Node attempted to change attestation nonce");
 
                 // Request CSR from node
                 nonce = RandomNumberGenerator.GetBytes(32);
-                NodeOperationalCredentialsCluster.CSRResponse? csr = await operationalCredentials.CSRRequest(secureSession, nonce, false);
+                NodeOperationalCredentialsCluster.CSRResponse? csr = await operationalCredentials.CSRRequest(paseSecureSession, nonce, false);
                 NocsrElements nocsr = new NocsrElements(csr.Value.NOCSRElements);
                 CertificateRequest certReq = CertificateRequest.LoadSigningRequest(nocsr.Csr, HashAlgorithmName.SHA256);
 
@@ -188,33 +199,45 @@ namespace MatterDotNet.Entities
                 if (!nocsr.CSRNonce.SequenceEqual(nonce))
                     throw new CryptographicException("Node attempted to change CSR nonce");
 
+                // Load fabric root CA
+                bool certAdded = await operationalCredentials.AddTrustedRootCertificate(paseSecureSession, fabric.GetMatterCertBytes());
+                if (!certAdded)
+                    throw new CryptographicException("Node did not accept root certificate");
+
                 // Issue NOC
                 OperationalCertificate nodeCert = fabric.Sign(certReq);
-                NodeOperationalCredentialsCluster.NOCResponse? nocAdded = await operationalCredentials.AddNOC(secureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID, 0xFFF1);
+                NodeOperationalCredentialsCluster.NOCResponse? nocAdded = await operationalCredentials.AddNOC(paseSecureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID!.Value, 0xFFF1);
                 if (nocAdded.Value.StatusCode != NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK)
                     throw new IOException($"Failed to add new Network Operational Certificate: Error ({nocAdded.Value.StatusCode}): {nocAdded.Value.DebugText}");
-                await operationalCredentials.UpdateFabricLabel(secureSession, (fabric.CommonName.Length > 0 ? fabric.CommonName : "MatterDotNet"));
-                node.Provision(nodeCert, fabric);
+                
+                // Set Fabric Label
+                NodeOperationalCredentialsCluster.NOCResponse? nocUpdated = await operationalCredentials.UpdateFabricLabel(paseSecureSession, (!string.IsNullOrEmpty(fabric.CommonName) ? fabric.CommonName : "MatterDotNet"));
+                if (nocAdded.Value.StatusCode != NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK)
+                    Console.WriteLine("Failed to update fabric label");
 
-                // Close PASE Session
-                secureSession.Dispose();
-                secureSession = null;
+                Node? node = Node.CreateTemp(nodeCert, fabric, commissionableNode);
+
+                //TODO - Configure Network (WiFi / Thread)
+                //TODO - Operational Discovery if commissioning over BT-LE
 
                 // Establish CASE session
-                secureSession = await node.GetSession();
+                caseSecureSession = await node!.GetCASESession(unsecureSession);
 
                 // Done
-                GeneralCommissioningCluster.CommissioningCompleteResponse? complete = await commissioning.CommissioningComplete(secureSession);
+                GeneralCommissioningCluster.CommissioningCompleteResponse? complete = await commissioning.CommissioningComplete(caseSecureSession);
                 if (complete.Value.ErrorCode != GeneralCommissioningCluster.CommissioningErrorEnum.OK)
                     throw new InvalidOperationException(complete.Value.ErrorCode + ": " + complete.Value.DebugText);
                 nodes.Add(node.ID, node);
+                Console.WriteLine("Commissioning Complete!");
 
                 return node;
             }
             finally
             {
-                if (secureSession != null)
-                    secureSession.Dispose();
+                if (paseSecureSession != null)
+                    paseSecureSession.Dispose();
+                if (caseSecureSession != null)
+                    caseSecureSession.Dispose();
                 if (unsecureSession != null)
                     unsecureSession.Dispose();
             }
@@ -227,7 +250,7 @@ namespace MatterDotNet.Entities
         /// <returns></returns>
         public async Task<bool> RemoveNode(Node node)
         {
-            SecureSession session = await node.GetSession();
+            SecureSession session = await node.GetCASESession();
             NodeOperationalCredentialsCluster ops = node.Root.GetCluster<NodeOperationalCredentialsCluster>();
             byte index = await ops.GetCurrentFabricIndex(session);
             var response = await ops.RemoveFabric(session, index);
@@ -237,8 +260,16 @@ namespace MatterDotNet.Entities
             return success;
         }
 
+        /// <summary>
+        /// The collection of nodes in this fabric
+        /// </summary>
         public IReadOnlyCollection<Node> Nodes { get { return nodes.Values; } }
 
+        /// <summary>
+        /// Get a node by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public Node? GetNode(ulong id)
         {
             if (nodes.TryGetValue(id, out Node? node))

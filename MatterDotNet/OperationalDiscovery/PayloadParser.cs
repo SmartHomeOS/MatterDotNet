@@ -75,6 +75,7 @@ namespace MatterDotNet.OperationalDiscovery
 
         public static PayloadParser FromPIN(string pin)
         {
+            pin = pin.Replace("-", "");
             PayloadParser ret = new PayloadParser();
             if (pin.Length != 11 && pin.Length != 21)
                 throw new ArgumentException("Invalid PIN");

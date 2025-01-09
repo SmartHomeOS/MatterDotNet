@@ -24,20 +24,27 @@ namespace MatterDotNet.PKI
 {
     public class OperationalCertificate
     {
-        private static readonly TimeSpan EPOCH = TimeSpan.FromSeconds(946684800);
         protected X509Certificate2 cert;
 
-        protected const string OID_CommonName = "2.5.4.3";
-        protected const string OID_NodeId = "1.3.6.1.4.1.37244.1.1";
-        protected const string OID_FirmwareSigning = "1.3.6.1.4.1.37244.1.2";
-        protected const string OID_ICAC = "1.3.6.1.4.1.37244.1.3";
-        protected const string OID_RCAC = "1.3.6.1.4.1.37244.1.4";
-        protected const string OID_FabricID = "1.3.6.1.4.1.37244.1.5";
-        protected const string OID_NOCCat = "1.3.6.1.4.1.37244.1.6";
-        protected const string OID_VendorID = "1.3.6.1.4.1.37244.2.1";
-        protected const string OID_ProductID = "1.3.6.1.4.1.37244.2.2";
-        protected const string OID_ServerAuth = "1.3.6.1.5.5.7.3.1";
-        protected const string OID_ClientAuth = "1.3.6.1.5.5.7.3.2";
+        internal const string OID_CommonName = "2.5.4.3";
+        internal const string OID_Surname = "2.5.4.4";
+        internal const string OID_SerialNum = "2.5.4.5";
+        internal const string OID_CountryName = "2.5.4.6";
+        internal const string OID_LocalityName = "2.5.4.7";
+        internal const string OID_StateOrProvinceName = "2.5.4.8";
+        internal const string OID_OrgName = "2.5.4.10";
+        internal const string OID_OrgUnitName = "2.5.4.11";
+        internal const string OID_Title = "2.5.4.12";
+        internal const string OID_NodeId = "1.3.6.1.4.1.37244.1.1";
+        internal const string OID_FirmwareSigning = "1.3.6.1.4.1.37244.1.2";
+        internal const string OID_ICAC = "1.3.6.1.4.1.37244.1.3";
+        internal const string OID_RCAC = "1.3.6.1.4.1.37244.1.4";
+        internal const string OID_FabricID = "1.3.6.1.4.1.37244.1.5";
+        internal const string OID_NOCCat = "1.3.6.1.4.1.37244.1.6";
+        internal const string OID_VendorID = "1.3.6.1.4.1.37244.2.1";
+        internal const string OID_ProductID = "1.3.6.1.4.1.37244.2.2";
+        internal const string OID_ServerAuth = "1.3.6.1.5.5.7.3.1";
+        internal const string OID_ClientAuth = "1.3.6.1.5.5.7.3.2";
 
         protected OperationalCertificate() { }
 
@@ -66,6 +73,30 @@ namespace MatterDotNet.PKI
                     case OID_CommonName:
                         CommonName = dn.GetSingleElementValue()!;
                         break;
+                    case OID_Surname:
+                        Surname = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_SerialNum:
+                        SerialNum = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_CountryName:
+                        CountryName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_LocalityName:
+                        LocalityName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_StateOrProvinceName:
+                        StateOrProvinceName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_OrgName:
+                        OrgName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_OrgUnitName:
+                        OrgUnitName = dn.GetSingleElementValue()!;
+                        break;
+                    case OID_Title:
+                        Title = dn.GetSingleElementValue()!;
+                        break;
                     case OID_NodeId:
                         if (ulong.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out ulong id))
                             NodeID = id;
@@ -87,8 +118,8 @@ namespace MatterDotNet.PKI
                             FabricID = fabric;
                         break;
                     case OID_NOCCat:
-                        if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint noc))
-                            Cats.Add(new CASEAuthenticatedTag(noc));
+                        if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint cat))
+                            Cats.Add(new CASEAuthenticatedTag(cat));
                         break;
                     case OID_VendorID:
                         if (uint.TryParse(dn.GetSingleElementValue()!, NumberStyles.HexNumber, null, out uint vid))
@@ -105,7 +136,7 @@ namespace MatterDotNet.PKI
                 switch (dn.GetSingleElementType().Value)
                 {
                     case OID_CommonName:
-                            IssuerName = dn.GetSingleElementValue()!;
+                            IssuerCommonName = dn.GetSingleElementValue()!;
                             break;
                 }
             }
@@ -113,6 +144,7 @@ namespace MatterDotNet.PKI
 
         public bool VerifyChain(byte[] intermediateCert, DCLClient dcl, VerificationLevel level)
         {
+            ArgumentNullException.ThrowIfNull(intermediateCert, nameof(intermediateCert));
             if (level == VerificationLevel.AnyDevice)
                 return true;
             X509Chain chain = new X509Chain();
@@ -220,6 +252,30 @@ namespace MatterDotNet.PKI
                 {
                     case OID_CommonName:
                         attrs.Add(new DnAttribute() { CommonName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_Surname:
+                        attrs.Add(new DnAttribute() { Surname = dn.GetSingleElementValue() });
+                        break;
+                    case OID_SerialNum:
+                        attrs.Add(new DnAttribute() { SerialNum = dn.GetSingleElementValue() });
+                        break;
+                    case OID_CountryName:
+                        attrs.Add(new DnAttribute() { CountryName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_LocalityName:
+                        attrs.Add(new DnAttribute() { LocalityName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_StateOrProvinceName:
+                        attrs.Add(new DnAttribute() { StateOrProvinceName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_OrgName:
+                        attrs.Add(new DnAttribute() { OrgName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_OrgUnitName:
+                        attrs.Add(new DnAttribute() { OrgUnitName = dn.GetSingleElementValue() });
+                        break;
+                    case OID_Title:
+                        attrs.Add(new DnAttribute() { Title = dn.GetSingleElementValue() });
                         break;
                     case OID_NodeId:
                         if (ulong.TryParse(dn.GetSingleElementValue(), NumberStyles.HexNumber, null, out ulong id))
@@ -331,19 +387,35 @@ namespace MatterDotNet.PKI
             return cert.GetECDsaPublicKey()?.VerifyData(message, signature, HashAlgorithmName.SHA256) ?? false;
         }
 
-        public string IssuerName { get; private set; } = string.Empty;
+        public string? IssuerCommonName { get; protected set; } = string.Empty;
 
-        public string CommonName { get; protected set; } = string.Empty;
+        public string? CommonName { get; protected set; } = string.Empty;
 
-        public ulong NodeID { get; private set; }
+        public string? Surname { get; private set; }
 
-        public ulong FirmwareSigningID { get; private set; }
+        public string? LocalityName { get; private set; }
 
-        public ulong ICAC { get; private set; }
+        public string? CountryName { get; private set; }
 
-        public ulong RCAC { get; protected set; }
+        public string? OrgName { get; private set; }
 
-        public ulong FabricID { get; protected set; }
+        public string? OrgUnitName { get; private set; }
+
+        public string? Title { get; private set; }
+
+        public string? StateOrProvinceName { get; private set; }
+
+        public string? SerialNum { get; private set; }
+
+        public ulong? NodeID { get; private set; }
+
+        public ulong? FirmwareSigningID { get; private set; }
+
+        public ulong? ICAC { get; private set; }
+
+        public ulong? RCAC { get; protected set; }
+
+        public ulong? FabricID { get; protected set; }
 
         public List<CASEAuthenticatedTag> Cats { get; private set; } = [];
 

@@ -931,7 +931,7 @@ namespace Generator
                                 writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.id + ");");
                         }
                     }
-                    if (response == null)
+                    if (response == null || response.field == null)
                     {
                         if (cmd.response != "N")
                             writer.WriteLine("            return ValidateResponse(resp);");
@@ -1128,7 +1128,8 @@ namespace Generator
             writer.WriteLine("        public enum Feature {");
             foreach (clusterFeature item in features)
             {
-                writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
+                if (item.summary != null)
+                    writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                 writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + (1 << item.bit) + ",");
             }
             writer.WriteLine("        }");
@@ -1422,6 +1423,8 @@ namespace Generator
                 return "TimeUtil.EPOCH";
             if (type == "elapsed-s")
             {
+                if (value == "null")
+                    return value;
                 if (value.EndsWith('s'))
                     value = value.Substring(0, value.Length - 1);
                 return $"TimeSpan.FromSeconds({value})";

@@ -56,7 +56,7 @@ namespace MatterDotNet.Entities
         /// <exception cref="IOException"></exception>
         public async Task<SecureSession> GetCASESession()
         {
-            using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.Address!, connection.Port), true))
+            using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IPAddress!, connection.Port), true))
                 return await GetCASESession(session);
         }
         /// <summary>

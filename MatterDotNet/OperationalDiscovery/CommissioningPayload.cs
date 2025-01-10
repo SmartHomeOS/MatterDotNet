@@ -92,7 +92,7 @@ namespace MatterDotNet.OperationalDiscovery
         /// <summary>
         /// Length of Discriminator (bits)
         /// </summary>
-        public byte DiscriminatorLength { get; set; }
+        public bool LongDiscriminator { get; set; }
         /// <summary>
         /// Device Type
         /// </summary>
@@ -116,8 +116,8 @@ namespace MatterDotNet.OperationalDiscovery
 
             Flow = (FlowType)readBits(data, 35, 2);
             Capabilities = (DiscoveryCapabilities)readBits(data, 37, 8);
-            DiscriminatorLength = 12;
-            Discriminator = (ushort)readBits(data, 45, DiscriminatorLength);
+            LongDiscriminator = true;
+            Discriminator = (ushort)readBits(data, 45, 12);
             Passcode = readBits(data, 57, 27);
             uint padding = readBits(data, 84, 4);
             if (padding != 0)
@@ -163,7 +163,7 @@ namespace MatterDotNet.OperationalDiscovery
             ret.Passcode = (uint)(group1 & 0x3FFF);
             ushort group2 = ushort.Parse(pin.Substring(6, 4));
             ret.Passcode |= (uint)(group2 << 14);
-            ret.DiscriminatorLength = 4;
+            ret.LongDiscriminator = false;
             if (vidpid)
             {
                 if (pin.Length != 21)

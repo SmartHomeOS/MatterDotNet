@@ -10,6 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using System.Buffers.Binary;
 using TinyDNS;
 using TinyDNS.Enums;
 using TinyDNS.Records;
@@ -42,6 +43,26 @@ namespace MatterDotNet.OperationalDiscovery
                 }
                 return service; 
             }
+        }
+
+        /// <summary>
+        /// Generate commissionable node info from BLE advertisement
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="bleAdvertisement"></param>
+        /// <returns></returns>
+        public static ODNode FromAdvertisement(string id, string name, ReadOnlySpan<byte> bleAdvertisement)
+        {
+            ODNode ret = new ODNode();
+            if (bleAdvertisement[0] == 0x0)
+                ret.CommissioningMode = CommissioningMode.Basic;
+            ret.Discriminator = (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(1, 2)) & 0xFFF);
+            ret.Vendor = BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(3, 2));
+            ret.Product = BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(5, 2));
+            ret.DeviceName = name;
+            ret.BTAddress = id;
+            return ret;
         }
 
         /// <summary>
@@ -109,9 +130,13 @@ namespace MatterDotNet.OperationalDiscovery
         /// <returns></returns>
         public async Task<ODNode?> Find(string operationalInstanceName)
         {
-            List<ODNode> results = Parse(await mdns.ResolveServiceInstance(operationalInstanceName, "_matter._tcp", "local"));
-            if (results.Count > 0)
-                return results[0];
+            List<ODNode> results;
+            for (int i = 0; i < 10; i++)
+            {
+                results = Parse(await mdns.ResolveServiceInstance(operationalInstanceName, "_matter._tcp", "local"));
+                if (results.Count > 0)
+                    return results[0];
+            }
             return null;
         }
 
@@ -155,14 +180,14 @@ namespace MatterDotNet.OperationalDiscovery
                 {
                     if (node.Port == 0 && additional is SRVRecord service)
                         node.Port = service.Port;
-                    else if (node.Address == null && additional is ARecord A)
-                        node.Address = A.Address;
-                    else if (node.Address == null && additional is AAAARecord AAAA)
-                        node.Address = AAAA.Address;
+                    else if (node.IPAddress == null && additional is ARecord A)
+                        node.IPAddress = A.Address;
+                    else if (node.IPAddress == null && additional is AAAARecord AAAA)
+                        node.IPAddress = AAAA.Address;
                     else if (additional is TxtRecord txt)
                         PopulateText(txt, ref node);
                 }
-                if (node.Address == null || node.Port == 0)
+                if (node.IPAddress == null || node.Port == 0)
                     continue;
                 ret.Add(node);
             }
@@ -196,7 +221,7 @@ namespace MatterDotNet.OperationalDiscovery
                         break;
                     case "D":
                         if (ushort.TryParse(kv[1], out ushort descriminator))
-                            node.Descriminator = descriminator;
+                            node.Discriminator = descriminator;
                         break;
                     case "SII":
                         if (int.TryParse(kv[1], out int sessionIdle))

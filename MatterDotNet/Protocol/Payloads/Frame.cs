@@ -24,7 +24,10 @@ namespace MatterDotNet.Protocol.Payloads
     /// </summary>
     public class Frame
     {
-        internal const int MAX_SIZE = 1280;
+        /// <summary>
+        /// Frame MTU Size
+        /// </summary>
+        public const int MAX_SIZE = 1280;
         internal static readonly byte[] PRIVACY_INFO = Encoding.UTF8.GetBytes("PrivacyKey");
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace MatterDotNet.Protocol.Payloads
             return $"Frame [F:{Flags}, Session: {SessionID}, S:{Security}, From: {SourceNodeID}, To: {DestinationID}, Ctr: {Counter}, Message: {Message}";
         }
 
-        internal void Serialize(PayloadWriter stream, SessionContext session)
+        public void Serialize(PayloadWriter stream, SessionContext session)
         {
             stream.Write((byte)Flags);
             stream.Write(SessionID);
@@ -121,13 +124,13 @@ namespace MatterDotNet.Protocol.Payloads
             }
         }
 
-        internal Frame(IPayload? payload, byte opCode)
+        public Frame(IPayload? payload, byte opCode)
         {
             Valid = true;
             Message = new Version1Payload(payload, opCode);
         }
 
-        internal Frame(Span<byte> payload)
+        public Frame(Span<byte> payload)
         {
             Valid = true;
             Flags = (MessageFlags)payload[0];

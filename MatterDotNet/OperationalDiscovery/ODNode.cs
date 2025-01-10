@@ -24,11 +24,15 @@ namespace MatterDotNet.OperationalDiscovery
         /// <summary>
         /// Discovered IP Address
         /// </summary>
-        public IPAddress? Address { get; set; }
+        public IPAddress? IPAddress { get; set; }
         /// <summary>
         /// Discovered Port
         /// </summary>
         public ushort Port { get; set; }
+        /// <summary>
+        /// Discovered BT LE Address
+        /// </summary>
+        public string BTAddress { get; set; }
         /// <summary>
         /// Idle Session Interval
         /// </summary>
@@ -66,12 +70,17 @@ namespace MatterDotNet.OperationalDiscovery
         /// </summary>
         public uint Product {  get; set; }
         /// <summary>
-        /// Descriminator
+        /// Discriminator
         /// </summary>
-        public ushort Descriminator { get; set; }
+        public ushort Discriminator { get; set; }
         /// <summary>
         /// Current Commissioning Mode
         /// </summary>
         public CommissioningMode CommissioningMode { get; set; }
+
+        public override string ToString()
+        {
+            return $"Vendor: {Vendor}, Product: {Product}, Discriminator: {Discriminator:X3}, Name: {DeviceName}, Address: {(BTAddress != null ? BTAddress : $"{IPAddress}:{Port}")}, Type: {Type}, Mode: {CommissioningMode}";
+        }
     }
 }

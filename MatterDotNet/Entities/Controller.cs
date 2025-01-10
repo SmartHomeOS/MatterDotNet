@@ -107,14 +107,14 @@ namespace MatterDotNet.Entities
                 throw new NotImplementedException("BLE Commissioning is not supported yet");
 
             // Discover the Node
-            ODNode? commissionableNode = await DiscoveryService.Shared.Find(payload.VendorID, payload.ProductID, payload.Discriminator, payload.DiscriminatorLength == 12);
+            ODNode? commissionableNode = await DiscoveryService.Shared.Find(payload.VendorID, payload.ProductID, payload.Discriminator, payload.LongDiscriminator);
             if (commissionableNode == null)
                 return null;
 
             try
             {
                 // Establish PASE session
-                unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.Address!, commissionableNode.Port), true);
+                unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.IPAddress!, commissionableNode.Port), true);
                 PASE pase = new PASE(unsecureSession);
                 paseSecureSession = await pase.EstablishSecureSession(payload.Passcode);
                 if (paseSecureSession == null)

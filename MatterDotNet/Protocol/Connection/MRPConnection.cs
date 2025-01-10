@@ -118,7 +118,7 @@ namespace MatterDotNet.Protocol.Connection
                 ack.Flags |= MessageFlags.DestinationNodeID;
             ack.Message.AckCounter = counter;
             ack.Message.Protocol = Payloads.ProtocolType.SecureChannel;
-            PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
+            PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE);
             ack.Serialize(writer, session!);
             if (AckTable.TryGetValue(exchange, out uint ctr) && ctr == counter)
                 AckTable.TryRemove(exchange, out _);

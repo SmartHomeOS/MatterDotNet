@@ -26,7 +26,7 @@ namespace Test
             Assert.That(parser.VendorID, Is.EqualTo(65535), "Invalid Vendor ID");
             Assert.That(parser.ProductID, Is.EqualTo(65535), "Invalid Product ID");
             Assert.That(parser.Passcode, Is.EqualTo(0x7FFFFFF), "Invalid Passcode");
-            Assert.That(parser.DiscriminatorLength, Is.EqualTo(4), "Invalid Discriminator Length");
+            Assert.That(parser.LongDiscriminator, Is.EqualTo(false), "Invalid Discriminator Length");
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace Test
             Assert.That(parser.VendorID, Is.EqualTo(1), "Invalid Vendor ID");
             Assert.That(parser.ProductID, Is.EqualTo(1), "Invalid Product ID");
             Assert.That(parser.Passcode, Is.EqualTo(12345679), "Invalid Passcode");
-            Assert.That(parser.DiscriminatorLength, Is.EqualTo(4), "Invalid Discriminator Length");
+            Assert.That(parser.LongDiscriminator, Is.EqualTo(false), "Invalid Discriminator Length");
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Test
             Assert.That(parser.VendorID, Is.EqualTo(0), "Vendor ID should not exist");
             Assert.That(parser.ProductID, Is.EqualTo(0), "Product ID should not exist");
             Assert.That(parser.Passcode, Is.EqualTo(97095205), "Invalid Passcode");
-            Assert.That(parser.DiscriminatorLength, Is.EqualTo(4), "Invalid Discriminator Length");
+            Assert.That(parser.LongDiscriminator, Is.EqualTo(false), "Invalid Discriminator Length");
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Test
             Assert.That(parser.Passcode, Is.EqualTo(20202021), "Invalid Passcode");
             Assert.That(parser.Capabilities, Is.EqualTo(CommissioningPayload.DiscoveryCapabilities.BLE), "Invalid Capabilities");
             Assert.That(parser.Flow, Is.EqualTo(CommissioningPayload.FlowType.STANDARD), "Invalid Capabilities");
-            Assert.That(parser.DiscriminatorLength, Is.EqualTo(12), "Invalid Discriminator Length");
+            Assert.That(parser.LongDiscriminator, Is.EqualTo(true), "Invalid Discriminator Length");
         }
     }
 }

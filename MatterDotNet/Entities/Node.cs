@@ -13,6 +13,7 @@
 using MatterDotNet.Clusters.Utility;
 using MatterDotNet.OperationalDiscovery;
 using MatterDotNet.PKI;
+using MatterDotNet.Protocol.Connection;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Net;
@@ -56,15 +57,23 @@ namespace MatterDotNet.Entities
         /// <exception cref="IOException"></exception>
         public async Task<SecureSession> GetCASESession()
         {
-            using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IPAddress!, connection.Port), true))
-                return await GetCASESession(session);
+            if (connection.IPAddress != null)
+            {
+                using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IPAddress!, connection.Port), true))
+                    return await GetCASESession(session);
+            }
+            else
+            {
+                using (SessionContext session = SessionManager.GetUnsecureSession(new BLEEndPoint(connection.BTAddress), true))
+                    return await GetCASESession(session);
+            }
         }
         /// <summary>
         /// Get a secure session for the node
         /// </summary>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession> GetCASESession(SessionContext session)
+        internal async Task<SecureSession> GetCASESession(SessionContext session)
         {
             CASE caseProtocol = new CASE(session);
             //TODO - Use OD session params
@@ -74,15 +83,18 @@ namespace MatterDotNet.Entities
             return caseSession;
         }
 
-        internal static Node CreateTemp(OperationalCertificate noc, Fabric fabric, ODNode opInfo)
+        internal static Node CreateTemp(OperationalCertificate noc, Fabric fabric, ODNode opInfo, EndPoint rootNode)
         {
-            return new Node(opInfo, fabric, noc);
+            Node node = new Node(opInfo, fabric, noc);
+            rootNode.SetNode(node);
+            node.root = rootNode;
+            return node;
         }
 
         internal static async Task<Node?> Enumerate(OperationalCertificate noc, Fabric fabric)
         {
             string operationalInstanceName = $"{Convert.ToHexString(fabric.CompressedFabricID)}-{noc.NodeID:X16}";
-            ODNode? opInfo = await DiscoveryService.Shared.Find(operationalInstanceName);
+            ODNode? opInfo = await IPDiscoveryService.Shared.Find(operationalInstanceName);
             if (opInfo == null)
                 return null;
             return await Enumerate(noc, fabric, opInfo);
@@ -110,6 +122,14 @@ namespace MatterDotNet.Entities
                 }
             }
             await node.Root.EnumerateClusters(session);
+        }
+
+        internal string OperationalInstanceName
+        {
+            get
+            {
+                return $"{Convert.ToHexString(fabric.CompressedFabricID)}-{noc.NodeID:X16}";
+            }
         }
 
         /// <inheritdoc />

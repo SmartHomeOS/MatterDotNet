@@ -1,24 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0; net9.0</TargetFrameworks>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <Version>0.1.0</Version>
-	  <Authors>jdomnitz</Authors>
-	  <Company>SmartHomeOS and Contributors</Company>
-	  <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-	  <Title>MatterDotNet</Title>
-	  <Description>A C# implementation of the Matter 1.3 Standard (Formally known as project chip)</Description>
-	  <Copyright>Copyright MatterDotNet Contributors</Copyright>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <RepositoryUrl>https://github.com/SmartHomeOS/MatterDotNet/</RepositoryUrl>
-	  <PackageTags>matter; matter-controller; smarthome; project-chip; dotnet;</PackageTags>
-	  <PackageReleaseNotes>Library is not yet functional. See README for details.</PackageReleaseNotes>
-	  <PackageIcon>logo.png</PackageIcon>
-	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<Version>0.1.0</Version>
+	<Authors>jdomnitz</Authors>
+	<Company>SmartHomeOS and Contributors</Company>
+	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+	<Title>MatterDotNet</Title>
+	<Description>A C# implementation of the Matter 1.3 Standard (Formally known as project chip)</Description>
+	<Copyright>Copyright MatterDotNet Contributors</Copyright>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<RepositoryUrl>https://github.com/SmartHomeOS/MatterDotNet/</RepositoryUrl>
+	<PackageTags>matter; matter-controller; smarthome; project-chip; dotnet;</PackageTags>
+	<PackageReleaseNotes>Library is not yet functional. See README for details.</PackageReleaseNotes>
+	<PackageIcon>logo.png</PackageIcon>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-
+	
+  <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">
+    <TargetFrameworks>net8.0-windows10.0.19041.0; net9.0-windows10.0.19041.0; net8.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">
+    <TargetFrameworks>net8.0; net9.0</TargetFrameworks>
+  </PropertyGroup>
+	
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
     <IsTrimmable>True</IsTrimmable>
     <IsAotCompatible>True</IsAotCompatible>
@@ -40,6 +46,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="InTheHand.BluetoothLE" Version="4.0.37" />
     <PackageReference Include="TinyDNS" Version="0.9.0" />
   </ItemGroup>
 

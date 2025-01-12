@@ -201,7 +201,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                     Frame response = await exchange.Read();
                     if (response.Message.Payload is InvokeResponseMessage msg)
                     {
-                        if (!msg.InvokeResponses[0].Status!.CommandRef.HasValue || msg.InvokeResponses[0].Status!.CommandRef!.Value == refNum)
+                        if (msg.InvokeResponses[0].Status == null || !msg.InvokeResponses[0].Status!.CommandRef.HasValue || msg.InvokeResponses[0].Status!.CommandRef!.Value == refNum)
                             return msg.InvokeResponses[0];
                     }
                     else if (response.Message.Payload is StatusResponseMessage status)

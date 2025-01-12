@@ -1,22 +1,25 @@
 [![Build](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml)
 # MatterDotNet
-**Coming Soon** - New implementation in progress
+##### A C# implementation of the Matter 1.4 (formerly Project CHIP) standard
 
 #### What's Working
-* Automatic Code Generation (directly from the specification)
+* Automatic code generation (directly from the specification)
+* Operational discovery over IP or Bluetooth LE
 * Commissioning by QR code or PIN
-* Operational Discovery over IP or BT LE
-* Reading/Writing Attributes
+* Reading/Writing attributes
 * Executing cluster commands
 
-#### What's In Progress:
-* Cluster generation
+#### In-Progress:
+* Matter 1.4 cluster generation
 
 #### Coming Soon
-* Matter 1.4 Standard Implementation
 * Multicast/Group Control
 * Subscriptions
 * Events
+* Over the Air Software Updates
+
+#### Will Not Implement
+* Provisional specification items (including TermsAndConditions and Joint Fabric)
 
 #### Other Projects:
 * Check out my other projects for [HomeKit](https://github.com/SmartHomeOS/HomeKitDotNet) and [ZWave](https://github.com/SmartHomeOS/ZWaveDotNet)

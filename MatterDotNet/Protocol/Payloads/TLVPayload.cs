@@ -36,6 +36,8 @@ namespace MatterDotNet.Protocol.Payloads
         /// <param name="structureNumber"></param>
         internal TLVPayload(TLVReader reader, long structureNumber = -1) { }
 
+        public TLVPayload(object[] fields) { }
+
         /// <summary>
         /// Write the TLVs to an application payload
         /// </summary>

@@ -23,10 +23,10 @@ namespace MatterDotNet.Protocol.Sessions
     public static class SessionManager
     {
         private static uint globalCtr;
-        private static ConcurrentDictionary<IPEndPoint, IConnection> connections = new ConcurrentDictionary<IPEndPoint, IConnection>();
+        private static ConcurrentDictionary<EndPoint, IConnection> connections = new ConcurrentDictionary<EndPoint, IConnection>();
         private static ConcurrentDictionary<ushort, SessionContext> sessions = new ConcurrentDictionary<ushort, SessionContext>();
 
-        public static SessionContext GetUnsecureSession(IPEndPoint ep, bool initiator)
+        public static SessionContext GetUnsecureSession(EndPoint ep, bool initiator)
         {
             return GetUnsecureSession(GetConnection(ep), initiator);
         }
@@ -40,7 +40,7 @@ namespace MatterDotNet.Protocol.Sessions
             return ctx;
         }
 
-        public static SecureSession? CreateSession(IPEndPoint ep, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, byte[] resumptionId, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
+        internal static SecureSession? CreateSession(EndPoint ep, bool PASE, bool initiator, ushort initiatorSessionId, ushort responderSessionId, byte[] i2r, byte[] r2i, ulong localNodeId, ulong peerNodeId, byte[] sharedSecret, byte[] resumptionId, bool group, uint idleInterval, uint activeInterval, uint activeThreshold)
         {
             return CreateSession(GetConnection(ep), PASE, initiator, initiatorSessionId, responderSessionId, i2r, r2i, localNodeId, peerNodeId, sharedSecret, resumptionId, group, idleInterval, activeInterval, activeThreshold);
         }
@@ -86,13 +86,23 @@ namespace MatterDotNet.Protocol.Sessions
             }
         }
 
-        private static IConnection GetConnection(IPEndPoint endPoint)
+        private static IConnection GetConnection(EndPoint endPoint)
         {
             if (connections.TryGetValue(endPoint, out IConnection? connection))
                 return connection;
-            IConnection con = new MRPConnection(endPoint);
-            connections.TryAdd(endPoint, con);
-            return con;
+            if (endPoint is IPEndPoint ipep)
+            {
+                IConnection con = new MRPConnection(ipep);
+                connections.TryAdd(endPoint, con);
+                return con;
+            }
+            else if (endPoint is BLEEndPoint ble)
+            {
+                IConnection con = new BTPConnection(ble);
+                connections.TryAdd(endPoint, con);
+                return con;
+            }
+            throw new ArgumentException("Invalid EndPoint");
         }
 
         public static SessionParameter GetDefaultSessionParams()

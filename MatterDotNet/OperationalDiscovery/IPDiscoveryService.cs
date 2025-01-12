@@ -10,7 +10,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Buffers.Binary;
 using TinyDNS;
 using TinyDNS.Enums;
 using TinyDNS.Records;
@@ -18,18 +17,18 @@ using TinyDNS.Records;
 namespace MatterDotNet.OperationalDiscovery
 {
     /// <summary>
-    /// Operational Discovery Service
+    /// IP Operational Discovery Service
     /// </summary>
-    public class DiscoveryService
+    public class IPDiscoveryService
     {
         bool running = false;
         MDNS mdns = new MDNS();
-        private static DiscoveryService service = new DiscoveryService();
+        private static IPDiscoveryService service = new IPDiscoveryService();
 
         /// <summary>
         /// Return a shared instance of the discovery service
         /// </summary>
-        public static DiscoveryService Shared
+        public static IPDiscoveryService Shared
         {
             get 
             { 
@@ -46,41 +45,18 @@ namespace MatterDotNet.OperationalDiscovery
         }
 
         /// <summary>
-        /// Generate commissionable node info from BLE advertisement
+        /// Find IP commissionable nodes matching the given params
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <param name="bleAdvertisement"></param>
+        /// <param name="commissioningPayload"></param>
         /// <returns></returns>
-        public static ODNode FromAdvertisement(string id, string name, ReadOnlySpan<byte> bleAdvertisement)
+        public async Task<ODNode?> Find(CommissioningPayload commissioningPayload)
         {
-            ODNode ret = new ODNode();
-            if (bleAdvertisement[0] == 0x0)
-                ret.CommissioningMode = CommissioningMode.Basic;
-            ret.Discriminator = (ushort)(BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(1, 2)) & 0xFFF);
-            ret.Vendor = BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(3, 2));
-            ret.Product = BinaryPrimitives.ReadUInt16LittleEndian(bleAdvertisement.Slice(5, 2));
-            ret.DeviceName = name;
-            ret.BTAddress = id;
-            return ret;
-        }
-
-        /// <summary>
-        /// Find commissionable nodes matching the given params
-        /// </summary>
-        /// <param name="vendor"></param>
-        /// <param name="product"></param>
-        /// <param name="discriminator"></param>
-        /// <param name="fullLen"></param>
-        /// <returns></returns>
-        public async Task<ODNode?> Find(uint vendor, uint product, uint discriminator, bool fullLen)
-        {
-            List<ODNode> results = await Find(discriminator, fullLen);
+            List<ODNode> results = await Find(commissioningPayload.Discriminator, commissioningPayload.LongDiscriminator);
             foreach (ODNode result in results)
             {
-                if (result.Vendor != 0 && result.Vendor != vendor)
+                if (result.Vendor != 0 && commissioningPayload.VendorID != 0 && result.Vendor != commissioningPayload.VendorID)
                     continue;
-                if (result.Product != 0 && result.Product != product)
+                if (result.Product != 0 && commissioningPayload.ProductID != 0 && result.Product != commissioningPayload.ProductID)
                     continue;
                 return result;
             }
@@ -88,7 +64,7 @@ namespace MatterDotNet.OperationalDiscovery
         }
 
         /// <summary>
-        /// Find commissionable nodes matching the given discriminator
+        /// Find IP commissionable nodes matching the given discriminator
         /// </summary>
         /// <param name="discriminator"></param>
         /// <param name="fullLen"></param>
@@ -127,11 +103,14 @@ namespace MatterDotNet.OperationalDiscovery
         /// Query operational information about the provided instance
         /// </summary>
         /// <param name="operationalInstanceName"></param>
+        /// <param name="extendedSearch"></param>
         /// <returns></returns>
-        public async Task<ODNode?> Find(string operationalInstanceName)
+        public async Task<ODNode?> Find(string operationalInstanceName, bool extendedSearch = false)
         {
+            Console.WriteLine("Looking for " + operationalInstanceName);
             List<ODNode> results;
-            for (int i = 0; i < 10; i++)
+            int length = extendedSearch ? 20 : 10; // 60 / 30 seconds
+            for (int i = 0; i < length; i++)
             {
                 results = Parse(await mdns.ResolveServiceInstance(operationalInstanceName, "_matter._tcp", "local"));
                 if (results.Count > 0)
@@ -141,7 +120,7 @@ namespace MatterDotNet.OperationalDiscovery
         }
 
         /// <summary>
-        /// Find all commissionable nodes
+        /// Find all commissionable nodes accessible by IP
         /// </summary>
         /// <returns></returns>
         public async Task<ODNode[]> FindAll()

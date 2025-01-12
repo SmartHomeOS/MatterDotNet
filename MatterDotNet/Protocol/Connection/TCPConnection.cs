@@ -66,6 +66,8 @@ namespace MatterDotNet.Protocol.Connection
             }
         }
 
+        public bool Connected { get { return client.Connected; } }
+
         public void Dispose()
         {
             cts.Cancel();

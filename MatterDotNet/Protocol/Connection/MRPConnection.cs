@@ -17,7 +17,6 @@ using MatterDotNet.Protocol.Sessions;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
 {
@@ -181,6 +180,8 @@ namespace MatterDotNet.Protocol.Connection
             if (AckTable.TryGetValue(exchange.ID, out uint ctr))
                 await SendAck(exchange.Session, exchange.ID, ctr, exchange.Session.Initiator);
         }
+
+        public bool Connected { get { return !cts.IsCancellationRequested; } }
 
         /// <inheritdoc />
         public void Dispose()

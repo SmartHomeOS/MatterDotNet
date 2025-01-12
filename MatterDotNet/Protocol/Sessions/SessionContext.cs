@@ -136,7 +136,7 @@ namespace MatterDotNet.Protocol.Sessions
         public void Dispose()
         {
             Console.WriteLine("Closing Session " + LocalSessionID);
-            if (this is SecureSession secure)
+            if (this is SecureSession secure && secure.Connection.Connected)
                 CreateExchange().SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.CLOSE_SESSION), (byte)SecureOpCodes.StatusReport), false).Wait();
             var keys = exchanges.Keys;
             foreach (var key in keys)

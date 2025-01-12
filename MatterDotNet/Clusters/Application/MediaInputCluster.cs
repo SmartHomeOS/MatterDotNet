@@ -80,8 +80,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public InputInfo() { }
 
+            /// <summary>
+            /// Input Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal InputInfo(object[] fields) {
+            public InputInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Index = reader.GetByte(0)!.Value;
                 InputType = (InputTypeEnum)reader.GetUShort(1)!.Value;

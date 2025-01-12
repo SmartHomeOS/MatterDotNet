@@ -44,8 +44,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public Target() { }
 
+            /// <summary>
+            /// Target
+            /// </summary>
             [SetsRequiredMembers]
-            internal Target(object[] fields) {
+            public Target(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Node = reader.GetULong(1)!.Value;
                 Group = reader.GetUShort(2)!.Value;

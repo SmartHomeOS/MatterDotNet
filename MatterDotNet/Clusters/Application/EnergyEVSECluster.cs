@@ -263,8 +263,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ChargingTargetSchedule() { }
 
+            /// <summary>
+            /// Charging Target Schedule
+            /// </summary>
             [SetsRequiredMembers]
-            internal ChargingTargetSchedule(object[] fields) {
+            public ChargingTargetSchedule(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 DayOfWeekForSequence = (TargetDayOfWeekBitmap)reader.GetUShort(0)!.Value;
                 {
@@ -300,8 +303,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ChargingTarget() { }
 
+            /// <summary>
+            /// Charging Target
+            /// </summary>
             [SetsRequiredMembers]
-            internal ChargingTarget(object[] fields) {
+            public ChargingTarget(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 TargetTimeMinutesPastMidnight = reader.GetUShort(0)!.Value;
                 TargetSoC = reader.GetByte(1, true);
@@ -638,7 +644,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Session Duration attribute
         /// </summary>
         public async Task<TimeSpan?> GetSessionDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 65, true);
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 65, true) ?? null;
         }
 
         /// <summary>

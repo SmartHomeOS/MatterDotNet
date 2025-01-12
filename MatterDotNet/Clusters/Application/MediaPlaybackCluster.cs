@@ -206,8 +206,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public PlaybackPosition() { }
 
+            /// <summary>
+            /// Playback Position
+            /// </summary>
             [SetsRequiredMembers]
-            internal PlaybackPosition(object[] fields) {
+            public PlaybackPosition(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 UpdatedAt = TimeUtil.FromEpochUS(reader.GetULong(0))!.Value;
                 Position = reader.GetULong(1, true);
@@ -231,8 +234,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public TrackAttributes() { }
 
+            /// <summary>
+            /// Track Attributes
+            /// </summary>
             [SetsRequiredMembers]
-            internal TrackAttributes(object[] fields) {
+            public TrackAttributes(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 LanguageCode = reader.GetString(0, false)!;
                 {
@@ -275,8 +281,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Track() { }
 
+            /// <summary>
+            /// Track
+            /// </summary>
             [SetsRequiredMembers]
-            internal Track(object[] fields) {
+            public Track(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ID = reader.GetString(0, false)!;
                 TrackAttributes = new TrackAttributes((object[])fields[1]);

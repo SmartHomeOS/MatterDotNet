@@ -90,8 +90,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public HarmonicMeasurement() { }
 
+            /// <summary>
+            /// Harmonic Measurement
+            /// </summary>
             [SetsRequiredMembers]
-            internal HarmonicMeasurement(object[] fields) {
+            public HarmonicMeasurement(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Order = reader.GetByte(0)!.Value;
                 Measurement = reader.GetLong(1, true);
@@ -115,8 +118,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public MeasurementRange() { }
 
+            /// <summary>
+            /// Measurement Range
+            /// </summary>
             [SetsRequiredMembers]
-            internal MeasurementRange(object[] fields) {
+            public MeasurementRange(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MeasurementType = (MeasurementType)reader.GetUShort(0)!.Value;
                 Min = reader.GetLong(1)!.Value;

@@ -66,8 +66,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public TargetInfo() { }
 
+            /// <summary>
+            /// Target Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal TargetInfo(object[] fields) {
+            public TargetInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Identifier = reader.GetByte(0)!.Value;
                 Name = reader.GetString(1, false)!;

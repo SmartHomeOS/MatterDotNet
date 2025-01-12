@@ -71,8 +71,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Balance() { }
 
+            /// <summary>
+            /// Balance
+            /// </summary>
             [SetsRequiredMembers]
-            internal Balance(object[] fields) {
+            public Balance(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Step = reader.GetByte(0)!.Value;
                 Label = reader.GetString(1, true);

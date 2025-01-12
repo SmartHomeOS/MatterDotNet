@@ -278,8 +278,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Constraints() { }
 
+            /// <summary>
+            /// Constraints
+            /// </summary>
             [SetsRequiredMembers]
-            internal Constraints(object[] fields) {
+            public Constraints(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(0))!.Value;
                 Duration = TimeSpan.FromSeconds(reader.GetUInt(1)!.Value);
@@ -312,8 +315,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Cost() { }
 
+            /// <summary>
+            /// Cost
+            /// </summary>
             [SetsRequiredMembers]
-            internal Cost(object[] fields) {
+            public Cost(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CostType = (CostTypeEnum)reader.GetUShort(0)!.Value;
                 Value = reader.GetInt(1)!.Value;
@@ -321,7 +327,7 @@ namespace MatterDotNet.Clusters.Application
                 Currency = reader.GetUShort(3, true);
             }
             public required CostTypeEnum CostType { get; set; }
-            public required int  Value { get; set; } = 0;
+            public required int Value { get; set; } = 0;
             public required byte DecimalPoints { get; set; } = 0;
             public ushort? Currency { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -344,8 +350,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Forecast() { }
 
+            /// <summary>
+            /// Forecast
+            /// </summary>
             [SetsRequiredMembers]
-            internal Forecast(object[] fields) {
+            public Forecast(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ForecastId = reader.GetUShort(0)!.Value;
                 ActiveSlotNumber = reader.GetUShort(1, true);
@@ -405,8 +414,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public PowerAdjust() { }
 
+            /// <summary>
+            /// Power Adjust
+            /// </summary>
             [SetsRequiredMembers]
-            internal PowerAdjust(object[] fields) {
+            public PowerAdjust(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MinPower = reader.GetLong(0)!.Value;
                 MaxPower = reader.GetLong(1)!.Value;
@@ -436,8 +448,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public SlotAdjustment() { }
 
+            /// <summary>
+            /// Slot Adjustment
+            /// </summary>
             [SetsRequiredMembers]
-            internal SlotAdjustment(object[] fields) {
+            public SlotAdjustment(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 SlotIndex = reader.GetByte(0)!.Value;
                 NominalPower = reader.GetLong(1)!.Value;
@@ -464,8 +479,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Slot() { }
 
+            /// <summary>
+            /// Slot
+            /// </summary>
             [SetsRequiredMembers]
-            internal Slot(object[] fields) {
+            public Slot(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MinDuration = TimeSpan.FromSeconds(reader.GetUInt(0)!.Value);
                 MaxDuration = TimeSpan.FromSeconds(reader.GetUInt(1)!.Value);

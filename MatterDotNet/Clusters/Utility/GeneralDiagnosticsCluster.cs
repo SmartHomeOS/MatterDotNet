@@ -227,8 +227,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public NetworkInterface() { }
 
+            /// <summary>
+            /// Network Interface
+            /// </summary>
             [SetsRequiredMembers]
-            internal NetworkInterface(object[] fields) {
+            public NetworkInterface(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Name = reader.GetString(0, false)!;
                 IsOperational = reader.GetBool(1)!.Value;

@@ -126,8 +126,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ReplacementProduct() { }
 
+            /// <summary>
+            /// Replacement Product
+            /// </summary>
             [SetsRequiredMembers]
-            internal ReplacementProduct(object[] fields) {
+            public ReplacementProduct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ProductIdentifierType = (ProductIdentifierTypeEnum)reader.GetUShort(0)!.Value;
                 ProductIdentifierValue = reader.GetString(1, false)!;

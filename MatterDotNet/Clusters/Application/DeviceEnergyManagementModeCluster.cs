@@ -42,8 +42,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ModeOption() { }
 
+            /// <summary>
+            /// Mode Option
+            /// </summary>
             [SetsRequiredMembers]
-            internal ModeOption(object[] fields) {
+            public ModeOption(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
             }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {

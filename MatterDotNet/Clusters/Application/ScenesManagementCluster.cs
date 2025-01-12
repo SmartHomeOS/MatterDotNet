@@ -71,8 +71,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public AttributeValuePair() { }
 
+            /// <summary>
+            /// Attribute Value Pair
+            /// </summary>
             [SetsRequiredMembers]
-            internal AttributeValuePair(object[] fields) {
+            public AttributeValuePair(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 AttributeID = reader.GetUInt(0)!.Value;
                 ValueUnsigned8 = reader.GetByte(1, true);
@@ -90,7 +93,7 @@ namespace MatterDotNet.Clusters.Application
             public ushort? ValueUnsigned16 { get; set; }
             public short? ValueSigned16 { get; set; }
             public uint? ValueUnsigned32 { get; set; }
-            public int ? ValueSigned32 { get; set; }
+            public int? ValueSigned32 { get; set; }
             public ulong? ValueUnsigned64 { get; set; }
             public long? ValueSigned64 { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -125,8 +128,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ExtensionFieldSet() { }
 
+            /// <summary>
+            /// Extension Field Set
+            /// </summary>
             [SetsRequiredMembers]
-            internal ExtensionFieldSet(object[] fields) {
+            public ExtensionFieldSet(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ClusterID = reader.GetUInt(0)!.Value;
                 {
@@ -161,8 +167,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public LogicalSceneTable() { }
 
+            /// <summary>
+            /// Logical  Scene  Table
+            /// </summary>
             [SetsRequiredMembers]
-            internal LogicalSceneTable(object[] fields) {
+            public LogicalSceneTable(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 SceneGroupID = reader.GetUShort(0)!.Value;
                 SceneID = reader.GetByte(1)!.Value;
@@ -206,8 +215,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public SceneInfo() { }
 
+            /// <summary>
+            /// Scene Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal SceneInfo(object[] fields) {
+            public SceneInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 SceneCount = reader.GetByte(0)!.Value;
                 CurrentScene = reader.GetByte(1)!.Value;
@@ -525,7 +537,7 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new GetSceneMembershipResponse() {
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
-                Capacity = (byte)GetField(resp, 1),
+                Capacity = (byte?)GetField(resp, 1),
                 GroupID = (ushort)GetField(resp, 2),
                 SceneList = (byte[])GetField(resp, 3),
             };

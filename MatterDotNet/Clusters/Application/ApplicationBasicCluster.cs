@@ -68,8 +68,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Application() { }
 
+            /// <summary>
+            /// Application
+            /// </summary>
             [SetsRequiredMembers]
-            internal Application(object[] fields) {
+            public Application(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CatalogVendorID = reader.GetUShort(0)!.Value;
                 ApplicationID = reader.GetString(1, false)!;

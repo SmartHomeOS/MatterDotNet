@@ -46,8 +46,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public ValidProxy() { }
 
+            /// <summary>
+            /// Valid Proxy
+            /// </summary>
             [SetsRequiredMembers]
-            internal ValidProxy(object[] fields) {
+            public ValidProxy(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 NodeID = reader.GetULong(1)!.Value;
             }

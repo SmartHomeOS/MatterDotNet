@@ -141,8 +141,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ChannelInfo() { }
 
+            /// <summary>
+            /// Channel Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal ChannelInfo(object[] fields) {
+            public ChannelInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MajorNumber = reader.GetUShort(0)!.Value;
                 MinorNumber = reader.GetUShort(1)!.Value;
@@ -186,8 +189,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ChannelPaging() { }
 
+            /// <summary>
+            /// Channel Paging
+            /// </summary>
             [SetsRequiredMembers]
-            internal ChannelPaging(object[] fields) {
+            public ChannelPaging(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 PreviousToken = new PageToken((object[])fields[0]);
                 NextToken = new PageToken((object[])fields[1]);
@@ -213,8 +219,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public LineupInfo() { }
 
+            /// <summary>
+            /// Lineup Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal LineupInfo(object[] fields) {
+            public LineupInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 OperatorName = reader.GetString(0, false)!;
                 LineupName = reader.GetString(1, true);
@@ -246,8 +255,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public PageToken() { }
 
+            /// <summary>
+            /// Page Token
+            /// </summary>
             [SetsRequiredMembers]
-            internal PageToken(object[] fields) {
+            public PageToken(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Limit = reader.GetUShort(0, true);
                 After = reader.GetString(1, true);
@@ -277,8 +289,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ProgramCast() { }
 
+            /// <summary>
+            /// Program Cast
+            /// </summary>
             [SetsRequiredMembers]
-            internal ProgramCast(object[] fields) {
+            public ProgramCast(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Name = reader.GetString(0, false)!;
                 Role = reader.GetString(1, false)!;
@@ -302,8 +317,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ProgramCategory() { }
 
+            /// <summary>
+            /// Program Category
+            /// </summary>
             [SetsRequiredMembers]
-            internal ProgramCategory(object[] fields) {
+            public ProgramCategory(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Category = reader.GetString(0, false)!;
                 SubCategory = reader.GetString(1, true);
@@ -328,8 +346,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Program() { }
 
+            /// <summary>
+            /// Program
+            /// </summary>
             [SetsRequiredMembers]
-            internal Program(object[] fields) {
+            public Program(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Identifier = reader.GetString(0, false)!;
                 Channel = new ChannelInfo((object[])fields[1]);
@@ -482,8 +503,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public SeriesInfo() { }
 
+            /// <summary>
+            /// Series Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal SeriesInfo(object[] fields) {
+            public SeriesInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Season = reader.GetString(0, false)!;
                 Episode = reader.GetString(1, false)!;

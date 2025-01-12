@@ -59,8 +59,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ModeOption() { }
 
+            /// <summary>
+            /// Mode Option
+            /// </summary>
             [SetsRequiredMembers]
-            internal ModeOption(object[] fields) {
+            public ModeOption(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Label = reader.GetString(0, false)!;
                 Mode = reader.GetByte(1)!.Value;
@@ -99,8 +102,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public SemanticTag() { }
 
+            /// <summary>
+            /// Semantic Tag
+            /// </summary>
             [SetsRequiredMembers]
-            internal SemanticTag(object[] fields) {
+            public SemanticTag(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MfgCode = reader.GetUShort(0)!.Value;
                 Value = reader.GetUShort(1)!.Value;

@@ -92,8 +92,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public BasicCommissioningInfo() { }
 
+            /// <summary>
+            /// Basic Commissioning Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal BasicCommissioningInfo(object[] fields) {
+            public BasicCommissioningInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 FailSafeExpiryLengthSeconds = reader.GetUShort(0)!.Value;
                 MaxCumulativeFailsafeSeconds = reader.GetUShort(1)!.Value;

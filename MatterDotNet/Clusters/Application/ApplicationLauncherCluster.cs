@@ -77,8 +77,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ApplicationEP() { }
 
+            /// <summary>
+            /// Application EP
+            /// </summary>
             [SetsRequiredMembers]
-            internal ApplicationEP(object[] fields) {
+            public ApplicationEP(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Application = new Application((object[])fields[0]);
                 Endpoint = reader.GetUShort(1, true);
@@ -103,8 +106,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Application() { }
 
+            /// <summary>
+            /// Application
+            /// </summary>
             [SetsRequiredMembers]
-            internal Application(object[] fields) {
+            public Application(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CatalogVendorID = reader.GetUShort(0)!.Value;
                 ApplicationID = reader.GetString(1, false)!;

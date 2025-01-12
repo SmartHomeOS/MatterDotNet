@@ -81,8 +81,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public MonitoringRegistration() { }
 
+            /// <summary>
+            /// Monitoring Registration
+            /// </summary>
             [SetsRequiredMembers]
-            internal MonitoringRegistration(object[] fields) {
+            public MonitoringRegistration(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CheckInNodeID = reader.GetULong(1)!.Value;
                 MonitoredSubject = reader.GetULong(2)!.Value;

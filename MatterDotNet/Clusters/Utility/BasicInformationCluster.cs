@@ -166,8 +166,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public CapabilityMinima() { }
 
+            /// <summary>
+            /// Capability Minima
+            /// </summary>
             [SetsRequiredMembers]
-            internal CapabilityMinima(object[] fields) {
+            public CapabilityMinima(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CaseSessionsPerFabric = reader.GetUShort(0)!.Value;
                 SubscriptionsPerFabric = reader.GetUShort(1)!.Value;
@@ -191,8 +194,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public ProductAppearance() { }
 
+            /// <summary>
+            /// Product Appearance
+            /// </summary>
             [SetsRequiredMembers]
-            internal ProductAppearance(object[] fields) {
+            public ProductAppearance(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Finish = (ProductFinishEnum)reader.GetUShort(0)!.Value;
                 PrimaryColor = (ColorEnum)reader.GetUShort(1)!.Value;

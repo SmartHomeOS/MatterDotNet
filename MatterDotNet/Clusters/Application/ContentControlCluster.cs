@@ -122,8 +122,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public AppInfo() { }
 
+            /// <summary>
+            /// App Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal AppInfo(object[] fields) {
+            public AppInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CatalogVendorID = reader.GetUShort(0)!.Value;
                 ApplicationID = reader.GetString(1, false)!;
@@ -147,8 +150,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public BlockChannel() { }
 
+            /// <summary>
+            /// Block Channel
+            /// </summary>
             [SetsRequiredMembers]
-            internal BlockChannel(object[] fields) {
+            public BlockChannel(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 BlockChannelIndex = reader.GetUShort(0, true);
                 MajorNumber = reader.GetUShort(1)!.Value;
@@ -179,8 +185,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public RatingName() { }
 
+            /// <summary>
+            /// Rating Name
+            /// </summary>
             [SetsRequiredMembers]
-            internal RatingName(object[] fields) {
+            public RatingName(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 RatingNameField = reader.GetString(0, false)!;
                 RatingNameDesc = reader.GetString(1, true);
@@ -205,8 +214,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public TimePeriodStructType() { }
 
+            /// <summary>
+            /// Time Period Struct type
+            /// </summary>
             [SetsRequiredMembers]
-            internal TimePeriodStructType(object[] fields) {
+            public TimePeriodStructType(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 StartHour = reader.GetByte(0)!.Value;
                 StartMinute = reader.GetByte(1)!.Value;
@@ -236,8 +248,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public TimeWindow() { }
 
+            /// <summary>
+            /// Time Window
+            /// </summary>
             [SetsRequiredMembers]
-            internal TimeWindow(object[] fields) {
+            public TimeWindow(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 TimeWindowIndex = reader.GetUShort(0, true);
                 DayOfWeek = (DayOfWeekBitmapType)reader.GetUShort(1)!.Value;

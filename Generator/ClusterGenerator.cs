@@ -993,8 +993,10 @@ namespace Generator
             writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(structType.name)}\n        /// </summary>");
             writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {");
             writer.WriteLine($"            /// <summary>\n            /// {GeneratorUtil.FieldNameToComment(structType.name)}\n            /// </summary>");
-            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}() {{ }}\n\n            [SetsRequiredMembers]");
-            writer.WriteLine($"            internal {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
+            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}() {{ }}\n");
+            writer.WriteLine($"            /// <summary>\n            /// {GeneratorUtil.FieldNameToComment(structType.name)}\n            /// </summary>");
+            writer.WriteLine($"            [SetsRequiredMembers]");
+            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             foreach (clusterDataTypesStructField field in structType.field)
             {

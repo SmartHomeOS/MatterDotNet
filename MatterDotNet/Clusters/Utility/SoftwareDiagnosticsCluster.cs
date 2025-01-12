@@ -59,8 +59,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public ThreadMetrics() { }
 
+            /// <summary>
+            /// Thread Metrics
+            /// </summary>
             [SetsRequiredMembers]
-            internal ThreadMetrics(object[] fields) {
+            public ThreadMetrics(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ID = reader.GetULong(0)!.Value;
                 Name = reader.GetString(1, true);

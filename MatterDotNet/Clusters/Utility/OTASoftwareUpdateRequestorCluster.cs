@@ -134,8 +134,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public ProviderLocation() { }
 
+            /// <summary>
+            /// Provider Location
+            /// </summary>
             [SetsRequiredMembers]
-            internal ProviderLocation(object[] fields) {
+            public ProviderLocation(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ProviderNodeID = reader.GetULong(1)!.Value;
                 Endpoint = reader.GetUShort(2)!.Value;

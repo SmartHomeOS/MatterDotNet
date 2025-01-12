@@ -191,8 +191,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Action() { }
 
+            /// <summary>
+            /// Action
+            /// </summary>
             [SetsRequiredMembers]
-            internal Action(object[] fields) {
+            public Action(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ActionID = reader.GetUShort(0)!.Value;
                 Name = reader.GetString(1, false)!;
@@ -228,8 +231,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public EndpointList() { }
 
+            /// <summary>
+            /// Endpoint List
+            /// </summary>
             [SetsRequiredMembers]
-            internal EndpointList(object[] fields) {
+            public EndpointList(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 EndpointListID = reader.GetUShort(0)!.Value;
                 Name = reader.GetString(1, false)!;

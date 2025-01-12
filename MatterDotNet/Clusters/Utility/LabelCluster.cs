@@ -40,8 +40,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public Label() { }
 
+            /// <summary>
+            /// Label
+            /// </summary>
             [SetsRequiredMembers]
-            internal Label(object[] fields) {
+            public Label(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 LabelField = reader.GetString(0, false)!;
                 Value = reader.GetString(1, false)!;

@@ -204,8 +204,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public AdditionalInfo() { }
 
+            /// <summary>
+            /// Additional Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal AdditionalInfo(object[] fields) {
+            public AdditionalInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Name = reader.GetString(0, false)!;
                 Value = reader.GetString(1, false)!;
@@ -229,8 +232,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public BrandingInformation() { }
 
+            /// <summary>
+            /// Branding Information
+            /// </summary>
             [SetsRequiredMembers]
-            internal BrandingInformation(object[] fields) {
+            public BrandingInformation(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ProviderName = reader.GetString(0, false)!;
                 Background = new StyleInformation((object[])fields[1]);
@@ -271,8 +277,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ContentSearch() { }
 
+            /// <summary>
+            /// Content Search
+            /// </summary>
             [SetsRequiredMembers]
-            internal ContentSearch(object[] fields) {
+            public ContentSearch(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 {
                     ParameterList = new Parameter[((object[])fields[0]).Length];
@@ -304,8 +313,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Dimension() { }
 
+            /// <summary>
+            /// Dimension
+            /// </summary>
             [SetsRequiredMembers]
-            internal Dimension(object[] fields) {
+            public Dimension(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Width = reader.GetDouble(0)!.Value;
                 Height = reader.GetDouble(1)!.Value;
@@ -332,8 +344,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Parameter() { }
 
+            /// <summary>
+            /// Parameter
+            /// </summary>
             [SetsRequiredMembers]
-            internal Parameter(object[] fields) {
+            public Parameter(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Type = (ParameterEnum)reader.GetUShort(0)!.Value;
                 Value = reader.GetString(1, false)!;
@@ -373,8 +388,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public PlaybackPreferences() { }
 
+            /// <summary>
+            /// Playback Preferences
+            /// </summary>
             [SetsRequiredMembers]
-            internal PlaybackPreferences(object[] fields) {
+            public PlaybackPreferences(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 PlaybackPosition = reader.GetULong(0, true);
                 TextTrack = new TrackPreference((object[])fields[1]);
@@ -418,8 +436,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public StyleInformation() { }
 
+            /// <summary>
+            /// Style Information
+            /// </summary>
             [SetsRequiredMembers]
-            internal StyleInformation(object[] fields) {
+            public StyleInformation(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ImageURL = reader.GetString(0, true);
                 Color = reader.GetString(1, true);
@@ -449,8 +470,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public TrackPreference() { }
 
+            /// <summary>
+            /// Track Preference
+            /// </summary>
             [SetsRequiredMembers]
-            internal TrackPreference(object[] fields) {
+            public TrackPreference(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 LanguageCode = reader.GetString(0, false)!;
                 {

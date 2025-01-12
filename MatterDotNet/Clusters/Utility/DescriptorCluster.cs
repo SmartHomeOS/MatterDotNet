@@ -58,8 +58,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public DeviceType() { }
 
+            /// <summary>
+            /// Device Type
+            /// </summary>
             [SetsRequiredMembers]
-            internal DeviceType(object[] fields) {
+            public DeviceType(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 DeviceTypeField = (DeviceTypeEnum)reader.GetUInt(0)!.Value;
                 Revision = reader.GetUShort(1)!.Value;

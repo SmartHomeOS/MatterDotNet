@@ -88,8 +88,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public GroupInfoMap() { }
 
+            /// <summary>
+            /// Group Info Map
+            /// </summary>
             [SetsRequiredMembers]
-            internal GroupInfoMap(object[] fields) {
+            public GroupInfoMap(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 GroupId = reader.GetUShort(1)!.Value;
                 {
@@ -129,8 +132,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public GroupKeyMap() { }
 
+            /// <summary>
+            /// Group Key Map
+            /// </summary>
             [SetsRequiredMembers]
-            internal GroupKeyMap(object[] fields) {
+            public GroupKeyMap(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 GroupId = reader.GetUShort(1)!.Value;
                 GroupKeySetID = reader.GetUShort(2)!.Value;
@@ -154,8 +160,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public GroupKeySet() { }
 
+            /// <summary>
+            /// Group Key Set
+            /// </summary>
             [SetsRequiredMembers]
-            internal GroupKeySet(object[] fields) {
+            public GroupKeySet(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 GroupKeySetID = reader.GetUShort(0)!.Value;
                 GroupKeySecurityPolicy = (GroupKeySecurityPolicyEnum)reader.GetUShort(1)!.Value;

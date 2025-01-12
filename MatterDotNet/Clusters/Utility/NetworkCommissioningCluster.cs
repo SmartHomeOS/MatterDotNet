@@ -210,8 +210,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public NetworkInfo() { }
 
+            /// <summary>
+            /// Network Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal NetworkInfo(object[] fields) {
+            public NetworkInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 NetworkID = reader.GetBytes(0, false, 32, 1
 )!;
@@ -236,8 +239,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public ThreadInterfaceScanResult() { }
 
+            /// <summary>
+            /// Thread Interface Scan Result
+            /// </summary>
             [SetsRequiredMembers]
-            internal ThreadInterfaceScanResult(object[] fields) {
+            public ThreadInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 PanId = reader.GetUShort(0)!.Value;
                 ExtendedPanId = reader.GetULong(1)!.Value;
@@ -279,8 +285,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public WiFiInterfaceScanResult() { }
 
+            /// <summary>
+            /// WiFi Interface Scan Result
+            /// </summary>
             [SetsRequiredMembers]
-            internal WiFiInterfaceScanResult(object[] fields) {
+            public WiFiInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Security = (WiFiSecurityBitmap)reader.GetUShort(0)!.Value;
                 SSID = reader.GetBytes(1, false)!;
@@ -399,7 +408,7 @@ namespace MatterDotNet.Clusters.Utility
         public struct ConnectNetworkResponse() {
             public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
-            public required int ? ErrorValue { get; set; }
+            public required int? ErrorValue { get; set; }
         }
 
         private record ReorderNetworkPayload : TLVPayload {
@@ -615,8 +624,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Last Connect Error Value attribute
         /// </summary>
-        public async Task<int ?> GetLastConnectErrorValue(SecureSession session) {
-            return (int ?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+        public async Task<int?> GetLastConnectErrorValue(SecureSession session) {
+            return (int?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
         }
 
         /// <summary>

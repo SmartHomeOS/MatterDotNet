@@ -56,8 +56,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ModeOption() { }
 
+            /// <summary>
+            /// Mode Option
+            /// </summary>
             [SetsRequiredMembers]
-            internal ModeOption(object[] fields) {
+            public ModeOption(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Label = reader.GetString(0, false)!;
                 Mode = reader.GetByte(1)!.Value;
@@ -96,8 +99,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public ModeTag() { }
 
+            /// <summary>
+            /// Mode Tag
+            /// </summary>
             [SetsRequiredMembers]
-            internal ModeTag(object[] fields) {
+            public ModeTag(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MfgCode = reader.GetUShort(0, true);
                 Value = reader.GetUShort(1)!.Value;

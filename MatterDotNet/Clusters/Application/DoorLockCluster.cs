@@ -867,8 +867,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public Credential() { }
 
+            /// <summary>
+            /// Credential
+            /// </summary>
             [SetsRequiredMembers]
-            internal Credential(object[] fields) {
+            public Credential(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CredentialType = (CredentialTypeEnum)reader.GetUShort(0)!.Value;
                 CredentialIndex = reader.GetUShort(1)!.Value;
@@ -1446,9 +1449,9 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new GetPINCodeResponse() {
                 UserID = (ushort)GetField(resp, 0),
-                UserStatus = (UserStatusEnum)(byte)GetField(resp, 1),
-                UserType = (UserTypeEnum)(byte)GetField(resp, 2),
-                PINCode = (byte[])GetField(resp, 3),
+                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 1),
+                UserType = (UserTypeEnum?)(byte)GetField(resp, 2),
+                PINCode = (byte[]?)GetField(resp, 3),
             };
         }
 
@@ -1695,9 +1698,9 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new GetRFIDCodeResponse() {
                 UserID = (ushort)GetField(resp, 0),
-                UserStatus = (UserStatusEnum)(byte)GetField(resp, 1),
-                UserType = (UserTypeEnum)(byte)GetField(resp, 2),
-                RFIDCode = (byte[])GetField(resp, 3),
+                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 1),
+                UserType = (UserTypeEnum?)(byte)GetField(resp, 2),
+                RFIDCode = (byte[]?)GetField(resp, 3),
             };
         }
 
@@ -1749,15 +1752,15 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new GetUserResponse() {
                 UserIndex = (ushort)GetField(resp, 0),
-                UserName = (string)GetField(resp, 1),
-                UserUniqueID = (uint)GetField(resp, 2),
-                UserStatus = (UserStatusEnum)(byte)GetField(resp, 3),
-                UserType = (UserTypeEnum)(byte)GetField(resp, 4),
-                CredentialRule = (CredentialRuleEnum)(byte)GetField(resp, 5),
-                Credentials = (Credential[])GetField(resp, 6),
-                CreatorFabricIndex = (byte)GetField(resp, 7),
-                LastModifiedFabricIndex = (byte)GetField(resp, 8),
-                NextUserIndex = (ushort)GetField(resp, 9),
+                UserName = (string?)GetField(resp, 1),
+                UserUniqueID = (uint?)GetField(resp, 2),
+                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 3),
+                UserType = (UserTypeEnum?)(byte)GetField(resp, 4),
+                CredentialRule = (CredentialRuleEnum?)(byte)GetField(resp, 5),
+                Credentials = (Credential[]?)GetField(resp, 6),
+                CreatorFabricIndex = (byte?)GetField(resp, 7),
+                LastModifiedFabricIndex = (byte?)GetField(resp, 8),
+                NextUserIndex = (ushort?)GetField(resp, 9),
             };
         }
 
@@ -1789,7 +1792,7 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new SetCredentialResponse() {
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
-                UserIndex = (ushort)GetField(resp, 1),
+                UserIndex = (ushort?)GetField(resp, 1),
                 NextCredentialIndex = (ushort?)GetOptionalField(resp, 2),
             };
         }
@@ -1806,9 +1809,9 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new GetCredentialStatusResponse() {
                 CredentialExists = (bool)GetField(resp, 0),
-                UserIndex = (ushort)GetField(resp, 1),
-                CreatorFabricIndex = (byte)GetField(resp, 2),
-                LastModifiedFabricIndex = (byte)GetField(resp, 3),
+                UserIndex = (ushort?)GetField(resp, 1),
+                CreatorFabricIndex = (byte?)GetField(resp, 2),
+                LastModifiedFabricIndex = (byte?)GetField(resp, 3),
                 NextCredentialIndex = (ushort?)GetOptionalField(resp, 4),
             };
         }

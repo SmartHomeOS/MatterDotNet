@@ -190,8 +190,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public DSTOffset() { }
 
+            /// <summary>
+            /// DST Offset
+            /// </summary>
             [SetsRequiredMembers]
-            internal DSTOffset(object[] fields) {
+            public DSTOffset(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Offset = reader.GetInt(0)!.Value;
                 ValidStarting = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
@@ -221,8 +224,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public FabricScopedTrustedTimeSource() { }
 
+            /// <summary>
+            /// Fabric Scoped Trusted Time Source
+            /// </summary>
             [SetsRequiredMembers]
-            internal FabricScopedTrustedTimeSource(object[] fields) {
+            public FabricScopedTrustedTimeSource(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 NodeID = reader.GetULong(0)!.Value;
                 Endpoint = reader.GetUShort(1)!.Value;
@@ -246,8 +252,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public TimeZone() { }
 
+            /// <summary>
+            /// Time Zone
+            /// </summary>
             [SetsRequiredMembers]
-            internal TimeZone(object[] fields) {
+            public TimeZone(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Offset = reader.GetInt(0)!.Value;
                 ValidAt = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
@@ -275,8 +284,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public TrustedTimeSource() { }
 
+            /// <summary>
+            /// Trusted Time Source
+            /// </summary>
             [SetsRequiredMembers]
-            internal TrustedTimeSource(object[] fields) {
+            public TrustedTimeSource(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 FabricIndex = reader.GetByte(0)!.Value;
                 NodeID = reader.GetULong(1)!.Value;

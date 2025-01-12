@@ -71,8 +71,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public CumulativeEnergyReset() { }
 
+            /// <summary>
+            /// Cumulative Energy Reset
+            /// </summary>
             [SetsRequiredMembers]
-            internal CumulativeEnergyReset(object[] fields) {
+            public CumulativeEnergyReset(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ImportedResetTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(0, true));
                 ExportedResetTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(1, true));
@@ -106,8 +109,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public EnergyMeasurement() { }
 
+            /// <summary>
+            /// Energy Measurement
+            /// </summary>
             [SetsRequiredMembers]
-            internal EnergyMeasurement(object[] fields) {
+            public EnergyMeasurement(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Energy = reader.GetLong(0)!.Value;
                 StartTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(1, true));

@@ -141,8 +141,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public NeighborTable() { }
 
+            /// <summary>
+            /// Neighbor Table
+            /// </summary>
             [SetsRequiredMembers]
-            internal NeighborTable(object[] fields) {
+            public NeighborTable(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ExtAddress = reader.GetULong(0)!.Value;
                 Age = reader.GetUInt(1)!.Value;
@@ -202,8 +205,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public OperationalDatasetComponents() { }
 
+            /// <summary>
+            /// Operational Dataset Components
+            /// </summary>
             [SetsRequiredMembers]
-            internal OperationalDatasetComponents(object[] fields) {
+            public OperationalDatasetComponents(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ActiveTimestampPresent = reader.GetBool(0)!.Value;
                 PendingTimestampPresent = reader.GetBool(1)!.Value;
@@ -257,8 +263,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public RouteTable() { }
 
+            /// <summary>
+            /// Route Table
+            /// </summary>
             [SetsRequiredMembers]
-            internal RouteTable(object[] fields) {
+            public RouteTable(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ExtAddress = reader.GetULong(0)!.Value;
                 Rloc16 = reader.GetUShort(1)!.Value;
@@ -306,8 +315,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public SecurityPolicy() { }
 
+            /// <summary>
+            /// Security Policy
+            /// </summary>
             [SetsRequiredMembers]
-            internal SecurityPolicy(object[] fields) {
+            public SecurityPolicy(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 RotationTime = reader.GetUShort(0)!.Value;
                 Flags = reader.GetUShort(1)!.Value;

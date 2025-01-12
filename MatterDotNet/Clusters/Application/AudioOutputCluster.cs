@@ -74,8 +74,11 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             public OutputInfo() { }
 
+            /// <summary>
+            /// Output Info
+            /// </summary>
             [SetsRequiredMembers]
-            internal OutputInfo(object[] fields) {
+            public OutputInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Index = reader.GetByte(0)!.Value;
                 OutputType = (OutputTypeEnum)reader.GetUShort(1)!.Value;

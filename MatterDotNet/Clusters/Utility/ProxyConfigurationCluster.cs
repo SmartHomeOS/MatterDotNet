@@ -44,8 +44,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public Configuration() { }
 
+            /// <summary>
+            /// Configuration
+            /// </summary>
             [SetsRequiredMembers]
-            internal Configuration(object[] fields) {
+            public Configuration(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ProxyAllNodes = reader.GetBool(1)!.Value;
                 {

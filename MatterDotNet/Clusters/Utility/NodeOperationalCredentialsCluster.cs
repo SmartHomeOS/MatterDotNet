@@ -116,8 +116,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public FabricDescriptor() { }
 
+            /// <summary>
+            /// Fabric Descriptor
+            /// </summary>
             [SetsRequiredMembers]
-            internal FabricDescriptor(object[] fields) {
+            public FabricDescriptor(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 RootPublicKey = reader.GetBytes(1, false)!;
                 VendorID = reader.GetUShort(2)!.Value;
@@ -150,8 +153,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public NOC() { }
 
+            /// <summary>
+            /// NOC
+            /// </summary>
             [SetsRequiredMembers]
-            internal NOC(object[] fields) {
+            public NOC(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 NOCField = reader.GetBytes(1, false)!;
                 ICAC = reader.GetBytes(2, false)!;

@@ -108,8 +108,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public AccessControlEntry() { }
 
+            /// <summary>
+            /// Access Control Entry
+            /// </summary>
             [SetsRequiredMembers]
-            internal AccessControlEntry(object[] fields) {
+            public AccessControlEntry(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Privilege = (AccessControlEntryPrivilegeEnum)reader.GetUShort(1)!.Value;
                 AuthMode = (AccessControlEntryAuthModeEnum)reader.GetUShort(2)!.Value;
@@ -167,8 +170,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public AccessControlExtension() { }
 
+            /// <summary>
+            /// Access Control Extension
+            /// </summary>
             [SetsRequiredMembers]
-            internal AccessControlExtension(object[] fields) {
+            public AccessControlExtension(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Data = reader.GetBytes(1, false)!;
             }
@@ -189,8 +195,11 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             public AccessControlTarget() { }
 
+            /// <summary>
+            /// Access Control Target
+            /// </summary>
             [SetsRequiredMembers]
-            internal AccessControlTarget(object[] fields) {
+            public AccessControlTarget(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Cluster = reader.GetUInt(0, true);
                 Endpoint = reader.GetUShort(1, true);

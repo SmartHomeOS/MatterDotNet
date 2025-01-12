@@ -15,6 +15,7 @@ using MatterDotNet.DCL;
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.OperationalDiscovery;
 using MatterDotNet.PKI;
+using MatterDotNet.Protocol.Connection;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
@@ -22,6 +23,8 @@ using MatterDotNet.Security;
 using MatterDotNet.Util;
 using System.Globalization;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -92,29 +95,45 @@ namespace MatterDotNet.Entities
         /// Commission a node into the fabric using a commissioning payload
         /// </summary>
         /// <param name="payload"></param>
+        /// <param name="targetSSID"></param>
         /// <param name="verification"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         /// <exception cref="IOException"></exception>
         /// <exception cref="CryptographicException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<Node?> Commission(CommissioningPayload payload, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
+        public async Task<CommissioningState> StartCommissioning(CommissioningPayload payload, string? targetSSID = null, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
         {
             SessionContext? unsecureSession = null;
             SecureSession? paseSecureSession = null;
-            SecureSession? caseSecureSession = null;
-            if ((payload.Capabilities & CommissioningPayload.DiscoveryCapabilities.IP) != CommissioningPayload.DiscoveryCapabilities.IP && payload.Capabilities != CommissioningPayload.DiscoveryCapabilities.UNKNOWN)
-                throw new NotImplementedException("BLE Commissioning is not supported yet");
 
             // Discover the Node
-            ODNode? commissionableNode = await DiscoveryService.Shared.Find(payload.VendorID, payload.ProductID, payload.Discriminator, payload.LongDiscriminator);
+            ODNode? commissionableNode = null;
+            if (payload.Capabilities == CommissioningPayload.DiscoveryCapabilities.UNKNOWN)
+            {
+                commissionableNode = await BTDiscoveryService.Find(payload);
+                if (commissionableNode == null)
+                    commissionableNode = await IPDiscoveryService.Shared.Find(payload);
+                
+            }
+            if ((payload.Capabilities | CommissioningPayload.DiscoveryCapabilities.BLE) != 0)
+                commissionableNode = await BTDiscoveryService.Find(payload);
+            if (commissionableNode == null && (payload.Capabilities | CommissioningPayload.DiscoveryCapabilities.IP) != 0)
+                commissionableNode = await IPDiscoveryService.Shared.Find(payload);
             if (commissionableNode == null)
-                return null;
+                return new CommissioningState();
 
             try
             {
                 // Establish PASE session
-                unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.IPAddress!, commissionableNode.Port), true);
+                if (commissionableNode.IP6Address != null)
+                    unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.IP6Address, commissionableNode.Port), true);
+                else if (commissionableNode.IP4Address != null)
+                    unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(commissionableNode.IP4Address, commissionableNode.Port), true);
+                else if (commissionableNode.BTAddress != null)
+                    unsecureSession = SessionManager.GetUnsecureSession(new BLEEndPoint(commissionableNode.BTAddress), true);
+                else
+                    throw new NotSupportedException("Failed to discover the Node's connection info");
                 PASE pase = new PASE(unsecureSession);
                 paseSecureSession = await pase.EstablishSecureSession(payload.Passcode);
                 if (paseSecureSession == null)
@@ -123,40 +142,73 @@ namespace MatterDotNet.Entities
                 // Get Basic Commissioning Info
                 GeneralCommissioningCluster commissioning = new GeneralCommissioningCluster(0);
                 GeneralCommissioningCluster.BasicCommissioningInfo basicInfo = await commissioning.GetBasicCommissioningInfo(paseSecureSession);
-                ushort expiration = Math.Min(Math.Max((ushort)90, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
+                ushort expiration = Math.Min(Math.Max((ushort)180, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
                 
                 // Arm Fail Safe
                 GeneralCommissioningCluster.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42);
 
+                // Discover Root Clusters
+                EndPoint root = new EndPoint(0);
+                await root.EnumerateClusters(paseSecureSession);
+
+                // Get Network Setup
+                List<string> connected = new List<string>();
+                FabricInterface SupportedComms = FabricInterface.None;
+                if (root.HasCluster<NetworkCommissioningCluster>())
+                {
+                    NetworkCommissioningCluster.Feature features = await root.GetCluster<NetworkCommissioningCluster>().GetSupportedFeatures(paseSecureSession);
+                    if ((features & NetworkCommissioningCluster.Feature.WiFiNetworkInterface) != 0)
+                        SupportedComms = FabricInterface.WiFi | FabricInterface.IP;
+                    if ((features & NetworkCommissioningCluster.Feature.ThreadNetworkInterface) != 0)
+                        SupportedComms = FabricInterface.Thread | FabricInterface.IP;
+                    if ((features & NetworkCommissioningCluster.Feature.EthernetNetworkInterface) != 0)
+                        SupportedComms = FabricInterface.Ethernet | FabricInterface.IP;
+                }
+                else
+                {
+                    SupportedComms = FabricInterface.IP;
+                    connected.Add("Default");
+                }
 
                 // Set regulatory information
-                await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioningCluster.RegulatoryLocationTypeEnum.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
+                if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
+                    await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioningCluster.RegulatoryLocationTypeEnum.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
 
                 // Configure Date/Time
                 try
                 {
-                    TimeSynchronizationCluster timeSync = new TimeSynchronizationCluster(0);
-                    bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronizationCluster.GranularityEnum.MillisecondsGranularity, TimeSynchronizationCluster.TimeSourceEnum.NonMatterNTP);
-                    if (!success)
-                        Console.WriteLine("Failed to set UTC Time");
-                    var rules = TimeZoneInfo.Local.GetAdjustmentRules();
-                    List<TimeSynchronizationCluster.TimeZone> zones = new List<TimeSynchronizationCluster.TimeZone>();
-                    foreach (var rule in rules)
+                    if (root.HasCluster<TimeSynchronizationCluster>())
                     {
-                        if (rule.DateEnd > DateTime.Now)
+                        TimeSynchronizationCluster timeSync = root.GetCluster<TimeSynchronizationCluster>();
+                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronizationCluster.GranularityEnum.MillisecondsGranularity, TimeSynchronizationCluster.TimeSourceEnum.NonMatterNTP);
+                        if (!success)
+                            Console.WriteLine("Failed to set UTC Time");
+                        if (await timeSync.Supports(paseSecureSession, TimeSynchronizationCluster.Feature.TimeZone))
                         {
-                            zones.Add(new TimeSynchronizationCluster.TimeZone()
+                            var rules = TimeZoneInfo.Local.GetAdjustmentRules();
+                            List<TimeSynchronizationCluster.TimeZone> zones = new List<TimeSynchronizationCluster.TimeZone>();
+                            foreach (var rule in rules)
                             {
-                                Offset = (int)(rule.BaseUtcOffsetDelta + TimeZoneInfo.Local.BaseUtcOffset).TotalSeconds,
-                                ValidAt = TimeUtil.Max(rule.DateStart, TimeUtil.EPOCH),
-                                Name = TimeZoneInfo.Local.DisplayName.Truncate(64)
-                            });
+                                if (rule.DateEnd > DateTime.Now)
+                                {
+                                    zones.Add(new TimeSynchronizationCluster.TimeZone()
+                                    {
+                                        Offset = (int)(rule.BaseUtcOffsetDelta + TimeZoneInfo.Local.BaseUtcOffset).TotalSeconds,
+                                        ValidAt = TimeUtil.Max(rule.DateStart, TimeUtil.EPOCH),
+                                        Name = TimeZoneInfo.Local.DisplayName.Truncate(64)
+                                    });
+                                }
+                            }
+                            TimeSynchronizationCluster.SetTimeZoneResponse? tzResp = await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
+                            if (tzResp.HasValue && tzResp.Value.DSTOffsetsRequired)
+                            {
+                                //TODO - await timeSync.SetDSTOffset()
+                            }
                         }
                     }
-                    await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
                 }
                 catch (Exception) {
-                    Console.WriteLine("Failed to update time sync cluster (likely doesn't exist)");
+                    Console.WriteLine("Failed to update time sync cluster");
                 }
 
                 // Validate Device Attestation Certificate (DAC)
@@ -215,31 +267,215 @@ namespace MatterDotNet.Entities
                 if (nocAdded.Value.StatusCode != NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK)
                     Console.WriteLine("Failed to update fabric label");
 
-                Node? node = Node.CreateTemp(nodeCert, fabric, commissionableNode);
+                Node? node = Node.CreateTemp(nodeCert, fabric, commissionableNode, root);
 
-                //TODO - Configure Network (WiFi / Thread)
-                //TODO - Operational Discovery if commissioning over BT-LE
+                NetworkCommissioningCluster.ThreadInterfaceScanResult[] threadNetworks = Array.Empty<NetworkCommissioningCluster.ThreadInterfaceScanResult>();
+                NetworkCommissioningCluster.WiFiInterfaceScanResult[] wifiNetworks = Array.Empty<NetworkCommissioningCluster.WiFiInterfaceScanResult>();
 
-                // Establish CASE session
-                caseSecureSession = await node!.GetCASESession(unsecureSession);
+                if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
+                {
+                    NetworkCommissioningCluster.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioningCluster>().GetNetworks(paseSecureSession);
+                    foreach (NetworkCommissioningCluster.NetworkInfo info in networks)
+                    {
+                        if (info.Connected)
+                            connected.Add(Encoding.UTF8.GetString(info.NetworkID));
+                    }
 
-                // Done
-                GeneralCommissioningCluster.CommissioningCompleteResponse? complete = await commissioning.CommissioningComplete(caseSecureSession);
-                if (complete.Value.ErrorCode != GeneralCommissioningCluster.CommissioningErrorEnum.OK)
-                    throw new InvalidOperationException(complete.Value.ErrorCode + ": " + complete.Value.DebugText);
-                nodes.Add(node.ID, node);
-                Console.WriteLine("Commissioning Complete!");
+                    byte[]? ssid = null;
+                    if (targetSSID != null)
+                        ssid = Encoding.UTF8.GetBytes(targetSSID);
+                    var results = await root.GetCluster<NetworkCommissioningCluster>().ScanNetworks(paseSecureSession, ssid, 42);
+                    if (results.HasValue)
+                    {
+                        if (results.Value.ThreadScanResults != null)
+                            threadNetworks = results.Value.ThreadScanResults;
+                        if (results.Value.WiFiScanResults != null)
+                            wifiNetworks = results.Value.WiFiScanResults;
+                    }
+                }
 
-                return node;
+                return new CommissioningState(node, paseSecureSession, SupportedComms, wifiNetworks, threadNetworks, connected.ToArray());
             }
             finally
             {
-                if (paseSecureSession != null)
-                    paseSecureSession.Dispose();
-                if (caseSecureSession != null)
-                    caseSecureSession.Dispose();
                 if (unsecureSession != null)
                     unsecureSession.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Connect the device to the selected WiFi network and then complete commissioning
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="selectedNetwork"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.WiFiInterfaceScanResult selectedNetwork, string password)
+        {
+            await CompleteCommissioning(info, selectedNetwork, Encoding.UTF8.GetBytes(password));
+        }
+
+        /// <summary>
+        /// Connect the device to the selected WiFi network and then complete commissioning
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="selectedNetwork"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.WiFiInterfaceScanResult selectedNetwork, byte[] password)
+        {
+            ArgumentNullException.ThrowIfNull(info, nameof(info));
+            ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
+            ArgumentNullException.ThrowIfNull(password, nameof(password));
+
+            if (!info.CommissioningStarted)
+                throw new ArgumentException("Commissioning was unable to find the device. Completion is not possible.");
+            try
+            {
+                if ((info.SupportedInterfaces & FabricInterface.WiFi) == 0)
+                    throw new NotSupportedException("The device does not support WiFi");
+
+                NetworkCommissioningCluster network = info.Node!.Root.GetCluster<NetworkCommissioningCluster>();
+                var result = await network.AddOrUpdateWiFiNetwork(info.PASE!, selectedNetwork.SSID, password, 42);
+                if (!result.HasValue)
+                    throw new IOException("Failed to configure network. Unknown Error");
+                else if (result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success && result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.DuplicateNetworkID)
+                    throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
+
+                var connect = await network.ConnectNetwork(info.PASE!, selectedNetwork.SSID, 42);
+                if (!connect.HasValue)
+                    throw new IOException("Failed to connect to network. Unknown Error");
+                else if (connect.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success)
+                    throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
+                else
+                    info.Upgrade(Encoding.UTF8.GetString(selectedNetwork.SSID));
+                Console.WriteLine("Connected to " + selectedNetwork.SSID);
+            }
+            catch
+            {
+                info.PASE?.Dispose();
+                throw;
+            }
+
+            await CompleteCommissioning(info);
+        }
+
+        /// <summary>
+        /// Connect the device to the selected Thread network and then complete commissioning
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="selectedNetwork"></param>
+        /// <param name="operationalDataSet"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.ThreadInterfaceScanResult selectedNetwork, byte[] operationalDataSet)
+        {
+            ArgumentNullException.ThrowIfNull(info, nameof(info));
+            ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
+            ArgumentNullException.ThrowIfNull(operationalDataSet, nameof(operationalDataSet));
+
+            if (!info.CommissioningStarted)
+                throw new ArgumentException("Commissioning was unable to find the device. Completion is not possible.");
+            try
+            {
+                if ((info.SupportedInterfaces & FabricInterface.Thread) == 0)
+                    throw new NotSupportedException("The device does not support Thread");
+
+                NetworkCommissioningCluster network = info.Node!.Root.GetCluster<NetworkCommissioningCluster>();
+                var result = await network.AddOrUpdateThreadNetwork(info.PASE!, operationalDataSet, 42);
+                if (!result.HasValue)
+                    throw new IOException("Failed to configure network. Unknown Error");
+                else if (result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success && result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.DuplicateNetworkID)
+                    throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
+
+                var connect = await network.ConnectNetwork(info.PASE!, Encoding.UTF8.GetBytes(selectedNetwork.NetworkName!), 42);
+                if (!connect.HasValue)
+                    throw new IOException("Failed to connect to network. Unknown Error");
+                else if (connect.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success)
+                    throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
+                else
+                    info.Upgrade(selectedNetwork.NetworkName!);
+                Console.WriteLine("Connected to " + selectedNetwork.NetworkName);
+            }
+            catch
+            {
+                info.PASE?.Dispose();
+                throw;
+            }
+
+            await CompleteCommissioning(info);
+        }
+
+        /// <summary>
+        /// Complete comissioning for a device that is already on the operational network
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task CompleteCommissioning(CommissioningState info)
+        {
+            if (!info.CommissioningStarted)
+                throw new ArgumentException("Commissioning was unable to find the device. Completion is not possible.");
+            try
+            {
+                if (info.ConnectedNetworks.Length == 0)
+                    throw new NotSupportedException("The device is not connected to any networks. WiFi or Thread network info is required.");
+
+                // Perform Operational Discovery for the node now on the correct network
+                ODNode? discoveredNode = await IPDiscoveryService.Shared.Find(info.Node!.OperationalInstanceName, true);
+                if (discoveredNode == null || (discoveredNode.IP6Address == null && discoveredNode.IP4Address == null))
+                    throw new InvalidOperationException("The device could not be found on the operational network");
+
+                // Establish CASE session
+                SessionContext? unsecureSession = null;
+                SecureSession? caseSecureSession = null;
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        IPAddress address;
+                        if (discoveredNode.IP4Address == null)
+                            address = discoveredNode.IP6Address!;
+                        else if (discoveredNode.IP6Address == null)
+                            address = discoveredNode.IP4Address;
+                        else
+                            address = ((i % 2) == 0) ? discoveredNode.IP6Address : discoveredNode.IP4Address;
+                        unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(address!, discoveredNode.Port), true);
+                        caseSecureSession = await info.Node!.GetCASESession(unsecureSession);
+                        break;
+                    }
+                    catch (IOException) {
+                        Console.WriteLine("Unable to connect to device. Retry attempt: " + (i + 1));
+                        if (i == 5)
+                            throw new IOException("Device is not reachable on the new network");
+                        //Service is likely still starting
+                        await Task.Delay(750 * i);
+                    }
+                }
+
+                try
+                {
+                    // Done
+                    GeneralCommissioningCluster.CommissioningCompleteResponse? complete = await info.Node.Root.GetCluster<GeneralCommissioningCluster>().CommissioningComplete(caseSecureSession!);
+                    if (complete.Value.ErrorCode != GeneralCommissioningCluster.CommissioningErrorEnum.OK)
+                        throw new InvalidOperationException(complete.Value.ErrorCode + ": " + complete.Value.DebugText);
+                    nodes.Add(info.Node.ID, info.Node);
+                    Console.WriteLine("Commissioning Complete!");
+
+                    await Node.Populate(caseSecureSession!, info.Node);
+                }
+                finally
+                {
+                    caseSecureSession?.Dispose();
+                }
+            }
+            finally
+            {
+                info.PASE?.Dispose();
             }
         }
         

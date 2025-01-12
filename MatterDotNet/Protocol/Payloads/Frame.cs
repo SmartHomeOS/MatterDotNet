@@ -15,6 +15,7 @@ using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Sessions;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Net;
 using System.Text;
 
 namespace MatterDotNet.Protocol.Payloads
@@ -130,14 +131,14 @@ namespace MatterDotNet.Protocol.Payloads
             Message = new Version1Payload(payload, opCode);
         }
 
-        public Frame(Span<byte> payload)
+        public Frame(Span<byte> payload, EndPoint endPoint)
         {
             Valid = true;
             Flags = (MessageFlags)payload[0];
             SessionID = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(1, 2));
             Security = (SecurityFlags)payload[3];
 
-            SecureSession? session = SessionManager.GetSession(SessionID) as SecureSession;
+            SecureSession? session = SessionManager.GetSession(SessionID, endPoint) as SecureSession;
 
             if ((Security & SecurityFlags.Privacy) == SecurityFlags.Privacy)
             {

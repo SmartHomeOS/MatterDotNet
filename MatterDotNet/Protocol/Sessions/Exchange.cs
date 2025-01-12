@@ -31,12 +31,19 @@ namespace MatterDotNet.Protocol.Sessions
 
         public async Task SendFrame(Frame frame, bool reliable = true)
         {
-            frame.SessionID = Session.RemoteSessionID;
-            if (Session.Initiator)
-                frame.Message.Flags |= ExchangeFlags.Initiator;
-            frame.Message.ExchangeID = ID;
-            frame.Counter = Session.GetSessionCounter();
-            await Session.Connection.SendFrame(this, frame, reliable);
+            try
+            {
+                frame.SessionID = Session.RemoteSessionID;
+                if (Session.Initiator)
+                    frame.Message.Flags |= ExchangeFlags.Initiator;
+                frame.Message.ExchangeID = ID;
+                frame.Counter = Session.GetSessionCounter();
+                await Session.Connection.SendFrame(this, frame, reliable);
+            }
+            catch(OperationCanceledException e)
+            {
+                Console.WriteLine("Failed to send frame: " + e.ToString());
+            }
         }
 
         public async Task<Frame> Read(CancellationToken token = default)

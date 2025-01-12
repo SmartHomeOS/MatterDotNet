@@ -141,7 +141,7 @@ namespace MatterDotNet.Protocol.Sessions
             var keys = exchanges.Keys;
             foreach (var key in keys)
                 exchanges[key].Dispose();
-            SessionManager.RemoveSession(LocalSessionID);
+            SessionManager.RemoveSession(LocalSessionID, Connection.EndPoint);
             GC.SuppressFinalize(this);
         }
     }

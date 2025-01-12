@@ -24,7 +24,7 @@ namespace MatterDotNet.Protocol.Sessions
     {
         private static uint globalCtr;
         private static ConcurrentDictionary<EndPoint, IConnection> connections = new ConcurrentDictionary<EndPoint, IConnection>();
-        private static ConcurrentDictionary<ushort, SessionContext> sessions = new ConcurrentDictionary<ushort, SessionContext>();
+        private static ConcurrentDictionary<EndPoint, ConcurrentDictionary<ushort, SessionContext>> sessions = new ConcurrentDictionary<EndPoint, ConcurrentDictionary<ushort, SessionContext>>();
 
         public static SessionContext GetUnsecureSession(EndPoint ep, bool initiator)
         {
@@ -33,10 +33,16 @@ namespace MatterDotNet.Protocol.Sessions
 
         internal static SessionContext GetUnsecureSession(IConnection connection, bool initiator)
         {
-            if (sessions.TryGetValue(0, out SessionContext? existing))
-                return existing;
+            ConcurrentDictionary<ushort, SessionContext>? existing;
+            if (!sessions.TryGetValue(connection.EndPoint, out existing))
+            {
+                existing = new ConcurrentDictionary<ushort, SessionContext>();
+                sessions.TryAdd(connection.EndPoint, existing);
+            }
+            if (existing.TryGetValue(0, out SessionContext? existingSession))
+                return existingSession;
             SessionContext ctx = new SessionContext(connection, initiator, 0, 0, 0, 0, new MessageState());
-            sessions.TryAdd(0, ctx);
+            existing.TryAdd(0, ctx);
             return ctx;
         }
 
@@ -49,27 +55,42 @@ namespace MatterDotNet.Protocol.Sessions
         {
             if (group == false && initiatorSessionId == 0)
                 return null; //Unsecured session
+            ConcurrentDictionary<ushort, SessionContext>? existing;
+            if (!sessions.TryGetValue(connection.EndPoint, out existing))
+            {
+                existing = new ConcurrentDictionary<ushort, SessionContext>();
+                sessions.TryAdd(connection.EndPoint, existing);
+            }
+            if (existing.TryGetValue(initiator ? initiatorSessionId : responderSessionId, out SessionContext? existingSession) && existingSession is SecureSession secure && secure.PASE == PASE)
+                return secure;
+
             SecureSession ctx = new SecureSession(connection, PASE, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, sharedSecret, resumptionId, 0, new MessageState(), localNodeId, peerNodeId, idleInterval, activeInterval, activeThreshold);
             Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
-            sessions.TryAdd(ctx.LocalSessionID, ctx);
+            existing.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;
         }
 
-        public static SessionContext? GetSession(ushort sessionId)
+        public static SessionContext? GetSession(ushort sessionId, EndPoint endPoint)
         {
-            if (sessions.TryGetValue(sessionId, out SessionContext? ctx))
-                return ctx;
+            ConcurrentDictionary<ushort, SessionContext>? existing;
+            if (!sessions.TryGetValue(endPoint, out existing))
+                return null;
+            if (existing.TryGetValue(sessionId, out SessionContext? existingSession))
+                return existingSession;
             return null;
         }
 
-        internal static void RemoveSession(ushort sessionId)
+        internal static void RemoveSession(ushort sessionId, EndPoint endPoint)
         {
-            sessions.TryRemove(sessionId, out _);
+            ConcurrentDictionary<ushort, SessionContext>? existing;
+            if (!sessions.TryGetValue(endPoint, out existing))
+                return;
+            existing.TryRemove(sessionId, out _);
         }
 
         internal static ushort GetAvailableSessionID()
         {
-            return (ushort)Random.Shared.Next(0, ushort.MaxValue);
+            return (ushort)Random.Shared.Next(1, ushort.MaxValue);
         }
 
         public static uint GlobalUnencryptedCounter

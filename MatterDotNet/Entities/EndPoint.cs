@@ -24,7 +24,7 @@ namespace MatterDotNet.Entities
     /// </summary>
     public class EndPoint
     {
-        private Node? node;
+        private Node? node; //TODO - Remove if not used when groups are implemented
         private Dictionary<uint, ClusterBase> clusters;
         private ushort index;
         private Dictionary<ushort, EndPoint> children;

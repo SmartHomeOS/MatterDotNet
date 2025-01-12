@@ -21,11 +21,13 @@ namespace MatterDotNet.Protocol.Connection
 {
     internal class TCPConnection : IConnection
     {
+        IPEndPoint destination;
         TcpClient client;
         NetworkStream stream;
         CancellationTokenSource cts = new CancellationTokenSource();
         public TCPConnection(IPEndPoint destination)
         {
+            this.destination = destination;
             client = new TcpClient();
             client.Connect(destination);
             stream = client.GetStream();
@@ -52,9 +54,9 @@ namespace MatterDotNet.Protocol.Connection
                 await stream.ReadExactlyAsync(len);
                 frameLen = BinaryPrimitives.ReadInt32LittleEndian(len);
                 await stream.ReadExactlyAsync(data.Slice(0, frameLen));
-                Frame frame = new Frame(data.Slice(0, frameLen).Span);
+                Frame frame = new Frame(data.Slice(0, frameLen).Span, destination);
                 Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " Received: " + frame.ToString());
-                SessionContext? session = SessionManager.GetSession(frame.SessionID);
+                SessionContext? session = SessionManager.GetSession(frame.SessionID, destination);
                 if (session == null)
                 {
                     Console.WriteLine("Unknown Session: " + frame.SessionID);
@@ -67,6 +69,8 @@ namespace MatterDotNet.Protocol.Connection
         }
 
         public bool Connected { get { return client.Connected; } }
+
+        public EndPoint EndPoint { get { return destination; } }
 
         public void Dispose()
         {

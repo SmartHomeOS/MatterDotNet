@@ -15,6 +15,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Sessions;
+using System.Net;
 using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
@@ -43,9 +44,11 @@ namespace MatterDotNet.Protocol.Connection
         SemaphoreSlim WriteLock = new SemaphoreSlim(1, 1);
         bool connected;
         BluetoothDevice? device;
+        BLEEndPoint destination;
 
         public BTPConnection(BLEEndPoint bleDevice)
         {
+            destination = bleDevice;
             Connect(bleDevice.Address).Wait();
             AckTimer = new Timer(SendAck, null, ACK_TIME, ACK_TIME);
             if (Read == null || Write == null)
@@ -60,7 +63,7 @@ namespace MatterDotNet.Protocol.Connection
         }
 
         private async Task Connect()
-        { 
+        {
             if (!device!.Gatt.IsConnected)
                 await device.Gatt.ConnectAsync();
             MTU = (ushort)Math.Min(device.Gatt.Mtu, 244);
@@ -83,29 +86,22 @@ namespace MatterDotNet.Protocol.Connection
 
         private async Task SendHandshake()
         {
-            try
-            {
-                Console.WriteLine("Send Handshake Request");
-                BTPFrame handshake = new BTPFrame(BTPFlags.Handshake | BTPFlags.Management | BTPFlags.Beginning | BTPFlags.Ending);
-                handshake.OpCode = BTPManagementOpcode.Handshake;
-                handshake.WindowSize = 8;
-                handshake.ATT_MTU = MTU;
-                await Write.WriteValueWithResponseAsync(handshake.Serialize(9));
-                Read.CharacteristicValueChanged += Read_CharacteristicValueChanged;
-                await Read.StartNotificationsAsync();
+            Console.WriteLine("Send Handshake Request");
+            BTPFrame handshake = new BTPFrame(BTPFlags.Handshake | BTPFlags.Management | BTPFlags.Beginning | BTPFlags.Ending);
+            handshake.OpCode = BTPManagementOpcode.Handshake;
+            handshake.WindowSize = 8;
+            handshake.ATT_MTU = MTU;
+            await Write.WriteValueWithResponseAsync(handshake.Serialize(9));
+            Read.CharacteristicValueChanged += Read_CharacteristicValueChanged;
+            await Read.StartNotificationsAsync();
 
-                BTPFrame frame = await instream.Reader.ReadAsync();
-                MTU = frame.ATT_MTU;
-                ServerWindow = frame.WindowSize;
-                if (frame.Version != BTPFrame.MATTER_BT_VERSION1)
-                    throw new NotSupportedException($"Version {frame.Version} not supported");
-                connected = true;
-                Console.WriteLine($"MTU: {MTU}, Window: {ServerWindow}");
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message); 
-            }
+            BTPFrame frame = await instream.Reader.ReadAsync();
+            MTU = frame.ATT_MTU;
+            ServerWindow = frame.WindowSize;
+            if (frame.Version != BTPFrame.MATTER_BT_VERSION1)
+                throw new NotSupportedException($"Version {frame.Version} not supported");
+            connected = true;
+            Console.WriteLine($"MTU: {MTU}, Window: {ServerWindow}");
         }
 
         private async void SendAck(object? state)
@@ -125,6 +121,7 @@ namespace MatterDotNet.Protocol.Connection
                 Console.WriteLine("[StandaloneAck] Wrote Segment: " + segment);
                 await Write.WriteValueWithResponseAsync(segment.Serialize(MTU));
             }
+            catch (OperationCanceledException) { }
             finally
             {
                 WriteLock.Release();
@@ -201,13 +198,13 @@ namespace MatterDotNet.Protocol.Connection
                     foreach (BTPFrame part in segments)
                         buffer.Write(part.Payload);
                     segments.Clear();
-                    Frame frame = new Frame(buffer.GetPayload().Span);
+                    Frame frame = new Frame(buffer.GetPayload().Span, destination);
                     if (!frame.Valid)
                     {
                         Console.WriteLine("Invalid frame received");
                         continue;
                     }
-                    SessionContext? session = SessionManager.GetSession(frame.SessionID);
+                    SessionContext? session = SessionManager.GetSession(frame.SessionID, destination);
                     Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " Received: " + frame.ToString());
                     if (session == null)
                     {
@@ -231,7 +228,9 @@ namespace MatterDotNet.Protocol.Connection
             return Task.CompletedTask;
         }
 
-        public bool Connected { get {  return connected; } }
+        public bool Connected { get { return connected; } }
+
+        public EndPoint EndPoint { get { return destination; } }
 
         /// <inheritdoc />
         public void Dispose()

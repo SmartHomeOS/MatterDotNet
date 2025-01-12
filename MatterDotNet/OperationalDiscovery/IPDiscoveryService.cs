@@ -110,9 +110,15 @@ namespace MatterDotNet.OperationalDiscovery
             Console.WriteLine("Looking for " + operationalInstanceName);
             List<ODNode> results;
             int length = extendedSearch ? 20 : 10; // 60 / 30 seconds
+            DNSRecordType[] records;
+            if (extendedSearch)
+                records = [DNSRecordType.ANY, DNSRecordType.SRV, DNSRecordType.TXT, DNSRecordType.AAAA];
+            else
+                records = [DNSRecordType.SRV, DNSRecordType.TXT, DNSRecordType.A, DNSRecordType.AAAA];
+            string domain = operationalInstanceName + "._matter._tcp.local";
             for (int i = 0; i < length; i++)
             {
-                results = Parse(await mdns.ResolveServiceInstance(operationalInstanceName, "_matter._tcp", "local"));
+                results = Parse(await mdns.ResolveQuery(domain, false, records));
                 if (results.Count > 0)
                     return results[0];
             }
@@ -154,19 +160,21 @@ namespace MatterDotNet.OperationalDiscovery
                         node.Port = service.Port;
                     else if (answer is TxtRecord txt)
                         PopulateText(txt, ref node);
+                    else if (answer is AAAARecord AAAA)
+                        node.IP6Address = AAAA.Address;
                 }
                 foreach (ResourceRecord additional in msg.Additionals)
                 {
                     if (node.Port == 0 && additional is SRVRecord service)
                         node.Port = service.Port;
-                    else if (node.IPAddress == null && additional is ARecord A)
-                        node.IPAddress = A.Address;
-                    else if (node.IPAddress == null && additional is AAAARecord AAAA)
-                        node.IPAddress = AAAA.Address;
+                    else if (node.IP4Address == null && additional is ARecord A)
+                        node.IP4Address = A.Address;
+                    else if (node.IP6Address == null && additional is AAAARecord AAAA)
+                        node.IP6Address = AAAA.Address;
                     else if (additional is TxtRecord txt)
                         PopulateText(txt, ref node);
                 }
-                if (node.IPAddress == null || node.Port == 0)
+                if ((node.IP4Address == null && node.IP6Address == null) || node.Port == 0)
                     continue;
                 ret.Add(node);
             }

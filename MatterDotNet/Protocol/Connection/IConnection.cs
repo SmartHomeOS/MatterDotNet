@@ -12,6 +12,7 @@
 
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Net;
 
 namespace MatterDotNet.Protocol.Connection
 {
@@ -20,5 +21,6 @@ namespace MatterDotNet.Protocol.Connection
         Task SendFrame(Exchange exchange, Frame frame, bool reliable);
         Task CloseExchange(Exchange exchange);
         bool Connected { get; }
+        EndPoint EndPoint { get; }
     }
 }

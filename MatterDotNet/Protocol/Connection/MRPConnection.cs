@@ -34,9 +34,11 @@ namespace MatterDotNet.Protocol.Connection
         CancellationTokenSource cts = new CancellationTokenSource();
 
         UdpClient client;
+        IPEndPoint destination;
 
         public MRPConnection(IPEndPoint ep)
         {
+            destination = ep;
             client = new UdpClient(ep.AddressFamily);
             client.Connect(ep);
             Task.Factory.StartNew(Run);
@@ -68,7 +70,7 @@ namespace MatterDotNet.Protocol.Connection
                     }
                 }
             }
-            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " SENT: " + frame.ToString());
+            Console.WriteLine("MRP SENT: " + frame.ToString());
             await client.SendAsync(writer.GetPayload());
             exchange.Session.Timestamp = DateTime.Now;
             while (reliable)
@@ -132,13 +134,13 @@ namespace MatterDotNet.Protocol.Connection
                 while (!cts.IsCancellationRequested)
                 {
                     UdpReceiveResult result = await client.ReceiveAsync();
-                    Frame frame = new Frame(result.Buffer);
+                    Frame frame = new Frame(result.Buffer, destination);
                     if (!frame.Valid)
                     {
                         Console.WriteLine("Invalid frame received");
                         continue;
                     }
-                    SessionContext? session = SessionManager.GetSession(frame.SessionID);
+                    SessionContext? session = SessionManager.GetSession(frame.SessionID, destination);
                     bool ack = false;
                     if ((frame.Message.Flags & ExchangeFlags.Reliability) == ExchangeFlags.Reliability)
                     {
@@ -182,6 +184,8 @@ namespace MatterDotNet.Protocol.Connection
         }
 
         public bool Connected { get { return !cts.IsCancellationRequested; } }
+
+        public EndPoint EndPoint { get { return destination; } }
 
         /// <inheritdoc />
         public void Dispose()

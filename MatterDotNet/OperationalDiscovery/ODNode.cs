@@ -22,9 +22,13 @@ namespace MatterDotNet.OperationalDiscovery
     public record ODNode
     {
         /// <summary>
-        /// Discovered IP Address
+        /// Discovered IPv6 Address
         /// </summary>
-        public IPAddress? IPAddress { get; set; }
+        public IPAddress? IP6Address { get; set; }
+        /// <summary>
+        /// Discovered IPv4 Address
+        /// </summary>
+        public IPAddress? IP4Address { get; set; }
         /// <summary>
         /// Discovered Port
         /// </summary>
@@ -32,7 +36,7 @@ namespace MatterDotNet.OperationalDiscovery
         /// <summary>
         /// Discovered BT LE Address
         /// </summary>
-        public string BTAddress { get; set; }
+        public string? BTAddress { get; set; }
         /// <summary>
         /// Idle Session Interval
         /// </summary>
@@ -80,7 +84,7 @@ namespace MatterDotNet.OperationalDiscovery
 
         public override string ToString()
         {
-            return $"Vendor: {Vendor}, Product: {Product}, Discriminator: {Discriminator:X3}, Name: {DeviceName}, Address: {(BTAddress != null ? BTAddress : $"{IPAddress}:{Port}")}, Type: {Type}, Mode: {CommissioningMode}";
+            return $"Vendor: {Vendor}, Product: {Product}, Discriminator: {Discriminator:X3}, Name: {DeviceName}, Address: {(BTAddress != null ? BTAddress : $"{IP6Address}:{Port}")}, Type: {Type}, Mode: {CommissioningMode}";
         }
     }
 }

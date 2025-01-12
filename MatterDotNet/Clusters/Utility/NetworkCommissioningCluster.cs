@@ -245,33 +245,41 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public ThreadInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                PanId = reader.GetUShort(0)!.Value;
-                ExtendedPanId = reader.GetULong(1)!.Value;
-                NetworkName = reader.GetString(2, false, 16, 1)!;
-                Channel = reader.GetUShort(3)!.Value;
-                Version = reader.GetByte(4)!.Value;
-                ExtendedAddress = new PhysicalAddress(reader.GetBytes(5, false, 8, 6)!);
-                RSSI = reader.GetSByte(6)!.Value;
-                LQI = reader.GetByte(7)!.Value;
+                PanId = reader.GetUShort(0, true);
+                ExtendedPanId = reader.GetULong(1, true);
+                NetworkName = reader.GetString(2, true, 16, 1);
+                Channel = reader.GetUShort(3, true);
+                Version = reader.GetByte(4, true);
+                ExtendedAddress = new PhysicalAddress(reader.GetBytes(5, true, 8, 6)!);
+                RSSI = reader.GetSByte(6, true);
+                LQI = reader.GetByte(7, true);
             }
-            public required ushort PanId { get; set; }
-            public required ulong ExtendedPanId { get; set; }
-            public required string NetworkName { get; set; }
-            public required ushort Channel { get; set; }
-            public required byte Version { get; set; }
-            public required PhysicalAddress ExtendedAddress { get; set; }
-            public required sbyte RSSI { get; set; }
-            public required byte LQI { get; set; }
+            public required ushort? PanId { get; set; }
+            public required ulong? ExtendedPanId { get; set; }
+            public required string? NetworkName { get; set; }
+            public required ushort? Channel { get; set; }
+            public required byte? Version { get; set; }
+            public required PhysicalAddress? ExtendedAddress { get; set; }
+            public required sbyte? RSSI { get; set; }
+            public required byte? LQI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, PanId, 65534);
-                writer.WriteULong(1, ExtendedPanId);
-                writer.WriteString(2, NetworkName, 16, 1);
-                writer.WriteUShort(3, Channel);
-                writer.WriteByte(4, Version);
-                writer.WriteBytes(5, ExtendedAddress.GetAddressBytes());
-                writer.WriteSByte(6, RSSI);
-                writer.WriteByte(7, LQI);
+                if (PanId != null)
+                    writer.WriteUShort(0, PanId, 65534);
+                if (ExtendedPanId != null)
+                    writer.WriteULong(1, ExtendedPanId);
+                if (NetworkName != null)
+                    writer.WriteString(2, NetworkName, 16, 1);
+                if (Channel != null)
+                    writer.WriteUShort(3, Channel);
+                if (Version != null)
+                    writer.WriteByte(4, Version);
+                if (ExtendedAddress != null)
+                    writer.WriteBytes(5, ExtendedAddress.GetAddressBytes());
+                if (RSSI != null)
+                    writer.WriteSByte(6, RSSI);
+                if (LQI != null)
+                    writer.WriteByte(7, LQI);
                 writer.EndContainer();
             }
         }
@@ -291,25 +299,29 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public WiFiInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Security = (WiFiSecurityBitmap)reader.GetUShort(0)!.Value;
-                SSID = reader.GetBytes(1, false)!;
-                BSSID = reader.GetBytes(2, false)!;
-                Channel = reader.GetUShort(3)!.Value;
+                Security = (WiFiSecurityBitmap)reader.GetUShort(0, true)!.Value;
+                SSID = reader.GetBytes(1, true);
+                BSSID = reader.GetBytes(2, true);
+                Channel = reader.GetUShort(3, true);
                 WiFiBand = (WiFiBandEnum)reader.GetUShort(4, true)!.Value;
                 RSSI = reader.GetSByte(5, true);
             }
-            public required WiFiSecurityBitmap Security { get; set; }
-            public required byte[] SSID { get; set; }
-            public required byte[] BSSID { get; set; }
-            public required ushort Channel { get; set; }
+            public required WiFiSecurityBitmap? Security { get; set; }
+            public required byte[]? SSID { get; set; }
+            public required byte[]? BSSID { get; set; }
+            public required ushort? Channel { get; set; }
             public WiFiBandEnum? WiFiBand { get; set; }
             public sbyte? RSSI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)Security);
-                writer.WriteBytes(1, SSID, 32);
-                writer.WriteBytes(2, BSSID, 6);
-                writer.WriteUShort(3, Channel);
+                if (Security != null)
+                    writer.WriteUShort(0, (ushort?)Security);
+                if (SSID != null)
+                    writer.WriteBytes(1, SSID, 32);
+                if (BSSID != null)
+                    writer.WriteBytes(2, BSSID, 6);
+                if (Channel != null)
+                    writer.WriteUShort(3, Channel);
                 if (WiFiBand != null)
                     writer.WriteUShort(4, (ushort?)WiFiBand);
                 if (RSSI != null)

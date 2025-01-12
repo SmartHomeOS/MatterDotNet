@@ -303,19 +303,21 @@ namespace MatterDotNet.Clusters.Application
 
         #region Payloads
         private record RewindPayload : TLVPayload {
-            public required bool AudioAdvanceUnmuted { get; set; } = false;
+            public bool? AudioAdvanceUnmuted { get; set; } = false;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBool(0, AudioAdvanceUnmuted);
+                if (AudioAdvanceUnmuted != null)
+                    writer.WriteBool(0, AudioAdvanceUnmuted);
                 writer.EndContainer();
             }
         }
 
         private record FastForwardPayload : TLVPayload {
-            public required bool AudioAdvanceUnmuted { get; set; } = false;
+            public bool? AudioAdvanceUnmuted { get; set; } = false;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBool(0, AudioAdvanceUnmuted);
+                if (AudioAdvanceUnmuted != null)
+                    writer.WriteBool(0, AudioAdvanceUnmuted);
                 writer.EndContainer();
             }
         }
@@ -357,11 +359,12 @@ namespace MatterDotNet.Clusters.Application
 
         private record ActivateAudioTrackPayload : TLVPayload {
             public required string TrackID { get; set; }
-            public required byte? AudioOutputIndex { get; set; }
+            public byte? AudioOutputIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, TrackID, 32);
-                writer.WriteByte(1, AudioOutputIndex);
+                if (AudioOutputIndex != null)
+                    writer.WriteByte(1, AudioOutputIndex);
                 writer.EndContainer();
             }
         }
@@ -458,7 +461,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Rewind
         /// </summary>
-        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool AudioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool? AudioAdvanceUnmuted) {
             RewindPayload requestFields = new RewindPayload() {
                 AudioAdvanceUnmuted = AudioAdvanceUnmuted,
             };
@@ -474,7 +477,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Fast Forward
         /// </summary>
-        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool AudioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool? AudioAdvanceUnmuted) {
             FastForwardPayload requestFields = new FastForwardPayload() {
                 AudioAdvanceUnmuted = AudioAdvanceUnmuted,
             };
@@ -538,7 +541,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Activate Audio Track
         /// </summary>
-        public async Task<bool> ActivateAudioTrack(SecureSession session, string TrackID, byte AudioOutputIndex) {
+        public async Task<bool> ActivateAudioTrack(SecureSession session, string TrackID, byte? AudioOutputIndex) {
             ActivateAudioTrackPayload requestFields = new ActivateAudioTrackPayload() {
                 TrackID = TrackID,
                 AudioOutputIndex = AudioOutputIndex,

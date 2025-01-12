@@ -175,7 +175,7 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 SceneGroupID = reader.GetUShort(0)!.Value;
                 SceneID = reader.GetByte(1)!.Value;
-                SceneName = reader.GetString(2, false)!;
+                SceneName = reader.GetString(2, true);
                 SceneTransitionTime = reader.GetUInt(3)!.Value;
                 {
                     ExtensionFields = new ExtensionFieldSet[((object[])fields[4]).Length];
@@ -186,14 +186,15 @@ namespace MatterDotNet.Clusters.Application
             }
             public required ushort SceneGroupID { get; set; }
             public required byte SceneID { get; set; }
-            public required string SceneName { get; set; }
+            public required string? SceneName { get; set; }
             public required uint SceneTransitionTime { get; set; } = 0;
             public required ExtensionFieldSet[] ExtensionFields { get; set; } = Array.Empty<ExtensionFieldSet>();
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, SceneGroupID);
                 writer.WriteByte(1, SceneID, 254);
-                writer.WriteString(2, SceneName, 16);
+                if (SceneName != null)
+                    writer.WriteString(2, SceneName, 16);
                 writer.WriteUInt(3, SceneTransitionTime, 60000000);
                 {
                     writer.StartArray(4);
@@ -295,9 +296,9 @@ namespace MatterDotNet.Clusters.Application
             public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
-            public required uint TransitionTime { get; set; }
-            public required string SceneName { get; set; }
-            public required ExtensionFieldSet[] ExtensionFieldSetStructs { get; set; }
+            public uint? TransitionTime { get; set; }
+            public string? SceneName { get; set; }
+            public ExtensionFieldSet[]? ExtensionFieldSetStructs { get; set; }
         }
 
         private record RemoveScenePayload : TLVPayload {
@@ -387,7 +388,7 @@ namespace MatterDotNet.Clusters.Application
             public required IMStatusCode Status { get; set; }
             public required byte? Capacity { get; set; }
             public required ushort GroupID { get; set; }
-            public required byte[] SceneList { get; set; }
+            public byte[]? SceneList { get; set; }
         }
 
         private record CopyScenePayload : TLVPayload {
@@ -456,7 +457,7 @@ namespace MatterDotNet.Clusters.Application
                 SceneID = (byte)GetField(resp, 2),
                 TransitionTime = (uint)GetField(resp, 3),
                 SceneName = (string)GetField(resp, 4),
-                ExtensionFieldSetStructs = (ExtensionFieldSet[])GetField(resp, 5),
+                ExtensionFieldSetStructs = GetArrayField<ExtensionFieldSet>(resp, 5),
             };
         }
 

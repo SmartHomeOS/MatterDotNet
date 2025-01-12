@@ -444,7 +444,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new GetTargetsResponse() {
-                ChargingTargetSchedules = (ChargingTargetSchedule[])GetField(resp, 0),
+                ChargingTargetSchedules = GetArrayField<ChargingTargetSchedule>(resp, 0),
             };
         }
 

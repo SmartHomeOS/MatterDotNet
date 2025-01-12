@@ -408,7 +408,8 @@ namespace MatterDotNet.Clusters.Application
             public required TrackPreference[]? AudioTracks { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteULong(0, PlaybackPosition);
+                if (PlaybackPosition != null)
+                    writer.WriteULong(0, PlaybackPosition);
                 if (TextTrack == null)
                     writer.WriteNull(1);
                 else
@@ -502,7 +503,8 @@ namespace MatterDotNet.Clusters.Application
                 }
                 else
                     writer.WriteNull(1);
-                writer.WriteByte(2, AudioOutputIndex);
+                if (AudioOutputIndex != null)
+                    writer.WriteByte(2, AudioOutputIndex);
                 writer.EndContainer();
             }
         }

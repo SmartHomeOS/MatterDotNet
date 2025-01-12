@@ -153,7 +153,7 @@ namespace MatterDotNet.Clusters.Application
                 CallSign = reader.GetString(3, true);
                 AffiliateCallSign = reader.GetString(4, true);
                 Identifier = reader.GetString(5, true);
-                Type = (ChannelTypeEnum)reader.GetUShort(6, true)!.Value;
+                Type = (ChannelTypeEnum?)reader.GetUShort(6, true);
             }
             public required ushort MajorNumber { get; set; }
             public required ushort MinorNumber { get; set; }
@@ -175,7 +175,7 @@ namespace MatterDotNet.Clusters.Application
                 if (Identifier != null)
                     writer.WriteString(5, Identifier);
                 if (Type != null)
-                    writer.WriteUShort(6, (ushort?)Type);
+                    writer.WriteUShort(6, (ushort)Type);
                 writer.EndContainer();
             }
         }
@@ -376,7 +376,7 @@ namespace MatterDotNet.Clusters.Application
                 DvbiUrl = reader.GetString(11, true);
                 ReleaseDate = reader.GetString(12, true);
                 ParentalGuidanceText = reader.GetString(13, true);
-                RecordingFlag = (RecordingFlagBitmap)reader.GetUShort(14)!.Value;
+                RecordingFlag = (RecordingFlagBitmap?)reader.GetUShort(14, true);
                 SeriesInfo = new SeriesInfo((object[])fields[15]);
                 {
                     CategoryList = new ProgramCategory[((object[])fields[16]).Length];
@@ -411,7 +411,7 @@ namespace MatterDotNet.Clusters.Application
             public string? DvbiUrl { get; set; } = "";
             public string? ReleaseDate { get; set; } = "";
             public string? ParentalGuidanceText { get; set; } = "";
-            public required RecordingFlagBitmap RecordingFlag { get; set; }
+            public required RecordingFlagBitmap? RecordingFlag { get; set; }
             public SeriesInfo? SeriesInfo { get; set; } = null;
             public ProgramCategory[]? CategoryList { get; set; } = Array.Empty<ProgramCategory>();
             public ProgramCast[]? CastList { get; set; } = Array.Empty<ProgramCast>();
@@ -457,7 +457,8 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteString(12, ReleaseDate, 30);
                 if (ParentalGuidanceText != null)
                     writer.WriteString(13, ParentalGuidanceText, 255);
-                writer.WriteUShort(14, (ushort)RecordingFlag);
+                if (RecordingFlag != null)
+                    writer.WriteUShort(14, (ushort)RecordingFlag);
                 if (SeriesInfo != null)
                     SeriesInfo.Serialize(writer, 15);
                 if (CategoryList != null)
@@ -720,7 +721,7 @@ namespace MatterDotNet.Clusters.Application
                 return null;
             return new ProgramGuideResponse() {
                 Paging = (ChannelPaging)GetField(resp, 0),
-                ProgramList = (Program[])GetField(resp, 1),
+                ProgramList = GetArrayField<Program>(resp, 1),
             };
         }
 

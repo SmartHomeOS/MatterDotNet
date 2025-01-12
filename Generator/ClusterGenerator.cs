@@ -223,10 +223,13 @@ namespace Generator
                 if (field.type == "enum8" && field.name == "Status")
                     field.type = "status";
                 writer.Write("            public ");
-                if (field.optionalConform == null)
+                bool optional = field.mandatoryConform == null;
+                if (!optional && (field.mandatoryConform!.feature != null || field.mandatoryConform.orTerm != null))
+                    optional = true;
+                if (!optional)
                     writer.Write("required ");
                 WriteType(field.type, field.entry?.type, writer);
-                if (field.optionalConform != null || field.quality?.nullable == true)
+                if (optional || field.quality?.nullable == true)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(command.name))
                     writer.Write(" " + GeneratorUtil.SanitizeName(field.name) + "Field { get; set; }");
@@ -290,7 +293,10 @@ namespace Generator
                                 throw new NotImplementedException();
                         }
                     }
-                    WriteStructType(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
+                    bool optional = field.mandatoryConform == null;
+                    if (!optional && (field.mandatoryConform!.feature != null || field.mandatoryConform.orTerm != null))
+                        optional = true;
+                    WriteStructType(optional, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(command.name) ? field.name + "Field" : field.name), cluster, writer);
                 }
                 writer.WriteLine("                writer.EndContainer();");
                 writer.WriteLine("            }");
@@ -330,6 +336,7 @@ namespace Generator
                     writer.WriteLine($"{totalIndent}writer.WriteBool({id}, {name});");
                     return;
                 case "int8":
+                case "SignedTemperature":
                     writer.Write($"{totalIndent}writer.WriteSByte({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -338,6 +345,7 @@ namespace Generator
                     break;
                 case "int16":
                 case "temperature":
+                case "TemperatureDifference":
                     writer.Write($"{totalIndent}writer.WriteShort({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -375,6 +383,7 @@ namespace Generator
                 case "fabric-idx":
                 case "action-id":
                 case "percent":
+                case "UnsignedTemperature":
                     writer.Write($"{totalIndent}writer.WriteByte({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -416,6 +425,7 @@ namespace Generator
                     unsigned = true;
                     break;
                 case "epoch-s":
+                case "utc":
                     includes.Add("MatterDotNet.Util");
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if (!{name}.HasValue)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
@@ -537,7 +547,12 @@ namespace Generator
                     writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.GetAddressBytes());");
                     return;
                 case "devtype-id":
-                    writer.WriteLine($"{totalIndent}writer.WriteUInt({id}, {(optional || nullable ? "(uint?)" : "(uint)")}{name});");
+                    writer.WriteLine($"{totalIndent}writer.WriteUInt({id}, {(nullable ? "(uint?)" : "(uint)")}{name});");
+                    return;
+                case "MessageID":
+                    if (nullable && !optional)
+                        writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
+                    writer.WriteLine($"{totalIndent}writer.WriteBytes({id}, {name}.ToByteArray());");
                     return;
                 case "octstr":
                 case "ipv6pre":
@@ -556,9 +571,9 @@ namespace Generator
                     break;
                 default:
                     if (type == "status")
-                        writer.WriteLine($"{totalIndent}writer.WriteByte({id}, {(optional || nullable ? "(byte?)" : "(byte)")}{name});");
+                        writer.WriteLine($"{totalIndent}writer.WriteByte({id}, {(nullable ? "(byte?)" : "(byte)")}{name});");
                     else if (HasEnum(cluster, type) || HasBitmap(cluster, type) || type == "ref_CharacteristicEnum" || type == "ref_MeasurementTypeEnum")
-                        writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {(optional || nullable ? "(ushort?)" : "(ushort)")}{name});");
+                        writer.WriteLine($"{totalIndent}writer.WriteUShort({id}, {(nullable ? "(ushort?)" : "(ushort)")}{name});");
                     else
                     {
                         if (nullable && !optional)
@@ -601,10 +616,12 @@ namespace Generator
                     writer.Write($"reader.GetBool({id}");
                     break;
                 case "int8":
+                case "SignedTemperature":
                     writer.Write($"reader.GetSByte({id}");
                     break;
                 case "int16":
                 case "temperature":
+                case "TemperatureDifference":
                     writer.Write($"reader.GetShort({id}");
                     break;
                 case "int24":
@@ -630,6 +647,7 @@ namespace Generator
                 case "fabric-idx":
                 case "action-id":
                 case "percent":
+                case "UnsignedTemperature":
                     writer.Write($"reader.GetByte({id}");
                     break;
                 case "uint16":
@@ -688,7 +706,11 @@ namespace Generator
                 case "hwadr":
                     writer.WriteLine($"new PhysicalAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 8, 6)!);");
                     return;
+                case "MessageID":
+                    writer.WriteLine($"new Guid(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16)!);");
+                    return;
                 case "epoch-s":
+                case "utc":
                     includes.Add("MatterDotNet.Util");
                     writer.Write($"TimeUtil.FromEpochSeconds(reader.GetUInt({id}");
                     extraClose = true;
@@ -756,14 +778,18 @@ namespace Generator
                             type = "MediaPlaybackCluster.CharacteristicEnum";
                         else if (type == "ref_MeasurementTypeEnum")
                             type = "MeasurementType";
-                        
+
                         if (type == "status")
                             writer.Write($"(IMStatusCode)reader.GetByte({id}");
                         else
-                            writer.Write($"({GeneratorUtil.SanitizeName(type)})reader.GetUShort({id}");
+                            writer.Write($"({GeneratorUtil.SanitizeName(type)}");
                         if (optional)
-                            writer.Write(", true");
-                        writer.WriteLine(")!.Value;");
+                            writer.Write('?');
+                        writer.Write($")reader.GetUShort({id}");
+                        if (optional)
+                            writer.WriteLine(", true);");
+                        else
+                            writer.WriteLine(")!.Value;");
                     }
                     else {
                         writer.Write($"new ");
@@ -893,7 +919,7 @@ namespace Generator
                                 continue;
                             writer.Write(", ");
                             WriteType(field.type, field.entry?.type, writer);
-                            if (field.optionalConform != null)
+                            if (field.optionalConform != null || (field.mandatoryConform != null && (field.mandatoryConform.feature != null || field.mandatoryConform.orTerm != null)))
                                 writer.Write('?');
                             writer.Write(" " + field.name);
                         }
@@ -943,30 +969,55 @@ namespace Generator
                         writer.WriteLine("            return new " + GeneratorUtil.SanitizeName(response.name) + "() {");
                         foreach (var field in response.field)
                         {
-                            writer.Write("                " + GeneratorUtil.SanitizeName(field.name) + " = (");
-                            WriteType(field.type, field.entry?.type, writer);
-                            if (field.optionalConform != null)
+                            if (field.type == "list" && field.entry != null && HasStruct(cluster, field.entry.type))
                             {
-                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
-                                    writer.Write("?)(byte");
-                                writer.WriteLine($"?)GetOptionalField(resp, {field.id}),");
+                                writer.Write("                " + GeneratorUtil.SanitizeName(field.name) + " = ");
+                                if (field.optionalConform != null || (field.mandatoryConform != null && (field.mandatoryConform.feature != null || field.mandatoryConform.orTerm != null)))
+                                    writer.Write("GetOptionalArrayField<");
+                                else
+                                    writer.Write("GetArrayField<");
+                                WriteType(field.entry.type, null, writer);
+                                writer.WriteLine($">(resp, {field.id}),");
                             }
                             else
                             {
-                                if (field.quality?.nullable == true)
-                                    writer.Write('?');
-                                if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type) || field.type == "status")
-                                    writer.Write(")(byte");
-                                if (field.type == "elapsed-s")
-                                    writer.WriteLine($".FromSeconds((uint)GetField(resp, {field.id}))),");
-                                else if (field.type == "ref_DataTypeSystemTimeUs" || field.type == "systime-us")
-                                    writer.WriteLine($".FromMicroseconds((ulong)GetField(resp, {field.id}))),");
-                                else if (field.type == "ref_DataTypeSystemTimeMs" || field.type == "systime-ms")
-                                    writer.WriteLine($".FromMilliseconds((ulong)GetField(resp, {field.id}))),");
-                                else if (field.type == "ref_DataTypePosixMs")
-                                    writer.WriteLine($".FromUnixTimeMilliseconds((long)(ulong)GetField(resp, {field.id}))),");
+                                writer.Write("                " + GeneratorUtil.SanitizeName(field.name) + " = ");
+                                if (field.type == "ref_DataTypePosixMs" && field.quality?.nullable == true)
+                                    writer.Write($"GetField(resp, {field.id}) != null ? ");
                                 else
-                                    writer.WriteLine($")GetField(resp, {field.id}),");
+                                    writer.Write('(');
+                                WriteType(field.type, field.entry?.type, writer);
+                                if (field.optionalConform != null || (field.mandatoryConform != null && (field.mandatoryConform.feature != null || field.mandatoryConform.orTerm != null)))
+                                {
+                                    if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type))
+                                        writer.Write("?)(byte");
+                                    writer.WriteLine($"?)GetOptionalField(resp, {field.id}),");
+                                }
+                                else
+                                {
+                                    if (field.type == "elapsed-s")
+                                        writer.WriteLine($".FromSeconds((uint)GetField(resp, {field.id}))),");
+                                    else if (field.type == "ref_DataTypeSystemTimeUs" || field.type == "systime-us")
+                                        writer.WriteLine($".FromMicroseconds((ulong)GetField(resp, {field.id}))),");
+                                    else if (field.type == "ref_DataTypeSystemTimeMs" || field.type == "systime-ms")
+                                        writer.WriteLine($".FromMilliseconds((ulong)GetField(resp, {field.id}))),");
+                                    else if (field.type == "ref_DataTypePosixMs")
+                                    {
+                                        writer.Write($".FromUnixTimeMilliseconds((long)(ulong)GetField(resp, {field.id}))");
+                                        if (field.quality?.nullable == true)
+                                            writer.WriteLine(" : null,");
+                                        else
+                                            writer.WriteLine("),");
+                                    }
+                                    else
+                                    {
+                                        if (field.quality?.nullable == true)
+                                            writer.Write('?');
+                                        if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type) || field.type == "status")
+                                            writer.Write(")(byte");
+                                        writer.WriteLine($")GetField(resp, {field.id}),");
+                                    }
+                                }
                             }
                         }
                         writer.WriteLine("            };");
@@ -1008,7 +1059,11 @@ namespace Generator
                     to = toVal;
                 if (field.constraint?.fromSpecified == true && long.TryParse(field.constraint.from, out long fromVal))
                     from = fromVal;
-                WriteFieldReader(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id.ToString(), from, to, field.name, structType.name, cluster, writer);
+                bool optional = field.mandatoryConform == null;
+                if (!optional && (field.mandatoryConform!.feature != null || field.mandatoryConform.orTerm != null))
+                    optional = true;
+
+                WriteFieldReader(optional, field.quality?.nullable == true, field.type, field.entry?.type, field.id.ToString(), from, to, field.name, structType.name, cluster, writer);
             }
             writer.WriteLine("            }");
             foreach (clusterDataTypesStructField field in structType.field)
@@ -1024,7 +1079,7 @@ namespace Generator
                 if (field.mandatoryConform != null)
                     writer.Write("required ");
                 WriteType(field.type, field.entry?.type, writer);
-                if (field.mandatoryConform == null || field.quality?.nullable == true)
+                if (field.mandatoryConform == null || field.quality?.nullable == true || (field.mandatoryConform != null && (field.mandatoryConform!.feature != null || field.mandatoryConform.orTerm != null)))
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(structType.name))
                     writer.Write(" " + field.name + "Field { get; set; }");
@@ -1077,7 +1132,10 @@ namespace Generator
                             throw new NotImplementedException();
                     }
                 }
-                WriteStructType(field.mandatoryConform == null, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
+                bool optional = field.mandatoryConform == null;
+                if (!optional && (field.mandatoryConform!.feature != null || field.mandatoryConform.orTerm != null))
+                    optional = true;
+                WriteStructType(optional, field.quality?.nullable == true, field.type, field.entry?.type, field.id, from, to, (field.name == GeneratorUtil.SanitizeName(structType.name) ? field.name + "Field" : field.name), cluster, writer);
             }
             writer.WriteLine("                writer.EndContainer();");
             writer.WriteLine("            }");
@@ -1109,6 +1167,8 @@ namespace Generator
             writer.WriteLine("        /// </summary>");
             writer.WriteLine("        [Flags]");
             writer.WriteLine("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " {");
+            writer.WriteLine("            /// <summary>\n            /// Nothing Set\n            /// </summary>");
+            writer.WriteLine("            None = 0,");
             foreach (clusterDataTypesBitfieldItem item in enumType.bitfield)
             {
                 if (item.summary != null)
@@ -1254,6 +1314,7 @@ namespace Generator
                 case "fabric-idx":
                 case "action-id":
                 case "percent":
+                case "UnsignedTemperature":
                     writer.Write("byte");
                     break;
                 case "uint16":
@@ -1294,6 +1355,7 @@ namespace Generator
                     break;
                 case "epoch-s":
                 case "epoch-us":
+                case "utc":
                     includes.Add("MatterDotNet.Util");
                     writer.Write("DateTime");
                     break;
@@ -1311,10 +1373,12 @@ namespace Generator
                     writer.Write("ulong");
                     break;
                 case "int8":
+                case "SignedTemperature":
                     writer.Write("sbyte");
                     break;
                 case "int16":
                 case "temperature":
+                case "TemperatureDifference":
                     writer.Write("short");
                     break;
                 case "int24":
@@ -1353,6 +1417,9 @@ namespace Generator
                     includes.Add("System.Net.NetworkInformation");
                     writer.Write("PhysicalAddress");
                     break;
+                case "MessageID":
+                    writer.Write("Guid");
+                    break;
                 case "octstr":
                 case "ipv6pre":
                     if (openIndex)
@@ -1379,6 +1446,9 @@ namespace Generator
                 case "ref_MeasurementTypeEnum":
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("MeasurementType");
+                    break;
+                case "ref_OccupancyBitmap":
+                    writer.Write("OccupancySensingCluster.OccupancyBitmap");
                     break;
                 case "tod":
                 case "date":
@@ -1423,7 +1493,7 @@ namespace Generator
                 return value.Split(' ')[0];
             if (value.StartsWith('"'))
                 return value;
-            if (value == "0" && (type == "epoch-s" || type == "epoch-us"))
+            if (value == "0" && (type == "epoch-s" || type == "epoch-us" || type == "utc"))
                 return "TimeUtil.EPOCH";
             if (type == "elapsed-s")
             {
@@ -1437,6 +1507,20 @@ namespace Generator
                 return (value == "1" || value.Equals("true", StringComparison.InvariantCultureIgnoreCase)) ? "true" : "false";
             if (type == "status" && value == "SUCCESS")
                 return "IMStatusCode.SUCCESS";
+            if (type == "TemperatureDifference" || type == "SignedTemperature" || type == "UnsignedTemperature" || type == "temperature")
+            {
+                if (value == "null")
+                    return value;
+                if (value.EndsWith("°C"))
+                    value = value.Substring(0, value.Length - 2);
+                double temp = double.Parse(value);
+                if (type == "temperature" || type == "TemperatureDifference")
+                    return ((int)(temp * 100)).ToString();
+                else
+                    return ((int)(temp * 10)).ToString();
+            }
+            if (type == "ref_OccupancyBitmap")
+                return "(OccupancySensingCluster.OccupancyBitmap)" + value;
             return value.ToLowerInvariant();
         }
 
@@ -1449,6 +1533,10 @@ namespace Generator
             if (value == "-")
                 return false;
             if (value == "PhysicalMinLevel" || value == "PhysicalMaxLevel")
+                return false;
+            if (value == "AbsMinHeatSetpointLimit" || value == "AbsMaxHeatSetpointLimit")
+                return false;
+            if (value == "AbsMinCoolSetpointLimit" || value == "AbsMaxCoolSetpointLimit")
                 return false;
             return true;
         }

@@ -58,12 +58,14 @@ namespace MatterDotNet.Clusters.Application
 
         #region Payloads
         private record SetTemperaturePayload : TLVPayload {
-            public required short TargetTemperature { get; set; }
-            public required byte TargetTemperatureLevel { get; set; }
+            public short? TargetTemperature { get; set; }
+            public byte? TargetTemperatureLevel { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteShort(0, TargetTemperature);
-                writer.WriteByte(1, TargetTemperatureLevel);
+                if (TargetTemperature != null)
+                    writer.WriteShort(0, TargetTemperature);
+                if (TargetTemperatureLevel != null)
+                    writer.WriteByte(1, TargetTemperatureLevel);
                 writer.EndContainer();
             }
         }
@@ -73,7 +75,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Temperature
         /// </summary>
-        public async Task<bool> SetTemperature(SecureSession session, short TargetTemperature, byte TargetTemperatureLevel) {
+        public async Task<bool> SetTemperature(SecureSession session, short? TargetTemperature, byte? TargetTemperatureLevel) {
             SetTemperaturePayload requestFields = new SetTemperaturePayload() {
                 TargetTemperature = TargetTemperature,
                 TargetTemperatureLevel = TargetTemperatureLevel,

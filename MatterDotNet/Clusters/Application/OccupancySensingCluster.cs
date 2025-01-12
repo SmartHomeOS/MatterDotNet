@@ -61,6 +61,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum OccupancyBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Indicates the sensed occupancy state
             /// </summary>
             Occupied = 1,
@@ -71,6 +75,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum OccupancySensorTypeBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>

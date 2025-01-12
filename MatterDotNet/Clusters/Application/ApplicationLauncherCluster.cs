@@ -128,11 +128,12 @@ namespace MatterDotNet.Clusters.Application
 
         #region Payloads
         private record LaunchAppPayload : TLVPayload {
-            public required Application Application { get; set; }
+            public Application? Application { get; set; }
             public byte[]? Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                Application.Serialize(writer, 0);
+                if (Application != null)
+                    Application.Serialize(writer, 0);
                 if (Data != null)
                     writer.WriteBytes(1, Data);
                 writer.EndContainer();
@@ -140,19 +141,21 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record StopAppPayload : TLVPayload {
-            public required Application Application { get; set; }
+            public Application? Application { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                Application.Serialize(writer, 0);
+                if (Application != null)
+                    Application.Serialize(writer, 0);
                 writer.EndContainer();
             }
         }
 
         private record HideAppPayload : TLVPayload {
-            public required Application Application { get; set; }
+            public Application? Application { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                Application.Serialize(writer, 0);
+                if (Application != null)
+                    Application.Serialize(writer, 0);
                 writer.EndContainer();
             }
         }
@@ -170,7 +173,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Launch App
         /// </summary>
-        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application Application, byte[]? Data) {
+        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application? Application, byte[]? Data) {
             LaunchAppPayload requestFields = new LaunchAppPayload() {
                 Application = Application,
                 Data = Data,
@@ -187,7 +190,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Stop App
         /// </summary>
-        public async Task<LauncherResponse?> StopApp(SecureSession session, Application Application) {
+        public async Task<LauncherResponse?> StopApp(SecureSession session, Application? Application) {
             StopAppPayload requestFields = new StopAppPayload() {
                 Application = Application,
             };
@@ -203,7 +206,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Hide App
         /// </summary>
-        public async Task<LauncherResponse?> HideApp(SecureSession session, Application Application) {
+        public async Task<LauncherResponse?> HideApp(SecureSession session, Application? Application) {
             HideAppPayload requestFields = new HideAppPayload() {
                 Application = Application,
             };

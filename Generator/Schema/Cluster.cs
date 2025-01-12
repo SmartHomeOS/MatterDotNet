@@ -660,7 +660,8 @@ namespace Generator.Schema
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class attributeMandatoryConform
     {
-
+        private object featureField;
+        private object orTermField;
         private attributeMandatoryConformCondition conditionField;
 
         /// <remarks/>
@@ -673,6 +674,30 @@ namespace Generator.Schema
             set
             {
                 this.conditionField = value;
+            }
+        }
+
+        public object feature
+        {
+            get
+            {
+                return this.featureField;
+            }
+            set
+            {
+                this.featureField = value;
+            }
+        }
+
+        public object orTerm
+        {
+            get
+            {
+                return this.orTermField;
+            }
+            set
+            {
+                this.orTermField = value;
             }
         }
     }

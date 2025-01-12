@@ -135,7 +135,7 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public struct ChangeToModeResponse() {
             public required IMStatusCode Status { get; set; }
-            public required string StatusText { get; set; }
+            public string? StatusText { get; set; }
         }
         #endregion Payloads
 

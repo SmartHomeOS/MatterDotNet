@@ -352,7 +352,7 @@ namespace MatterDotNet.Clusters.Utility
                 return null;
             return new TimeSnapshotResponse() {
                 SystemTimeMs = (TimeSpan.FromMilliseconds((ulong)GetField(resp, 0))),
-                PosixTimeMs = GetField(resp, 1) != null ? (DateTimeOffset.FromUnixTimeMilliseconds((long)(ulong)GetField(resp, 1))) : null,
+                PosixTimeMs = GetField(resp, 1) != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)(ulong)GetField(resp, 1)) : null,
             };
         }
 

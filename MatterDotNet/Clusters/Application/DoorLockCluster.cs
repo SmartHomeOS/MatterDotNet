@@ -1757,7 +1757,7 @@ namespace MatterDotNet.Clusters.Application
                 UserStatus = (UserStatusEnum?)(byte)GetField(resp, 3),
                 UserType = (UserTypeEnum?)(byte)GetField(resp, 4),
                 CredentialRule = (CredentialRuleEnum?)(byte)GetField(resp, 5),
-                Credentials = (Credential[]?)GetField(resp, 6),
+                Credentials = GetArrayField<Credential>(resp, 6),
                 CreatorFabricIndex = (byte?)GetField(resp, 7),
                 LastModifiedFabricIndex = (byte?)GetField(resp, 8),
                 NextUserIndex = (ushort?)GetField(resp, 9),

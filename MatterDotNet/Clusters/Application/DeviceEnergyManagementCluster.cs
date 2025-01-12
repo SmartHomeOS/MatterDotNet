@@ -286,22 +286,25 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(0))!.Value;
                 Duration = TimeSpan.FromSeconds(reader.GetUInt(1)!.Value);
-                NominalPower = reader.GetLong(2)!.Value;
-                MaximumEnergy = reader.GetLong(3)!.Value;
-                LoadControl = reader.GetSByte(4)!.Value;
+                NominalPower = reader.GetLong(2, true);
+                MaximumEnergy = reader.GetLong(3, true);
+                LoadControl = reader.GetSByte(4, true);
             }
             public required DateTime StartTime { get; set; }
             public required TimeSpan Duration { get; set; }
-            public required long NominalPower { get; set; }
-            public required long MaximumEnergy { get; set; }
-            public required sbyte LoadControl { get; set; }
+            public required long? NominalPower { get; set; }
+            public required long? MaximumEnergy { get; set; }
+            public required sbyte? LoadControl { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, TimeUtil.ToEpochSeconds(StartTime));
                 writer.WriteUInt(1, (uint)Duration.TotalSeconds, 86400);
-                writer.WriteLong(2, NominalPower);
-                writer.WriteLong(3, MaximumEnergy);
-                writer.WriteSByte(4, LoadControl);
+                if (NominalPower != null)
+                    writer.WriteLong(2, NominalPower);
+                if (MaximumEnergy != null)
+                    writer.WriteLong(3, MaximumEnergy);
+                if (LoadControl != null)
+                    writer.WriteSByte(4, LoadControl);
                 writer.EndContainer();
             }
         }
@@ -361,7 +364,7 @@ namespace MatterDotNet.Clusters.Application
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(2))!.Value;
                 EndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(3))!.Value;
                 EarliestStartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(4, true));
-                LatestEndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(5))!.Value;
+                LatestEndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(5, true));
                 IsPauseable = reader.GetBool(6)!.Value;
                 {
                     Slots = new Slot[((object[])fields[7]).Length];
@@ -376,7 +379,7 @@ namespace MatterDotNet.Clusters.Application
             public required DateTime StartTime { get; set; }
             public required DateTime EndTime { get; set; }
             public required DateTime? EarliestStartTime { get; set; }
-            public required DateTime LatestEndTime { get; set; }
+            public required DateTime? LatestEndTime { get; set; }
             public required bool IsPauseable { get; set; }
             public required Slot[] Slots { get; set; }
             public required ForecastUpdateReasonEnum ForecastUpdateReason { get; set; }
@@ -390,7 +393,8 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteNull(4);
                 else
                     writer.WriteUInt(4, TimeUtil.ToEpochSeconds(EarliestStartTime!.Value));
-                writer.WriteUInt(5, TimeUtil.ToEpochSeconds(LatestEndTime));
+                if (LatestEndTime != null)
+                    writer.WriteUInt(5, TimeUtil.ToEpochSeconds(LatestEndTime!.Value));
                 writer.WriteBool(6, IsPauseable);
                 {
                     Constrain(Slots, 0, 10);
@@ -514,14 +518,14 @@ namespace MatterDotNet.Clusters.Application
             public required TimeSpan DefaultDuration { get; set; }
             public required TimeSpan ElapsedSlotTime { get; set; }
             public required TimeSpan RemainingSlotTime { get; set; }
-            public required bool SlotIsPauseable { get; set; }
-            public required TimeSpan MinPauseDuration { get; set; }
-            public required TimeSpan MaxPauseDuration { get; set; }
-            public required ushort ManufacturerESAState { get; set; }
-            public required long NominalPower { get; set; }
-            public required long MinPower { get; set; }
-            public required long MaxPower { get; set; }
-            public required long NominalEnergy { get; set; }
+            public required bool? SlotIsPauseable { get; set; }
+            public required TimeSpan? MinPauseDuration { get; set; }
+            public required TimeSpan? MaxPauseDuration { get; set; }
+            public required ushort? ManufacturerESAState { get; set; }
+            public required long? NominalPower { get; set; }
+            public required long? MinPower { get; set; }
+            public required long? MaxPower { get; set; }
+            public required long? NominalEnergy { get; set; }
             public Cost[]? Costs { get; set; }
             public required long MinPowerAdjustment { get; set; }
             public required long MaxPowerAdjustment { get; set; }
@@ -534,14 +538,22 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUInt(2, (uint)DefaultDuration.TotalSeconds);
                 writer.WriteUInt(3, (uint)ElapsedSlotTime.TotalSeconds);
                 writer.WriteUInt(4, (uint)RemainingSlotTime.TotalSeconds);
-                writer.WriteBool(5, SlotIsPauseable);
-                writer.WriteUInt(6, (uint)MinPauseDuration.TotalSeconds);
-                writer.WriteUInt(7, (uint)MaxPauseDuration.TotalSeconds);
-                writer.WriteUShort(8, ManufacturerESAState);
-                writer.WriteLong(9, NominalPower);
-                writer.WriteLong(10, MinPower);
-                writer.WriteLong(11, MaxPower);
-                writer.WriteLong(12, NominalEnergy);
+                if (SlotIsPauseable != null)
+                    writer.WriteBool(5, SlotIsPauseable);
+                if (MinPauseDuration != null)
+                    writer.WriteUInt(6, (uint)MinPauseDuration!.Value.TotalSeconds);
+                if (MaxPauseDuration != null)
+                    writer.WriteUInt(7, (uint)MaxPauseDuration!.Value.TotalSeconds);
+                if (ManufacturerESAState != null)
+                    writer.WriteUShort(8, ManufacturerESAState);
+                if (NominalPower != null)
+                    writer.WriteLong(9, NominalPower);
+                if (MinPower != null)
+                    writer.WriteLong(10, MinPower);
+                if (MaxPower != null)
+                    writer.WriteLong(11, MaxPower);
+                if (NominalEnergy != null)
+                    writer.WriteLong(12, NominalEnergy);
                 if (Costs != null)
                 if (Costs != null)
                 {

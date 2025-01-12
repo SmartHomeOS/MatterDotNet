@@ -245,8 +245,6 @@ namespace MatterDotNet.Clusters
                     return new ThreadNetworkDiagnosticsCluster(endPoint);
                 case WiFiNetworkDiagnosticsCluster.CLUSTER_ID:
                     return new WiFiNetworkDiagnosticsCluster(endPoint);
-                case DishwasherAlarmCluster.CLUSTER_ID:
-                    return new DishwasherAlarmCluster(endPoint);
                 case DoorLockCluster.CLUSTER_ID:
                     return new DoorLockCluster(endPoint);
                 case ElectricalEnergyMeasurementCluster.CLUSTER_ID:
@@ -313,8 +311,6 @@ namespace MatterDotNet.Clusters
                     return new ProxyConfigurationCluster(endPoint);
                 case ProxyDiscoveryCluster.CLUSTER_ID:
                     return new ProxyDiscoveryCluster(endPoint);
-                case RefrigeratorAlarmCluster.CLUSTER_ID:
-                    return new RefrigeratorAlarmCluster(endPoint);
                 case ResourceMonitoringClusters.CLUSTER_ID:
                     return new ResourceMonitoringClusters(endPoint);
                 case ScenesManagementCluster.CLUSTER_ID:

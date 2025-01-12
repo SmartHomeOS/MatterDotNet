@@ -223,6 +223,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum TargetDayOfWeekBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Sunday
             /// </summary>
             Sunday = 1,

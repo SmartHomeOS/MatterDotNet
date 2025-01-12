@@ -317,7 +317,7 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteULong(0, TimeUtil.ToEpochUS(UTCTime));
                 writer.WriteUShort(1, (ushort)Granularity);
                 if (TimeSource != null)
-                    writer.WriteUShort(2, (ushort?)TimeSource);
+                    writer.WriteUShort(2, (ushort)TimeSource);
                 writer.EndContainer();
             }
         }

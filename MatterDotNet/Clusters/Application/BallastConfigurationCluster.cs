@@ -39,6 +39,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum BallastStatusBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Operational state of the ballast.
             /// </summary>
             BallastNonOperational = 1,
@@ -53,6 +57,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum LampAlarmModeBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// State of LampBurnHours alarm generation
             /// </summary>

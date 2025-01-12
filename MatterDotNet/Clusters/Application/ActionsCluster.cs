@@ -131,6 +131,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum CommandBits {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Indicate support for InstantAction command
             /// </summary>
             InstantAction = 1,

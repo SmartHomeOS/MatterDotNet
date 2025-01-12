@@ -117,6 +117,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum RecordingFlagBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// The program is scheduled for recording.
             /// </summary>
             Scheduled = 1,

@@ -184,6 +184,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum SupportedProtocolsBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Device supports Dynamic Adaptive Streaming over HTTP (DASH)
             /// </summary>
             DASH = 1,

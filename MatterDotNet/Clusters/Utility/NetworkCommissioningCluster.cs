@@ -151,6 +151,10 @@ namespace MatterDotNet.Clusters.Utility
         [Flags]
         public enum ThreadCapabilitiesBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Thread Border Router functionality is present
             /// </summary>
             IsBorderRouterCapable = 1,
@@ -177,6 +181,10 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         [Flags]
         public enum WiFiSecurityBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Supports unencrypted Wi-Fi
             /// </summary>
@@ -299,11 +307,11 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public WiFiInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Security = (WiFiSecurityBitmap)reader.GetUShort(0, true)!.Value;
+                Security = (WiFiSecurityBitmap?)reader.GetUShort(0, true);
                 SSID = reader.GetBytes(1, true);
                 BSSID = reader.GetBytes(2, true);
                 Channel = reader.GetUShort(3, true);
-                WiFiBand = (WiFiBandEnum)reader.GetUShort(4, true)!.Value;
+                WiFiBand = (WiFiBandEnum?)reader.GetUShort(4, true);
                 RSSI = reader.GetSByte(5, true);
             }
             public required WiFiSecurityBitmap? Security { get; set; }
@@ -315,7 +323,7 @@ namespace MatterDotNet.Clusters.Utility
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (Security != null)
-                    writer.WriteUShort(0, (ushort?)Security);
+                    writer.WriteUShort(0, (ushort)Security);
                 if (SSID != null)
                     writer.WriteBytes(1, SSID, 32);
                 if (BSSID != null)
@@ -323,7 +331,7 @@ namespace MatterDotNet.Clusters.Utility
                 if (Channel != null)
                     writer.WriteUShort(3, Channel);
                 if (WiFiBand != null)
-                    writer.WriteUShort(4, (ushort?)WiFiBand);
+                    writer.WriteUShort(4, (ushort)WiFiBand);
                 if (RSSI != null)
                     writer.WriteSByte(5, RSSI);
                 writer.EndContainer();

@@ -82,6 +82,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum DayOfWeekBitmapType {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Sunday
             /// </summary>
             Sunday = 1,

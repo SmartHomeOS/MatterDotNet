@@ -222,7 +222,7 @@ namespace MatterDotNet.Clusters.Application
         #region Payloads
         private record PresentMessagesRequestPayload : TLVPayload {
             public required Guid MessageID { get; set; }
-            public required MessagePriorityEnum Priority { get; set; } = MessagePriorityEnum.0;
+            public required MessagePriorityEnum Priority { get; set; } = 0;
             public required MessageControlBitmap MessageControl { get; set; } = 0;
             public required DateTime? StartTime { get; set; } = TimeUtil.EPOCH;
             public required ulong? Duration { get; set; } = 0;

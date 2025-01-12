@@ -126,6 +126,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum PumpStatusBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// A fault related to the system or pump device is detected.
             /// </summary>
             DeviceFault = 1,

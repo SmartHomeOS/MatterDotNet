@@ -65,6 +65,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum AlarmModeBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Visual alarming
             /// </summary>
             Visual = 1,
@@ -79,6 +83,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum SensorFaultBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Unspecified fault detected
             /// </summary>

@@ -54,6 +54,10 @@ namespace MatterDotNet.Clusters.Utility
         [Flags]
         public enum NameSupportBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// The ability to store a name for a group.
             /// </summary>
             GroupNames = 128,

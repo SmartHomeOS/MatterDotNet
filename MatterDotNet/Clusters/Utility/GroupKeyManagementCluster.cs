@@ -174,7 +174,7 @@ namespace MatterDotNet.Clusters.Utility
                 EpochStartTime1 = TimeUtil.FromEpochUS(reader.GetULong(5, true));
                 EpochKey2 = reader.GetBytes(6, false)!;
                 EpochStartTime2 = TimeUtil.FromEpochUS(reader.GetULong(7, true));
-                GroupKeyMulticastPolicy = (GroupKeyMulticastPolicyEnum)reader.GetUShort(8, true)!.Value;
+                GroupKeyMulticastPolicy = (GroupKeyMulticastPolicyEnum?)reader.GetUShort(8, true);
             }
             public required ushort GroupKeySetID { get; set; }
             public required GroupKeySecurityPolicyEnum GroupKeySecurityPolicy { get; set; }
@@ -205,7 +205,7 @@ namespace MatterDotNet.Clusters.Utility
                 else
                     writer.WriteULong(7, TimeUtil.ToEpochUS(EpochStartTime2!.Value));
                 if (GroupKeyMulticastPolicy != null)
-                    writer.WriteUShort(8, (ushort?)GroupKeyMulticastPolicy);
+                    writer.WriteUShort(8, (ushort)GroupKeyMulticastPolicy);
                 writer.EndContainer();
             }
         }

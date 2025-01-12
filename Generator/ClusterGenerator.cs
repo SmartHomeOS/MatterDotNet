@@ -237,7 +237,7 @@ namespace Generator
                     writer.Write(" " + GeneratorUtil.SanitizeName(field.name) + " { get; set; }");
                 if (field.@default != null && DefaultValid(field.@default))
                 {
-                    if (field.type.EndsWith("Enum"))
+                    if (field.type.EndsWith("Enum") && field.@default != "0")
                         writer.WriteLine(" = " + field.type + "." + field.@default + ";");
                     else
                         writer.WriteLine(" = " + SanitizeDefault(field.@default, field.type, field.entry?.type) + ";");
@@ -317,7 +317,7 @@ namespace Generator
             switch (type)
             {
                 case "list": //Actually an array
-                    if (optional || nullable)
+                    if (nullable)
                         writer.WriteLine($"{totalIndent}if ({name} != null)");
                     writer.WriteLine($"{totalIndent}{{");
                     if (from != null || to != null)

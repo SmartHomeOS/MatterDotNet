@@ -121,6 +121,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum OnOffControlBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Indicates a command is only accepted when in On state.
             /// </summary>
             AcceptOnlyWhenOn = 1,

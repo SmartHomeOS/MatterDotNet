@@ -76,6 +76,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum ValveFaultBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Unspecified fault detected
             /// </summary>
             GeneralFault = 1,

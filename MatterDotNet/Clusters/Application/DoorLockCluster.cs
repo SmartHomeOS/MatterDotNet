@@ -621,6 +621,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum AlarmMaskBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Locking Mechanism Jammed
             /// </summary>
             LockJammed = 1,
@@ -656,6 +660,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum ConfigurationRegisterBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// The state of local programming functionality
             /// </summary>
             LocalProgramming = 1,
@@ -687,6 +695,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum CredentialRulesBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Only one credential is required for lock operation
             /// </summary>
             Single = 1,
@@ -705,6 +717,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum DaysMaskBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Schedule is applied on Sunday
             /// </summary>
@@ -740,6 +756,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum EventMaskBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// State of bit 0
             /// </summary>
@@ -812,6 +832,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum LocalProgrammingFeaturesBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// The state of the ability to add users, credentials or schedules on the device
             /// </summary>
             AddUsersCredentialsSchedules = 1,
@@ -834,6 +858,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum OperatingModesBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Normal operation mode
             /// </summary>

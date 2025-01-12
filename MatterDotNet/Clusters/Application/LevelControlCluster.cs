@@ -89,6 +89,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum OptionsBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Dependency on On/Off cluster
             /// </summary>
             ExecuteIfOff = 1,

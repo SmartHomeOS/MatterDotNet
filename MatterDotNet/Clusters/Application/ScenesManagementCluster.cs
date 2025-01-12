@@ -55,6 +55,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum CopyModeBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Copy all scenes in the scene table
             /// </summary>
             CopyAllScenes = 1,

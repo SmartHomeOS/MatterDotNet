@@ -162,6 +162,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum RockBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Indicate rock left to right
             /// </summary>
             RockLeftRight = 1,
@@ -180,6 +184,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum WindBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Indicate sleep wind
             /// </summary>

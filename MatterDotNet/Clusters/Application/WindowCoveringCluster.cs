@@ -225,6 +225,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum ConfigStatusBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Device is operational.
             /// </summary>
             Operational = 1,
@@ -260,6 +264,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum ModeBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Reverse the lift direction.
             /// </summary>
             MotorDirectionReversed = 1,
@@ -283,6 +291,10 @@ namespace MatterDotNet.Clusters.Application
         [Flags]
         public enum OperationalStatusBitmap {
             /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
             /// Global operational state.
             /// </summary>
             Global = 1,
@@ -301,6 +313,10 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         [Flags]
         public enum SafetyStatusBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
             /// <summary>
             /// Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range.
             /// </summary>

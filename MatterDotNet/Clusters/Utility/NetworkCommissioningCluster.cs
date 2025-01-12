@@ -330,8 +330,8 @@ namespace MatterDotNet.Clusters.Utility
         public struct ScanNetworksResponse() {
             public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
-            public required WiFiInterfaceScanResult[] WiFiScanResults { get; set; }
-            public required ThreadInterfaceScanResult[] ThreadScanResults { get; set; }
+            public WiFiInterfaceScanResult[]? WiFiScanResults { get; set; }
+            public ThreadInterfaceScanResult[]? ThreadScanResults { get; set; }
         }
 
         private record AddOrUpdateWiFiNetworkPayload : TLVPayload {
@@ -432,8 +432,8 @@ namespace MatterDotNet.Clusters.Utility
             return new ScanNetworksResponse() {
                 NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
-                WiFiScanResults = (WiFiInterfaceScanResult[])GetField(resp, 2),
-                ThreadScanResults = (ThreadInterfaceScanResult[])GetField(resp, 3),
+                WiFiScanResults = GetOptionalArrayField<WiFiInterfaceScanResult>(resp, 2),
+                ThreadScanResults = GetOptionalArrayField<ThreadInterfaceScanResult>(resp, 3),
             };
         }
 
@@ -506,7 +506,7 @@ namespace MatterDotNet.Clusters.Utility
             return new ConnectNetworkResponse() {
                 NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
-                ErrorValue = (int )GetField(resp, 2),
+                ErrorValue = (int?)GetField(resp, 2),
             };
         }
 

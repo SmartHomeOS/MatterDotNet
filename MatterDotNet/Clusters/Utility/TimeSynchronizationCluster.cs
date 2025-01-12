@@ -197,7 +197,7 @@ namespace MatterDotNet.Clusters.Utility
                 ValidStarting = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
                 ValidUntil = TimeUtil.FromEpochUS(reader.GetULong(2, true));
             }
-            public required int  Offset { get; set; }
+            public required int Offset { get; set; }
             public required DateTime ValidStarting { get; set; }
             public required DateTime? ValidUntil { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -253,7 +253,7 @@ namespace MatterDotNet.Clusters.Utility
                 ValidAt = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
                 Name = reader.GetString(2, true, 64, 0);
             }
-            public required int  Offset { get; set; }
+            public required int Offset { get; set; }
             public required DateTime ValidAt { get; set; }
             public string? Name { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {

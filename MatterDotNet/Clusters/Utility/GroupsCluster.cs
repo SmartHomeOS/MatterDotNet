@@ -196,7 +196,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new GetGroupMembershipResponse() {
-                Capacity = (byte)GetField(resp, 0),
+                Capacity = (byte?)GetField(resp, 0),
                 GroupList = (ushort[])GetField(resp, 1),
             };
         }

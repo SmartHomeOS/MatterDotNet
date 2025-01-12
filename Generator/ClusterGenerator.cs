@@ -953,6 +953,8 @@ namespace Generator
                             }
                             else
                             {
+                                if (field.quality?.nullable == true)
+                                    writer.Write('?');
                                 if (HasEnum(cluster, field.type) || HasBitmap(cluster, field.type) || field.type == "status")
                                     writer.Write(")(byte");
                                 if (field.type == "elapsed-s")
@@ -1315,7 +1317,7 @@ namespace Generator
                     break;
                 case "int24":
                 case "int32":
-                    writer.Write("int ");
+                    writer.Write("int");
                     break;
                 case "int40":
                 case "int48":

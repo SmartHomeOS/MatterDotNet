@@ -16,7 +16,7 @@
 using MatterDotNet.Clusters.Application;
 using MatterDotNet.Clusters.Utility;
 using MatterDotNet.Messages.InteractionModel;
-using MatterDotNet.Protocol.Payloads.Status;
+using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Data;
@@ -82,6 +82,32 @@ namespace MatterDotNet.Clusters
             if (fieldNumber >= fields.Length)
                 throw new DataException("Field " + fieldNumber + " is missing");
             return fields[fieldNumber]!;
+        }
+
+        protected static T[]? GetOptionalArrayField<T>(InvokeResponseIB resp, int fieldNumber) where T : TLVPayload
+        {
+            if (fieldNumber >= ((object[])resp.Command!.CommandFields!).Length)
+                return null;
+            return GetArrayField<T>(resp, fieldNumber);
+        }
+
+        /// <summary>
+        /// Gets a required field from an Invoke Response
+        /// </summary>
+        /// <param name="resp"></param>
+        /// <param name="fieldNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="DataException"></exception>
+        protected static T[] GetArrayField<T>(InvokeResponseIB resp, int fieldNumber) where T : TLVPayload
+        {
+            object[] fields = (object[])resp.Command!.CommandFields!;
+            if (fieldNumber >= fields.Length)
+                throw new DataException("Field " + fieldNumber + " is missing");
+            object[] array = (object[])fields[fieldNumber]!;
+            T[] ret = new T[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                ret[i] = ((T)Activator.CreateInstance(typeof(T), [array[i]])!);
+            return ret;
         }
 
         /// <summary>

@@ -365,12 +365,12 @@ namespace MatterDotNet.Protocol.Parsers
                     while (!IsEndContainer())
                     {
                         if (control == TLVControl.Anonymous)
-                            structure.Add(GetAny(-1)!);
+                            structure.Add(GetAny(-1, true)!);
                         else
                         {
                             while (this.tagNumber > structure.Count)
                                 structure.Add(null!);
-                            structure.Add(GetAny(this.tagNumber)!);
+                            structure.Add(GetAny(this.tagNumber, true)!);
                         }
                     }
                     EndContainer();

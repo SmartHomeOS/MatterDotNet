@@ -81,7 +81,7 @@ namespace MatterDotNet.Entities
         /// Start the controller and enumerate all nodes
         /// </summary>
         /// <returns></returns>
-        public async Task Start()
+        public async Task EnumerateFabric()
         {
             foreach (var noc in fabric.GetNodes())
             {

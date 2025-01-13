@@ -111,7 +111,7 @@ namespace MatterDotNet.Clusters.Application
                 ActiveDataset = ActiveDataset,
                 Breadcrumb = Breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -122,7 +122,7 @@ namespace MatterDotNet.Clusters.Application
             SetPendingDatasetRequestPayload requestFields = new SetPendingDatasetRequestPayload() {
                 PendingDataset = PendingDataset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

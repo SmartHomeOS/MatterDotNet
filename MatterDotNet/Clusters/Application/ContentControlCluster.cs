@@ -438,7 +438,7 @@ namespace MatterDotNet.Clusters.Application
                 OldPIN = OldPIN,
                 NewPIN = NewPIN,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -446,7 +446,7 @@ namespace MatterDotNet.Clusters.Application
         /// Reset PIN
         /// </summary>
         public async Task<ResetPINResponse?> ResetPIN(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS);
             if (!ValidateResponse(resp))
                 return null;
             return new ResetPINResponse() {
@@ -458,7 +458,7 @@ namespace MatterDotNet.Clusters.Application
         /// Enable
         /// </summary>
         public async Task<bool> Enable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -466,7 +466,7 @@ namespace MatterDotNet.Clusters.Application
         /// Disable
         /// </summary>
         public async Task<bool> Disable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x04);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 

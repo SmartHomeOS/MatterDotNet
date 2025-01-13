@@ -85,7 +85,7 @@ namespace MatterDotNet.Clusters.Application
             GetSetupPINPayload requestFields = new GetSetupPINPayload() {
                 TempAccountIdentifier = TempAccountIdentifier,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetSetupPINResponse() {
@@ -102,7 +102,7 @@ namespace MatterDotNet.Clusters.Application
                 SetupPIN = SetupPIN,
                 Node = Node,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -113,7 +113,7 @@ namespace MatterDotNet.Clusters.Application
             LogoutPayload requestFields = new LogoutPayload() {
                 Node = Node,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands

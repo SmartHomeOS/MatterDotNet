@@ -116,7 +116,7 @@ namespace MatterDotNet.Clusters.Application
             AddNetworkPayload requestFields = new AddNetworkPayload() {
                 OperationalDataset = OperationalDataset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -127,7 +127,7 @@ namespace MatterDotNet.Clusters.Application
             RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
                 ExtendedPanID = ExtendedPanID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 

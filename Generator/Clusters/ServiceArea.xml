@@ -94,6 +94,19 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+	<enum name="SelectAreasStatus" type="enum8">
+		<item value="0x00" name="Success"/>
+		<item value="0x01" name="UnsupportedArea"/>
+		<item value="0x02" name="DuplicatedAreas"/>
+		<item value="0x03" name="InvalidInMode"/>
+		<item value="0x04" name="InvalidSet"/>
+	</enum>
+	<enum name="SkipAreaStatus" type="enum8">
+		<item value="0x00" name="Success"/>
+		<item value="0x01" name="InvalidAreaList"/>
+		<item value="0x02" name="InvalidInMode"/>
+		<item value="0x03" name="InvalidSkippedArea"/>
+	</enum>
     <struct name="AreaInfoStruct">
       <field id="0" name="LocationInfo" type="locationdesc">
         <quality nullable="true"/>

@@ -303,7 +303,7 @@ namespace MatterDotNet.Clusters.Application
             public Constraints(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(0))!.Value;
-                Duration = TimeSpan.FromSeconds(reader.GetUInt(1)!.Value);
+                Duration = TimeUtil.FromSeconds(reader.GetUInt(1))!.Value;
                 NominalPower = reader.GetLong(2, true);
                 MaximumEnergy = reader.GetLong(3, true);
                 LoadControl = reader.GetSByte(4, true);
@@ -485,8 +485,8 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 MinPower = reader.GetLong(0)!.Value;
                 MaxPower = reader.GetLong(1)!.Value;
-                MinDuration = TimeSpan.FromSeconds(reader.GetUInt(2)!.Value);
-                MaxDuration = TimeSpan.FromSeconds(reader.GetUInt(3)!.Value);
+                MinDuration = TimeUtil.FromSeconds(reader.GetUInt(2))!.Value;
+                MaxDuration = TimeUtil.FromSeconds(reader.GetUInt(3))!.Value;
             }
             public required long MinPower { get; set; } = 0;
             public required long MaxPower { get; set; } = 0;
@@ -519,7 +519,7 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 SlotIndex = reader.GetByte(0)!.Value;
                 NominalPower = reader.GetLong(1, true);
-                Duration = TimeSpan.FromSeconds(reader.GetUInt(2)!.Value);
+                Duration = TimeUtil.FromSeconds(reader.GetUInt(2))!.Value;
             }
             public required byte SlotIndex { get; set; }
             public required long? NominalPower { get; set; }
@@ -549,14 +549,14 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public Slot(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                MinDuration = TimeSpan.FromSeconds(reader.GetUInt(0)!.Value);
-                MaxDuration = TimeSpan.FromSeconds(reader.GetUInt(1)!.Value);
-                DefaultDuration = TimeSpan.FromSeconds(reader.GetUInt(2)!.Value);
-                ElapsedSlotTime = TimeSpan.FromSeconds(reader.GetUInt(3)!.Value);
-                RemainingSlotTime = TimeSpan.FromSeconds(reader.GetUInt(4)!.Value);
+                MinDuration = TimeUtil.FromSeconds(reader.GetUInt(0))!.Value;
+                MaxDuration = TimeUtil.FromSeconds(reader.GetUInt(1))!.Value;
+                DefaultDuration = TimeUtil.FromSeconds(reader.GetUInt(2))!.Value;
+                ElapsedSlotTime = TimeUtil.FromSeconds(reader.GetUInt(3))!.Value;
+                RemainingSlotTime = TimeUtil.FromSeconds(reader.GetUInt(4))!.Value;
                 SlotIsPausable = reader.GetBool(5, true);
-                MinPauseDuration = reader.GetUInt(6, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(6)!.Value);
-                MaxPauseDuration = reader.GetUInt(7, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(7)!.Value);
+                MinPauseDuration = TimeUtil.FromSeconds(reader.GetUInt(6, true));
+                MaxPauseDuration = TimeUtil.FromSeconds(reader.GetUInt(7, true));
                 ManufacturerESAState = reader.GetUShort(8, true);
                 NominalPower = reader.GetLong(9, true);
                 MinPower = reader.GetLong(10, true);
@@ -570,8 +570,8 @@ namespace MatterDotNet.Clusters.Application
                 }
                 MinPowerAdjustment = reader.GetLong(14)!.Value;
                 MaxPowerAdjustment = reader.GetLong(15)!.Value;
-                MinDurationAdjustment = reader.GetUInt(16, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(16)!.Value);
-                MaxDurationAdjustment = reader.GetUInt(17, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(17)!.Value);
+                MinDurationAdjustment = TimeUtil.FromSeconds(reader.GetUInt(16, true));
+                MaxDurationAdjustment = TimeUtil.FromSeconds(reader.GetUInt(17, true));
             }
             public required TimeSpan MinDuration { get; set; }
             public required TimeSpan MaxDuration { get; set; }

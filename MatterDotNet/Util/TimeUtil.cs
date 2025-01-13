@@ -121,5 +121,17 @@ namespace MatterDotNet.Util
                 return null;
             return TimeSpan.FromMilliseconds(timespan.Value);
         }
+
+        /// <summary>
+        /// Converts a TimeSpan uint in sec to TimeSpan
+        /// </summary>
+        /// <param name="timespan"></param>
+        /// <returns></returns>
+        public static TimeSpan? FromSeconds(uint? timespan)
+        {
+            if (timespan == null)
+                return null;
+            return TimeSpan.FromSeconds(timespan.Value);
+        }
     }
 }

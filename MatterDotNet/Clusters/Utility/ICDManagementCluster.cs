@@ -24,7 +24,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// ICD Management Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class ICDManagementCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0046;
@@ -54,6 +54,25 @@ namespace MatterDotNet.Clusters.Utility
             /// Device supports operating as a Long Idle Time ICD.
             /// </summary>
             LongIdleTimeSupport = 4,
+            /// <summary>
+            /// Device supports dynamic switching from SIT to LIT operating modes.
+            /// </summary>
+            DynamicSitLitSupport = 8,
+        }
+
+        /// <summary>
+        /// Client Type
+        /// </summary>
+        public enum ClientType
+        {
+            /// <summary>
+            /// The client is typically resident, always-on, fixed infrastructure in the home.
+            /// </summary>
+            Permanent = 0,
+            /// <summary>
+            /// The client is mobile or non-resident or not always-on and may not always be available in the home.
+            /// </summary>
+            Ephemeral = 1
         }
 
         /// <summary>
@@ -68,6 +87,85 @@ namespace MatterDotNet.Clusters.Utility
             /// ICD is operating as a Long Idle Time ICD.
             /// </summary>
             LIT = 1,
+        }
+
+        /// <summary>
+        /// User Active Mode Trigger Bitmap
+        /// </summary>
+        [Flags]
+        public enum UserActiveModeTriggerBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Power Cycle to transition the device to ActiveMode
+            /// </summary>
+            PowerCycle = 1,
+            /// <summary>
+            /// Settings menu on the device informs how to transition the device to ActiveMode
+            /// </summary>
+            SettingsMenu = 2,
+            /// <summary>
+            /// Custom Instruction on how to transition the device to ActiveMode
+            /// </summary>
+            CustomInstruction = 4,
+            /// <summary>
+            /// Device Manual informs how to transition the device to ActiveMode
+            /// </summary>
+            DeviceManual = 8,
+            /// <summary>
+            /// Actuate Sensor to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensor = 16,
+            /// <summary>
+            /// Actuate Sensor for N seconds to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorSeconds = 32,
+            /// <summary>
+            /// Actuate Sensor N times to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorTimes = 64,
+            /// <summary>
+            /// Actuate Sensor until light blinks to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorLightsBlink = 128,
+            /// <summary>
+            /// Press Reset Button to transition the device to ActiveMode
+            /// </summary>
+            ResetButton = 256,
+            /// <summary>
+            /// Press Reset Button until light blinks to transition the device to ActiveMode
+            /// </summary>
+            ResetButtonLightsBlink = 512,
+            /// <summary>
+            /// Press Reset Button for N seconds to transition the device to ActiveMode
+            /// </summary>
+            ResetButtonSeconds = 1024,
+            /// <summary>
+            /// Press Reset Button N times to transition the device to ActiveMode
+            /// </summary>
+            ResetButtonTimes = 2048,
+            /// <summary>
+            /// Press Setup Button to transition the device to ActiveMode
+            /// </summary>
+            SetupButton = 4096,
+            /// <summary>
+            /// Press Setup Button for N seconds to transition the device to ActiveMode
+            /// </summary>
+            SetupButtonSeconds = 8192,
+            /// <summary>
+            /// Press Setup Button until light blinks to transition the device to ActiveMode
+            /// </summary>
+            SetupButtonLightsBlink = 16384,
+            /// <summary>
+            /// Press Setup Button N times to transition the device to ActiveMode
+            /// </summary>
+            SetupButtonTimes = 32768,
+            /// <summary>
+            /// Press the N Button to transition the device to ActiveMode
+            /// </summary>
+            AppDefinedButton = 65536,
         }
         #endregion Enums
 
@@ -89,13 +187,16 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 CheckInNodeID = reader.GetULong(1)!.Value;
                 MonitoredSubject = reader.GetULong(2)!.Value;
+                ClientType = (ClientType)(ushort)((dynamic)fields[4]);
             }
             public required ulong CheckInNodeID { get; set; }
             public required ulong MonitoredSubject { get; set; }
+            public required ClientType ClientType { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(1, CheckInNodeID);
                 writer.WriteULong(2, MonitoredSubject);
+                writer.WriteUShort(4, (ushort)ClientType);
                 writer.EndContainer();
             }
         }
@@ -107,6 +208,7 @@ namespace MatterDotNet.Clusters.Utility
             public required ulong MonitoredSubject { get; set; }
             public required byte[] Key { get; set; }
             public byte[]? VerificationKey { get; set; }
+            public required ClientType ClientType { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(0, CheckInNodeID);
@@ -114,6 +216,7 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteBytes(2, Key, 16);
                 if (VerificationKey != null)
                     writer.WriteBytes(3, VerificationKey, 16);
+                writer.WriteUShort(4, (ushort)ClientType);
                 writer.EndContainer();
             }
         }
@@ -158,12 +261,13 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Register Client
         /// </summary>
-        public async Task<RegisterClientResponse?> RegisterClient(SecureSession session, ulong CheckInNodeID, ulong MonitoredSubject, byte[] Key, byte[]? VerificationKey) {
+        public async Task<RegisterClientResponse?> RegisterClient(SecureSession session, ulong CheckInNodeID, ulong MonitoredSubject, byte[] Key, byte[]? VerificationKey, ClientType ClientType) {
             RegisterClientPayload requestFields = new RegisterClientPayload() {
                 CheckInNodeID = CheckInNodeID,
                 MonitoredSubject = MonitoredSubject,
                 Key = Key,
                 VerificationKey = VerificationKey,
+                ClientType = ClientType,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
@@ -272,8 +376,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the User Active Mode Trigger Hint attribute
         /// </summary>
-        public async Task<uint> GetUserActiveModeTriggerHint(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 6) ?? 0;
+        public async Task<UserActiveModeTriggerBitmap> GetUserActiveModeTriggerHint(SecureSession session) {
+            return (UserActiveModeTriggerBitmap)await GetEnumAttribute(session, 6);
         }
 
         /// <summary>
@@ -288,6 +392,13 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         public async Task<OperatingModeEnum> GetOperatingMode(SecureSession session) {
             return (OperatingModeEnum)await GetEnumAttribute(session, 8);
+        }
+
+        /// <summary>
+        /// Get the Maximum Check In Backoff attribute
+        /// </summary>
+        public async Task<uint> GetMaximumCheckInBackoff(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 9) ?? 1;
         }
         #endregion Attributes
 

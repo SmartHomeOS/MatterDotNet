@@ -1313,7 +1313,7 @@ namespace MatterDotNet.Clusters.Application
             LockDoorPayload requestFields = new LockDoorPayload() {
                 PINCode = PINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1324,7 +1324,7 @@ namespace MatterDotNet.Clusters.Application
             UnlockDoorPayload requestFields = new UnlockDoorPayload() {
                 PINCode = PINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1332,7 +1332,7 @@ namespace MatterDotNet.Clusters.Application
         /// Toggle
         /// </summary>
         public async Task<bool> Toggle(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x02);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -1344,7 +1344,7 @@ namespace MatterDotNet.Clusters.Application
                 Timeout = Timeout,
                 PINCode = PINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1358,7 +1358,7 @@ namespace MatterDotNet.Clusters.Application
                 UserType = UserType,
                 PIN = PIN,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1387,7 +1387,7 @@ namespace MatterDotNet.Clusters.Application
             ClearPINCodePayload requestFields = new ClearPINCodePayload() {
                 PINSlotIndex = PINSlotIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x07, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1395,7 +1395,7 @@ namespace MatterDotNet.Clusters.Application
         /// Clear All PIN Codes
         /// </summary>
         public async Task<bool> ClearAllPINCodes(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x08);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x08, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -1607,7 +1607,7 @@ namespace MatterDotNet.Clusters.Application
                 UserType = UserType,
                 RFIDCode = RFIDCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x16, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x16, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1636,7 +1636,7 @@ namespace MatterDotNet.Clusters.Application
             ClearRFIDCodePayload requestFields = new ClearRFIDCodePayload() {
                 RFIDSlotIndex = RFIDSlotIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x18, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x18, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1644,7 +1644,7 @@ namespace MatterDotNet.Clusters.Application
         /// Clear All RFID Codes
         /// </summary>
         public async Task<bool> ClearAllRFIDCodes(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x19);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x19, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -1661,7 +1661,7 @@ namespace MatterDotNet.Clusters.Application
                 UserType = UserType,
                 CredentialRule = CredentialRule,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x1A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x1A, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1696,7 +1696,7 @@ namespace MatterDotNet.Clusters.Application
             ClearUserPayload requestFields = new ClearUserPayload() {
                 UserIndex = UserIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x1D, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x1D, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1712,7 +1712,7 @@ namespace MatterDotNet.Clusters.Application
                 UserStatus = UserStatus,
                 UserType = UserType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x22, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x22, commandTimeoutMS, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetCredentialResponse() {
@@ -1749,7 +1749,7 @@ namespace MatterDotNet.Clusters.Application
             ClearCredentialPayload requestFields = new ClearCredentialPayload() {
                 Credential = Credential,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x26, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x26, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1760,7 +1760,7 @@ namespace MatterDotNet.Clusters.Application
             UnboltDoorPayload requestFields = new UnboltDoorPayload() {
                 PINCode = PINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x27, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x27, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1774,7 +1774,7 @@ namespace MatterDotNet.Clusters.Application
                 GroupIdentifier = GroupIdentifier,
                 GroupResolvingKey = GroupResolvingKey,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x28, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x28, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1782,7 +1782,7 @@ namespace MatterDotNet.Clusters.Application
         /// Clear Aliro Reader Config
         /// </summary>
         public async Task<bool> ClearAliroReaderConfig(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x29);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x29, commandTimeoutMS);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -25,6 +25,16 @@ namespace MatterDotNet.Messages
 
         /// <inheritdoc />
         [SetsRequiredMembers]
+        public LocationDescriptor(object[] fields)
+        {
+            FieldReader reader = new FieldReader(fields);
+            LocationName = reader.GetString(0)!;
+            FloorNumber = reader.GetUShort(1)!.Value;
+            AreaType = new SemanticTag(reader.GetStruct(2)!);
+        }
+
+        /// <inheritdoc />
+        [SetsRequiredMembers]
         public LocationDescriptor(Memory<byte> data) : this(new TLVReader(data)) {}
 
         public required string LocationName { get; set; }

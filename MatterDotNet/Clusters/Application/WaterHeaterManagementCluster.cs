@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Application
@@ -114,7 +115,7 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public WaterHeaterBoostInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Duration = TimeSpan.FromSeconds(reader.GetUInt(0)!.Value);
+                Duration = TimeUtil.FromSeconds(reader.GetUInt(0))!.Value;
                 OneShot = reader.GetBool(1, true);
                 EmergencyBoost = reader.GetBool(2, true);
                 TemporarySetpoint = reader.GetShort(3, true);

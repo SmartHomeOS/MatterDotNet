@@ -317,7 +317,7 @@ namespace Generator
             switch (type)
             {
                 case "list": //Actually an array
-                    if (nullable)
+                    if (nullable && !optional)
                         writer.WriteLine($"{totalIndent}if ({name} != null)");
                     writer.WriteLine($"{totalIndent}{{");
                     if (from != null || to != null)
@@ -512,6 +512,7 @@ namespace Generator
                 case "event-no":
                 case "SubjectID":
                 case "subject-id":
+                case "ref_SubjectId":
                     writer.Write($"{totalIndent}writer.WriteULong({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
@@ -686,6 +687,7 @@ namespace Generator
                 case "event-no":
                 case "SubjectID":
                 case "subject-id":
+                case "ref_SubjectId":
                     writer.Write($"reader.GetULong({id}");
                     break;
                 case "single":
@@ -720,7 +722,8 @@ namespace Generator
                     extraClose = true;
                     break;
                 case "elapsed-s":
-                    writer.Write($"TimeSpan.FromSeconds(reader.GetUInt({id}");
+                    includes.Add("MatterDotNet.Util");
+                    writer.Write($"TimeUtil.FromSeconds(reader.GetUInt({id}");
                     extraClose = true;
                     break;
                 case "epoch-us":
@@ -940,7 +943,7 @@ namespace Generator
                         }
                         writer.WriteLine("            };");
                         if (cmd.access.timed)
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ", requestFields);");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.id + ", commandTimeoutMS, requestFields);");
                         else
                             writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.id + ", requestFields);");
                     }
@@ -949,14 +952,14 @@ namespace Generator
                         if (cmd.response == "N")
                         {
                             if (cmd.access.timed)
-                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ");");
+                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, cluster, " + cmd.id + ", commandTimeoutMS);");
                             else
                                 writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, cluster, " + cmd.id + ");");
                         }
                         else
                         {
                             if (cmd.access.timed)
-                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, " + cmd.id + ");");
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.id + ", commandTimeoutMS);");
                             else
                                 writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.id + ");");
                         }
@@ -1375,6 +1378,7 @@ namespace Generator
                 case "event-no":
                 case "SubjectID":
                 case "subject-id":
+                case "ref_SubjectId":
                     writer.Write("ulong");
                     break;
                 case "int8":
@@ -1446,7 +1450,7 @@ namespace Generator
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("SemanticTag");
                     break;
-                case "LocationDescriptorStruct":
+                case "locationdesc":
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("LocationDescriptor");
                     break;
@@ -1460,6 +1464,9 @@ namespace Generator
                     break;
                 case "ref_OccupancyBitmap":
                     writer.Write("OccupancySensingCluster.OccupancyBitmap");
+                    break;
+                case "ref_DeviceTypeStruct":
+                    writer.Write("DescriptorCluster.DeviceType");
                     break;
                 case "tod":
                 case "date":

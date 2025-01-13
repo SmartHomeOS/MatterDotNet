@@ -396,7 +396,7 @@ namespace MatterDotNet.Clusters.Application
         /// Disable
         /// </summary>
         public async Task<bool> Disable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -409,7 +409,7 @@ namespace MatterDotNet.Clusters.Application
                 MinimumChargeCurrent = MinimumChargeCurrent,
                 MaximumChargeCurrent = MaximumChargeCurrent,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -421,7 +421,7 @@ namespace MatterDotNet.Clusters.Application
                 DischargingEnabledUntil = DischargingEnabledUntil,
                 MaximumDischargeCurrent = MaximumDischargeCurrent,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -429,7 +429,7 @@ namespace MatterDotNet.Clusters.Application
         /// Start Diagnostics
         /// </summary>
         public async Task<bool> StartDiagnostics(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x04);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS);
             return ValidateResponse(resp);
         }
 
@@ -440,7 +440,7 @@ namespace MatterDotNet.Clusters.Application
             SetTargetsPayload requestFields = new SetTargetsPayload() {
                 ChargingTargetSchedules = ChargingTargetSchedules,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -448,7 +448,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get Targets
         /// </summary>
         public async Task<GetTargetsResponse?> GetTargets(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x06);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x06, commandTimeoutMS);
             if (!ValidateResponse(resp))
                 return null;
             return new GetTargetsResponse() {
@@ -460,7 +460,7 @@ namespace MatterDotNet.Clusters.Application
         /// Clear Targets
         /// </summary>
         public async Task<bool> ClearTargets(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x07);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x07, commandTimeoutMS);
             return ValidateResponse(resp);
         }
         #endregion Commands

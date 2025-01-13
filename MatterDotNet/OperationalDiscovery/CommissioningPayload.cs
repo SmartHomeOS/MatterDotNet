@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Security;
+using System.Text;
 
 namespace MatterDotNet.OperationalDiscovery
 {
@@ -41,6 +42,10 @@ namespace MatterDotNet.OperationalDiscovery
             /// IP
             /// </summary>
             IP = 0x4,
+            /// <summary>
+            /// WiFi Public Action Frame
+            /// </summary>
+            WiFi = 0x8
         }
         /// <summary>
         /// Commissioning Flow
@@ -123,6 +128,20 @@ namespace MatterDotNet.OperationalDiscovery
             if (padding != 0)
                 throw new ArgumentException("Invalid QR Code");
         }
+
+        /// <summary>
+        /// Create a payload from a NFC Tag NDEF block
+        /// </summary>
+        /// <param name="QRCode"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static CommissioningPayload FromNFC(byte[] ndef)
+        {
+            if (ndef.Length < 10)
+                throw new ArgumentException("Invalid Format");
+            return FromQR(Encoding.UTF8.GetString(ndef.AsSpan(5)));
+        }
+
 
         /// <summary>
         /// Create a payload from a QR code starting with "MT:"

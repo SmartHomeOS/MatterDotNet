@@ -331,9 +331,9 @@ namespace MatterDotNet.Protocol.Parsers
             else if (any is bool)
                 WriteBool(tagNumber, (bool)any);
             else if (any is uint || any is ulong || any is ushort || any is byte)
-                WriteULong(tagNumber, (ulong)any);
+                WriteULong(tagNumber, (ulong)(dynamic)any);
             else if (any is int || any is long || any is short || any is sbyte)
-                WriteLong(tagNumber, (long)any);
+                WriteLong(tagNumber, (long)(dynamic)any);
             else if (any is byte[])
                 WriteBytes(tagNumber, (byte[])any);
             else if (any is string)

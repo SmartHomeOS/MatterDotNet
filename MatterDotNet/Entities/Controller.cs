@@ -44,13 +44,19 @@ namespace MatterDotNet.Entities
         {
             this.fabric = fabric;
         }
+        
+        /// <summary>
+        /// Create a controller with a new fabric
+        /// </summary>
+        /// <param name="fabricName"></param>
+        public Controller(string fabricName = "MatterDotNot") : this((ulong)Random.Shared.NextInt64(), fabricName) { }
 
         /// <summary>
         /// Create a controller with a new fabric
         /// </summary>
         /// <param name="fabricId"></param>
         /// <param name="fabricName"></param>
-        public Controller(uint fabricId, string fabricName = "MatterDotNot")
+        public Controller(ulong fabricId, string fabricName = "MatterDotNot")
         {
             this.fabric = new Fabric(fabricName, fabricId, RandomNumberGenerator.GetBytes(16));
             this.fabric.CreateCommissioner();

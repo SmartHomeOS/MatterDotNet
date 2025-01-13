@@ -432,7 +432,6 @@ namespace MatterDotNet.Clusters.Application
                 if (Description != null)
                     writer.WriteString(6, Description, 8192);
                 if (AudioLanguages != null)
-                if (AudioLanguages != null)
                 {
                     Constrain(AudioLanguages, 0, 10);
                     writer.StartArray(7);
@@ -441,7 +440,6 @@ namespace MatterDotNet.Clusters.Application
                     }
                     writer.EndContainer();
                 }
-                if (Ratings != null)
                 if (Ratings != null)
                 {
                     Constrain(Ratings, 0, 255);
@@ -466,7 +464,6 @@ namespace MatterDotNet.Clusters.Application
                 if (SeriesInfo != null)
                     SeriesInfo.Serialize(writer, 15);
                 if (CategoryList != null)
-                if (CategoryList != null)
                 {
                     Constrain(CategoryList, 0, 255);
                     writer.StartArray(16);
@@ -476,7 +473,6 @@ namespace MatterDotNet.Clusters.Application
                     writer.EndContainer();
                 }
                 if (CastList != null)
-                if (CastList != null)
                 {
                     Constrain(CastList, 0, 255);
                     writer.StartArray(17);
@@ -485,7 +481,6 @@ namespace MatterDotNet.Clusters.Application
                     }
                     writer.EndContainer();
                 }
-                if (ExternalIDList != null)
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
@@ -579,7 +574,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUInt(0, TimeUtil.ToEpochSeconds(StartTime));
                 writer.WriteUInt(1, TimeUtil.ToEpochSeconds(EndTime));
                 if (ChannelList != null)
-                if (ChannelList != null)
                 {
                     Constrain(ChannelList, 0, 255);
                     writer.StartArray(2);
@@ -592,7 +586,6 @@ namespace MatterDotNet.Clusters.Application
                     PageToken.Serialize(writer, 3);
                 if (RecordingFlag != null)
                     writer.WriteUShort(5, (ushort?)RecordingFlag);
-                if (ExternalIDList != null)
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
@@ -626,7 +619,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteString(0, ProgramIdentifier, 255);
                 writer.WriteBool(1, ShouldRecordSeries);
                 if (ExternalIDList != null)
-                if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);
                     writer.StartArray(2);
@@ -650,7 +642,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, ProgramIdentifier, 255);
                 writer.WriteBool(1, ShouldRecordSeries);
-                if (ExternalIDList != null)
                 if (ExternalIDList != null)
                 {
                     Constrain(ExternalIDList, 0, 255);

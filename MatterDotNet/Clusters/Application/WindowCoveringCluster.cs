@@ -379,14 +379,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record GoToLiftPercentagePayload : TLVPayload {
-            public byte? LiftPercentageValue { get; set; }
-            public ushort? LiftPercent100thsValue { get; set; }
+            public required ushort LiftPercent100thsValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (LiftPercentageValue != null)
-                    writer.WriteByte(0, LiftPercentageValue);
-                if (LiftPercent100thsValue != null)
-                    writer.WriteUShort(1, LiftPercent100thsValue);
+                writer.WriteUShort(0, LiftPercent100thsValue);
                 writer.EndContainer();
             }
         }
@@ -401,14 +397,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record GoToTiltPercentagePayload : TLVPayload {
-            public byte? TiltPercentageValue { get; set; }
-            public ushort? TiltPercent100thsValue { get; set; }
+            public required ushort TiltPercent100thsValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (TiltPercentageValue != null)
-                    writer.WriteByte(0, TiltPercentageValue);
-                if (TiltPercent100thsValue != null)
-                    writer.WriteUShort(1, TiltPercent100thsValue);
+                writer.WriteUShort(0, TiltPercent100thsValue);
                 writer.EndContainer();
             }
         }
@@ -453,9 +445,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Lift Percentage
         /// </summary>
-        public async Task<bool> GoToLiftPercentage(SecureSession session, byte? LiftPercentageValue, ushort? LiftPercent100thsValue) {
+        public async Task<bool> GoToLiftPercentage(SecureSession session, ushort LiftPercent100thsValue) {
             GoToLiftPercentagePayload requestFields = new GoToLiftPercentagePayload() {
-                LiftPercentageValue = LiftPercentageValue,
                 LiftPercent100thsValue = LiftPercent100thsValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
@@ -476,9 +467,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Tilt Percentage
         /// </summary>
-        public async Task<bool> GoToTiltPercentage(SecureSession session, byte? TiltPercentageValue, ushort? TiltPercent100thsValue) {
+        public async Task<bool> GoToTiltPercentage(SecureSession session, ushort TiltPercent100thsValue) {
             GoToTiltPercentagePayload requestFields = new GoToTiltPercentagePayload() {
-                TiltPercentageValue = TiltPercentageValue,
                 TiltPercent100thsValue = TiltPercent100thsValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
@@ -652,13 +642,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Mode attribute
         /// </summary>
         public async Task<ModeBitmap> GetMode(SecureSession session) {
-            return (ModeBitmap)await GetEnumAttribute(session, 23);
+            return (ModeBitmap?)(dynamic?)await GetAttribute(session, 23) ?? 0;
         }
 
         /// <summary>
         /// Set the Mode attribute
         /// </summary>
-        public async Task SetMode (SecureSession session, ModeBitmap value) {
+        public async Task SetMode (SecureSession session, ModeBitmap? value = 0) {
             await SetAttribute(session, 23, value);
         }
 

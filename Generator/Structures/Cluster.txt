@@ -5,3 +5,10 @@
 	Tag [2] : UNSIGNED INTEGER [ range 8-bits ]
 	Label [3, optional] : string
 }
+
+LocationDescriptor => STRUCTURE
+{
+	LocationName [0] : string [ LENGTH 128 ],
+	FloorNumber [1] : UNSIGNED INTEGER [ range 16-bits ],
+	AreaType [2] : SemanticTag
+}

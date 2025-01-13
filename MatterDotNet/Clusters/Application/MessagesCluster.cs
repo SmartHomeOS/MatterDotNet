@@ -205,7 +205,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteULong(4, Duration);
                 writer.WriteString(5, MessageText, 256);
                 if (Responses != null)
-                if (Responses != null)
                 {
                     Constrain(Responses, 0, 4);
                     writer.StartArray(6);
@@ -239,7 +238,6 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteUInt(3, TimeUtil.ToEpochSeconds(StartTime!.Value));
                 writer.WriteULong(4, Duration);
                 writer.WriteString(5, MessageText, 256);
-                if (Responses != null)
                 if (Responses != null)
                 {
                     Constrain(Responses, 0, 4);

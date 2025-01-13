@@ -25,7 +25,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Thermostat Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 6)]
+    [ClusterRevision(CLUSTER_ID, 8)]
     public class ThermostatCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0201;
@@ -71,6 +71,14 @@ namespace MatterDotNet.Clusters.Application
             /// Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute
             /// </summary>
             LocalTemperatureNotExposed = 64,
+            /// <summary>
+            /// Supports enhanced schedules
+            /// </summary>
+            MatterScheduleConfiguration = 128,
+            /// <summary>
+            /// Thermostat supports setpoint presets
+            /// </summary>
+            Presets = 256,
         }
 
         /// <summary>
@@ -207,6 +215,40 @@ namespace MatterDotNet.Clusters.Application
             /// All modes are possible
             /// </summary>
             CoolingAndHeatingWithReheat = 5,
+        }
+
+        /// <summary>
+        /// Preset Scenario
+        /// </summary>
+        public enum PresetScenarioEnum {
+            /// <summary>
+            /// The thermostat-controlled area is occupied
+            /// </summary>
+            Occupied = 1,
+            /// <summary>
+            /// The thermostat-controlled area is unoccupied
+            /// </summary>
+            Unoccupied = 2,
+            /// <summary>
+            /// Users are likely to be sleeping
+            /// </summary>
+            Sleep = 3,
+            /// <summary>
+            /// Users are likely to be waking up
+            /// </summary>
+            Wake = 4,
+            /// <summary>
+            /// Users are on vacation
+            /// </summary>
+            Vacation = 5,
+            /// <summary>
+            /// Users are likely to be going to sleep
+            /// </summary>
+            GoingToSleep = 6,
+            /// <summary>
+            /// Custom presets
+            /// </summary>
+            UserDefined = 254,
         }
 
         /// <summary>
@@ -405,6 +447,40 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
+        /// Occupancy Bitmap
+        /// </summary>
+        [Flags]
+        public enum OccupancyBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Indicates the occupancy state
+            /// </summary>
+            Occupied = 1,
+        }
+
+        /// <summary>
+        /// Preset Type Features Bitmap
+        /// </summary>
+        [Flags]
+        public enum PresetTypeFeaturesBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Preset may be automatically activated by the thermostat
+            /// </summary>
+            Automatic = 1,
+            /// <summary>
+            /// Preset supports user-provided names
+            /// </summary>
+            SupportsNames = 2,
+        }
+
+        /// <summary>
         /// Programming Operation Mode Bitmap
         /// </summary>
         [Flags]
@@ -437,27 +513,27 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             None = 0,
             /// <summary>
-            /// Heat State On
+            /// Heat Stage On
             /// </summary>
             Heat = 1,
             /// <summary>
-            /// Cool State On
+            /// Cool Stage On
             /// </summary>
             Cool = 2,
             /// <summary>
-            /// Fan State On
+            /// Fan Stage On
             /// </summary>
             Fan = 4,
             /// <summary>
-            /// Heat 2 State On
+            /// Heat 2 Stage On
             /// </summary>
             HeatStage2 = 8,
             /// <summary>
-            /// Cool 2 State On
+            /// Cool 2 Stage On
             /// </summary>
             CoolStage2 = 16,
             /// <summary>
-            /// Fan 2 State On
+            /// Fan 2 Stage On
             /// </summary>
             FanStage2 = 32,
             /// <summary>
@@ -550,9 +626,239 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             CoolSetpointPresent = 2,
         }
+
+        /// <summary>
+        /// Schedule Type Features Bitmap
+        /// </summary>
+        [Flags]
+        public enum ScheduleTypeFeaturesBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Supports presets
+            /// </summary>
+            SupportsPresets = 1,
+            /// <summary>
+            /// Supports setpoints
+            /// </summary>
+            SupportsSetpoints = 2,
+            /// <summary>
+            /// Supports user-provided names
+            /// </summary>
+            SupportsNames = 4,
+            /// <summary>
+            /// Supports transitioning to SystemModeOff
+            /// </summary>
+            SupportsOff = 8,
+        }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Preset
+        /// </summary>
+        public record Preset : TLVPayload {
+            /// <summary>
+            /// Preset
+            /// </summary>
+            public Preset() { }
+
+            /// <summary>
+            /// Preset
+            /// </summary>
+            [SetsRequiredMembers]
+            public Preset(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                PresetHandle = reader.GetBytes(0, false)!;
+                PresetScenario = (PresetScenarioEnum)reader.GetUShort(1)!.Value;
+                Name = reader.GetString(2, true);
+                CoolingSetpoint = reader.GetShort(3, true);
+                HeatingSetpoint = reader.GetShort(4, true);
+                BuiltIn = reader.GetBool(5, true);
+            }
+            public required byte[]? PresetHandle { get; set; }
+            public required PresetScenarioEnum PresetScenario { get; set; }
+            public string? Name { get; set; } = null;
+            public required short? CoolingSetpoint { get; set; } = 2600;
+            public required short? HeatingSetpoint { get; set; } = 2000;
+            public required bool? BuiltIn { get; set; } = false;
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, PresetHandle, 16);
+                writer.WriteUShort(1, (ushort)PresetScenario);
+                if (Name != null)
+                    writer.WriteString(2, Name, 64);
+                if (CoolingSetpoint != null)
+                    writer.WriteShort(3, CoolingSetpoint);
+                if (HeatingSetpoint != null)
+                    writer.WriteShort(4, HeatingSetpoint);
+                writer.WriteBool(5, BuiltIn);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Preset Type
+        /// </summary>
+        public record PresetType : TLVPayload {
+            /// <summary>
+            /// Preset Type
+            /// </summary>
+            public PresetType() { }
+
+            /// <summary>
+            /// Preset Type
+            /// </summary>
+            [SetsRequiredMembers]
+            public PresetType(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                PresetScenario = (PresetScenarioEnum)reader.GetUShort(0)!.Value;
+                NumberOfPresets = reader.GetByte(1)!.Value;
+                PresetTypeFeatures = (PresetTypeFeaturesBitmap)reader.GetUShort(2)!.Value;
+            }
+            public required PresetScenarioEnum PresetScenario { get; set; }
+            public required byte NumberOfPresets { get; set; } = 0;
+            public required PresetTypeFeaturesBitmap PresetTypeFeatures { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)PresetScenario);
+                writer.WriteByte(1, NumberOfPresets);
+                writer.WriteUShort(2, (ushort)PresetTypeFeatures);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Schedule
+        /// </summary>
+        public record Schedule : TLVPayload {
+            /// <summary>
+            /// Schedule
+            /// </summary>
+            public Schedule() { }
+
+            /// <summary>
+            /// Schedule
+            /// </summary>
+            [SetsRequiredMembers]
+            public Schedule(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                ScheduleHandle = reader.GetBytes(0, false)!;
+                SystemMode = (SystemModeEnum)reader.GetUShort(1)!.Value;
+                Name = reader.GetString(2, true);
+                PresetHandle = reader.GetBytes(3, true);
+                {
+                    Transitions = new ScheduleTransition[((object[])fields[4]).Length];
+                    for (int i = 0; i < Transitions.Length; i++) {
+                        Transitions[i] = new ScheduleTransition((object[])fields[-1]);
+                    }
+                }
+                BuiltIn = reader.GetBool(5, true);
+            }
+            public required byte[]? ScheduleHandle { get; set; }
+            public required SystemModeEnum SystemMode { get; set; }
+            public string? Name { get; set; }
+            public byte[]? PresetHandle { get; set; }
+            public required ScheduleTransition[] Transitions { get; set; } = Array.Empty<ScheduleTransition>();
+            public required bool? BuiltIn { get; set; } = false;
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, ScheduleHandle, 16);
+                writer.WriteUShort(1, (ushort)SystemMode);
+                if (Name != null)
+                    writer.WriteString(2, Name, 64);
+                if (PresetHandle != null)
+                    writer.WriteBytes(3, PresetHandle, 16);
+                {
+                    Constrain(Transitions, 1);
+                    writer.StartArray(4);
+                    foreach (var item in Transitions) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.WriteBool(5, BuiltIn);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Schedule Transition
+        /// </summary>
+        public record ScheduleTransition : TLVPayload {
+            /// <summary>
+            /// Schedule Transition
+            /// </summary>
+            public ScheduleTransition() { }
+
+            /// <summary>
+            /// Schedule Transition
+            /// </summary>
+            [SetsRequiredMembers]
+            public ScheduleTransition(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                DayOfWeek = (ScheduleDayOfWeekBitmap)reader.GetUShort(0)!.Value;
+                TransitionTime = reader.GetUShort(1)!.Value;
+                PresetHandle = reader.GetBytes(2, true);
+                SystemMode = (SystemModeEnum?)reader.GetUShort(3, true);
+                CoolingSetpoint = reader.GetShort(4, true);
+                HeatingSetpoint = reader.GetShort(5, true);
+            }
+            public required ScheduleDayOfWeekBitmap DayOfWeek { get; set; }
+            public required ushort TransitionTime { get; set; }
+            public byte[]? PresetHandle { get; set; }
+            public SystemModeEnum? SystemMode { get; set; }
+            public short? CoolingSetpoint { get; set; }
+            public short? HeatingSetpoint { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)DayOfWeek);
+                writer.WriteUShort(1, TransitionTime, 1439);
+                if (PresetHandle != null)
+                    writer.WriteBytes(2, PresetHandle, 16);
+                if (SystemMode != null)
+                    writer.WriteUShort(3, (ushort)SystemMode);
+                if (CoolingSetpoint != null)
+                    writer.WriteShort(4, CoolingSetpoint);
+                if (HeatingSetpoint != null)
+                    writer.WriteShort(5, HeatingSetpoint);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Schedule Type
+        /// </summary>
+        public record ScheduleType : TLVPayload {
+            /// <summary>
+            /// Schedule Type
+            /// </summary>
+            public ScheduleType() { }
+
+            /// <summary>
+            /// Schedule Type
+            /// </summary>
+            [SetsRequiredMembers]
+            public ScheduleType(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                SystemMode = (SystemModeEnum)reader.GetUShort(0)!.Value;
+                NumberOfSchedules = reader.GetByte(1)!.Value;
+                ScheduleTypeFeatures = (ScheduleTypeFeaturesBitmap)reader.GetUShort(2)!.Value;
+            }
+            public required SystemModeEnum SystemMode { get; set; }
+            public required byte NumberOfSchedules { get; set; } = 0;
+            public required ScheduleTypeFeaturesBitmap ScheduleTypeFeatures { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)SystemMode);
+                writer.WriteByte(1, NumberOfSchedules);
+                writer.WriteUShort(2, (ushort)ScheduleTypeFeatures);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Weekly Schedule Transition
         /// </summary>
@@ -651,6 +957,24 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
+
+        private record SetActiveScheduleRequestPayload : TLVPayload {
+            public required byte[] ScheduleHandle { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, ScheduleHandle, 16);
+                writer.EndContainer();
+            }
+        }
+
+        private record SetActivePresetRequestPayload : TLVPayload {
+            public required byte[]? PresetHandle { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, PresetHandle, 16);
+                writer.EndContainer();
+            }
+        }
         #endregion Payloads
 
         #region Commands
@@ -723,6 +1047,28 @@ namespace MatterDotNet.Clusters.Application
                 UnreadEntries = (ushort)GetField(resp, 5),
             };
         }
+
+        /// <summary>
+        /// Set Active Schedule Request
+        /// </summary>
+        public async Task<bool> SetActiveScheduleRequest(SecureSession session, byte[] ScheduleHandle) {
+            SetActiveScheduleRequestPayload requestFields = new SetActiveScheduleRequestPayload() {
+                ScheduleHandle = ScheduleHandle,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            return ValidateResponse(resp);
+        }
+
+        /// <summary>
+        /// Set Active Preset Request
+        /// </summary>
+        public async Task<bool> SetActivePresetRequest(SecureSession session, byte[] PresetHandle) {
+            SetActivePresetRequestPayload requestFields = new SetActivePresetRequestPayload() {
+                PresetHandle = PresetHandle,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            return ValidateResponse(resp);
+        }
         #endregion Commands
 
         #region Attributes
@@ -764,8 +1110,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Occupancy attribute
         /// </summary>
-        public async Task<OccupancySensingCluster.OccupancyBitmap> GetOccupancy(SecureSession session) {
-            return (OccupancySensingCluster.OccupancyBitmap?)(dynamic?)await GetAttribute(session, 2) ?? (OccupancySensingCluster.OccupancyBitmap)1;
+        public async Task<OccupancyBitmap> GetOccupancy(SecureSession session) {
+            return (OccupancyBitmap)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
@@ -1284,6 +1630,113 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public async Task SetACCapacityFormat (SecureSession session, ACCapacityFormatEnum value) {
             await SetAttribute(session, 71, value);
+        }
+
+        /// <summary>
+        /// Get the Preset Types attribute
+        /// </summary>
+        public async Task<PresetType[]> GetPresetTypes(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 72))!);
+            PresetType[] list = new PresetType[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new PresetType(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Get the Schedule Types attribute
+        /// </summary>
+        public async Task<ScheduleType[]> GetScheduleTypes(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 73))!);
+            ScheduleType[] list = new ScheduleType[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new ScheduleType(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Get the Number Of Presets attribute
+        /// </summary>
+        public async Task<byte> GetNumberOfPresets(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 74) ?? 0;
+        }
+
+        /// <summary>
+        /// Get the Number Of Schedules attribute
+        /// </summary>
+        public async Task<byte> GetNumberOfSchedules(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 75) ?? 0;
+        }
+
+        /// <summary>
+        /// Get the Number Of Schedule Transitions attribute
+        /// </summary>
+        public async Task<byte> GetNumberOfScheduleTransitions(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 76) ?? 0;
+        }
+
+        /// <summary>
+        /// Get the Number Of Schedule Transition Per Day attribute
+        /// </summary>
+        public async Task<byte?> GetNumberOfScheduleTransitionPerDay(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 77, true) ?? null;
+        }
+
+        /// <summary>
+        /// Get the Active Preset Handle attribute
+        /// </summary>
+        public async Task<byte[]?> GetActivePresetHandle(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 78, true) ?? null;
+        }
+
+        /// <summary>
+        /// Get the Active Schedule Handle attribute
+        /// </summary>
+        public async Task<byte[]?> GetActiveScheduleHandle(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 79, true) ?? null;
+        }
+
+        /// <summary>
+        /// Get the Presets attribute
+        /// </summary>
+        public async Task<Preset[]> GetPresets(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 80))!);
+            Preset[] list = new Preset[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new Preset(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Set the Presets attribute
+        /// </summary>
+        public async Task SetPresets (SecureSession session, Preset[] value) {
+            await SetAttribute(session, 80, value);
+        }
+
+        /// <summary>
+        /// Get the Schedules attribute
+        /// </summary>
+        public async Task<Schedule[]> GetSchedules(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 81))!);
+            Schedule[] list = new Schedule[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new Schedule(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Set the Schedules attribute
+        /// </summary>
+        public async Task SetSchedules (SecureSession session, Schedule[] value) {
+            await SetAttribute(session, 81, value);
+        }
+
+        /// <summary>
+        /// Get the Setpoint Hold Expiry Timestamp attribute
+        /// </summary>
+        public async Task<DateTime?> GetSetpointHoldExpiryTimestamp(SecureSession session) {
+            return (DateTime?)(dynamic?)await GetAttribute(session, 82, true) ?? null;
         }
         #endregion Attributes
 

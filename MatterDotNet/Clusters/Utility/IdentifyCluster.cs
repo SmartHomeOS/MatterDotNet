@@ -23,7 +23,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Identify Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 4)]
+    [ClusterRevision(CLUSTER_ID, 5)]
     public class IdentifyCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0003;

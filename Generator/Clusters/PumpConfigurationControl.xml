@@ -96,37 +96,44 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
+      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a
+                                 constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCONST"/>
         </mandatoryConform>
       </item>
-      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
+      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a
+                                 constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCOMP"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a constant flow through the pump.">
+      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a
+                                 constant flow through the pump.">
         <mandatoryConform>
           <feature name="FLW"/>
         </mandatoryConform>
       </item>
-      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a constant temperature.">
+      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a
+                                 constant temperature.">
         <mandatoryConform>
           <feature name="TEMP"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.">
+      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide
+                                 the most suitable performance with respect to comfort and energy savings.">
         <mandatoryConform>
           <feature name="AUTO"/>
         </mandatoryConform>
       </item>
     </enum>
     <enum name="OperationModeEnum">
-      <item value="0" name="Normal" summary="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.">
+      <item value="0" name="Normal" summary="The pump is controlled by a setpoint,
+                    as defined by a connected remote sensor or by the ControlMode attribute.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed it can without being stopped.">
+      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed
+                    it can without being stopped.">
         <mandatoryConform>
           <feature name="SPD"/>
         </mandatoryConform>
@@ -136,7 +143,8 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump, regardless of what these are.">
+      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump,
+                    regardless of what these are.">
         <mandatoryConform>
           <feature name="LOCAL"/>
         </mandatoryConform>
@@ -365,11 +373,8 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0022" name="AlarmMask" type="map16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0022" name="AlarmMask">
       <deprecateConform/>
-      <constraint type="desc"/>
     </attribute>
   </attributes>
   <events>

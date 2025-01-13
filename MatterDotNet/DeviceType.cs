@@ -40,6 +40,10 @@ namespace MatterDotNet
         /// </summary>
         BasicVideoPlayer = 0x0028,
         /// <summary>
+        /// Battery Storage Type
+        /// </summary>
+        BatteryStorage = 0x0018,
+        /// <summary>
         /// Bridged Node Type
         /// </summary>
         BridgedNode = 0x0013,
@@ -136,9 +140,17 @@ namespace MatterDotNet
         /// </summary>
         GenericSwitch = 0x000F,
         /// <summary>
+        /// Heat Pump Type
+        /// </summary>
+        HeatPump = 0x0309,
+        /// <summary>
         /// Humidity Sensor Type
         /// </summary>
         HumiditySensor = 0x0307,
+        /// <summary>
+        /// Joint Fabric Administrator Type
+        /// </summary>
+        JointFabricAdministrator = 0x0130,
         /// <summary>
         /// Laundry Dryer Type
         /// </summary>
@@ -159,6 +171,18 @@ namespace MatterDotNet
         /// Mode Select Type
         /// </summary>
         ModeSelect = 0x0027,
+        /// <summary>
+        /// Mounted Dimmable Load Control Type
+        /// </summary>
+        MountedDimmableLoadControl = 0x0110,
+        /// <summary>
+        /// Mounted On/Off Control Type
+        /// </summary>
+        MountedOn_OffControl = 0x010F,
+        /// <summary>
+        /// Network Infrastructure Manager Type
+        /// </summary>
+        NetworkInfrastructureManager = 0x0090,
         /// <summary>
         /// Occupancy Sensor Type
         /// </summary>
@@ -228,9 +252,17 @@ namespace MatterDotNet
         /// </summary>
         RootNode = 0x0016,
         /// <summary>
+        /// Secondary Network Interface Type
+        /// </summary>
+        SecondaryNetworkInterface = 0x0019,
+        /// <summary>
         /// Smoke CO Alarm Type
         /// </summary>
         SmokeCOAlarm = 0x0076,
+        /// <summary>
+        /// Solar Power Type
+        /// </summary>
+        SolarPower = 0x0017,
         /// <summary>
         /// Speaker Type
         /// </summary>
@@ -248,6 +280,10 @@ namespace MatterDotNet
         /// </summary>
         Thermostat = 0x0301,
         /// <summary>
+        /// Thread Border Router Type
+        /// </summary>
+        ThreadBorderRouter = 0x0091,
+        /// <summary>
         /// Video Remote Control Type
         /// </summary>
         VideoRemoteControl = 0x002A,
@@ -255,6 +291,10 @@ namespace MatterDotNet
         /// Water Freeze Detector Type
         /// </summary>
         WaterFreezeDetector = 0x0041,
+        /// <summary>
+        /// Water Heater Type
+        /// </summary>
+        WaterHeater = 0x050F,
         /// <summary>
         /// Water Leak Detector Type
         /// </summary>

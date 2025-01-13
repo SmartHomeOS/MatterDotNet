@@ -20,7 +20,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Laundry Washer Controls Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 1)]
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class LaundryWasherControlsCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0053;

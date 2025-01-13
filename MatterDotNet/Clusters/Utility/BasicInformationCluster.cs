@@ -22,7 +22,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Basic Information Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
+    [ClusterRevision(CLUSTER_ID, 4)]
     public class BasicInformationCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0028;

@@ -371,7 +371,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUShort(0, (ushort)Type);
                 writer.WriteString(1, Value, 1024);
                 if (ExternalIDList != null)
-                if (ExternalIDList != null)
                 {
                     writer.StartArray(2);
                     foreach (var item in ExternalIDList) {

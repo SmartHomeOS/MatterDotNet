@@ -25,7 +25,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Device Energy Management Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
+    [ClusterRevision(CLUSTER_ID, 4)]
     public class DeviceEnergyManagementCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0098;
@@ -266,6 +266,24 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             OptOut = 3,
         }
+
+        /// <summary>
+        /// Power Adjust Reason
+        /// </summary>
+        public enum PowerAdjustReasonEnum {
+            /// <summary>
+            /// There is no Power Adjustment active
+            /// </summary>
+            NoAdjustment = 0,
+            /// <summary>
+            /// There is PowerAdjustment active due to local EMS optimization
+            /// </summary>
+            LocalOptimizationAdjustment = 1,
+            /// <summary>
+            /// There is PowerAdjustment active due to local EMS optimization
+            /// </summary>
+            GridOptimizationAdjustment = 2,
+        }
         #endregion Enums
 
         #region Records
@@ -359,13 +377,13 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public Forecast(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                ForecastId = reader.GetUShort(0)!.Value;
+                ForecastID = reader.GetUInt(0)!.Value;
                 ActiveSlotNumber = reader.GetUShort(1, true);
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(2))!.Value;
                 EndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(3))!.Value;
                 EarliestStartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(4, true));
                 LatestEndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(5, true));
-                IsPauseable = reader.GetBool(6)!.Value;
+                IsPausable = reader.GetBool(6)!.Value;
                 {
                     Slots = new Slot[((object[])fields[7]).Length];
                     for (int i = 0; i < Slots.Length; i++) {
@@ -374,28 +392,26 @@ namespace MatterDotNet.Clusters.Application
                 }
                 ForecastUpdateReason = (ForecastUpdateReasonEnum)reader.GetUShort(8)!.Value;
             }
-            public required ushort ForecastId { get; set; } = 0;
+            public required uint ForecastID { get; set; } = 0;
             public required ushort? ActiveSlotNumber { get; set; } = 0;
             public required DateTime StartTime { get; set; }
             public required DateTime EndTime { get; set; }
             public required DateTime? EarliestStartTime { get; set; }
             public required DateTime? LatestEndTime { get; set; }
-            public required bool IsPauseable { get; set; }
+            public required bool IsPausable { get; set; }
             public required Slot[] Slots { get; set; }
             public required ForecastUpdateReasonEnum ForecastUpdateReason { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, ForecastId);
+                writer.WriteUInt(0, ForecastID);
                 writer.WriteUShort(1, ActiveSlotNumber);
                 writer.WriteUInt(2, TimeUtil.ToEpochSeconds(StartTime));
                 writer.WriteUInt(3, TimeUtil.ToEpochSeconds(EndTime));
-                if (!EarliestStartTime.HasValue)
-                    writer.WriteNull(4);
-                else
+                if (EarliestStartTime != null)
                     writer.WriteUInt(4, TimeUtil.ToEpochSeconds(EarliestStartTime!.Value));
                 if (LatestEndTime != null)
                     writer.WriteUInt(5, TimeUtil.ToEpochSeconds(LatestEndTime!.Value));
-                writer.WriteBool(6, IsPauseable);
+                writer.WriteBool(6, IsPausable);
                 {
                     Constrain(Slots, 0, 10);
                     writer.StartArray(7);
@@ -405,6 +421,49 @@ namespace MatterDotNet.Clusters.Application
                     writer.EndContainer();
                 }
                 writer.WriteUShort(8, (ushort)ForecastUpdateReason);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Power Adjust Capability
+        /// </summary>
+        public record PowerAdjustCapability : TLVPayload {
+            /// <summary>
+            /// Power Adjust Capability
+            /// </summary>
+            public PowerAdjustCapability() { }
+
+            /// <summary>
+            /// Power Adjust Capability
+            /// </summary>
+            [SetsRequiredMembers]
+            public PowerAdjustCapability(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                {
+                    PowerAdjustCapabilityField = new PowerAdjust[((object[])fields[0]).Length];
+                    for (int i = 0; i < PowerAdjustCapabilityField.Length; i++) {
+                        PowerAdjustCapabilityField[i] = new PowerAdjust((object[])fields[-1]);
+                    }
+                }
+                Cause = (PowerAdjustReasonEnum)reader.GetUShort(1)!.Value;
+            }
+            public required PowerAdjust[]? PowerAdjustCapabilityField { get; set; } = null;
+            public required PowerAdjustReasonEnum Cause { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (PowerAdjustCapabilityField != null)
+                {
+                    Constrain(PowerAdjustCapabilityField, 0, 8);
+                    writer.StartArray(0);
+                    foreach (var item in PowerAdjustCapabilityField) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                else
+                    writer.WriteNull(0);
+                writer.WriteUShort(1, (ushort)Cause);
                 writer.EndContainer();
             }
         }
@@ -459,16 +518,17 @@ namespace MatterDotNet.Clusters.Application
             public SlotAdjustment(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 SlotIndex = reader.GetByte(0)!.Value;
-                NominalPower = reader.GetLong(1)!.Value;
+                NominalPower = reader.GetLong(1, true);
                 Duration = TimeSpan.FromSeconds(reader.GetUInt(2)!.Value);
             }
             public required byte SlotIndex { get; set; }
-            public required long NominalPower { get; set; }
+            public required long? NominalPower { get; set; }
             public required TimeSpan Duration { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, SlotIndex);
-                writer.WriteLong(1, NominalPower);
+                if (NominalPower != null)
+                    writer.WriteLong(1, NominalPower);
                 writer.WriteUInt(2, (uint)Duration.TotalSeconds);
                 writer.EndContainer();
             }
@@ -494,14 +554,14 @@ namespace MatterDotNet.Clusters.Application
                 DefaultDuration = TimeSpan.FromSeconds(reader.GetUInt(2)!.Value);
                 ElapsedSlotTime = TimeSpan.FromSeconds(reader.GetUInt(3)!.Value);
                 RemainingSlotTime = TimeSpan.FromSeconds(reader.GetUInt(4)!.Value);
-                SlotIsPauseable = reader.GetBool(5)!.Value;
-                MinPauseDuration = TimeSpan.FromSeconds(reader.GetUInt(6)!.Value);
-                MaxPauseDuration = TimeSpan.FromSeconds(reader.GetUInt(7)!.Value);
-                ManufacturerESAState = reader.GetUShort(8)!.Value;
-                NominalPower = reader.GetLong(9)!.Value;
-                MinPower = reader.GetLong(10)!.Value;
-                MaxPower = reader.GetLong(11)!.Value;
-                NominalEnergy = reader.GetLong(12)!.Value;
+                SlotIsPausable = reader.GetBool(5, true);
+                MinPauseDuration = reader.GetUInt(6, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(6)!.Value);
+                MaxPauseDuration = reader.GetUInt(7, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(7)!.Value);
+                ManufacturerESAState = reader.GetUShort(8, true);
+                NominalPower = reader.GetLong(9, true);
+                MinPower = reader.GetLong(10, true);
+                MaxPower = reader.GetLong(11, true);
+                NominalEnergy = reader.GetLong(12, true);
                 {
                     Costs = new Cost[((object[])fields[13]).Length];
                     for (int i = 0; i < Costs.Length; i++) {
@@ -510,15 +570,15 @@ namespace MatterDotNet.Clusters.Application
                 }
                 MinPowerAdjustment = reader.GetLong(14)!.Value;
                 MaxPowerAdjustment = reader.GetLong(15)!.Value;
-                MinDurationAdjustment = TimeSpan.FromSeconds(reader.GetUInt(16)!.Value);
-                MaxDurationAdjustment = TimeSpan.FromSeconds(reader.GetUInt(17)!.Value);
+                MinDurationAdjustment = reader.GetUInt(16, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(16)!.Value);
+                MaxDurationAdjustment = reader.GetUInt(17, true) == null ? null : TimeSpan.FromSeconds(reader.GetUInt(17)!.Value);
             }
             public required TimeSpan MinDuration { get; set; }
             public required TimeSpan MaxDuration { get; set; }
             public required TimeSpan DefaultDuration { get; set; }
             public required TimeSpan ElapsedSlotTime { get; set; }
             public required TimeSpan RemainingSlotTime { get; set; }
-            public required bool? SlotIsPauseable { get; set; }
+            public required bool? SlotIsPausable { get; set; }
             public required TimeSpan? MinPauseDuration { get; set; }
             public required TimeSpan? MaxPauseDuration { get; set; }
             public required ushort? ManufacturerESAState { get; set; }
@@ -529,8 +589,8 @@ namespace MatterDotNet.Clusters.Application
             public Cost[]? Costs { get; set; }
             public required long MinPowerAdjustment { get; set; }
             public required long MaxPowerAdjustment { get; set; }
-            public required TimeSpan MinDurationAdjustment { get; set; }
-            public required TimeSpan MaxDurationAdjustment { get; set; }
+            public required TimeSpan? MinDurationAdjustment { get; set; }
+            public required TimeSpan? MaxDurationAdjustment { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, (uint)MinDuration.TotalSeconds);
@@ -538,8 +598,8 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteUInt(2, (uint)DefaultDuration.TotalSeconds);
                 writer.WriteUInt(3, (uint)ElapsedSlotTime.TotalSeconds);
                 writer.WriteUInt(4, (uint)RemainingSlotTime.TotalSeconds);
-                if (SlotIsPauseable != null)
-                    writer.WriteBool(5, SlotIsPauseable);
+                if (SlotIsPausable != null)
+                    writer.WriteBool(5, SlotIsPausable);
                 if (MinPauseDuration != null)
                     writer.WriteUInt(6, (uint)MinPauseDuration!.Value.TotalSeconds);
                 if (MaxPauseDuration != null)
@@ -555,7 +615,6 @@ namespace MatterDotNet.Clusters.Application
                 if (NominalEnergy != null)
                     writer.WriteLong(12, NominalEnergy);
                 if (Costs != null)
-                if (Costs != null)
                 {
                     Constrain(Costs, 0, 5);
                     writer.StartArray(13);
@@ -566,8 +625,10 @@ namespace MatterDotNet.Clusters.Application
                 }
                 writer.WriteLong(14, MinPowerAdjustment);
                 writer.WriteLong(15, MaxPowerAdjustment);
-                writer.WriteUInt(16, (uint)MinDurationAdjustment.TotalSeconds);
-                writer.WriteUInt(17, (uint)MaxDurationAdjustment.TotalSeconds);
+                if (MinDurationAdjustment != null)
+                    writer.WriteUInt(16, (uint)MinDurationAdjustment!.Value.TotalSeconds);
+                if (MaxDurationAdjustment != null)
+                    writer.WriteUInt(17, (uint)MaxDurationAdjustment!.Value.TotalSeconds);
                 writer.EndContainer();
             }
         }
@@ -610,12 +671,12 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record ModifyForecastRequestPayload : TLVPayload {
-            public required uint ForecastId { get; set; }
+            public required uint ForecastID { get; set; }
             public required SlotAdjustment[] SlotAdjustments { get; set; }
             public required AdjustmentCauseEnum Cause { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, ForecastId);
+                writer.WriteUInt(0, ForecastID);
                 {
                     Constrain(SlotAdjustments, 0, 10);
                     writer.StartArray(1);
@@ -705,9 +766,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Modify Forecast Request
         /// </summary>
-        public async Task<bool> ModifyForecastRequest(SecureSession session, uint ForecastId, SlotAdjustment[] SlotAdjustments, AdjustmentCauseEnum Cause) {
+        public async Task<bool> ModifyForecastRequest(SecureSession session, uint ForecastID, SlotAdjustment[] SlotAdjustments, AdjustmentCauseEnum Cause) {
             ModifyForecastRequestPayload requestFields = new ModifyForecastRequestPayload() {
-                ForecastId = ForecastId,
+                ForecastID = ForecastID,
                 SlotAdjustments = SlotAdjustments,
                 Cause = Cause,
             };
@@ -796,12 +857,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Power Adjustment Capability attribute
         /// </summary>
-        public async Task<PowerAdjust[]?> GetPowerAdjustmentCapability(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            PowerAdjust[] list = new PowerAdjust[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new PowerAdjust(reader.GetStruct(i)!);
-            return list;
+        public async Task<PowerAdjustCapability?> GetPowerAdjustmentCapability(SecureSession session) {
+            return new PowerAdjustCapability((object[])(await GetAttribute(session, 5))!) ?? null;
         }
 
         /// <summary>

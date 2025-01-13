@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Initial Zigbee 3.0 release"/>
+    <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
     <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
@@ -75,54 +75,15 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <attribute name="Active"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x0102" name="Window Covering" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Absolute">
+        <feature code="" name="AbsolutePosition">
           <mandatoryConform>
             <condition name="Zigbee"/>
           </mandatoryConform>
         </feature>
       </features>
-      <commands>
-        <command id="" name="GoToLiftPercentage.LiftPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToLiftPercentage.LiftPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-      </commands>
     </cluster>
   </clusters>
 </deviceType>

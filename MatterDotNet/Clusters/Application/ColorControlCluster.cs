@@ -23,7 +23,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Color Control Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 6)]
+    [ClusterRevision(CLUSTER_ID, 7)]
     public class ColorControlCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0300;
@@ -44,15 +44,15 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Supports color specification via hue/saturation.
             /// </summary>
-            Hue_Saturation = 1,
+            HueSaturation = 1,
             /// <summary>
             /// Enhanced hue is supported.
             /// </summary>
-            Enhanced = 2,
+            EnhancedHue = 2,
             /// <summary>
             /// Color loop is supported.
             /// </summary>
-            Color = 4,
+            ColorLoop = 4,
             /// <summary>
             /// Supports color specification via XY.
             /// </summary>
@@ -60,56 +60,281 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Supports specification of color temperature.
             /// </summary>
-            Color2 = 16,
+            ColorTemperature = 16,
+        }
+
+        /// <summary>
+        /// Color Loop Action
+        /// </summary>
+        public enum ColorLoopActionEnum {
+            /// <summary>
+            /// De-activate the color loop.
+            /// </summary>
+            Deactivate = 0,
+            /// <summary>
+            /// Activate the color loop from the value in the ColorLoopStartEnhancedHue field.
+            /// </summary>
+            ActivateFromColorLoopStartEnhancedHue = 1,
+            /// <summary>
+            /// Activate the color loop from the value of the EnhancedCurrentHue attribute.
+            /// </summary>
+            ActivateFromEnhancedCurrentHue = 2,
+        }
+
+        /// <summary>
+        /// Color Loop Direction
+        /// </summary>
+        public enum ColorLoopDirectionEnum {
+            /// <summary>
+            /// Decrement the hue in the color loop.
+            /// </summary>
+            Decrement = 0,
+            /// <summary>
+            /// Increment the hue in the color loop.
+            /// </summary>
+            Increment = 1,
+        }
+
+        /// <summary>
+        /// Color Mode
+        /// </summary>
+        public enum ColorModeEnum {
+            /// <summary>
+            /// The current hue and saturation attributes determine the color.
+            /// </summary>
+            CurrentHueAndCurrentSaturation = 0,
+            /// <summary>
+            /// The current X and Y attributes determine the color.
+            /// </summary>
+            CurrentXAndCurrentY = 1,
+            /// <summary>
+            /// The color temperature attribute determines the color.
+            /// </summary>
+            ColorTemperatureMireds = 2,
+        }
+
+        /// <summary>
+        /// Direction
+        /// </summary>
+        public enum DirectionEnum {
+            /// <summary>
+            /// Shortest distance
+            /// </summary>
+            Shortest = 0,
+            /// <summary>
+            /// Longest distance
+            /// </summary>
+            Longest = 1,
+            /// <summary>
+            /// Up
+            /// </summary>
+            Up = 2,
+            /// <summary>
+            /// Down
+            /// </summary>
+            Down = 3,
+        }
+
+        /// <summary>
+        /// Drift Compensation
+        /// </summary>
+        public enum DriftCompensationEnum {
+            /// <summary>
+            /// There is no compensation.
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// The compensation is based on other or unknown mechanism.
+            /// </summary>
+            OtherOrUnknown = 1,
+            /// <summary>
+            /// The compensation is based on temperature monitoring.
+            /// </summary>
+            TemperatureMonitoring = 2,
+            /// <summary>
+            /// The compensation is based on optical luminance monitoring and feedback.
+            /// </summary>
+            OpticalLuminanceMonitoringAndFeedback = 3,
+            /// <summary>
+            /// The compensation is based on optical color monitoring and feedback.
+            /// </summary>
+            OpticalColorMonitoringAndFeedback = 4,
+        }
+
+        /// <summary>
+        /// Enhanced Color Mode
+        /// </summary>
+        public enum EnhancedColorModeEnum {
+            /// <summary>
+            /// The current hue and saturation attributes determine the color.
+            /// </summary>
+            CurrentHueAndCurrentSaturation = 0,
+            /// <summary>
+            /// The current X and Y attributes determine the color.
+            /// </summary>
+            CurrentXAndCurrentY = 1,
+            /// <summary>
+            /// The color temperature attribute determines the color.
+            /// </summary>
+            ColorTemperatureMireds = 2,
+            /// <summary>
+            /// The enhanced current hue and saturation attributes determine the color.
+            /// </summary>
+            EnhancedCurrentHueAndCurrentSaturation = 3,
+        }
+
+        /// <summary>
+        /// Move Mode
+        /// </summary>
+        public enum MoveModeEnum {
+            /// <summary>
+            /// Stop the movement
+            /// </summary>
+            Stop = 0,
+            /// <summary>
+            /// Move in an upwards direction
+            /// </summary>
+            Up = 1,
+            /// <summary>
+            /// Move in a downwards direction
+            /// </summary>
+            Down = 3,
+        }
+
+        /// <summary>
+        /// Step Mode
+        /// </summary>
+        public enum StepModeEnum {
+            /// <summary>
+            /// Step in an upwards direction
+            /// </summary>
+            Up = 1,
+            /// <summary>
+            /// Step in a downwards direction
+            /// </summary>
+            Down = 3,
+        }
+
+        /// <summary>
+        /// Color Capabilities Bitmap
+        /// </summary>
+        [Flags]
+        public enum ColorCapabilitiesBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Supports color specification via hue/saturation.
+            /// </summary>
+            HueSaturation = 1,
+            /// <summary>
+            /// Enhanced hue is supported.
+            /// </summary>
+            EnhancedHue = 2,
+            /// <summary>
+            /// Color loop is supported.
+            /// </summary>
+            ColorLoop = 4,
+            /// <summary>
+            /// Supports color specification via XY.
+            /// </summary>
+            XY = 8,
+            /// <summary>
+            /// Supports color specification via color temperature.
+            /// </summary>
+            ColorTemperature = 16,
+        }
+
+        /// <summary>
+        /// Options Bitmap
+        /// </summary>
+        [Flags]
+        public enum OptionsBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Dependency on On/Off cluster
+            /// </summary>
+            ExecuteIfOff = 1,
+        }
+
+        /// <summary>
+        /// Update Flags Bitmap
+        /// </summary>
+        [Flags]
+        public enum UpdateFlagsBitmap {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Device adheres to the associated action field.
+            /// </summary>
+            UpdateAction = 1,
+            /// <summary>
+            /// Device updates the associated direction attribute.
+            /// </summary>
+            UpdateDirection = 2,
+            /// <summary>
+            /// Device updates the associated time attribute.
+            /// </summary>
+            UpdateTime = 4,
+            /// <summary>
+            /// Device updates the associated start hue attribute.
+            /// </summary>
+            UpdateStartHue = 8,
         }
         #endregion Enums
 
         #region Payloads
         private record MoveToHuePayload : TLVPayload {
             public required byte Hue { get; set; }
-            public required byte Direction { get; set; }
+            public required DirectionEnum Direction { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Hue, 254);
-                writer.WriteByte(1, Direction);
+                writer.WriteUShort(1, (ushort)Direction);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record MoveHuePayload : TLVPayload {
-            public required byte MoveMode { get; set; }
+            public required MoveModeEnum MoveMode { get; set; }
             public required byte Rate { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, MoveMode);
+                writer.WriteUShort(0, (ushort)MoveMode);
                 writer.WriteByte(1, Rate);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record StepHuePayload : TLVPayload {
-            public required byte StepMode { get; set; }
+            public required StepModeEnum StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required byte TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, StepMode);
+                writer.WriteUShort(0, (ushort)StepMode);
                 writer.WriteByte(1, StepSize);
                 writer.WriteByte(2, TransitionTime);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -117,46 +342,46 @@ namespace MatterDotNet.Clusters.Application
         private record MoveToSaturationPayload : TLVPayload {
             public required byte Saturation { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Saturation, 254);
                 writer.WriteUShort(1, TransitionTime, 65534);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record MoveSaturationPayload : TLVPayload {
-            public required byte MoveMode { get; set; }
+            public required MoveModeEnum MoveMode { get; set; }
             public required byte Rate { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, MoveMode);
+                writer.WriteUShort(0, (ushort)MoveMode);
                 writer.WriteByte(1, Rate);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record StepSaturationPayload : TLVPayload {
-            public required byte StepMode { get; set; }
+            public required StepModeEnum StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required byte TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, StepMode);
+                writer.WriteUShort(0, (ushort)StepMode);
                 writer.WriteByte(1, StepSize);
                 writer.WriteByte(2, TransitionTime);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -165,15 +390,15 @@ namespace MatterDotNet.Clusters.Application
             public required byte Hue { get; set; }
             public required byte Saturation { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Hue, 254);
                 writer.WriteByte(1, Saturation, 254);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -182,15 +407,15 @@ namespace MatterDotNet.Clusters.Application
             public required ushort ColorX { get; set; }
             public required ushort ColorY { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, ColorX);
-                writer.WriteUShort(1, ColorY);
+                writer.WriteUShort(0, ColorX, 65279);
+                writer.WriteUShort(1, ColorY, 65279);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -198,14 +423,14 @@ namespace MatterDotNet.Clusters.Application
         private record MoveColorPayload : TLVPayload {
             public required short RateX { get; set; }
             public required short RateY { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteShort(0, RateX);
                 writer.WriteShort(1, RateY);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -214,15 +439,15 @@ namespace MatterDotNet.Clusters.Application
             public required short StepX { get; set; }
             public required short StepY { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteShort(0, StepX);
                 writer.WriteShort(1, StepY);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -230,63 +455,63 @@ namespace MatterDotNet.Clusters.Application
         private record MoveToColorTemperaturePayload : TLVPayload {
             public required ushort ColorTemperatureMireds { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, ColorTemperatureMireds);
+                writer.WriteUShort(0, ColorTemperatureMireds, 65279);
                 writer.WriteUShort(1, TransitionTime, 65534);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record EnhancedMoveToHuePayload : TLVPayload {
             public required ushort EnhancedHue { get; set; }
-            public required byte Direction { get; set; }
+            public required DirectionEnum Direction { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, EnhancedHue);
-                writer.WriteByte(1, Direction);
+                writer.WriteUShort(1, (ushort)Direction);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record EnhancedMoveHuePayload : TLVPayload {
-            public required byte MoveMode { get; set; }
+            public required MoveModeEnum MoveMode { get; set; }
             public required ushort Rate { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, MoveMode);
+                writer.WriteUShort(0, (ushort)MoveMode);
                 writer.WriteUShort(1, Rate);
-                writer.WriteByte(2, OptionsMask);
-                writer.WriteByte(3, OptionsOverride);
+                writer.WriteUShort(2, (ushort)OptionsMask);
+                writer.WriteUShort(3, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record EnhancedStepHuePayload : TLVPayload {
-            public required byte StepMode { get; set; }
+            public required StepModeEnum StepMode { get; set; }
             public required ushort StepSize { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, StepMode);
+                writer.WriteUShort(0, (ushort)StepMode);
                 writer.WriteUShort(1, StepSize);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -295,87 +520,87 @@ namespace MatterDotNet.Clusters.Application
             public required ushort EnhancedHue { get; set; }
             public required byte Saturation { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, EnhancedHue);
                 writer.WriteByte(1, Saturation, 254);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteByte(3, OptionsMask);
-                writer.WriteByte(4, OptionsOverride);
+                writer.WriteUShort(3, (ushort)OptionsMask);
+                writer.WriteUShort(4, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record ColorLoopSetPayload : TLVPayload {
-            public required byte UpdateFlags { get; set; }
-            public required byte Action { get; set; }
-            public required byte Direction { get; set; }
+            public required UpdateFlagsBitmap UpdateFlags { get; set; }
+            public required ColorLoopActionEnum Action { get; set; }
+            public required ColorLoopDirectionEnum Direction { get; set; }
             public required ushort Time { get; set; }
             public required ushort StartHue { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, UpdateFlags);
-                writer.WriteByte(1, Action);
-                writer.WriteByte(2, Direction);
+                writer.WriteUShort(0, (ushort)UpdateFlags);
+                writer.WriteUShort(1, (ushort)Action);
+                writer.WriteUShort(2, (ushort)Direction);
                 writer.WriteUShort(3, Time);
                 writer.WriteUShort(4, StartHue);
-                writer.WriteByte(5, OptionsMask);
-                writer.WriteByte(6, OptionsOverride);
+                writer.WriteUShort(5, (ushort)OptionsMask);
+                writer.WriteUShort(6, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record StopMoveStepPayload : TLVPayload {
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, OptionsMask);
-                writer.WriteByte(1, OptionsOverride);
+                writer.WriteUShort(0, (ushort)OptionsMask);
+                writer.WriteUShort(1, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record MoveColorTemperaturePayload : TLVPayload {
-            public required byte MoveMode { get; set; }
+            public required MoveModeEnum MoveMode { get; set; }
             public required ushort Rate { get; set; }
             public required ushort ColorTemperatureMinimumMireds { get; set; }
             public required ushort ColorTemperatureMaximumMireds { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, MoveMode);
+                writer.WriteUShort(0, (ushort)MoveMode);
                 writer.WriteUShort(1, Rate);
-                writer.WriteUShort(2, ColorTemperatureMinimumMireds);
-                writer.WriteUShort(3, ColorTemperatureMaximumMireds);
-                writer.WriteByte(4, OptionsMask);
-                writer.WriteByte(5, OptionsOverride);
+                writer.WriteUShort(2, ColorTemperatureMinimumMireds, 65279);
+                writer.WriteUShort(3, ColorTemperatureMaximumMireds, 65279);
+                writer.WriteUShort(4, (ushort)OptionsMask);
+                writer.WriteUShort(5, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
 
         private record StepColorTemperaturePayload : TLVPayload {
-            public required byte StepMode { get; set; }
+            public required StepModeEnum StepMode { get; set; }
             public required ushort StepSize { get; set; }
             public required ushort TransitionTime { get; set; }
             public required ushort ColorTemperatureMinimumMireds { get; set; }
             public required ushort ColorTemperatureMaximumMireds { get; set; }
-            public required byte OptionsMask { get; set; } = 0;
-            public required byte OptionsOverride { get; set; } = 0;
+            public required OptionsBitmap OptionsMask { get; set; } = 0;
+            public required OptionsBitmap OptionsOverride { get; set; } = 0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, StepMode);
+                writer.WriteUShort(0, (ushort)StepMode);
                 writer.WriteUShort(1, StepSize);
                 writer.WriteUShort(2, TransitionTime, 65534);
-                writer.WriteUShort(3, ColorTemperatureMinimumMireds);
-                writer.WriteUShort(4, ColorTemperatureMaximumMireds);
-                writer.WriteByte(5, OptionsMask);
-                writer.WriteByte(6, OptionsOverride);
+                writer.WriteUShort(3, ColorTemperatureMinimumMireds, 65279);
+                writer.WriteUShort(4, ColorTemperatureMaximumMireds, 65279);
+                writer.WriteUShort(5, (ushort)OptionsMask);
+                writer.WriteUShort(6, (ushort)OptionsOverride);
                 writer.EndContainer();
             }
         }
@@ -385,7 +610,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move To Hue
         /// </summary>
-        public async Task<bool> MoveToHue(SecureSession session, byte Hue, byte Direction, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveToHue(SecureSession session, byte Hue, DirectionEnum Direction, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveToHuePayload requestFields = new MoveToHuePayload() {
                 Hue = Hue,
                 Direction = Direction,
@@ -400,7 +625,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move Hue
         /// </summary>
-        public async Task<bool> MoveHue(SecureSession session, byte MoveMode, byte Rate, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveHue(SecureSession session, MoveModeEnum MoveMode, byte Rate, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveHuePayload requestFields = new MoveHuePayload() {
                 MoveMode = MoveMode,
                 Rate = Rate,
@@ -414,7 +639,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Step Hue
         /// </summary>
-        public async Task<bool> StepHue(SecureSession session, byte StepMode, byte StepSize, byte TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> StepHue(SecureSession session, StepModeEnum StepMode, byte StepSize, byte TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             StepHuePayload requestFields = new StepHuePayload() {
                 StepMode = StepMode,
                 StepSize = StepSize,
@@ -429,7 +654,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move To Saturation
         /// </summary>
-        public async Task<bool> MoveToSaturation(SecureSession session, byte Saturation, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveToSaturation(SecureSession session, byte Saturation, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveToSaturationPayload requestFields = new MoveToSaturationPayload() {
                 Saturation = Saturation,
                 TransitionTime = TransitionTime,
@@ -443,7 +668,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move Saturation
         /// </summary>
-        public async Task<bool> MoveSaturation(SecureSession session, byte MoveMode, byte Rate, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveSaturation(SecureSession session, MoveModeEnum MoveMode, byte Rate, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveSaturationPayload requestFields = new MoveSaturationPayload() {
                 MoveMode = MoveMode,
                 Rate = Rate,
@@ -457,7 +682,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Step Saturation
         /// </summary>
-        public async Task<bool> StepSaturation(SecureSession session, byte StepMode, byte StepSize, byte TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> StepSaturation(SecureSession session, StepModeEnum StepMode, byte StepSize, byte TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             StepSaturationPayload requestFields = new StepSaturationPayload() {
                 StepMode = StepMode,
                 StepSize = StepSize,
@@ -472,7 +697,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move To Hue And Saturation
         /// </summary>
-        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte Hue, byte Saturation, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte Hue, byte Saturation, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveToHueAndSaturationPayload requestFields = new MoveToHueAndSaturationPayload() {
                 Hue = Hue,
                 Saturation = Saturation,
@@ -487,7 +712,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move To Color
         /// </summary>
-        public async Task<bool> MoveToColor(SecureSession session, ushort ColorX, ushort ColorY, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveToColor(SecureSession session, ushort ColorX, ushort ColorY, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveToColorPayload requestFields = new MoveToColorPayload() {
                 ColorX = ColorX,
                 ColorY = ColorY,
@@ -502,7 +727,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move Color
         /// </summary>
-        public async Task<bool> MoveColor(SecureSession session, short RateX, short RateY, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveColor(SecureSession session, short RateX, short RateY, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveColorPayload requestFields = new MoveColorPayload() {
                 RateX = RateX,
                 RateY = RateY,
@@ -516,7 +741,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Step Color
         /// </summary>
-        public async Task<bool> StepColor(SecureSession session, short StepX, short StepY, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> StepColor(SecureSession session, short StepX, short StepY, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             StepColorPayload requestFields = new StepColorPayload() {
                 StepX = StepX,
                 StepY = StepY,
@@ -531,7 +756,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move To Color Temperature
         /// </summary>
-        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort ColorTemperatureMireds, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort ColorTemperatureMireds, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveToColorTemperaturePayload requestFields = new MoveToColorTemperaturePayload() {
                 ColorTemperatureMireds = ColorTemperatureMireds,
                 TransitionTime = TransitionTime,
@@ -545,7 +770,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enhanced Move To Hue
         /// </summary>
-        public async Task<bool> EnhancedMoveToHue(SecureSession session, ushort EnhancedHue, byte Direction, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> EnhancedMoveToHue(SecureSession session, ushort EnhancedHue, DirectionEnum Direction, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             EnhancedMoveToHuePayload requestFields = new EnhancedMoveToHuePayload() {
                 EnhancedHue = EnhancedHue,
                 Direction = Direction,
@@ -560,7 +785,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enhanced Move Hue
         /// </summary>
-        public async Task<bool> EnhancedMoveHue(SecureSession session, byte MoveMode, ushort Rate, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> EnhancedMoveHue(SecureSession session, MoveModeEnum MoveMode, ushort Rate, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             EnhancedMoveHuePayload requestFields = new EnhancedMoveHuePayload() {
                 MoveMode = MoveMode,
                 Rate = Rate,
@@ -574,7 +799,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enhanced Step Hue
         /// </summary>
-        public async Task<bool> EnhancedStepHue(SecureSession session, byte StepMode, ushort StepSize, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> EnhancedStepHue(SecureSession session, StepModeEnum StepMode, ushort StepSize, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             EnhancedStepHuePayload requestFields = new EnhancedStepHuePayload() {
                 StepMode = StepMode,
                 StepSize = StepSize,
@@ -589,7 +814,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enhanced Move To Hue And Saturation
         /// </summary>
-        public async Task<bool> EnhancedMoveToHueAndSaturation(SecureSession session, ushort EnhancedHue, byte Saturation, ushort TransitionTime, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> EnhancedMoveToHueAndSaturation(SecureSession session, ushort EnhancedHue, byte Saturation, ushort TransitionTime, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             EnhancedMoveToHueAndSaturationPayload requestFields = new EnhancedMoveToHueAndSaturationPayload() {
                 EnhancedHue = EnhancedHue,
                 Saturation = Saturation,
@@ -604,7 +829,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Color Loop Set
         /// </summary>
-        public async Task<bool> ColorLoopSet(SecureSession session, byte UpdateFlags, byte Action, byte Direction, ushort Time, ushort StartHue, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> ColorLoopSet(SecureSession session, UpdateFlagsBitmap UpdateFlags, ColorLoopActionEnum Action, ColorLoopDirectionEnum Direction, ushort Time, ushort StartHue, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             ColorLoopSetPayload requestFields = new ColorLoopSetPayload() {
                 UpdateFlags = UpdateFlags,
                 Action = Action,
@@ -621,7 +846,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Stop Move Step
         /// </summary>
-        public async Task<bool> StopMoveStep(SecureSession session, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> StopMoveStep(SecureSession session, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             StopMoveStepPayload requestFields = new StopMoveStepPayload() {
                 OptionsMask = OptionsMask,
                 OptionsOverride = OptionsOverride,
@@ -633,7 +858,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Move Color Temperature
         /// </summary>
-        public async Task<bool> MoveColorTemperature(SecureSession session, byte MoveMode, ushort Rate, ushort ColorTemperatureMinimumMireds, ushort ColorTemperatureMaximumMireds, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> MoveColorTemperature(SecureSession session, MoveModeEnum MoveMode, ushort Rate, ushort ColorTemperatureMinimumMireds, ushort ColorTemperatureMaximumMireds, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             MoveColorTemperaturePayload requestFields = new MoveColorTemperaturePayload() {
                 MoveMode = MoveMode,
                 Rate = Rate,
@@ -649,7 +874,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Step Color Temperature
         /// </summary>
-        public async Task<bool> StepColorTemperature(SecureSession session, byte StepMode, ushort StepSize, ushort TransitionTime, ushort ColorTemperatureMinimumMireds, ushort ColorTemperatureMaximumMireds, byte OptionsMask, byte OptionsOverride) {
+        public async Task<bool> StepColorTemperature(SecureSession session, StepModeEnum StepMode, ushort StepSize, ushort TransitionTime, ushort ColorTemperatureMinimumMireds, ushort ColorTemperatureMaximumMireds, OptionsBitmap OptionsMask, OptionsBitmap OptionsOverride) {
             StepColorTemperaturePayload requestFields = new StepColorTemperaturePayload() {
                 StepMode = StepMode,
                 StepSize = StepSize,
@@ -724,8 +949,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Drift Compensation attribute
         /// </summary>
-        public async Task<byte> GetDriftCompensation(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 5))!;
+        public async Task<DriftCompensationEnum> GetDriftCompensation(SecureSession session) {
+            return (DriftCompensationEnum)await GetEnumAttribute(session, 5);
         }
 
         /// <summary>
@@ -745,21 +970,21 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Color Mode attribute
         /// </summary>
-        public async Task<byte> GetColorMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 8) ?? 1;
+        public async Task<ColorModeEnum> GetColorMode(SecureSession session) {
+            return (ColorModeEnum)await GetEnumAttribute(session, 8);
         }
 
         /// <summary>
         /// Get the Options attribute
         /// </summary>
-        public async Task<byte> GetOptions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 15) ?? 0;
+        public async Task<OptionsBitmap> GetOptions(SecureSession session) {
+            return (OptionsBitmap)await GetEnumAttribute(session, 15);
         }
 
         /// <summary>
         /// Set the Options attribute
         /// </summary>
-        public async Task SetOptions (SecureSession session, byte? value = 0) {
+        public async Task SetOptions (SecureSession session, OptionsBitmap value) {
             await SetAttribute(session, 15, value);
         }
 
@@ -1060,8 +1285,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Enhanced Color Mode attribute
         /// </summary>
-        public async Task<byte> GetEnhancedColorMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 16385) ?? 1;
+        public async Task<EnhancedColorModeEnum> GetEnhancedColorMode(SecureSession session) {
+            return (EnhancedColorModeEnum)await GetEnumAttribute(session, 16385);
         }
 
         /// <summary>
@@ -1082,14 +1307,14 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Color Loop Time attribute
         /// </summary>
         public async Task<ushort> GetColorLoopTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16388) ?? 0x0019;
+            return (ushort?)(dynamic?)await GetAttribute(session, 16388) ?? 25;
         }
 
         /// <summary>
         /// Get the Color Loop Start Enhanced Hue attribute
         /// </summary>
         public async Task<ushort> GetColorLoopStartEnhancedHue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16389) ?? 0x2300;
+            return (ushort?)(dynamic?)await GetAttribute(session, 16389) ?? 8960;
         }
 
         /// <summary>
@@ -1102,22 +1327,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Color Capabilities attribute
         /// </summary>
-        public async Task<ushort> GetColorCapabilities(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16394) ?? 0;
+        public async Task<ColorCapabilitiesBitmap> GetColorCapabilities(SecureSession session) {
+            return (ColorCapabilitiesBitmap)await GetEnumAttribute(session, 16394);
         }
 
         /// <summary>
         /// Get the Color Temp Physical Min Mireds attribute
         /// </summary>
         public async Task<ushort> GetColorTempPhysicalMinMireds(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16395) ?? 0;
+            return (ushort)(dynamic?)(await GetAttribute(session, 16395))!;
         }
 
         /// <summary>
         /// Get the Color Temp Physical Max Mireds attribute
         /// </summary>
         public async Task<ushort> GetColorTempPhysicalMaxMireds(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16396) ?? 0xFEFF;
+            return (ushort)(dynamic?)(await GetAttribute(session, 16396))!;
         }
 
         /// <summary>

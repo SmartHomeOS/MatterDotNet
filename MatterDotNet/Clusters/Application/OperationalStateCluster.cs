@@ -24,7 +24,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Operational State Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class OperationalStateCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0060;

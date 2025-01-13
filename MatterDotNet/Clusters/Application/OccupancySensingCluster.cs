@@ -13,14 +13,16 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Protocol.Parsers;
+using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Application
 {
     /// <summary>
     /// Occupancy Sensing Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 4)]
+    [ClusterRevision(CLUSTER_ID, 5)]
     public class OccupancySensingCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0406;
@@ -33,6 +35,45 @@ namespace MatterDotNet.Clusters.Application
         protected OccupancySensingCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// Supports sensing using a modality not listed in the other bits
+            /// </summary>
+            Other = 1,
+            /// <summary>
+            /// Supports sensing using PIR (Passive InfraRed)
+            /// </summary>
+            PassiveInfrared = 2,
+            /// <summary>
+            /// Supports sensing using UltraSound
+            /// </summary>
+            Ultrasonic = 4,
+            /// <summary>
+            /// Supports sensing using a physical contact
+            /// </summary>
+            PhysicalContact = 8,
+            /// <summary>
+            /// Supports sensing using Active InfraRed measurement (e.g. time-of-flight or transflective/reflective IR sensing)
+            /// </summary>
+            ActiveInfrared = 16,
+            /// <summary>
+            /// Supports sensing using radar waves (microwave)
+            /// </summary>
+            Radar = 32,
+            /// <summary>
+            /// Supports sensing based on RF signal analysis
+            /// </summary>
+            RFSensing = 64,
+            /// <summary>
+            /// Supports sensing based on analyzing images
+            /// </summary>
+            Vision = 128,
+        }
+
         /// <summary>
         /// Occupancy Sensor Type
         /// </summary>
@@ -94,7 +135,61 @@ namespace MatterDotNet.Clusters.Application
         }
         #endregion Enums
 
+        #region Records
+        /// <summary>
+        /// Hold Time Limits
+        /// </summary>
+        public record HoldTimeLimits : TLVPayload {
+            /// <summary>
+            /// Hold Time Limits
+            /// </summary>
+            public HoldTimeLimits() { }
+
+            /// <summary>
+            /// Hold Time Limits
+            /// </summary>
+            [SetsRequiredMembers]
+            public HoldTimeLimits(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                HoldTimeMin = reader.GetUShort(0)!.Value;
+                HoldTimeMax = reader.GetUShort(1)!.Value;
+                HoldTimeDefault = reader.GetUShort(2)!.Value;
+            }
+            public required ushort HoldTimeMin { get; set; }
+            public required ushort HoldTimeMax { get; set; }
+            public required ushort HoldTimeDefault { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, HoldTimeMin, ushort.MaxValue, 1);
+                writer.WriteUShort(1, HoldTimeMax);
+                writer.WriteUShort(2, HoldTimeDefault);
+                writer.EndContainer();
+            }
+        }
+        #endregion Records
+
         #region Attributes
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
+
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
+
         /// <summary>
         /// Get the Occupancy attribute
         /// </summary>
@@ -114,6 +209,27 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public async Task<OccupancySensorTypeBitmap> GetOccupancySensorTypeBitmap(SecureSession session) {
             return (OccupancySensorTypeBitmap)await GetEnumAttribute(session, 2);
+        }
+
+        /// <summary>
+        /// Get the Hold Time attribute
+        /// </summary>
+        public async Task<ushort> GetHoldTime(SecureSession session) {
+            return (ushort)(dynamic?)(await GetAttribute(session, 3))!;
+        }
+
+        /// <summary>
+        /// Set the Hold Time attribute
+        /// </summary>
+        public async Task SetHoldTime (SecureSession session, ushort value) {
+            await SetAttribute(session, 3, value);
+        }
+
+        /// <summary>
+        /// Get the Hold Time Limits attribute
+        /// </summary>
+        public async Task<HoldTimeLimits> GetHoldTimeLimits(SecureSession session) {
+            return new HoldTimeLimits((object[])(await GetAttribute(session, 4))!);
         }
 
         /// <summary>

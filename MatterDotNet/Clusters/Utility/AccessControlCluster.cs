@@ -12,9 +12,11 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Utility
@@ -22,7 +24,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Access Control Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 1)]
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class AccessControlCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x001F;
@@ -35,6 +37,21 @@ namespace MatterDotNet.Clusters.Utility
         protected AccessControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// Device provides ACL Extension attribute
+            /// </summary>
+            Extension = 1,
+            /// <summary>
+            /// Device is managed
+            /// </summary>
+            ManagedDevice = 2,
+        }
+
         /// <summary>
         /// Access Control Entry Auth Mode
         /// </summary>
@@ -77,6 +94,28 @@ namespace MatterDotNet.Clusters.Utility
             /// Manage privileges, and can observe and modify the Access Control Cluster
             /// </summary>
             Administer = 5,
+        }
+
+        /// <summary>
+        /// Access Restriction Type
+        /// </summary>
+        public enum AccessRestrictionTypeEnum {
+            /// <summary>
+            /// Clients on this fabric are currently forbidden from reading and writing an attribute
+            /// </summary>
+            AttributeAccessForbidden = 0,
+            /// <summary>
+            /// Clients on this fabric are currently forbidden from writing an attribute
+            /// </summary>
+            AttributeWriteForbidden = 1,
+            /// <summary>
+            /// Clients on this fabric are currently forbidden from invoking a command
+            /// </summary>
+            CommandForbidden = 2,
+            /// <summary>
+            /// Clients on this fabric are currently forbidden from reading an event
+            /// </summary>
+            EventForbidden = 3,
         }
 
         /// <summary>
@@ -216,9 +255,185 @@ namespace MatterDotNet.Clusters.Utility
                 writer.EndContainer();
             }
         }
+
+        /// <summary>
+        /// Access Restriction Entry
+        /// </summary>
+        public record AccessRestrictionEntry : TLVPayload {
+            /// <summary>
+            /// Access Restriction Entry
+            /// </summary>
+            public AccessRestrictionEntry() { }
+
+            /// <summary>
+            /// Access Restriction Entry
+            /// </summary>
+            [SetsRequiredMembers]
+            public AccessRestrictionEntry(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Endpoint = reader.GetUShort(0)!.Value;
+                Cluster = reader.GetUInt(1)!.Value;
+                {
+                    Restrictions = new AccessRestriction[((object[])fields[2]).Length];
+                    for (int i = 0; i < Restrictions.Length; i++) {
+                        Restrictions[i] = new AccessRestriction((object[])fields[-1]);
+                    }
+                }
+            }
+            public required ushort Endpoint { get; set; }
+            public required uint Cluster { get; set; }
+            public required AccessRestriction[] Restrictions { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, Endpoint);
+                writer.WriteUInt(1, Cluster);
+                {
+                    Constrain(Restrictions, 1);
+                    writer.StartArray(2);
+                    foreach (var item in Restrictions) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Access Restriction
+        /// </summary>
+        public record AccessRestriction : TLVPayload {
+            /// <summary>
+            /// Access Restriction
+            /// </summary>
+            public AccessRestriction() { }
+
+            /// <summary>
+            /// Access Restriction
+            /// </summary>
+            [SetsRequiredMembers]
+            public AccessRestriction(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Type = (AccessRestrictionTypeEnum)reader.GetUShort(0)!.Value;
+                ID = reader.GetUInt(1, true);
+            }
+            public required AccessRestrictionTypeEnum Type { get; set; }
+            public required uint? ID { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)Type);
+                writer.WriteUInt(1, ID);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Commissioning Access Restriction Entry
+        /// </summary>
+        public record CommissioningAccessRestrictionEntry : TLVPayload {
+            /// <summary>
+            /// Commissioning Access Restriction Entry
+            /// </summary>
+            public CommissioningAccessRestrictionEntry() { }
+
+            /// <summary>
+            /// Commissioning Access Restriction Entry
+            /// </summary>
+            [SetsRequiredMembers]
+            public CommissioningAccessRestrictionEntry(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Endpoint = reader.GetUShort(0)!.Value;
+                Cluster = reader.GetUInt(1)!.Value;
+                {
+                    Restrictions = new AccessRestriction[((object[])fields[2]).Length];
+                    for (int i = 0; i < Restrictions.Length; i++) {
+                        Restrictions[i] = new AccessRestriction((object[])fields[-1]);
+                    }
+                }
+            }
+            public required ushort Endpoint { get; set; }
+            public required uint Cluster { get; set; }
+            public required AccessRestriction[] Restrictions { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, Endpoint);
+                writer.WriteUInt(1, Cluster);
+                {
+                    Constrain(Restrictions, 1);
+                    writer.StartArray(2);
+                    foreach (var item in Restrictions) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
         #endregion Records
 
+        #region Payloads
+        private record ReviewFabricRestrictionsPayload : TLVPayload {
+            public required CommissioningAccessRestrictionEntry[] ARL { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                {
+                    writer.StartArray(0);
+                    foreach (var item in ARL) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Review Fabric Restrictions Response - Reply from server
+        /// </summary>
+        public struct ReviewFabricRestrictionsResponse() {
+            public required ulong Token { get; set; }
+        }
+        #endregion Payloads
+
+        #region Commands
+        /// <summary>
+        /// Review Fabric Restrictions
+        /// </summary>
+        public async Task<ReviewFabricRestrictionsResponse?> ReviewFabricRestrictions(SecureSession session, CommissioningAccessRestrictionEntry[] ARL) {
+            ReviewFabricRestrictionsPayload requestFields = new ReviewFabricRestrictionsPayload() {
+                ARL = ARL,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            if (!ValidateResponse(resp))
+                return null;
+            return new ReviewFabricRestrictionsResponse() {
+                Token = (ulong)GetField(resp, 0),
+            };
+        }
+        #endregion Commands
+
         #region Attributes
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
+
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
+
         /// <summary>
         /// Get the ACL attribute
         /// </summary>
@@ -274,6 +489,28 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         public async Task<ushort> GetAccessControlEntriesPerFabric(SecureSession session) {
             return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 4;
+        }
+
+        /// <summary>
+        /// Get the Commissioning ARL attribute
+        /// </summary>
+        public async Task<CommissioningAccessRestrictionEntry[]> GetCommissioningARL(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
+            CommissioningAccessRestrictionEntry[] list = new CommissioningAccessRestrictionEntry[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new CommissioningAccessRestrictionEntry(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Get the ARL attribute
+        /// </summary>
+        public async Task<AccessRestrictionEntry[]> GetARL(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
+            AccessRestrictionEntry[] list = new AccessRestrictionEntry[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new AccessRestrictionEntry(reader.GetStruct(i)!);
+            return list;
         }
         #endregion Attributes
 

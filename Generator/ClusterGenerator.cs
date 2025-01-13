@@ -534,7 +534,9 @@ namespace Generator
                     break;
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
+                case "ref_IPv4Address":
                 case "ref_Ipv6Adr":
+                case "ref_IPv6Address":
                 case "ipv6adr":
                     if (nullable && !optional)
                         writer.Write($"{totalIndent}if ({name} == null)\n{totalIndent}    writer.WriteNull({id});\n{totalIndent}else\n    ");
@@ -696,9 +698,11 @@ namespace Generator
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 4)!);;");
                     return;
                 case "ref_Ipv4Adr":
+                case "ref_IPv4Address":
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 4, 4)!);;");
                     return;
                 case "ref_Ipv6Adr":
+                case "ref_IPv6Address":
                 case "ipv6adr":
                     writer.WriteLine($"new IPAddress(reader.GetBytes({id}, {(optional ? "true" : "false")}, 16, 16)!);;");
                     return;
@@ -1121,6 +1125,7 @@ namespace Generator
                             break;
                         case "between":
                         case "lengthBetween":
+                        case "countBetween":
                             if (long.TryParse(field.constraint.from, out long parsedFrom))
                                 from = parsedFrom;
                             if (long.TryParse(field.constraint.to, out long parsedTo))
@@ -1407,7 +1412,9 @@ namespace Generator
                     break;
                 case "ref_IpAdr":
                 case "ref_Ipv4Adr":
+                case "ref_IPv4Address":
                 case "ref_Ipv6Adr":
+                case "ref_IPv6Address":
                 case "ipv6adr":
                     includes.Add("System.Net");
                     writer.Write("IPAddress");
@@ -1438,6 +1445,10 @@ namespace Generator
                 case "ref_SemTag":
                     includes.Add("MatterDotNet.Messages");
                     writer.Write("SemanticTag");
+                    break;
+                case "LocationDescriptorStruct":
+                    includes.Add("MatterDotNet.Messages");
+                    writer.Write("LocationDescriptor");
                     break;
                 case "ref_MeasurementAccuracyStruct":
                     includes.Add("MatterDotNet.Messages");

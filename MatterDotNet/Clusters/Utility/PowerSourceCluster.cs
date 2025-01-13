@@ -20,7 +20,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Power Source Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class PowerSourceCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x002F;

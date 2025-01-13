@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009B" name="Energy Preference Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009B" name="Energy Preference">
@@ -77,16 +77,16 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="EnergyPriorityEnum">
-      <item value="0" name="Comfort">
+      <item value="0" name="Comfort" summary="User comfort">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Speed">
+      <item value="1" name="Speed" summary="Speed of operation">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Efficiency">
+      <item value="2" name="Efficiency" summary="Amount of Energy consumed by the device">
         <mandatoryConform/>
       </item>
-      <item value="3" name="WaterConsumption">
+      <item value="3" name="WaterConsumption" summary="Amount of water consumed by the device">
         <mandatoryConform/>
       </item>
     </enum>

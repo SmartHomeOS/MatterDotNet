@@ -24,7 +24,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// Thread Network Diagnostics Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class ThreadNetworkDiagnosticsCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0035;
@@ -821,6 +821,20 @@ namespace MatterDotNet.Clusters.Utility
             for (int i = 0; i < reader.Count; i++)
                 list[i] = (NetworkFaultEnum)reader.GetUShort(i)!.Value;
             return list;
+        }
+
+        /// <summary>
+        /// Get the Ext Address attribute
+        /// </summary>
+        public async Task<ulong?> GetExtAddress(SecureSession session) {
+            return (ulong?)(dynamic?)await GetAttribute(session, 63, true);
+        }
+
+        /// <summary>
+        /// Get the Rloc16 attribute
+        /// </summary>
+        public async Task<ushort?> GetRloc16(SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 64, true);
         }
         #endregion Attributes
 

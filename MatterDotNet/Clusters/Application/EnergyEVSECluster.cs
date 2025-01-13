@@ -25,7 +25,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Energy EVSE Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
+    [ClusterRevision(CLUSTER_ID, 3)]
     public class EnergyEVSECluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0099;
@@ -212,9 +212,13 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             DisabledError = 3,
             /// <summary>
-            /// The EV is not currently allowed to charge or discharge due to Diagnostics Mode.
+            /// The EV is not currently allowed to charge or discharge due to self-diagnostics mode.
             /// </summary>
             DisabledDiagnostics = 4,
+            /// <summary>
+            /// The EV is currently allowed to charge and discharge
+            /// </summary>
+            Enabled = 5,
         }
 
         /// <summary>

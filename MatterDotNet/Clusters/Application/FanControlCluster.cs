@@ -119,27 +119,27 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Fan is capable of off, low, medium and high modes
             /// </summary>
-            Off_Low_Med_High = 0,
+            OffLowMedHigh = 0,
             /// <summary>
             /// Fan is capable of off, low and high modes
             /// </summary>
-            Off_Low_High = 1,
+            OffLowHigh = 1,
             /// <summary>
             /// Fan is capable of off, low, medium, high and auto modes
             /// </summary>
-            Off_Low_Med_High_Auto = 2,
+            OffLowMedHighAuto = 2,
             /// <summary>
             /// Fan is capable of off, low, high and auto modes
             /// </summary>
-            Off_Low_High_Auto = 3,
+            OffLowHighAuto = 3,
             /// <summary>
             /// Fan is capable of off, high and auto modes
             /// </summary>
-            Off_High_Auto = 4,
+            OffHighAuto = 4,
             /// <summary>
             /// Fan is capable of off and high modes
             /// </summary>
-            Off_High = 5,
+            OffHigh = 5,
         }
 
         /// <summary>

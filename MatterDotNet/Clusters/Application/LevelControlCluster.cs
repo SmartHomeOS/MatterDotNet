@@ -23,7 +23,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Level Control Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 5)]
+    [ClusterRevision(CLUSTER_ID, 6)]
     public class LevelControlCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0008;
@@ -50,7 +50,7 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             Lighting = 2,
             /// <summary>
-            /// Supports frequency attributes and behavior. The Pulse Width Modulation cluster was created for frequency control.
+            /// Supports frequency attributes and behavior.
             /// </summary>
             Frequency = 4,
         }

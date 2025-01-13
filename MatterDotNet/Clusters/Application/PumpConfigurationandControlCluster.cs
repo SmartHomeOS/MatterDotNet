@@ -378,13 +378,6 @@ namespace MatterDotNet.Clusters.Application
         public async Task SetControlMode (SecureSession session, ControlModeEnum value) {
             await SetAttribute(session, 33, value);
         }
-
-        /// <summary>
-        /// Get the Alarm Mask attribute
-        /// </summary>
-        public async Task<ushort> GetAlarmMask(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 34) ?? 0;
-        }
         #endregion Attributes
 
         /// <inheritdoc />

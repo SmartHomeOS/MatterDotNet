@@ -54,7 +54,7 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Supports specifying the list of replacement products
             /// </summary>
-            Replacement = 4,
+            ReplacementProductList = 4,
         }
 
         /// <summary>

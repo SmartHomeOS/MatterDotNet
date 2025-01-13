@@ -305,23 +305,33 @@ Davis, CA 95616, USA
       <bitfield name="Operational" bit="0" summary="Device is operational.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="OnlineReserved" bit="1" summary="Deprecated and reserved.">
-        <mandatoryConform/>
+      <bitfield name="OnlineReserved" bit="1">
+        <deprecateConform/>
       </bitfield>
       <bitfield name="LiftMovementReversed" bit="2" summary="The lift movement is reversed.">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
       </bitfield>
       <bitfield name="LiftPositionAware" bit="3" summary="Supports the PositionAwareLift feature (PA_LF).">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="PA_LF"/>
+        </mandatoryConform>
       </bitfield>
       <bitfield name="TiltPositionAware" bit="4" summary="Supports the PositionAwareTilt feature (PA_TL).">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="PA_TL"/>
+        </mandatoryConform>
       </bitfield>
       <bitfield name="LiftEncoderControlled" bit="5" summary="Uses an encoder for lift.">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="PA_LF"/>
+        </mandatoryConform>
       </bitfield>
       <bitfield name="TiltEncoderControlled" bit="6" summary="Uses an encoder for tilt.">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="PA_TL"/>
+        </mandatoryConform>
       </bitfield>
     </bitmap>
     <bitmap name="ModeBitmap">
@@ -339,14 +349,18 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <bitmap name="OperationalStatusBitmap">
-      <bitfield name="Global" from="0" to="1" summary="Global operational state.">
+      <bitfield name="Global" from="1" to="0" summary="Global operational state.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Lift" from="2" to="3" summary="Lift operational state.">
-        <mandatoryConform/>
+      <bitfield name="Lift" from="3" to="2" summary="Lift operational state.">
+        <mandatoryConform>
+          <feature name="LF"/>
+        </mandatoryConform>
       </bitfield>
-      <bitfield name="Tilt" from="4" to="5" summary="Tilt operational state.">
-        <mandatoryConform/>
+      <bitfield name="Tilt" from="5" to="4" summary="Tilt operational state.">
+        <mandatoryConform>
+          <feature name="TL"/>
+        </mandatoryConform>
       </bitfield>
     </bitmap>
     <bitmap name="SafetyStatusBitmap">
@@ -463,7 +477,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -473,14 +487,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
           <feature name="PA_TL"/>
         </andTerm>
       </optionalConform>
-      <constraint type="between" from="0" to="100"/>
     </attribute>
     <attribute id="0x000A" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
@@ -490,7 +503,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -500,7 +513,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>
@@ -523,7 +536,7 @@ Davis, CA 95616, USA
           <feature name="PA_LF"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="10000"/>
+      <constraint type="max" value="10000"/>
     </attribute>
     <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
@@ -534,7 +547,7 @@ Davis, CA 95616, USA
           <feature name="PA_TL"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="10000"/>
+      <constraint type="max" value="10000"/>
     </attribute>
     <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -546,7 +559,7 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="65534"/>
+      <constraint type="max" value="65534"/>
     </attribute>
     <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
@@ -558,7 +571,7 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="65534"/>
+      <constraint type="max" value="65534"/>
     </attribute>
     <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -570,7 +583,7 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="65534"/>
+      <constraint type="max" value="65534"/>
     </attribute>
     <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
       <access read="true" readPrivilege="view"/>
@@ -582,7 +595,7 @@ Davis, CA 95616, USA
           <feature name="ABS"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="65534"/>
+      <constraint type="max" value="65534"/>
     </attribute>
     <attribute id="0x0014" name="VelocityLift">
       <deprecateConform/>
@@ -593,7 +606,7 @@ Davis, CA 95616, USA
     <attribute id="0x0016" name="DecelerationTimeLift">
       <deprecateConform/>
     </attribute>
-    <attribute id="0x0017" name="Mode" type="ModeBitmap" default="0">
+    <attribute id="0x0017" name="Mode" type="ModeBitmap Type." default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
@@ -651,12 +664,8 @@ Davis, CA 95616, USA
           <feature name="LF"/>
         </optionalConform>
       </otherwiseConform>
-      <field id="0" name="LiftPercentageValue" type="percent">
-        <optionalConform choice="a"/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="LiftPercent100thsValue" type="percent100ths">
-        <optionalConform choice="a"/>
+      <field id="0" name="LiftPercent100thsValue" type="percent100ths">
+        <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
@@ -686,12 +695,8 @@ Davis, CA 95616, USA
           <feature name="TL"/>
         </optionalConform>
       </otherwiseConform>
-      <field id="0" name="TiltPercentageValue" type="percent">
-        <optionalConform choice="a"/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="TiltPercent100thsValue" type="percent100ths">
-        <optionalConform choice="a"/>
+      <field id="0" name="TiltPercent100thsValue" type="percent100ths">
+        <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>

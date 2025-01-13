@@ -24,7 +24,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Application Launcher Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 1)]
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class ApplicationLauncherCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x050C;
@@ -57,13 +57,25 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             Success = 0,
             /// <summary>
-            /// Requested app is not available.
+            /// Requested app is not available
             /// </summary>
             AppNotAvailable = 1,
             /// <summary>
-            /// Video platform unable to honor command.
+            /// Video platform unable to honor command
             /// </summary>
             SystemBusy = 2,
+            /// <summary>
+            /// User approval for app download is pending
+            /// </summary>
+            PendingUserApproval = 3,
+            /// <summary>
+            /// Downloading the requested app
+            /// </summary>
+            Downloading = 4,
+            /// <summary>
+            /// Installing the requested app
+            /// </summary>
+            Installing = 5,
         }
         #endregion Enums
 

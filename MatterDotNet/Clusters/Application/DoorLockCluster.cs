@@ -26,7 +26,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Door Lock Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 7)]
+    [ClusterRevision(CLUSTER_ID, 8)]
     public class DoorLockCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0101;
@@ -57,10 +57,6 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             FingerCredentials = 4,
             /// <summary>
-            /// Lock supports local/on-lock logging when Events are not supported
-            /// </summary>
-            Logging = 8,
-            /// <summary>
             /// Lock supports week day user access schedules
             /// </summary>
             WeekDayAccessSchedules = 16,
@@ -81,10 +77,6 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             User = 256,
             /// <summary>
-            /// Operation and Programming Notifications
-            /// </summary>
-            Notification = 512,
-            /// <summary>
             /// Lock supports year day user access schedules
             /// </summary>
             YearDayAccessSchedules = 1024,
@@ -96,6 +88,14 @@ namespace MatterDotNet.Clusters.Application
             /// Lock supports unbolting
             /// </summary>
             Unbolting = 4096,
+            /// <summary>
+            /// Lock supports Aliro credential provisioning as defined in ref_Aliro
+            /// </summary>
+            AliroProvisioning = 8192,
+            /// <summary>
+            /// Lock supports the Bluetooth LE + UWB Access Control Flow as defined in ref_Aliro
+            /// </summary>
+            AliroBLEUWB = 16384,
         }
 
         /// <summary>
@@ -182,6 +182,18 @@ namespace MatterDotNet.Clusters.Application
             /// Face identifier credential type
             /// </summary>
             Face = 5,
+            /// <summary>
+            /// A Credential Issuer public key as defined in ref_Aliro
+            /// </summary>
+            AliroCredentialIssuerKey = 6,
+            /// <summary>
+            /// An Endpoint public key as defined in ref_Aliro which can be evicted if space is needed for another endpoint key
+            /// </summary>
+            AliroEvictableEndpointKey = 7,
+            /// <summary>
+            /// An Endpoint public key as defined in ref_Aliro which cannot be evicted if space is needed for another endpoint key
+            /// </summary>
+            AliroNonEvictableEndpointKey = 8,
         }
 
         /// <summary>
@@ -230,32 +242,6 @@ namespace MatterDotNet.Clusters.Application
             /// Door state is ajar
             /// </summary>
             DoorAjar = 5,
-        }
-
-        /// <summary>
-        /// Event Source
-        /// </summary>
-        public enum EventSourceEnum {
-            /// <summary>
-            /// Event source is keypad
-            /// </summary>
-            Keypad = 0,
-            /// <summary>
-            /// Event source is remote
-            /// </summary>
-            Remote = 1,
-            /// <summary>
-            /// Event source is manual
-            /// </summary>
-            Manual = 2,
-            /// <summary>
-            /// Event source is RFID
-            /// </summary>
-            RFID = 3,
-            /// <summary>
-            /// Event source is unknown
-            /// </summary>
-            Indeterminate = 255,
         }
 
         /// <summary>
@@ -342,6 +328,18 @@ namespace MatterDotNet.Clusters.Application
             /// Lock user face information was added, cleared, or modified.
             /// </summary>
             Face = 10,
+            /// <summary>
+            /// An Aliro credential issuer key credential was added, cleared, or modified.
+            /// </summary>
+            AliroCredentialIssuerKey = 11,
+            /// <summary>
+            /// An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified.
+            /// </summary>
+            AliroEvictableEndpointKey = 12,
+            /// <summary>
+            /// An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified.
+            /// </summary>
+            AliroNonEvictableEndpointKey = 13,
         }
 
         /// <summary>
@@ -527,6 +525,10 @@ namespace MatterDotNet.Clusters.Application
             /// Lock/unlock operation came from biometric source (e.g. face, fingerprint/fingervein)
             /// </summary>
             Biometric = 9,
+            /// <summary>
+            /// Lock/unlock operation came from an interaction defined in ref_Aliro, or user change operation was a step-up credential provisioning as defined in ref_Aliro
+            /// </summary>
+            Aliro = 10,
         }
 
         /// <summary>
@@ -632,10 +634,6 @@ namespace MatterDotNet.Clusters.Application
             /// Lock Reset to Factory Defaults
             /// </summary>
             LockFactoryReset = 2,
-            /// <summary>
-            /// Reserved
-            /// </summary>
-            N_A = 4,
             /// <summary>
             /// RF Module Power Cycled
             /// </summary>
@@ -749,81 +747,6 @@ namespace MatterDotNet.Clusters.Application
             /// Schedule is applied on Saturday
             /// </summary>
             Saturday = 64,
-        }
-
-        /// <summary>
-        /// Event Mask Bitmap
-        /// </summary>
-        [Flags]
-        public enum EventMaskBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// State of bit 0
-            /// </summary>
-            Bit0 = 1,
-            /// <summary>
-            /// State of bit 1
-            /// </summary>
-            Bit1 = 2,
-            /// <summary>
-            /// State of bit 2
-            /// </summary>
-            Bit2 = 4,
-            /// <summary>
-            /// State of bit 3
-            /// </summary>
-            Bit3 = 8,
-            /// <summary>
-            /// State of bit 4
-            /// </summary>
-            Bit4 = 16,
-            /// <summary>
-            /// State of bit 5
-            /// </summary>
-            Bit5 = 32,
-            /// <summary>
-            /// State of bit 6
-            /// </summary>
-            Bit6 = 64,
-            /// <summary>
-            /// State of bit 7
-            /// </summary>
-            Bit7 = 128,
-            /// <summary>
-            /// State of bit 8
-            /// </summary>
-            Bit8 = 256,
-            /// <summary>
-            /// State of bit 9
-            /// </summary>
-            Bit9 = 512,
-            /// <summary>
-            /// State of bit 10
-            /// </summary>
-            Bit10 = 1024,
-            /// <summary>
-            /// State of bit 11
-            /// </summary>
-            Bit11 = 2048,
-            /// <summary>
-            /// State of bit 12
-            /// </summary>
-            Bit12 = 4096,
-            /// <summary>
-            /// State of bit 13
-            /// </summary>
-            Bit13 = 8192,
-            /// <summary>
-            /// State of bit 14
-            /// </summary>
-            Bit14 = 16384,
-            /// <summary>
-            /// State of bit 15
-            /// </summary>
-            Bit15 = 32768,
         }
 
         /// <summary>
@@ -946,28 +869,6 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteBytes(1, PINCode);
                 writer.EndContainer();
             }
-        }
-
-        private record GetLogRecordPayload : TLVPayload {
-            public required ushort LogIndex { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, LogIndex);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Get Log Record Response - Reply from server
-        /// </summary>
-        public struct GetLogRecordResponse() {
-            public required ushort LogEntryID { get; set; }
-            public required DateTime Timestamp { get; set; }
-            public required EventTypeEnum EventType { get; set; }
-            public required EventSourceEnum Source { get; set; }
-            public required byte EventID { get; set; }
-            public required ushort UserID { get; set; }
-            public required byte[] PIN { get; set; }
         }
 
         private record SetPINCodePayload : TLVPayload {
@@ -1362,6 +1263,7 @@ namespace MatterDotNet.Clusters.Application
             public required byte? CreatorFabricIndex { get; set; }
             public required byte? LastModifiedFabricIndex { get; set; }
             public ushort? NextCredentialIndex { get; set; }
+            public byte[]? CredentialData { get; set; }
         }
 
         private record ClearCredentialPayload : TLVPayload {
@@ -1382,6 +1284,22 @@ namespace MatterDotNet.Clusters.Application
                 writer.StartStructure(structNumber);
                 if (PINCode != null)
                     writer.WriteBytes(0, PINCode);
+                writer.EndContainer();
+            }
+        }
+
+        private record SetAliroReaderConfigPayload : TLVPayload {
+            public required byte[] SigningKey { get; set; }
+            public required byte[] VerificationKey { get; set; }
+            public required byte[] GroupIdentifier { get; set; }
+            public byte[]? GroupResolvingKey { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, SigningKey, 32);
+                writer.WriteBytes(1, VerificationKey, 65);
+                writer.WriteBytes(2, GroupIdentifier, 16);
+                if (GroupResolvingKey != null)
+                    writer.WriteBytes(3, GroupResolvingKey, 16);
                 writer.EndContainer();
             }
         }
@@ -1428,27 +1346,6 @@ namespace MatterDotNet.Clusters.Application
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x03, requestFields);
             return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Get Log Record
-        /// </summary>
-        public async Task<GetLogRecordResponse?> GetLogRecord(SecureSession session, ushort LogIndex) {
-            GetLogRecordPayload requestFields = new GetLogRecordPayload() {
-                LogIndex = LogIndex,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
-            if (!ValidateResponse(resp))
-                return null;
-            return new GetLogRecordResponse() {
-                LogEntryID = (ushort)GetField(resp, 0),
-                Timestamp = (DateTime)GetField(resp, 1),
-                EventType = (EventTypeEnum)(byte)GetField(resp, 2),
-                Source = (EventSourceEnum)(byte)GetField(resp, 3),
-                EventID = (byte)GetField(resp, 4),
-                UserID = (ushort)GetField(resp, 5),
-                PIN = (byte[])GetField(resp, 6),
-            };
         }
 
         /// <summary>
@@ -1841,6 +1738,7 @@ namespace MatterDotNet.Clusters.Application
                 CreatorFabricIndex = (byte?)GetField(resp, 2),
                 LastModifiedFabricIndex = (byte?)GetField(resp, 3),
                 NextCredentialIndex = (ushort?)GetOptionalField(resp, 4),
+                CredentialData = (byte[]?)GetOptionalField(resp, 5),
             };
         }
 
@@ -1863,6 +1761,28 @@ namespace MatterDotNet.Clusters.Application
                 PINCode = PINCode,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x27, requestFields);
+            return ValidateResponse(resp);
+        }
+
+        /// <summary>
+        /// Set Aliro Reader Config
+        /// </summary>
+        public async Task<bool> SetAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, byte[] SigningKey, byte[] VerificationKey, byte[] GroupIdentifier, byte[]? GroupResolvingKey) {
+            SetAliroReaderConfigPayload requestFields = new SetAliroReaderConfigPayload() {
+                SigningKey = SigningKey,
+                VerificationKey = VerificationKey,
+                GroupIdentifier = GroupIdentifier,
+                GroupResolvingKey = GroupResolvingKey,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x28, requestFields);
+            return ValidateResponse(resp);
+        }
+
+        /// <summary>
+        /// Clear Aliro Reader Config
+        /// </summary>
+        public async Task<bool> ClearAliroReaderConfig(SecureSession session, ushort commandTimeoutMS) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x29);
             return ValidateResponse(resp);
         }
         #endregion Commands
@@ -1960,13 +1880,6 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Number Of Log Records Supported attribute
-        /// </summary>
-        public async Task<ushort> GetNumberOfLogRecordsSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0;
-        }
-
-        /// <summary>
         /// Get the Number Of Total Users Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfTotalUsersSupported(SecureSession session) {
@@ -2048,20 +1961,6 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public async Task<byte> GetNumberOfCredentialsSupportedPerUser(SecureSession session) {
             return (byte?)(dynamic?)await GetAttribute(session, 28) ?? 0;
-        }
-
-        /// <summary>
-        /// Get the Enable Logging attribute
-        /// </summary>
-        public async Task<bool> GetEnableLogging(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 32) ?? false;
-        }
-
-        /// <summary>
-        /// Set the Enable Logging attribute
-        /// </summary>
-        public async Task SetEnableLogging (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 32, value);
         }
 
         /// <summary>
@@ -2303,101 +2202,74 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Keypad Operation Event Mask attribute
+        /// Get the Aliro Reader Verification Key attribute
         /// </summary>
-        public async Task<EventMaskBitmap> GetKeypadOperationEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 65);
+        public async Task<byte[]?> GetAliroReaderVerificationKey(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 128, true) ?? null;
         }
 
         /// <summary>
-        /// Set the Keypad Operation Event Mask attribute
+        /// Get the Aliro Reader Group Identifier attribute
         /// </summary>
-        public async Task SetKeypadOperationEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 65, value);
+        public async Task<byte[]?> GetAliroReaderGroupIdentifier(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 129, true) ?? null;
         }
 
         /// <summary>
-        /// Get the Remote Operation Event Mask attribute
+        /// Get the Aliro Reader Group Sub Identifier attribute
         /// </summary>
-        public async Task<EventMaskBitmap> GetRemoteOperationEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 66);
+        public async Task<byte[]> GetAliroReaderGroupSubIdentifier(SecureSession session) {
+            return (byte[])(dynamic?)(await GetAttribute(session, 130))!;
         }
 
         /// <summary>
-        /// Set the Remote Operation Event Mask attribute
+        /// Get the Aliro Expedited Transaction Supported Protocol Versions attribute
         /// </summary>
-        public async Task SetRemoteOperationEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 66, value);
+        public async Task<byte[][]> GetAliroExpeditedTransactionSupportedProtocolVersions(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 131))!);
+            byte[][] list = new byte[reader.Count][];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = reader.GetBytes(i, false)!;
+            return list;
         }
 
         /// <summary>
-        /// Get the Manual Operation Event Mask attribute
+        /// Get the Aliro Group Resolving Key attribute
         /// </summary>
-        public async Task<EventMaskBitmap> GetManualOperationEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 67);
+        public async Task<byte[]?> GetAliroGroupResolvingKey(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 132, true) ?? null;
         }
 
         /// <summary>
-        /// Set the Manual Operation Event Mask attribute
+        /// Get the Aliro Supported BLEUWB Protocol Versions attribute
         /// </summary>
-        public async Task SetManualOperationEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 67, value);
+        public async Task<byte[][]> GetAliroSupportedBLEUWBProtocolVersions(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 133))!);
+            byte[][] list = new byte[reader.Count][];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = reader.GetBytes(i, false)!;
+            return list;
         }
 
         /// <summary>
-        /// Get the RFID Operation Event Mask attribute
+        /// Get the Aliro BLE Advertising Version attribute
         /// </summary>
-        public async Task<EventMaskBitmap> GetRFIDOperationEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 68);
+        public async Task<byte> GetAliroBLEAdvertisingVersion(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 134) ?? 0;
         }
 
         /// <summary>
-        /// Set the RFID Operation Event Mask attribute
+        /// Get the Number Of Aliro Credential Issuer Keys Supported attribute
         /// </summary>
-        public async Task SetRFIDOperationEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 68, value);
+        public async Task<ushort> GetNumberOfAliroCredentialIssuerKeysSupported(SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 135) ?? 0;
         }
 
         /// <summary>
-        /// Get the Keypad Programming Event Mask attribute
+        /// Get the Number Of Aliro Endpoint Keys Supported attribute
         /// </summary>
-        public async Task<EventMaskBitmap> GetKeypadProgrammingEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 69);
-        }
-
-        /// <summary>
-        /// Set the Keypad Programming Event Mask attribute
-        /// </summary>
-        public async Task SetKeypadProgrammingEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 69, value);
-        }
-
-        /// <summary>
-        /// Get the Remote Programming Event Mask attribute
-        /// </summary>
-        public async Task<EventMaskBitmap> GetRemoteProgrammingEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 70);
-        }
-
-        /// <summary>
-        /// Set the Remote Programming Event Mask attribute
-        /// </summary>
-        public async Task SetRemoteProgrammingEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 70, value);
-        }
-
-        /// <summary>
-        /// Get the RFID Programming Event Mask attribute
-        /// </summary>
-        public async Task<EventMaskBitmap> GetRFIDProgrammingEventMask(SecureSession session) {
-            return (EventMaskBitmap)await GetEnumAttribute(session, 71);
-        }
-
-        /// <summary>
-        /// Set the RFID Programming Event Mask attribute
-        /// </summary>
-        public async Task SetRFIDProgrammingEventMask (SecureSession session, EventMaskBitmap value) {
-            await SetAttribute(session, 71, value);
+        public async Task<ushort> GetNumberOfAliroEndpointKeysSupported(SecureSession session) {
+            return (ushort?)(dynamic?)await GetAttribute(session, 136) ?? 0;
         }
         #endregion Attributes
 

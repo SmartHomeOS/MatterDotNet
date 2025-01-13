@@ -24,7 +24,7 @@ namespace MatterDotNet.Clusters.Utility
     /// <summary>
     /// General Commissioning Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 1)]
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class GeneralCommissioningCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0030;
@@ -37,6 +37,17 @@ namespace MatterDotNet.Clusters.Utility
         protected GeneralCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
+        /// <summary>
+        /// Supported Features
+        /// </summary>
+        [Flags]
+        public enum Feature {
+            /// <summary>
+            /// Supports Terms &amp; Conditions acknowledgement
+            /// </summary>
+            TermsAndConditions = 1,
+        }
+
         /// <summary>
         /// Commissioning Error
         /// </summary>
@@ -61,6 +72,18 @@ namespace MatterDotNet.Clusters.Utility
             /// <see cref="BusyWithOtherAdmin"/> Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.
             /// </summary>
             BusyWithOtherAdmin = 4,
+            /// <summary>
+            /// <see cref="RequiredTCNotAccepted"/> One or more required TC features from the Enhanced Setup Flow were not accepted.
+            /// </summary>
+            RequiredTCNotAccepted = 5,
+            /// <summary>
+            /// <see cref="TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
+            /// </summary>
+            TCAcknowledgementsNotReceived = 6,
+            /// <summary>
+            /// <see cref="TCMinVersionNotMet, TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
+            /// </summary>
+            TCMinVersionNotMet = 7,
         }
 
         /// <summary>
@@ -160,6 +183,24 @@ namespace MatterDotNet.Clusters.Utility
             public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
             public required string DebugText { get; set; } = "";
         }
+
+        private record SetTCAcknowledgementsPayload : TLVPayload {
+            public required ushort TCVersion { get; set; }
+            public required ushort TCUserResponse { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, TCVersion);
+                writer.WriteUShort(1, TCUserResponse);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Set TC Acknowledgements Response - Reply from server
+        /// </summary>
+        public struct SetTCAcknowledgementsResponse() {
+            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
+        }
         #endregion Payloads
 
         #region Commands
@@ -210,9 +251,46 @@ namespace MatterDotNet.Clusters.Utility
                 DebugText = (string)GetField(resp, 1),
             };
         }
+
+        /// <summary>
+        /// Set TC Acknowledgements
+        /// </summary>
+        public async Task<SetTCAcknowledgementsResponse?> SetTCAcknowledgements(SecureSession session, ushort TCVersion, ushort TCUserResponse) {
+            SetTCAcknowledgementsPayload requestFields = new SetTCAcknowledgementsPayload() {
+                TCVersion = TCVersion,
+                TCUserResponse = TCUserResponse,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            if (!ValidateResponse(resp))
+                return null;
+            return new SetTCAcknowledgementsResponse() {
+                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
+            };
+        }
         #endregion Commands
 
         #region Attributes
+        /// <summary>
+        /// Features supported by this cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public async Task<Feature> GetSupportedFeatures(SecureSession session)
+        {
+            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
+        }
+
+        /// <summary>
+        /// Returns true when the feature is supported by the cluster
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public async Task<bool> Supports(SecureSession session, Feature feature)
+        {
+            return ((feature & await GetSupportedFeatures(session)) != 0);
+        }
+
         /// <summary>
         /// Get the Breadcrumb attribute
         /// </summary>
@@ -253,6 +331,41 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         public async Task<bool> GetSupportsConcurrentConnection(SecureSession session) {
             return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
+        }
+
+        /// <summary>
+        /// Get the TC Accepted Version attribute
+        /// </summary>
+        public async Task<ushort> GetTCAcceptedVersion(SecureSession session) {
+            return (ushort)(dynamic?)(await GetAttribute(session, 5))!;
+        }
+
+        /// <summary>
+        /// Get the TC Min Required Version attribute
+        /// </summary>
+        public async Task<ushort> GetTCMinRequiredVersion(SecureSession session) {
+            return (ushort)(dynamic?)(await GetAttribute(session, 6))!;
+        }
+
+        /// <summary>
+        /// Get the TC Acknowledgements attribute
+        /// </summary>
+        public async Task<ushort> GetTCAcknowledgements(SecureSession session) {
+            return (ushort)(dynamic?)(await GetAttribute(session, 7))!;
+        }
+
+        /// <summary>
+        /// Get the TC Acknowledgements Required attribute
+        /// </summary>
+        public async Task<bool> GetTCAcknowledgementsRequired(SecureSession session) {
+            return (bool?)(dynamic?)await GetAttribute(session, 8) ?? true;
+        }
+
+        /// <summary>
+        /// Get the TC Update Deadline attribute
+        /// </summary>
+        public async Task<uint?> GetTCUpdateDeadline(SecureSession session) {
+            return (uint?)(dynamic?)await GetAttribute(session, 9, true);
         }
         #endregion Attributes
 

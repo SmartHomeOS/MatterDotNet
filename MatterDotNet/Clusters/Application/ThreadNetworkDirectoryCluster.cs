@@ -1,0 +1,189 @@
+﻿// MatterDotNet Copyright (C) 2025 
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY, without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// WARNING: This file was auto-generated. Do not edit.
+
+using MatterDotNet.Messages.InteractionModel;
+using MatterDotNet.Protocol.Parsers;
+using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Sessions;
+using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
+
+namespace MatterDotNet.Clusters.Application
+{
+    /// <summary>
+    /// Thread Network Directory Cluster
+    /// </summary>
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class ThreadNetworkDirectoryCluster : ClusterBase
+    {
+        internal const uint CLUSTER_ID = 0x0453;
+
+        /// <summary>
+        /// Thread Network Directory Cluster
+        /// </summary>
+        public ThreadNetworkDirectoryCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected ThreadNetworkDirectoryCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+
+        #region Records
+        /// <summary>
+        /// Thread Network
+        /// </summary>
+        public record ThreadNetwork : TLVPayload {
+            /// <summary>
+            /// Thread Network
+            /// </summary>
+            public ThreadNetwork() { }
+
+            /// <summary>
+            /// Thread Network
+            /// </summary>
+            [SetsRequiredMembers]
+            public ThreadNetwork(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                ExtendedPanID = reader.GetBytes(0, false)!;
+                NetworkName = reader.GetString(1, false, 16, 1)!;
+                Channel = reader.GetUShort(2)!.Value;
+                ActiveTimestamp = reader.GetULong(3)!.Value;
+            }
+            public required byte[] ExtendedPanID { get; set; }
+            public required string NetworkName { get; set; }
+            public required ushort Channel { get; set; }
+            public required ulong ActiveTimestamp { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, ExtendedPanID, 8);
+                writer.WriteString(1, NetworkName, 16, 1);
+                writer.WriteUShort(2, Channel);
+                writer.WriteULong(3, ActiveTimestamp);
+                writer.EndContainer();
+            }
+        }
+        #endregion Records
+
+        #region Payloads
+        private record AddNetworkPayload : TLVPayload {
+            public required byte[] OperationalDataset { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, OperationalDataset, 254);
+                writer.EndContainer();
+            }
+        }
+
+        private record RemoveNetworkPayload : TLVPayload {
+            public required byte[] ExtendedPanID { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, ExtendedPanID, 8);
+                writer.EndContainer();
+            }
+        }
+
+        private record GetOperationalDatasetPayload : TLVPayload {
+            public required byte[] ExtendedPanID { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, ExtendedPanID, 8);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Operational Dataset Response - Reply from server
+        /// </summary>
+        public struct OperationalDatasetResponse() {
+            public required byte[] OperationalDataset { get; set; }
+        }
+        #endregion Payloads
+
+        #region Commands
+        /// <summary>
+        /// Add Network
+        /// </summary>
+        public async Task<bool> AddNetwork(SecureSession session, ushort commandTimeoutMS, byte[] OperationalDataset) {
+            AddNetworkPayload requestFields = new AddNetworkPayload() {
+                OperationalDataset = OperationalDataset,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x00, requestFields);
+            return ValidateResponse(resp);
+        }
+
+        /// <summary>
+        /// Remove Network
+        /// </summary>
+        public async Task<bool> RemoveNetwork(SecureSession session, ushort commandTimeoutMS, byte[] ExtendedPanID) {
+            RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
+                ExtendedPanID = ExtendedPanID,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, commandTimeoutMS, 0x01, requestFields);
+            return ValidateResponse(resp);
+        }
+
+        /// <summary>
+        /// Get Operational Dataset
+        /// </summary>
+        public async Task<OperationalDatasetResponse?> GetOperationalDataset(SecureSession session, byte[] ExtendedPanID) {
+            GetOperationalDatasetPayload requestFields = new GetOperationalDatasetPayload() {
+                ExtendedPanID = ExtendedPanID,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            if (!ValidateResponse(resp))
+                return null;
+            return new OperationalDatasetResponse() {
+                OperationalDataset = (byte[])GetField(resp, 0),
+            };
+        }
+        #endregion Commands
+
+        #region Attributes
+        /// <summary>
+        /// Get the Preferred Extended Pan ID attribute
+        /// </summary>
+        public async Task<byte[]?> GetPreferredExtendedPanID(SecureSession session) {
+            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+        }
+
+        /// <summary>
+        /// Set the Preferred Extended Pan ID attribute
+        /// </summary>
+        public async Task SetPreferredExtendedPanID (SecureSession session, byte[]? value = null) {
+            await SetAttribute(session, 0, value, true);
+        }
+
+        /// <summary>
+        /// Get the Thread Networks attribute
+        /// </summary>
+        public async Task<ThreadNetwork[]> GetThreadNetworks(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            ThreadNetwork[] list = new ThreadNetwork[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new ThreadNetwork(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Get the Thread Network Table Size attribute
+        /// </summary>
+        public async Task<byte> GetThreadNetworkTableSize(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 10;
+        }
+        #endregion Attributes
+
+        /// <inheritdoc />
+        public override string ToString() {
+            return "Thread Network Directory Cluster";
+        }
+    }
+}

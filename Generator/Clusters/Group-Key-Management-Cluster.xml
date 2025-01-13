@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
   </revisionHistory>
   <clusterIds>
@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
-      <optionalConform/>
+      <provisionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -220,7 +220,7 @@ Davis, CA 95616, USA
     <command id="0x04" name="KeySetReadAllIndices Command" direction="commandToServer" response="KeySetReadAllIndicesResponse Command">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="reserved">
+      <field id="0" name="DoNotUse">
         <disallowConform/>
       </field>
     </command>

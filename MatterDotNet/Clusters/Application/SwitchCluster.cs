@@ -20,7 +20,7 @@ namespace MatterDotNet.Clusters.Application
     /// <summary>
     /// Switch Cluster
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 1)]
+    [ClusterRevision(CLUSTER_ID, 2)]
     public class SwitchCluster : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x003B;
@@ -47,17 +47,21 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             MomentarySwitch = 2,
             /// <summary>
-            /// Switch supports release
+            /// Switch supports release events generation
             /// </summary>
             MomentarySwitchRelease = 4,
             /// <summary>
-            /// Switch supports long press
+            /// Switch supports long press detection
             /// </summary>
             MomentarySwitchLongPress = 8,
             /// <summary>
-            /// Switch supports multi-press
+            /// Switch supports multi-press detection
             /// </summary>
             MomentarySwitchMultiPress = 16,
+            /// <summary>
+            /// Switch is momentary, targeted at specific user actions (focus on multi-press and optionally long press) with a reduced event generation scheme
+            /// </summary>
+            ActionSwitch = 32,
         }
         #endregion Enums
 

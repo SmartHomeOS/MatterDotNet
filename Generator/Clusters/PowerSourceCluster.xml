@@ -55,10 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
+    <revision revision="3" summary="Added Q quality (replacing C quality) on BatPercentRemaining, BatTimeRemaining and BatTimeToFullCharge"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x002F" name="Power Source"/>
@@ -66,10 +67,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="PS" scope="Node"/>
   <features>
     <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
-      <optionalConform/>
+      <optionalConform choice="a"/>
     </feature>
     <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
-      <optionalConform/>
+      <optionalConform choice="a"/>
     </feature>
     <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
       <optionalConform>
@@ -631,15 +632,15 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="BatPercentRemaining" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="between" from="0" to="200"/>
+      <constraint type="max" value="200"/>
     </attribute>
     <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
@@ -744,7 +745,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>

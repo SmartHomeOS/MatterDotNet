@@ -54,9 +54,21 @@ namespace MatterDotNet.Clusters.Application
         /// Energy Priority
         /// </summary>
         public enum EnergyPriorityEnum {
+            /// <summary>
+            /// User comfort
+            /// </summary>
             Comfort = 0,
+            /// <summary>
+            /// Speed of operation
+            /// </summary>
             Speed = 1,
+            /// <summary>
+            /// Amount of Energy consumed by the device
+            /// </summary>
             Efficiency = 2,
+            /// <summary>
+            /// Amount of water consumed by the device
+            /// </summary>
             WaterConsumption = 3,
         }
         #endregion Enums

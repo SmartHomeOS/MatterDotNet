@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Support determining capabilities for Wi-Fi and Thread interfaces. Additional Wi-Fi directed scanning requirements."/>
   </revisionHistory>
   <clusterIds>
@@ -119,22 +119,22 @@ Davis, CA 95616, USA
     </enum>
     <enum name="WiFiBandEnum">
       <item value="0" name="2G4" summary="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="1" name="3G65" summary="3.65GHz - 3.655GHz to 3.695GHz (802.11y)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="5" name="1G" summary="Sub-1GHz - 755MHz to 931MHz (802.11ah)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
     </enum>
     <bitmap name="ThreadCapabilitiesBitmap">
@@ -185,7 +185,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
-        <constraint type="between" from="0" to="65534"/>
+        <constraint type="max" value="65534"/>
       </field>
       <field id="1" name="ExtendedPanId" type="uint64">
         <mandatoryConform>
@@ -452,7 +452,7 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="NetworkIndex" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="MaxNetworks - 1"/>
+        <constraint type="max" value="MaxNetworks - 1"/>
       </field>
     </command>
     <command id="0x06" name="ConnectNetwork" direction="commandToServer" response="ConnectNetworkResponse">

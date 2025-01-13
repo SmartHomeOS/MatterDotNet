@@ -14,9 +14,11 @@ using MatterDotNet.Clusters.Utility;
 using MatterDotNet.OperationalDiscovery;
 using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Connection;
+using MatterDotNet.Protocol.Cryptography;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MatterDotNet.Entities
@@ -57,22 +59,45 @@ namespace MatterDotNet.Entities
         /// <exception cref="IOException"></exception>
         public async Task<SecureSession> GetCASESession()
         {
-            if (connection.IP6Address != null)
-            {
-                using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IP6Address!, connection.Port), true))
-                    return await GetCASESession(session);
-            }
-            else if(connection.IP4Address != null)
+            if (connection.IP4Address != null)
             {
                 using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IP4Address!, connection.Port), true))
                     return await GetCASESession(session);
             }
+            else if (connection.IP6Address != null)
+            {
+                using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IP6Address!, connection.Port), true))
+                    return await GetCASESession(session);
+            }
             else
             {
-                using (SessionContext session = SessionManager.GetUnsecureSession(new BLEEndPoint(connection.BTAddress), true))
+                using (SessionContext session = SessionManager.GetUnsecureSession(new BLEEndPoint(connection.BTAddress!), true))
                     return await GetCASESession(session);
             }
         }
+
+        /// <summary>
+        /// Open a commissioning window with a new randomly generateed PIN Code
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="timeoutSec"></param>
+        /// <returns></returns>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        public async Task<string?> OpenEnhancedCommissioning(SecureSession session, ushort timeoutSec = 300)
+        {
+            if (!root.HasCluster<AdministratorCommissioningCluster>())
+                throw new PlatformNotSupportedException("Admin commissioning cluster not found");
+            uint passcode = Crypto.GeneratePasscode();
+            ushort discriminator = (ushort)(Random.Shared.Next() & 0xFFF);
+            string pin = CommissioningPayload.GeneratePIN(discriminator, passcode);
+            SPAKE2Plus spake = new SPAKE2Plus();
+            AdministratorCommissioningCluster com = root.GetCluster<AdministratorCommissioningCluster>();
+            byte[] salt = RandomNumberGenerator.GetBytes(32);
+            if (!await com.OpenCommissioningWindow(session, 10000, timeoutSec, spake.CommissioneePakeInput(passcode, 10000, salt), discriminator, 10000, salt))
+                return null;
+            return pin;
+        }
+
         /// <summary>
         /// Get a secure session for the node
         /// </summary>

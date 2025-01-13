@@ -196,6 +196,23 @@ namespace MatterDotNet.OperationalDiscovery
             return ret;
         }
 
+        /// <summary>
+        /// Generate a pairing code from a 12-bit discriminator and passcode
+        /// </summary>
+        /// <param name="descriminator"></param>
+        /// <param name="passcode"></param>
+        /// <returns></returns>
+        public static string GeneratePIN(ushort descriminator, uint passcode)
+        {
+            descriminator >>= 8;
+            byte b1 = (byte)((descriminator & 0xF) >> 2);
+            ushort group1 = (ushort)((descriminator & 0x3) << 14);
+            group1 |= (ushort)(passcode & 0x3FFF);
+            uint group2 = passcode >> 14;
+            string ret = string.Concat(b1, group1.ToString("00000"), group2.ToString("0000"));
+            return ret.Substring(0, 4) + '-' + ret.Substring(4, 3) + '-' + ret.Substring(7) + Checksum.GenerateVerhoeff(ret);
+        }
+
         private static byte[] Decode(string str)
         {
             List<byte> data = new List<byte>();

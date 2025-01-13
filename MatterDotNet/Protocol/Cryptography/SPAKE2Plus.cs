@@ -12,6 +12,7 @@
 
 using MatterDotNet.Messages.PASE;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Security;
 using System.Buffers.Binary;
 using System.Numerics;
 using System.Security.Cryptography;
@@ -66,6 +67,19 @@ namespace MatterDotNet.Protocol.Cryptography
             y = new BigInteger(RandomNumberGenerator.GetBytes(Crypto.GROUP_SIZE_BYTES), true, true) % SecP256.p;
             BigIntegerPoint Y = SecP256.Add(SecP256.Multiply(y, SecP256.GeneratorP), SecP256.Multiply(w0, N)); //Y = pB
             return Y;
+        }
+
+        public byte[] CommissioneePakeInput(uint passcode, int iterations, byte[] salt)
+        {
+            byte[] pinBytes = new byte[4];
+            BinaryPrimitives.WriteUInt32LittleEndian(pinBytes, passcode);
+            byte[] w = Crypto.PBKDF(pinBytes, salt, iterations, Crypto.W_SIZE_BITS * 2);
+            BigInteger w0s = new BigInteger(w.AsSpan().Slice(0, Crypto.W_SIZE_BYTES), true, true);
+            BigInteger w1s = new BigInteger(w.AsSpan().Slice(Crypto.W_SIZE_BYTES, Crypto.W_SIZE_BYTES), true, true);
+            w0 = w0s % SecP256.n;
+            w1 = w1s % SecP256.n;
+            L = SecP256.Multiply(w1, SecP256.GeneratorP);
+            return SpanUtil.Combine(w0.ToByteArray(true, true), L.ToBytes(false));
         }
 
         public (BigIntegerPoint Z, BigIntegerPoint V) InitiatorValidate(BigIntegerPoint pB)

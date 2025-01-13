@@ -13,6 +13,7 @@
 using MatterDotNet.Security;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace MatterDotNet.Protocol.Cryptography
 {
@@ -214,29 +215,26 @@ namespace MatterDotNet.Protocol.Cryptography
             return (pub, p.D!);
         }
 
-        //public static byte[] Sign(byte[] privateKey, byte[] message)
-        //{
-        //    ArgumentNullException.ThrowIfNull(privateKey, nameof(privateKey));
-        //    ArgumentNullException.ThrowIfNull(message, nameof(message));
-        //    ECParameters ecp = new ECParameters();
-        //    ecp.Curve = ECCurve.NamedCurves.nistP256;
-        //    ecp.D = privateKey;
-        //    ECDsa ec = ECDsa.Create(ecp);
-        //    return ec.SignData(message, HashAlgorithmName.SHA256);
-        //}
-
-        //public static bool Verify(byte[] publicKey, byte[] message, byte[] signature)
-        //{
-        //    ArgumentNullException.ThrowIfNull(publicKey, nameof(publicKey));
-        //    ArgumentNullException.ThrowIfNull(message, nameof(message));
-        //    ArgumentNullException.ThrowIfNull(signature, nameof(signature));
-        //    ECParameters ecp = new ECParameters();
-        //    ecp.Curve = ECCurve.NamedCurves.nistP256;
-        //    ecp.Q = new BigIntegerPoint(publicKey).ToECPoint();
-        //    ecp.Validate();
-        //    ECDsa ec = ECDsa.Create(ecp);
-        //    return ec.VerifyData(message, signature, HashAlgorithmName.SHA256);
-        //}
+        public static uint GeneratePasscode()
+        {
+            StringBuilder pin = new StringBuilder(10);
+            for (int i = 0; i < 8; i++)
+                pin.Append((char)Random.Shared.Next(48, 57));
+            string ret = pin.ToString();
+            bool allSame = true;
+            char check = ret[0];
+            foreach (char c in ret)
+            {
+                if (check != c)
+                {
+                    allSame = false;
+                    break;
+                }
+            }
+            if (allSame || ret == "12345678" || ret == "87654321")
+                return GeneratePasscode();
+            return uint.Parse(ret);
+        }
 
         public static byte[] ECDH(byte[] myPrivateKey, byte[] theirPublicKey)
         {

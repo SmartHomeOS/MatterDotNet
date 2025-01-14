@@ -19,9 +19,9 @@ namespace ExampleConsole
         static async Task Main(string[] args)
         {
             Controller controller = Controller.Load("fabric.fabric", "fabric.key");
-            await controller.Start();
+            await controller.EnumerateFabric();
             Console.WriteLine(controller.ToString());
-
+            
             Console.ReadLine();
         }
     }

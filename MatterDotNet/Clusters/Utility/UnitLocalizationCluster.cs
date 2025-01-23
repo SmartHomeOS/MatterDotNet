@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Unit Localization Cluster
+    /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for the units in which values are conveyed in communication to a user. As such, Nodes that visually or audibly convey measurable values to the user need a mechanism by which they can be configured to use a user’s preferred unit.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class UnitLocalizationCluster : ClusterBase
+    public class UnitLocalization : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x002D;
+        internal const uint CLUSTER_ID = 0x002d;
 
         /// <summary>
-        /// Unit Localization Cluster
+        /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for the units in which values are conveyed in communication to a user. As such, Nodes that visually or audibly convey measurable values to the user need a mechanism by which they can be configured to use a user’s preferred unit.
         /// </summary>
-        public UnitLocalizationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public UnitLocalization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected UnitLocalizationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected UnitLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -47,19 +47,19 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Temp Unit
         /// </summary>
-        public enum TempUnitEnum {
+        public enum TempUnit : byte {
             /// <summary>
             /// Temperature conveyed in Fahrenheit
             /// </summary>
-            Fahrenheit = 0,
+            Fahrenheit = 0x00,
             /// <summary>
             /// Temperature conveyed in Celsius
             /// </summary>
-            Celsius = 1,
+            Celsius = 0x01,
             /// <summary>
             /// Temperature conveyed in Kelvin
             /// </summary>
-            Kelvin = 2,
+            Kelvin = 0x02,
         }
         #endregion Enums
 
@@ -88,21 +88,21 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Temperature Unit attribute
         /// </summary>
-        public async Task<TempUnitEnum> GetTemperatureUnit(SecureSession session) {
-            return (TempUnitEnum)await GetEnumAttribute(session, 0);
+        public async Task<TempUnit> GetTemperatureUnit(SecureSession session) {
+            return (TempUnit)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Set the Temperature Unit attribute
         /// </summary>
-        public async Task SetTemperatureUnit (SecureSession session, TempUnitEnum value) {
+        public async Task SetTemperatureUnit (SecureSession session, TempUnit value) {
             await SetAttribute(session, 0, value);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Unit Localization Cluster";
+            return "Unit Localization";
         }
     }
 }

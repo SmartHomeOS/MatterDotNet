@@ -15,44 +15,46 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// User Label Cluster
+    /// The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class UserLabelCluster : LabelCluster
+    public class UserLabel : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0041;
 
         /// <summary>
-        /// User Label Cluster
+        /// The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
         /// </summary>
-        public UserLabelCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public UserLabel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected UserLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
         /// Get the Label List attribute
         /// </summary>
-        public async Task<Label[]> GetLabelList(SecureSession session) {
+        public async Task<FixedLabel.Label[]> GetLabelList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Label[] list = new Label[reader.Count];
+            FixedLabel.Label[] list = new FixedLabel.Label[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new Label(reader.GetStruct(i)!);
+                list[i] = new FixedLabel.Label(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Set the Label List attribute
         /// </summary>
-        public async Task SetLabelList (SecureSession session, Label[] value) {
+        public async Task SetLabelList (SecureSession session, FixedLabel.Label[] value) {
             await SetAttribute(session, 0, value);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "User Label Cluster";
+            return "User Label";
         }
     }
 }

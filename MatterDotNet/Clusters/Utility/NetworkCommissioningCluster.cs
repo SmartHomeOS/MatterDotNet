@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Network Commissioning Cluster
+    /// Functionality to configure, enable, disable network credentials and access on a Matter device.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class NetworkCommissioningCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class NetworkCommissioning : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0031;
 
         /// <summary>
-        /// Network Commissioning Cluster
+        /// Functionality to configure, enable, disable network credentials and access on a Matter device.
         /// </summary>
-        public NetworkCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public NetworkCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected NetworkCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected NetworkCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -55,132 +55,105 @@ namespace MatterDotNet.Clusters.Utility
             /// Ethernet related features
             /// </summary>
             EthernetNetworkInterface = 4,
+            /// <summary>
+            /// Device related features
+            /// </summary>
+            PerDeviceCredentials = 8,
         }
 
         /// <summary>
         /// Network Commissioning Status
         /// </summary>
-        public enum NetworkCommissioningStatusEnum {
+        public enum NetworkCommissioningStatus : byte {
             /// <summary>
             /// OK, no error
             /// </summary>
-            Success = 0,
+            Success = 0x0,
             /// <summary>
             /// <see cref="OutOfRange"/> Value Outside Range
             /// </summary>
-            OutOfRange = 1,
+            OutOfRange = 0x1,
             /// <summary>
             /// <see cref="BoundsExceeded"/> A collection would exceed its size limit
             /// </summary>
-            BoundsExceeded = 2,
+            BoundsExceeded = 0x2,
             /// <summary>
             /// <see cref="NetworkIdNotFound"/> The NetworkID is not among the collection of added networks
             /// </summary>
-            NetworkIDNotFound = 3,
+            NetworkIDNotFound = 0x3,
             /// <summary>
             /// <see cref="DuplicateNetworkId"/> The NetworkID is already among the collection of added networks
             /// </summary>
-            DuplicateNetworkID = 4,
+            DuplicateNetworkID = 0x4,
             /// <summary>
             /// <see cref="NetworkNotFound"/> Cannot find AP: SSID Not found
             /// </summary>
-            NetworkNotFound = 5,
+            NetworkNotFound = 0x5,
             /// <summary>
             /// <see cref="RegulatoryError"/> Cannot find AP: Mismatch on band/channels/regulatory domain / 2.4GHz vs 5GHz
             /// </summary>
-            RegulatoryError = 6,
+            RegulatoryError = 0x6,
             /// <summary>
             /// <see cref="AuthFailure"/> Cannot associate due to authentication failure
             /// </summary>
-            AuthFailure = 7,
+            AuthFailure = 0x7,
             /// <summary>
             /// <see cref="UnsupportedSecurity"/> Cannot associate due to unsupported security mode
             /// </summary>
-            UnsupportedSecurity = 8,
+            UnsupportedSecurity = 0x8,
             /// <summary>
             /// <see cref="OtherConnectionFailure"/> Other association failure
             /// </summary>
-            OtherConnectionFailure = 9,
+            OtherConnectionFailure = 0x9,
             /// <summary>
             /// <see cref="Ipv6Failed"/> Failure to generate an IPv6 address
             /// </summary>
-            IPV6Failed = 10,
+            IPV6Failed = 0xa,
             /// <summary>
-            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces
+            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +<->+ IP interfaces
             /// </summary>
-            IPBindFailed = 11,
+            IPBindFailed = 0xb,
             /// <summary>
             /// <see cref="UnknownError"/> Unknown error
             /// </summary>
-            UnknownError = 12,
+            UnknownError = 0xc,
         }
 
         /// <summary>
         /// WiFi Band
         /// </summary>
-        public enum WiFiBandEnum {
+        public enum WiFiBand : byte {
             /// <summary>
             /// 2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)
             /// </summary>
-            _2G4 = 0,
+            _2G4 = 0x0,
             /// <summary>
             /// 3.65GHz - 3.655GHz to 3.695GHz (802.11y)
             /// </summary>
-            _3G65 = 1,
+            _3G65 = 0x1,
             /// <summary>
             /// 5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)
             /// </summary>
-            _5G = 2,
+            _5G = 0x2,
             /// <summary>
             /// 6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)
             /// </summary>
-            _6G = 3,
+            _6G = 0x3,
             /// <summary>
             /// 60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)
             /// </summary>
-            _60G = 4,
+            _60G = 0x4,
             /// <summary>
             /// Sub-1GHz - 755MHz to 931MHz (802.11ah)
             /// </summary>
-            _1G = 5,
+            _1G = 0x5,
         }
 
         /// <summary>
-        /// Thread Capabilities Bitmap
+        /// WiFi Security
         /// </summary>
         [Flags]
-        public enum ThreadCapabilitiesBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Thread Border Router functionality is present
-            /// </summary>
-            IsBorderRouterCapable = 1,
-            /// <summary>
-            /// Router mode is supported (interface could be in router or REED mode)
-            /// </summary>
-            IsRouterCapable = 2,
-            /// <summary>
-            /// Sleepy end-device mode is supported
-            /// </summary>
-            IsSleepyEndDeviceCapable = 4,
-            /// <summary>
-            /// Device is a full Thread device (opposite of Minimal Thread Device)
-            /// </summary>
-            IsFullThreadDevice = 8,
-            /// <summary>
-            /// Synchronized sleepy end-device mode is supported
-            /// </summary>
-            IsSynchronizedSleepyEndDeviceCapable = 16,
-        }
-
-        /// <summary>
-        /// WiFi Security Bitmap
-        /// </summary>
-        [Flags]
-        public enum WiFiSecurityBitmap {
+        public enum WiFiSecurity : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -188,52 +161,80 @@ namespace MatterDotNet.Clusters.Utility
             /// <summary>
             /// Supports unencrypted Wi-Fi
             /// </summary>
-            Unencrypted = 1,
+            Unencrypted = 0x1,
             /// <summary>
             /// Supports Wi-Fi using WEP security
             /// </summary>
-            WEP = 2,
+            WEP = 0x2,
             /// <summary>
             /// Supports Wi-Fi using WPA-Personal security
             /// </summary>
-            WPAPERSONAL = 4,
+            WPAPERSONAL = 0x4,
             /// <summary>
             /// Supports Wi-Fi using WPA2-Personal security
             /// </summary>
-            WPA2PERSONAL = 8,
+            WPA2PERSONAL = 0x8,
             /// <summary>
             /// Supports Wi-Fi using WPA3-Personal security
             /// </summary>
-            WPA3PERSONAL = 16,
+            WPA3PERSONAL = 0x10,
+            WPA3MatterPDC = 0x20,
+        }
+
+        /// <summary>
+        /// Thread Capabilities
+        /// </summary>
+        [Flags]
+        public enum ThreadCapabilities : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            IsBorderRouterCapable = 0x1,
+            IsRouterCapable = 0x2,
+            IsSleepyEndDeviceCapable = 0x4,
+            IsFullThreadDevice = 0x8,
+            IsSynchronizedSleepyEndDeviceCapable = 0x10,
         }
         #endregion Enums
 
         #region Records
         /// <summary>
-        /// Network Info
+        /// WiFi Interface Scan Result
         /// </summary>
-        public record NetworkInfo : TLVPayload {
+        public record WiFiInterfaceScanResult : TLVPayload {
             /// <summary>
-            /// Network Info
+            /// WiFi Interface Scan Result
             /// </summary>
-            public NetworkInfo() { }
+            public WiFiInterfaceScanResult() { }
 
             /// <summary>
-            /// Network Info
+            /// WiFi Interface Scan Result
             /// </summary>
             [SetsRequiredMembers]
-            public NetworkInfo(object[] fields) {
+            public WiFiInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                NetworkID = reader.GetBytes(0, false, 32, 1
-)!;
-                Connected = reader.GetBool(1)!.Value;
+                Security = (WiFiSecurity)reader.GetUInt(0)!.Value;
+                SSID = reader.GetBytes(1, false, 32)!;
+                BSSID = reader.GetBytes(2, false, 6)!;
+                Channel = reader.GetUShort(3)!.Value;
+                WiFiBand = (WiFiBand)reader.GetUShort(4)!.Value;
+                RSSI = reader.GetSByte(5)!.Value;
             }
-            public required byte[] NetworkID { get; set; }
-            public required bool Connected { get; set; }
+            public required WiFiSecurity Security { get; set; }
+            public required byte[] SSID { get; set; }
+            public required byte[] BSSID { get; set; }
+            public required ushort Channel { get; set; }
+            public required WiFiBand WiFiBand { get; set; }
+            public required sbyte RSSI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NetworkID, 32, 1);
-                writer.WriteBool(1, Connected);
+                writer.WriteUInt(0, (uint)Security);
+                writer.WriteBytes(1, SSID, 32);
+                writer.WriteBytes(2, BSSID, 6);
+                writer.WriteUShort(3, Channel);
+                writer.WriteUShort(4, (ushort)WiFiBand);
+                writer.WriteSByte(5, RSSI);
                 writer.EndContainer();
             }
         }
@@ -253,87 +254,69 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public ThreadInterfaceScanResult(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                PanId = reader.GetUShort(0, true);
-                ExtendedPanId = reader.GetULong(1, true);
-                NetworkName = reader.GetString(2, true, 16, 1);
-                Channel = reader.GetUShort(3, true);
-                Version = reader.GetByte(4, true);
-                ExtendedAddress = new PhysicalAddress(reader.GetBytes(5, true, 8, 6)!);
-                RSSI = reader.GetSByte(6, true);
-                LQI = reader.GetByte(7, true);
+                PanId = reader.GetUShort(0)!.Value;
+                ExtendedPanId = reader.GetULong(1)!.Value;
+                NetworkName = reader.GetString(2, false, 16)!;
+                Channel = reader.GetUShort(3)!.Value;
+                Version = reader.GetByte(4)!.Value;
+                ExtendedAddress = new PhysicalAddress(reader.GetBytes(5, false, 8, 6)!);
+                RSSI = reader.GetSByte(6)!.Value;
+                LQI = reader.GetByte(7)!.Value;
             }
-            public required ushort? PanId { get; set; }
-            public required ulong? ExtendedPanId { get; set; }
-            public required string? NetworkName { get; set; }
-            public required ushort? Channel { get; set; }
-            public required byte? Version { get; set; }
-            public required PhysicalAddress? ExtendedAddress { get; set; }
-            public required sbyte? RSSI { get; set; }
-            public required byte? LQI { get; set; }
+            public required ushort PanId { get; set; }
+            public required ulong ExtendedPanId { get; set; }
+            public required string NetworkName { get; set; }
+            public required ushort Channel { get; set; }
+            public required byte Version { get; set; }
+            public required PhysicalAddress ExtendedAddress { get; set; }
+            public required sbyte RSSI { get; set; }
+            public required byte LQI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (PanId != null)
-                    writer.WriteUShort(0, PanId, 65534);
-                if (ExtendedPanId != null)
-                    writer.WriteULong(1, ExtendedPanId);
-                if (NetworkName != null)
-                    writer.WriteString(2, NetworkName, 16, 1);
-                if (Channel != null)
-                    writer.WriteUShort(3, Channel);
-                if (Version != null)
-                    writer.WriteByte(4, Version);
-                if (ExtendedAddress != null)
-                    writer.WriteBytes(5, ExtendedAddress.GetAddressBytes());
-                if (RSSI != null)
-                    writer.WriteSByte(6, RSSI);
-                if (LQI != null)
-                    writer.WriteByte(7, LQI);
+                writer.WriteUShort(0, PanId);
+                writer.WriteULong(1, ExtendedPanId);
+                writer.WriteString(2, NetworkName, 16);
+                writer.WriteUShort(3, Channel);
+                writer.WriteByte(4, Version);
+                writer.WriteBytes(5, ExtendedAddress.GetAddressBytes());
+                writer.WriteSByte(6, RSSI);
+                writer.WriteByte(7, LQI);
                 writer.EndContainer();
             }
         }
 
         /// <summary>
-        /// WiFi Interface Scan Result
+        /// Network Info
         /// </summary>
-        public record WiFiInterfaceScanResult : TLVPayload {
+        public record NetworkInfo : TLVPayload {
             /// <summary>
-            /// WiFi Interface Scan Result
+            /// Network Info
             /// </summary>
-            public WiFiInterfaceScanResult() { }
+            public NetworkInfo() { }
 
             /// <summary>
-            /// WiFi Interface Scan Result
+            /// Network Info
             /// </summary>
             [SetsRequiredMembers]
-            public WiFiInterfaceScanResult(object[] fields) {
+            public NetworkInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Security = (WiFiSecurityBitmap?)reader.GetUShort(0, true);
-                SSID = reader.GetBytes(1, true);
-                BSSID = reader.GetBytes(2, true);
-                Channel = reader.GetUShort(3, true);
-                WiFiBand = (WiFiBandEnum?)reader.GetUShort(4, true);
-                RSSI = reader.GetSByte(5, true);
+                NetworkID = reader.GetBytes(0, false, 32)!;
+                Connected = reader.GetBool(1)!.Value;
+                NetworkIdentifier = reader.GetBytes(2, true, 20);
+                ClientIdentifier = reader.GetBytes(3, true, 20);
             }
-            public required WiFiSecurityBitmap? Security { get; set; }
-            public required byte[]? SSID { get; set; }
-            public required byte[]? BSSID { get; set; }
-            public required ushort? Channel { get; set; }
-            public WiFiBandEnum? WiFiBand { get; set; }
-            public sbyte? RSSI { get; set; }
+            public required byte[] NetworkID { get; set; }
+            public required bool Connected { get; set; }
+            public byte[]? NetworkIdentifier { get; set; }
+            public byte[]? ClientIdentifier { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (Security != null)
-                    writer.WriteUShort(0, (ushort)Security);
-                if (SSID != null)
-                    writer.WriteBytes(1, SSID, 32);
-                if (BSSID != null)
-                    writer.WriteBytes(2, BSSID, 6);
-                if (Channel != null)
-                    writer.WriteUShort(3, Channel);
-                if (WiFiBand != null)
-                    writer.WriteUShort(4, (ushort)WiFiBand);
-                if (RSSI != null)
-                    writer.WriteSByte(5, RSSI);
+                writer.WriteBytes(0, NetworkID, 32);
+                writer.WriteBool(1, Connected);
+                if (NetworkIdentifier != null)
+                    writer.WriteBytes(2, NetworkIdentifier, 20);
+                if (ClientIdentifier != null)
+                    writer.WriteBytes(3, ClientIdentifier, 20);
                 writer.EndContainer();
             }
         }
@@ -341,12 +324,12 @@ namespace MatterDotNet.Clusters.Utility
 
         #region Payloads
         private record ScanNetworksPayload : TLVPayload {
-            public byte[]? SSID { get; set; } = null;
+            public byte[]? SSID { get; set; }
             public ulong? Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (SSID != null)
-                    writer.WriteBytes(0, SSID, 32, 1);
+                    writer.WriteBytes(0, SSID, 32);
                 if (Breadcrumb != null)
                     writer.WriteULong(1, Breadcrumb);
                 writer.EndContainer();
@@ -357,7 +340,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Scan Networks Response - Reply from server
         /// </summary>
         public struct ScanNetworksResponse() {
-            public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
+            public required NetworkCommissioningStatus NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
             public WiFiInterfaceScanResult[]? WiFiScanResults { get; set; }
             public ThreadInterfaceScanResult[]? ThreadScanResults { get; set; }
@@ -367,12 +350,21 @@ namespace MatterDotNet.Clusters.Utility
             public required byte[] SSID { get; set; }
             public required byte[] Credentials { get; set; }
             public ulong? Breadcrumb { get; set; }
+            public byte[]? NetworkIdentity { get; set; }
+            public byte[]? ClientIdentifier { get; set; }
+            public byte[]? PossessionNonce { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, SSID, 32);
                 writer.WriteBytes(1, Credentials, 64);
                 if (Breadcrumb != null)
                     writer.WriteULong(2, Breadcrumb);
+                if (NetworkIdentity != null)
+                    writer.WriteBytes(3, NetworkIdentity, 140);
+                if (ClientIdentifier != null)
+                    writer.WriteBytes(4, ClientIdentifier, 20);
+                if (PossessionNonce != null)
+                    writer.WriteBytes(5, PossessionNonce, 32);
                 writer.EndContainer();
             }
         }
@@ -394,7 +386,7 @@ namespace MatterDotNet.Clusters.Utility
             public ulong? Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NetworkID, 32, 1);
+                writer.WriteBytes(0, NetworkID, 32);
                 if (Breadcrumb != null)
                     writer.WriteULong(1, Breadcrumb);
                 writer.EndContainer();
@@ -405,9 +397,11 @@ namespace MatterDotNet.Clusters.Utility
         /// Network Config Response - Reply from server
         /// </summary>
         public struct NetworkConfigResponse() {
-            public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
+            public required NetworkCommissioningStatus NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
             public byte? NetworkIndex { get; set; }
+            public byte[]? ClientIdentity { get; set; }
+            public byte[]? PossessionSignature { get; set; }
         }
 
         private record ConnectNetworkPayload : TLVPayload {
@@ -415,7 +409,7 @@ namespace MatterDotNet.Clusters.Utility
             public ulong? Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NetworkID, 32, 1);
+                writer.WriteBytes(0, NetworkID, 32);
                 if (Breadcrumb != null)
                     writer.WriteULong(1, Breadcrumb);
                 writer.EndContainer();
@@ -426,7 +420,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Connect Network Response - Reply from server
         /// </summary>
         public struct ConnectNetworkResponse() {
-            public required NetworkCommissioningStatusEnum NetworkingStatus { get; set; }
+            public required NetworkCommissioningStatus NetworkingStatus { get; set; }
             public string? DebugText { get; set; }
             public required int? ErrorValue { get; set; }
         }
@@ -437,12 +431,32 @@ namespace MatterDotNet.Clusters.Utility
             public ulong? Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, NetworkID, 32, 1);
+                writer.WriteBytes(0, NetworkID, 32);
                 writer.WriteByte(1, NetworkIndex);
                 if (Breadcrumb != null)
                     writer.WriteULong(2, Breadcrumb);
                 writer.EndContainer();
             }
+        }
+
+        private record QueryIdentityPayload : TLVPayload {
+            public required byte[] KeyIdentifier { get; set; }
+            public byte[]? PossessionNonce { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteBytes(0, KeyIdentifier, 20);
+                if (PossessionNonce != null)
+                    writer.WriteBytes(1, PossessionNonce, 32);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Query Identity Response - Reply from server
+        /// </summary>
+        public struct QueryIdentityResponse() {
+            public required byte[] Identity { get; set; }
+            public byte[]? PossessionSignature { get; set; }
         }
         #endregion Payloads
 
@@ -450,16 +464,16 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Scan Networks
         /// </summary>
-        public async Task<ScanNetworksResponse?> ScanNetworks(SecureSession session, byte[]? SSID, ulong? Breadcrumb) {
+        public async Task<ScanNetworksResponse?> ScanNetworks(SecureSession session, byte[]? sSID, ulong? breadcrumb) {
             ScanNetworksPayload requestFields = new ScanNetworksPayload() {
-                SSID = SSID,
-                Breadcrumb = Breadcrumb,
+                SSID = sSID,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ScanNetworksResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 WiFiScanResults = GetOptionalArrayField<WiFiInterfaceScanResult>(resp, 2),
                 ThreadScanResults = GetOptionalArrayField<ThreadInterfaceScanResult>(resp, 3),
@@ -469,71 +483,80 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Add Or Update WiFi Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> AddOrUpdateWiFiNetwork(SecureSession session, byte[] SSID, byte[] Credentials, ulong? Breadcrumb) {
+        public async Task<NetworkConfigResponse?> AddOrUpdateWiFiNetwork(SecureSession session, byte[] sSID, byte[] credentials, ulong? breadcrumb, byte[]? networkIdentity, byte[]? clientIdentifier, byte[]? possessionNonce) {
             AddOrUpdateWiFiNetworkPayload requestFields = new AddOrUpdateWiFiNetworkPayload() {
-                SSID = SSID,
-                Credentials = Credentials,
-                Breadcrumb = Breadcrumb,
+                SSID = sSID,
+                Credentials = credentials,
+                Breadcrumb = breadcrumb,
+                NetworkIdentity = networkIdentity,
+                ClientIdentifier = clientIdentifier,
+                PossessionNonce = possessionNonce,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 NetworkIndex = (byte?)GetOptionalField(resp, 2),
+                ClientIdentity = (byte[]?)GetOptionalField(resp, 3),
+                PossessionSignature = (byte[]?)GetOptionalField(resp, 4),
             };
         }
 
         /// <summary>
         /// Add Or Update Thread Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> AddOrUpdateThreadNetwork(SecureSession session, byte[] OperationalDataset, ulong? Breadcrumb) {
+        public async Task<NetworkConfigResponse?> AddOrUpdateThreadNetwork(SecureSession session, byte[] operationalDataset, ulong? breadcrumb) {
             AddOrUpdateThreadNetworkPayload requestFields = new AddOrUpdateThreadNetworkPayload() {
-                OperationalDataset = OperationalDataset,
-                Breadcrumb = Breadcrumb,
+                OperationalDataset = operationalDataset,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 NetworkIndex = (byte?)GetOptionalField(resp, 2),
+                ClientIdentity = (byte[]?)GetOptionalField(resp, 3),
+                PossessionSignature = (byte[]?)GetOptionalField(resp, 4),
             };
         }
 
         /// <summary>
         /// Remove Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> RemoveNetwork(SecureSession session, byte[] NetworkID, ulong? Breadcrumb) {
+        public async Task<NetworkConfigResponse?> RemoveNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb) {
             RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
-                NetworkID = NetworkID,
-                Breadcrumb = Breadcrumb,
+                NetworkID = networkID,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 NetworkIndex = (byte?)GetOptionalField(resp, 2),
+                ClientIdentity = (byte[]?)GetOptionalField(resp, 3),
+                PossessionSignature = (byte[]?)GetOptionalField(resp, 4),
             };
         }
 
         /// <summary>
         /// Connect Network
         /// </summary>
-        public async Task<ConnectNetworkResponse?> ConnectNetwork(SecureSession session, byte[] NetworkID, ulong? Breadcrumb) {
+        public async Task<ConnectNetworkResponse?> ConnectNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb) {
             ConnectNetworkPayload requestFields = new ConnectNetworkPayload() {
-                NetworkID = NetworkID,
-                Breadcrumb = Breadcrumb,
+                NetworkID = networkID,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ConnectNetworkResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 ErrorValue = (int?)GetField(resp, 2),
             };
@@ -542,19 +565,38 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Reorder Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> ReorderNetwork(SecureSession session, byte[] NetworkID, byte NetworkIndex, ulong? Breadcrumb) {
+        public async Task<NetworkConfigResponse?> ReorderNetwork(SecureSession session, byte[] networkID, byte networkIndex, ulong? breadcrumb) {
             ReorderNetworkPayload requestFields = new ReorderNetworkPayload() {
-                NetworkID = NetworkID,
-                NetworkIndex = NetworkIndex,
-                Breadcrumb = Breadcrumb,
+                NetworkID = networkID,
+                NetworkIndex = networkIndex,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
-                NetworkingStatus = (NetworkCommissioningStatusEnum)(byte)GetField(resp, 0),
+                NetworkingStatus = (NetworkCommissioningStatus)(byte)GetField(resp, 0),
                 DebugText = (string?)GetOptionalField(resp, 1),
                 NetworkIndex = (byte?)GetOptionalField(resp, 2),
+                ClientIdentity = (byte[]?)GetOptionalField(resp, 3),
+                PossessionSignature = (byte[]?)GetOptionalField(resp, 4),
+            };
+        }
+
+        /// <summary>
+        /// Query Identity
+        /// </summary>
+        public async Task<QueryIdentityResponse?> QueryIdentity(SecureSession session, byte[] keyIdentifier, byte[]? possessionNonce) {
+            QueryIdentityPayload requestFields = new QueryIdentityPayload() {
+                KeyIdentifier = keyIdentifier,
+                PossessionNonce = possessionNonce,
+            };
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            if (!ValidateResponse(resp))
+                return null;
+            return new QueryIdentityResponse() {
+                Identity = (byte[])GetField(resp, 0),
+                PossessionSignature = (byte[]?)GetOptionalField(resp, 1),
             };
         }
         #endregion Commands
@@ -617,53 +659,53 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Interface Enabled attribute
         /// </summary>
         public async Task<bool> GetInterfaceEnabled(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
+            return (bool)(dynamic?)(await GetAttribute(session, 4))!;
         }
 
         /// <summary>
         /// Set the Interface Enabled attribute
         /// </summary>
-        public async Task SetInterfaceEnabled (SecureSession session, bool? value = true) {
+        public async Task SetInterfaceEnabled (SecureSession session, bool value) {
             await SetAttribute(session, 4, value);
         }
 
         /// <summary>
         /// Get the Last Networking Status attribute
         /// </summary>
-        public async Task<NetworkCommissioningStatusEnum?> GetLastNetworkingStatus(SecureSession session) {
-            return (NetworkCommissioningStatusEnum?)await GetEnumAttribute(session, 5, true);
+        public async Task<NetworkCommissioningStatus?> GetLastNetworkingStatus(SecureSession session) {
+            return (NetworkCommissioningStatus?)await GetEnumAttribute(session, 5, true);
         }
 
         /// <summary>
         /// Get the Last Network ID attribute
         /// </summary>
         public async Task<byte[]?> GetLastNetworkID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 6, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 6, true);
         }
 
         /// <summary>
         /// Get the Last Connect Error Value attribute
         /// </summary>
         public async Task<int?> GetLastConnectErrorValue(SecureSession session) {
-            return (int?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (int?)(dynamic?)await GetAttribute(session, 7, true);
         }
 
         /// <summary>
         /// Get the Supported WiFi Bands attribute
         /// </summary>
-        public async Task<WiFiBandEnum[]> GetSupportedWiFiBands(SecureSession session) {
+        public async Task<WiFiBand[]> GetSupportedWiFiBands(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
-            WiFiBandEnum[] list = new WiFiBandEnum[reader.Count];
+            WiFiBand[] list = new WiFiBand[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (WiFiBandEnum)reader.GetUShort(i)!.Value;
+                list[i] = (WiFiBand)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Supported Thread Features attribute
         /// </summary>
-        public async Task<ThreadCapabilitiesBitmap> GetSupportedThreadFeatures(SecureSession session) {
-            return (ThreadCapabilitiesBitmap)await GetEnumAttribute(session, 9);
+        public async Task<ThreadCapabilities> GetSupportedThreadFeatures(SecureSession session) {
+            return (ThreadCapabilities)await GetEnumAttribute(session, 9);
         }
 
         /// <summary>
@@ -676,7 +718,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Network Commissioning Cluster";
+            return "Network Commissioning";
         }
     }
 }

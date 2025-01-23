@@ -15,36 +15,36 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Illuminance Measurement Cluster
+    /// Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 3)]
-    public class IlluminanceMeasurementCluster : ClusterBase
+    public class IlluminanceMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0400;
 
         /// <summary>
-        /// Illuminance Measurement Cluster
+        /// Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
         /// </summary>
-        public IlluminanceMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public IlluminanceMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected IlluminanceMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected IlluminanceMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Light Sensor Type
         /// </summary>
-        public enum LightSensorTypeEnum {
+        public enum LightSensorType : byte {
             /// <summary>
             /// Indicates photodiode sensor type
             /// </summary>
-            Photodiode = 0,
+            Photodiode = 0x00,
             /// <summary>
             /// Indicates CMOS sensor type
             /// </summary>
-            CMOS = 1,
+            CMOS = 0x01,
         }
         #endregion Enums
 
@@ -53,7 +53,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Measured Value attribute
         /// </summary>
         public async Task<ushort?> GetMeasuredValue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0, true) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 0, true) ?? 0x0000;
         }
 
         /// <summary>
@@ -80,14 +80,14 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Light Sensor Type attribute
         /// </summary>
-        public async Task<LightSensorTypeEnum?> GetLightSensorType(SecureSession session) {
-            return (LightSensorTypeEnum?)await GetEnumAttribute(session, 4, true);
+        public async Task<LightSensorType?> GetLightSensorType(SecureSession session) {
+            return (LightSensorType?)await GetEnumAttribute(session, 4, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Illuminance Measurement Cluster";
+            return "Illuminance Measurement";
         }
     }
 }

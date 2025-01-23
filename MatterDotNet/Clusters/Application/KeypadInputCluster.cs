@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Keypad Input Cluster
+    /// This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class KeypadInputCluster : ClusterBase
+    public class KeypadInput : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0509;
 
         /// <summary>
-        /// Keypad Input Cluster
+        /// This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.
         /// </summary>
-        public KeypadInputCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public KeypadInput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected KeypadInputCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected KeypadInput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -56,42 +56,46 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Cec Key Code
+        /// Status
         /// </summary>
-        public enum CecKeyCodeEnum {
+        public enum Status : byte {
+            /// <summary>
+            /// Succeeded
+            /// </summary>
+            Success = 0x00,
+            /// <summary>
+            /// Key code is not supported.
+            /// </summary>
+            UnsupportedKey = 0x01,
+            /// <summary>
+            /// Requested key code is invalid in the context of the responder's current state.
+            /// </summary>
+            InvalidKeyInCurrentState = 0x02,
+        }
+
+        /// <summary>
+        /// CEC Key Code
+        /// </summary>
+        public enum CECKeyCode : byte {
             Select = 0x00,
+            Up = 0x01,
+            Down = 0x02,
+            Left = 0x03,
+            Right = 0x04,
+            RightUp = 0x05,
+            RightDown = 0x06,
+            LeftUp = 0x07,
+            LeftDown = 0x08,
+            RootMenu = 0x09,
             SetupMenu = 0x0A,
             ContentsMenu = 0x0B,
             FavoriteMenu = 0x0C,
             Exit = 0x0D,
-            Up = 0x01,
+            MediaTopMenu = 0x10,
+            MediaContextSensitiveMenu = 0x11,
             NumberEntryMode = 0x1D,
             Number11 = 0x1E,
             Number12 = 0x1F,
-            Down = 0x02,
-            Dot = 0x2A,
-            Enter = 0x2B,
-            Clear = 0x2C,
-            NextFavorite = 0x2F,
-            Left = 0x03,
-            Right = 0x04,
-            Eject = 0x4A,
-            Forward = 0x4B,
-            Backward = 0x4C,
-            StopRecord = 0x4D,
-            PauseRecord = 0x4E,
-            Reserved = 0x4F,
-            RightUp = 0x05,
-            RightDown = 0x06,
-            SelectAudioInputFunction = 0x6A,
-            PowerToggleFunction = 0x6B,
-            PowerOffFunction = 0x6C,
-            PowerOnFunction = 0x6D,
-            LeftUp = 0x07,
-            LeftDown = 0x08,
-            RootMenu = 0x09,
-            MediaTopMenu = 0x10,
-            MediaContextSensitiveMenu = 0x11,
             Number0OrNumber10 = 0x20,
             Numbers1 = 0x21,
             Numbers2 = 0x22,
@@ -102,6 +106,10 @@ namespace MatterDotNet.Clusters.Application
             Numbers7 = 0x27,
             Numbers8 = 0x28,
             Numbers9 = 0x29,
+            Dot = 0x2A,
+            Enter = 0x2B,
+            Clear = 0x2C,
+            NextFavorite = 0x2F,
             ChannelUp = 0x30,
             ChannelDown = 0x31,
             PreviousChannel = 0x32,
@@ -121,6 +129,12 @@ namespace MatterDotNet.Clusters.Application
             Record = 0x47,
             Rewind = 0x48,
             FastForward = 0x49,
+            Eject = 0x4A,
+            Forward = 0x4B,
+            Backward = 0x4C,
+            StopRecord = 0x4D,
+            PauseRecord = 0x4E,
+            Reserved = 0x4F,
             Angle = 0x50,
             SubPicture = 0x51,
             VideoOnDemand = 0x52,
@@ -139,6 +153,10 @@ namespace MatterDotNet.Clusters.Application
             TuneFunction = 0x67,
             SelectMediaFunction = 0x68,
             SelectAvInputFunction = 0x69,
+            SelectAudioInputFunction = 0x6A,
+            PowerToggleFunction = 0x6B,
+            PowerOffFunction = 0x6C,
+            PowerOnFunction = 0x6D,
             F1Blue = 0x71,
             F2Red = 0x72,
             F3Green = 0x73,
@@ -146,29 +164,11 @@ namespace MatterDotNet.Clusters.Application
             F5 = 0x75,
             Data = 0x76,
         }
-
-        /// <summary>
-        /// Status
-        /// </summary>
-        public enum StatusEnum {
-            /// <summary>
-            /// Succeeded
-            /// </summary>
-            Success = 0,
-            /// <summary>
-            /// Key code is not supported.
-            /// </summary>
-            UnsupportedKey = 1,
-            /// <summary>
-            /// Requested key code is invalid in the context of the responder's current state.
-            /// </summary>
-            InvalidKeyInCurrentState = 2,
-        }
         #endregion Enums
 
         #region Payloads
         private record SendKeyPayload : TLVPayload {
-            public required CecKeyCodeEnum KeyCode { get; set; }
+            public required CECKeyCode KeyCode { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)KeyCode);
@@ -180,7 +180,7 @@ namespace MatterDotNet.Clusters.Application
         /// Send Key Response - Reply from server
         /// </summary>
         public struct SendKeyResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
         }
         #endregion Payloads
 
@@ -188,15 +188,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Send Key
         /// </summary>
-        public async Task<SendKeyResponse?> SendKey(SecureSession session, CecKeyCodeEnum KeyCode) {
+        public async Task<SendKeyResponse?> SendKey(SecureSession session, CECKeyCode keyCode) {
             SendKeyPayload requestFields = new SendKeyPayload() {
-                KeyCode = KeyCode,
+                KeyCode = keyCode,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SendKeyResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
             };
         }
         #endregion Commands
@@ -226,7 +226,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Keypad Input Cluster";
+            return "Keypad Input";
         }
     }
 }

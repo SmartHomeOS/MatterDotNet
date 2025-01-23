@@ -17,22 +17,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.EnergyManagement
 {
     /// <summary>
-    /// Energy Preference Cluster
+    /// This cluster provides an interface to specify preferences for how devices should consume energy.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class EnergyPreferenceCluster : ClusterBase
+    public class EnergyPreference : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x009B;
 
         /// <summary>
-        /// Energy Preference Cluster
+        /// This cluster provides an interface to specify preferences for how devices should consume energy.
         /// </summary>
-        public EnergyPreferenceCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public EnergyPreference(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EnergyPreferenceCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected EnergyPreference(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -53,23 +53,23 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Energy Priority
         /// </summary>
-        public enum EnergyPriorityEnum {
+        public enum EnergyPriority : byte {
             /// <summary>
             /// User comfort
             /// </summary>
-            Comfort = 0,
+            Comfort = 0x00,
             /// <summary>
             /// Speed of operation
             /// </summary>
-            Speed = 1,
+            Speed = 0x01,
             /// <summary>
             /// Amount of Energy consumed by the device
             /// </summary>
-            Efficiency = 2,
+            Efficiency = 0x02,
             /// <summary>
             /// Amount of water consumed by the device
             /// </summary>
-            WaterConsumption = 3,
+            WaterConsumption = 0x03,
         }
         #endregion Enums
 
@@ -90,7 +90,7 @@ namespace MatterDotNet.Clusters.Application
             public Balance(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Step = reader.GetByte(0)!.Value;
-                Label = reader.GetString(1, true);
+                Label = reader.GetString(1, true, 64);
             }
             public required byte Step { get; set; }
             public string? Label { get; set; }
@@ -154,11 +154,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Energy Priorities attribute
         /// </summary>
-        public async Task<EnergyPriorityEnum[]> GetEnergyPriorities(SecureSession session) {
+        public async Task<EnergyPriority[]> GetEnergyPriorities(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            EnergyPriorityEnum[] list = new EnergyPriorityEnum[reader.Count];
+            EnergyPriority[] list = new EnergyPriority[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (EnergyPriorityEnum)reader.GetUShort(i)!.Value;
+                list[i] = (EnergyPriority)reader.GetUShort(i)!.Value;
             return list;
         }
 
@@ -190,7 +190,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Energy Preference Cluster";
+            return "Energy Preference";
         }
     }
 }

@@ -10,7 +10,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Clusters.Utility;
+using MatterDotNet.Clusters;
+using MatterDotNet.Clusters.CHIP;
+using MatterDotNet.Clusters.General;
 using MatterDotNet.DCL;
 using MatterDotNet.Messages.Certificates;
 using MatterDotNet.OperationalDiscovery;
@@ -146,12 +148,12 @@ namespace MatterDotNet.Entities
                     throw new IOException("PASE pairing failed");
                 
                 // Get Basic Commissioning Info
-                GeneralCommissioningCluster commissioning = new GeneralCommissioningCluster(0);
-                GeneralCommissioningCluster.BasicCommissioningInfo basicInfo = await commissioning.GetBasicCommissioningInfo(paseSecureSession);
+                GeneralCommissioning commissioning = new GeneralCommissioning(0);
+                GeneralCommissioning.BasicCommissioningInfo basicInfo = await commissioning.GetBasicCommissioningInfo(paseSecureSession);
                 ushort expiration = Math.Min(Math.Max((ushort)180, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
                 
                 // Arm Fail Safe
-                GeneralCommissioningCluster.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42);
+                GeneralCommissioning.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42);
 
                 // Discover Root Clusters
                 EndPoint root = new EndPoint(0);
@@ -160,14 +162,14 @@ namespace MatterDotNet.Entities
                 // Get Network Setup
                 List<string> connected = new List<string>();
                 FabricInterface SupportedComms = FabricInterface.None;
-                if (root.HasCluster<NetworkCommissioningCluster>())
+                if (root.HasCluster<NetworkCommissioning>())
                 {
-                    NetworkCommissioningCluster.Feature features = await root.GetCluster<NetworkCommissioningCluster>().GetSupportedFeatures(paseSecureSession);
-                    if ((features & NetworkCommissioningCluster.Feature.WiFiNetworkInterface) != 0)
+                    NetworkCommissioning.Feature features = await root.GetCluster<NetworkCommissioning>().GetSupportedFeatures(paseSecureSession);
+                    if ((features & NetworkCommissioning.Feature.WiFiNetworkInterface) != 0)
                         SupportedComms = FabricInterface.WiFi | FabricInterface.IP;
-                    if ((features & NetworkCommissioningCluster.Feature.ThreadNetworkInterface) != 0)
+                    if ((features & NetworkCommissioning.Feature.ThreadNetworkInterface) != 0)
                         SupportedComms = FabricInterface.Thread | FabricInterface.IP;
-                    if ((features & NetworkCommissioningCluster.Feature.EthernetNetworkInterface) != 0)
+                    if ((features & NetworkCommissioning.Feature.EthernetNetworkInterface) != 0)
                         SupportedComms = FabricInterface.Ethernet | FabricInterface.IP;
                 }
                 else
@@ -178,26 +180,26 @@ namespace MatterDotNet.Entities
 
                 // Set regulatory information
                 if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
-                    await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioningCluster.RegulatoryLocationTypeEnum.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
+                    await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioning.RegulatoryLocationType.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
 
                 // Configure Date/Time
                 try
                 {
-                    if (root.HasCluster<TimeSynchronizationCluster>())
+                    if (root.HasCluster<TimeSynchronization>())
                     {
-                        TimeSynchronizationCluster timeSync = root.GetCluster<TimeSynchronizationCluster>();
-                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronizationCluster.GranularityEnum.MillisecondsGranularity, TimeSynchronizationCluster.TimeSourceEnum.NonMatterNTP);
+                        TimeSynchronization timeSync = root.GetCluster<TimeSynchronization>();
+                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronization.Granularity.MillisecondsGranularity, TimeSynchronization.TimeSource.NonMatterNTP);
                         if (!success)
                             Console.WriteLine("Failed to set UTC Time");
-                        if (await timeSync.Supports(paseSecureSession, TimeSynchronizationCluster.Feature.TimeZone))
+                        if (await timeSync.Supports(paseSecureSession, TimeSynchronization.Feature.TimeZone))
                         {
                             var rules = TimeZoneInfo.Local.GetAdjustmentRules();
-                            List<TimeSynchronizationCluster.TimeZone> zones = new List<TimeSynchronizationCluster.TimeZone>();
+                            List<TimeSynchronization.TimeZone> zones = new List<TimeSynchronization.TimeZone>();
                             foreach (var rule in rules)
                             {
                                 if (rule.DateEnd > DateTime.Now)
                                 {
-                                    zones.Add(new TimeSynchronizationCluster.TimeZone()
+                                    zones.Add(new TimeSynchronization.TimeZone()
                                     {
                                         Offset = (int)(rule.BaseUtcOffsetDelta + TimeZoneInfo.Local.BaseUtcOffset).TotalSeconds,
                                         ValidAt = TimeUtil.Max(rule.DateStart, TimeUtil.EPOCH),
@@ -205,8 +207,8 @@ namespace MatterDotNet.Entities
                                     });
                                 }
                             }
-                            TimeSynchronizationCluster.SetTimeZoneResponse? tzResp = await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
-                            if (tzResp.HasValue && tzResp.Value.DSTOffsetsRequired)
+                            TimeSynchronization.SetTimeZoneResponse? tzResp = await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
+                            if (tzResp.HasValue && tzResp.Value.DSTOffsetRequired)
                             {
                                 //TODO - await timeSync.SetDSTOffset()
                             }
@@ -218,12 +220,12 @@ namespace MatterDotNet.Entities
                 }
 
                 // Validate Device Attestation Certificate (DAC)
-                NodeOperationalCredentialsCluster operationalCredentials = new NodeOperationalCredentialsCluster(0);
-                NodeOperationalCredentialsCluster.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.DACCertificate);
-                NodeOperationalCredentialsCluster.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, NodeOperationalCredentialsCluster.CertificateChainTypeEnum.PAICertificate);
+                OperationalCredentials operationalCredentials = new OperationalCredentials(0);
+                OperationalCredentials.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.DACCertificate);
+                OperationalCredentials.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.PAICertificate);
                 
                 byte[] nonce = RandomNumberGenerator.GetBytes(32);
-                NodeOperationalCredentialsCluster.AttestationResponse? resp = await operationalCredentials.AttestationRequest(paseSecureSession, nonce);
+                OperationalCredentials.AttestationResponse? resp = await operationalCredentials.AttestationRequest(paseSecureSession, nonce);
 
                 OperationalCertificate dacMatter = new OperationalCertificate(dacResp.Value.Certificate);
                 if (verification != VerificationLevel.AnyDevice && !dacMatter.VerifyChain(paiResp.Value.Certificate, new DCLClient(), verification))
@@ -244,7 +246,7 @@ namespace MatterDotNet.Entities
 
                 // Request CSR from node
                 nonce = RandomNumberGenerator.GetBytes(32);
-                NodeOperationalCredentialsCluster.CSRResponse? csr = await operationalCredentials.CSRRequest(paseSecureSession, nonce, false);
+                OperationalCredentials.CSRResponse? csr = await operationalCredentials.CSRRequest(paseSecureSession, nonce, false);
                 NocsrElements nocsr = new NocsrElements(csr.Value.NOCSRElements);
                 CertificateRequest certReq = CertificateRequest.LoadSigningRequest(nocsr.Csr, HashAlgorithmName.SHA256);
 
@@ -264,24 +266,24 @@ namespace MatterDotNet.Entities
 
                 // Issue NOC
                 OperationalCertificate nodeCert = fabric.Sign(certReq);
-                NodeOperationalCredentialsCluster.NOCResponse? nocAdded = await operationalCredentials.AddNOC(paseSecureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID!.Value, 0xFFF1);
-                if (nocAdded.Value.StatusCode != NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK)
+                OperationalCredentials.NOCResponse? nocAdded = await operationalCredentials.AddNOC(paseSecureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID!.Value, 0xFFF1);
+                if (nocAdded.Value.StatusCode != OperationalCredentials.NodeOperationalCertStatus.OK)
                     throw new IOException($"Failed to add new Network Operational Certificate: Error ({nocAdded.Value.StatusCode}): {nocAdded.Value.DebugText}");
                 
                 // Set Fabric Label
-                NodeOperationalCredentialsCluster.NOCResponse? nocUpdated = await operationalCredentials.UpdateFabricLabel(paseSecureSession, (!string.IsNullOrEmpty(fabric.CommonName) ? fabric.CommonName : "MatterDotNet"));
-                if (nocAdded.Value.StatusCode != NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK)
+                OperationalCredentials.NOCResponse? nocUpdated = await operationalCredentials.UpdateFabricLabel(paseSecureSession, (!string.IsNullOrEmpty(fabric.CommonName) ? fabric.CommonName : "MatterDotNet"));
+                if (nocAdded.Value.StatusCode != OperationalCredentials.NodeOperationalCertStatus.OK)
                     Console.WriteLine("Failed to update fabric label");
 
                 Node? node = Node.CreateTemp(nodeCert, fabric, commissionableNode, root);
 
-                NetworkCommissioningCluster.ThreadInterfaceScanResult[] threadNetworks = Array.Empty<NetworkCommissioningCluster.ThreadInterfaceScanResult>();
-                NetworkCommissioningCluster.WiFiInterfaceScanResult[] wifiNetworks = Array.Empty<NetworkCommissioningCluster.WiFiInterfaceScanResult>();
+                NetworkCommissioning.ThreadInterfaceScanResult[] threadNetworks = Array.Empty<NetworkCommissioning.ThreadInterfaceScanResult>();
+                NetworkCommissioning.WiFiInterfaceScanResult[] wifiNetworks = Array.Empty<NetworkCommissioning.WiFiInterfaceScanResult>();
 
                 if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
                 {
-                    NetworkCommissioningCluster.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioningCluster>().GetNetworks(paseSecureSession);
-                    foreach (NetworkCommissioningCluster.NetworkInfo info in networks)
+                    NetworkCommissioning.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioning>().GetNetworks(paseSecureSession);
+                    foreach (NetworkCommissioning.NetworkInfo info in networks)
                     {
                         if (info.Connected)
                             connected.Add(Encoding.UTF8.GetString(info.NetworkID));
@@ -290,7 +292,7 @@ namespace MatterDotNet.Entities
                     byte[]? ssid = null;
                     if (targetSSID != null)
                         ssid = Encoding.UTF8.GetBytes(targetSSID);
-                    var results = await root.GetCluster<NetworkCommissioningCluster>().ScanNetworks(paseSecureSession, ssid, 42);
+                    var results = await root.GetCluster<NetworkCommissioning>().ScanNetworks(paseSecureSession, ssid, 42);
                     if (results.HasValue)
                     {
                         if (results.Value.ThreadScanResults != null)
@@ -317,7 +319,7 @@ namespace MatterDotNet.Entities
         /// <param name="password"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.WiFiInterfaceScanResult selectedNetwork, string password)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, string password)
         {
             await CompleteCommissioning(info, selectedNetwork, Encoding.UTF8.GetBytes(password));
         }
@@ -330,7 +332,7 @@ namespace MatterDotNet.Entities
         /// <param name="password"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.WiFiInterfaceScanResult selectedNetwork, byte[] password)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, byte[] password)
         {
             ArgumentNullException.ThrowIfNull(info, nameof(info));
             ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
@@ -343,17 +345,17 @@ namespace MatterDotNet.Entities
                 if ((info.SupportedInterfaces & FabricInterface.WiFi) == 0)
                     throw new NotSupportedException("The device does not support WiFi");
 
-                NetworkCommissioningCluster network = info.Node!.Root.GetCluster<NetworkCommissioningCluster>();
-                var result = await network.AddOrUpdateWiFiNetwork(info.PASE!, selectedNetwork.SSID, password, 42);
+                NetworkCommissioning network = info.Node!.Root.GetCluster<NetworkCommissioning>();
+                var result = await network.AddOrUpdateWiFiNetwork(info.PASE!, selectedNetwork.SSID, password, 42, null, null, null);
                 if (!result.HasValue)
                     throw new IOException("Failed to configure network. Unknown Error");
-                else if (result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success && result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.DuplicateNetworkID)
+                else if (result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success && result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.DuplicateNetworkID)
                     throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
 
                 var connect = await network.ConnectNetwork(info.PASE!, selectedNetwork.SSID, 42);
                 if (!connect.HasValue)
                     throw new IOException("Failed to connect to network. Unknown Error");
-                else if (connect.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success)
+                else if (connect.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success)
                     throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
                 else
                     info.Upgrade(Encoding.UTF8.GetString(selectedNetwork.SSID));
@@ -376,7 +378,7 @@ namespace MatterDotNet.Entities
         /// <param name="operationalDataSet"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioningCluster.ThreadInterfaceScanResult selectedNetwork, byte[] operationalDataSet)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.ThreadInterfaceScanResult selectedNetwork, byte[] operationalDataSet)
         {
             ArgumentNullException.ThrowIfNull(info, nameof(info));
             ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
@@ -389,17 +391,17 @@ namespace MatterDotNet.Entities
                 if ((info.SupportedInterfaces & FabricInterface.Thread) == 0)
                     throw new NotSupportedException("The device does not support Thread");
 
-                NetworkCommissioningCluster network = info.Node!.Root.GetCluster<NetworkCommissioningCluster>();
+                NetworkCommissioning network = info.Node!.Root.GetCluster<NetworkCommissioning>();
                 var result = await network.AddOrUpdateThreadNetwork(info.PASE!, operationalDataSet, 42);
                 if (!result.HasValue)
                     throw new IOException("Failed to configure network. Unknown Error");
-                else if (result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success && result.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.DuplicateNetworkID)
+                else if (result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success && result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.DuplicateNetworkID)
                     throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
 
                 var connect = await network.ConnectNetwork(info.PASE!, Encoding.UTF8.GetBytes(selectedNetwork.NetworkName!), 42);
                 if (!connect.HasValue)
                     throw new IOException("Failed to connect to network. Unknown Error");
-                else if (connect.Value.NetworkingStatus != NetworkCommissioningCluster.NetworkCommissioningStatusEnum.Success)
+                else if (connect.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success)
                     throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
                 else
                     info.Upgrade(selectedNetwork.NetworkName!);
@@ -466,8 +468,8 @@ namespace MatterDotNet.Entities
                 try
                 {
                     // Done
-                    GeneralCommissioningCluster.CommissioningCompleteResponse? complete = await info.Node.Root.GetCluster<GeneralCommissioningCluster>().CommissioningComplete(caseSecureSession!);
-                    if (complete.Value.ErrorCode != GeneralCommissioningCluster.CommissioningErrorEnum.OK)
+                    GeneralCommissioning.CommissioningCompleteResponse? complete = await info.Node.Root.GetCluster<GeneralCommissioning>().CommissioningComplete(caseSecureSession!);
+                    if (complete.Value.ErrorCode != GeneralCommissioning.CommissioningError.OK)
                         throw new InvalidOperationException(complete.Value.ErrorCode + ": " + complete.Value.DebugText);
                     nodes.Add(info.Node.ID, info.Node);
                     Console.WriteLine("Commissioning Complete!");
@@ -493,10 +495,10 @@ namespace MatterDotNet.Entities
         public async Task<bool> RemoveNode(Node node)
         {
             SecureSession session = await node.GetCASESession();
-            NodeOperationalCredentialsCluster ops = node.Root.GetCluster<NodeOperationalCredentialsCluster>();
+            OperationalCredentials ops = node.Root.GetCluster<OperationalCredentials>();
             byte index = await ops.GetCurrentFabricIndex(session);
             var response = await ops.RemoveFabric(session, index);
-            bool success = response.Value.StatusCode == NodeOperationalCredentialsCluster.NodeOperationalCertStatusEnum.OK;
+            bool success = response.Value.StatusCode == OperationalCredentials.NodeOperationalCertStatus.OK;
             if (success)
                 nodes.Remove(node.ID);
             return success;

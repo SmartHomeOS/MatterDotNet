@@ -10,6 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 namespace MatterDotNet.Protocol.Parsers
 {
     public class FieldReader(IList<object> fields)
@@ -69,6 +70,16 @@ namespace MatterDotNet.Protocol.Parsers
             if (fields[(int)tagNumber] is ushort value)
                 return value;
             throw new InvalidDataException($"Tag {tagNumber}: Expected type ushort but received {fields[(int)tagNumber].GetType()}");
+        }
+
+        public decimal? GetDecimal(long tagNumber, bool nullable = false)
+        {
+            ushort? val = GetUShort(tagNumber, nullable);
+            if (!val.HasValue)
+                return val;
+            decimal ret = (int)(val.Value / 100);
+            ret += (val.Value % 100) / 100M;
+            return ret;
         }
 
         public int? GetInt(long tagNumber, bool nullable = false)
@@ -191,7 +202,7 @@ namespace MatterDotNet.Protocol.Parsers
         {
             if (fields.Count <= tagNumber)
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
-            if (fields[(int)tagNumber] == null && nullable)
+            if (fields[tagNumber] == null && nullable)
                 return null;
             return (object[])fields[tagNumber];
         }

@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Administrator Commissioning Cluster
+    /// Commands to trigger a Node to allow a new Administrator to commission it.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class AdministratorCommissioningCluster : ClusterBase
+    public class AdministratorCommissioning : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x003C;
+        internal const uint CLUSTER_ID = 0x003c;
 
         /// <summary>
-        /// Administrator Commissioning Cluster
+        /// Commands to trigger a Node to allow a new Administrator to commission it.
         /// </summary>
-        public AdministratorCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public AdministratorCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AdministratorCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected AdministratorCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -48,21 +48,30 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
+        /// Status Code
+        /// </summary>
+        public enum StatusCode : byte {
+            Busy = 0x02,
+            PAKEParameterError = 0x03,
+            WindowNotOpen = 0x04,
+        }
+
+        /// <summary>
         /// Commissioning Window Status
         /// </summary>
-        public enum CommissioningWindowStatusEnum {
+        public enum CommissioningWindowStatus : byte {
             /// <summary>
             /// Commissioning window not open
             /// </summary>
-            WindowNotOpen = 0,
+            WindowNotOpen = 0x00,
             /// <summary>
             /// An Enhanced Commissioning Method window is open
             /// </summary>
-            EnhancedWindowOpen = 1,
+            EnhancedWindowOpen = 0x01,
             /// <summary>
             /// A Basic Commissioning Method window is open
             /// </summary>
-            BasicWindowOpen = 2,
+            BasicWindowOpen = 0x02,
         }
         #endregion Enums
 
@@ -77,9 +86,9 @@ namespace MatterDotNet.Clusters.Utility
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, CommissioningTimeout);
                 writer.WriteBytes(1, PAKEPasscodeVerifier);
-                writer.WriteUShort(2, Discriminator, 4095);
-                writer.WriteUInt(3, Iterations, 100000, 1000);
-                writer.WriteBytes(4, Salt, 32, 16);
+                writer.WriteUShort(2, Discriminator);
+                writer.WriteUInt(3, Iterations);
+                writer.WriteBytes(4, Salt, 32);
                 writer.EndContainer();
             }
         }
@@ -98,13 +107,13 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Open Commissioning Window
         /// </summary>
-        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort CommissioningTimeout, byte[] PAKEPasscodeVerifier, ushort Discriminator, uint Iterations, byte[] Salt) {
+        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout, byte[] pAKEPasscodeVerifier, ushort discriminator, uint iterations, byte[] salt) {
             OpenCommissioningWindowPayload requestFields = new OpenCommissioningWindowPayload() {
-                CommissioningTimeout = CommissioningTimeout,
-                PAKEPasscodeVerifier = PAKEPasscodeVerifier,
-                Discriminator = Discriminator,
-                Iterations = Iterations,
-                Salt = Salt,
+                CommissioningTimeout = commissioningTimeout,
+                PAKEPasscodeVerifier = pAKEPasscodeVerifier,
+                Discriminator = discriminator,
+                Iterations = iterations,
+                Salt = salt,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -113,9 +122,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Open Basic Commissioning Window
         /// </summary>
-        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort CommissioningTimeout) {
+        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout) {
             OpenBasicCommissioningWindowPayload requestFields = new OpenBasicCommissioningWindowPayload() {
-                CommissioningTimeout = CommissioningTimeout,
+                CommissioningTimeout = commissioningTimeout,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -155,8 +164,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Window Status attribute
         /// </summary>
-        public async Task<CommissioningWindowStatusEnum> GetWindowStatus(SecureSession session) {
-            return (CommissioningWindowStatusEnum)await GetEnumAttribute(session, 0);
+        public async Task<CommissioningWindowStatus> GetWindowStatus(SecureSession session) {
+            return (CommissioningWindowStatus)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
@@ -176,7 +185,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Administrator Commissioning Cluster";
+            return "Administrator Commissioning";
         }
     }
 }

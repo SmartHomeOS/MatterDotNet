@@ -1,0 +1,230 @@
+﻿// MatterDotNet Copyright (C) 2025 
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY, without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// WARNING: This file was auto-generated. Do not edit.
+
+namespace MatterDotNet.Clusters
+{
+        /// <summary>
+        /// Position Tag
+        /// </summary>
+        public enum PositionTag : byte {
+            Left = 0x00,
+            Right = 0x01,
+            Top = 0x02,
+            Bottom = 0x03,
+            Middle = 0x04,
+            Row = 0x05,
+            Column = 0x06,
+        }
+
+        /// <summary>
+        /// Relative Position Tag
+        /// </summary>
+        public enum RelativePositionTag : byte {
+            Under = 0x00,
+            NextTo = 0x01,
+            Around = 0x02,
+            On = 0x03,
+            Above = 0x04,
+            FrontOf = 0x05,
+            Behind = 0x06,
+        }
+
+        /// <summary>
+        /// Area Type Tag
+        /// </summary>
+        public enum AreaTypeTag : byte {
+            Aisle = 0x00,
+            Attic = 0x01,
+            BackDoor = 0x02,
+            BackYard = 0x03,
+            Balcony = 0x04,
+            Ballroom = 0x05,
+            Bathroom = 0x06,
+            Bedroom = 0x07,
+            Border = 0x08,
+            Boxroom = 0x09,
+            BreakfastRoom = 0x0A,
+            Carport = 0x0B,
+            Cellar = 0x0C,
+            Cloakroom = 0x0D,
+            Closet = 0x0E,
+            Conservatory = 0x0F,
+            Corridor = 0x10,
+            CraftRoom = 0x11,
+            Cupboard = 0x12,
+            Deck = 0x13,
+            Den = 0x14,
+            Dining = 0x15,
+            DrawingRoom = 0x16,
+            DressingRoom = 0x17,
+            Driveway = 0x18,
+            Elevator = 0x19,
+            Ensuite = 0x1A,
+            Entrance = 0x1B,
+            Entryway = 0x1C,
+            FamilyRoom = 0x1D,
+            Foyer = 0x1E,
+            FrontDoor = 0x1F,
+            FrontYard = 0x20,
+            GameRoom = 0x21,
+            Garage = 0x22,
+            GarageDoor = 0x23,
+            Garden = 0x24,
+            GardenDoor = 0x25,
+            GuestBathroom = 0x26,
+            GuestBedroom = 0x27,
+            GuestRestroom = 0x28,
+            GuestRoom = 0x29,
+            Gym = 0x2A,
+            Hallway = 0x2B,
+            HearthRoom = 0x2C,
+            KidsRoom = 0x2D,
+            KidsBedroom = 0x2E,
+            Kitchen = 0x2F,
+            Larder = 0x30,
+            LaundryRoom = 0x31,
+            Lawn = 0x32,
+            Library = 0x33,
+            LivingRoom = 0x34,
+            Lounge = 0x35,
+            Media_TVRoom = 0x36,
+            MudRoom = 0x37,
+            MusicRoom = 0x38,
+            Nursery = 0x39,
+            Office = 0x3A,
+            OutdoorKitchen = 0x3B,
+            Outside = 0x3C,
+            Pantry = 0x3D,
+            ParkingLot = 0x3E,
+            Parlor = 0x3F,
+            Patio = 0x40,
+            PlayRoom = 0x41,
+            PoolRoom = 0x42,
+            Porch = 0x43,
+            PrimaryBathroom = 0x44,
+            PrimaryBedroom = 0x45,
+            Ramp = 0x46,
+            ReceptionRoom = 0x47,
+            RecreationRoom = 0x48,
+            Restroom = 0x49,
+            Roof = 0x4A,
+            Sauna = 0x4B,
+            Scullery = 0x4C,
+            SewingRoom = 0x4D,
+            Shed = 0x4E,
+            SideDoor = 0x4F,
+            SideYard = 0x50,
+            SittingRoom = 0x51,
+            Snug = 0x52,
+            Spa = 0x53,
+            Staircase = 0x54,
+            SteamRoom = 0x55,
+            StorageRoom = 0x56,
+            Studio = 0x57,
+            Study = 0x58,
+            SunRoom = 0x59,
+            SwimmingPool = 0x5A,
+            Terrace = 0x5B,
+            UtilityRoom = 0x5C,
+            Ward = 0x5D,
+            Workshop = 0x5E,
+        }
+
+        /// <summary>
+        /// Landmark Tag
+        /// </summary>
+        public enum LandmarkTag : byte {
+            AirConditioner = 0x00,
+            AirPurifier = 0x01,
+            BackDoor = 0x02,
+            BarStool = 0x03,
+            BathMat = 0x04,
+            Bathtub = 0x05,
+            Bed = 0x06,
+            Bookshelf = 0x07,
+            Chair = 0x08,
+            ChristmasTree = 0x09,
+            CoatRack = 0x0A,
+            CoffeeTable = 0x0B,
+            CookingRange = 0x0C,
+            Couch = 0x0D,
+            Countertop = 0x0E,
+            Cradle = 0x0F,
+            Crib = 0x10,
+            Desk = 0x11,
+            DiningTable = 0x12,
+            Dishwasher = 0x13,
+            Door = 0x14,
+            Dresser = 0x15,
+            LaundryDryer = 0x16,
+            Fan = 0x17,
+            Fireplace = 0x18,
+            Freezer = 0x19,
+            FrontDoor = 0x1A,
+            HighChair = 0x1B,
+            KitchenIsland = 0x1C,
+            Lamp = 0x1D,
+            LitterBox = 0x1E,
+            Mirror = 0x1F,
+            Nightstand = 0x20,
+            Oven = 0x21,
+            PetBed = 0x22,
+            PetBowl = 0x23,
+            PetCrate = 0x24,
+            Refrigerator = 0x25,
+            ScratchingPost = 0x26,
+            ShoeRack = 0x27,
+            Shower = 0x28,
+            SideDoor = 0x29,
+            Sink = 0x2A,
+            Sofa = 0x2B,
+            Stove = 0x2C,
+            Table = 0x2D,
+            Toilet = 0x2E,
+            TrashCan = 0x2F,
+            LaundryWasher = 0x30,
+            Window = 0x31,
+            WineCooler = 0x32,
+        }
+
+        /// <summary>
+        /// Floor Surface Tag
+        /// </summary>
+        public enum FloorSurfaceTag : byte {
+            Carpet = 0x00,
+            Ceramic = 0x01,
+            Concrete = 0x02,
+            Cork = 0x03,
+            DeepCarpet = 0x04,
+            Dirt = 0x05,
+            EngineeredWood = 0x06,
+            Glass = 0x07,
+            Grass = 0x08,
+            Hardwood = 0x09,
+            Laminate = 0x0A,
+            Linoleum = 0x0B,
+            Mat = 0x0C,
+            Metal = 0x0D,
+            Plastic = 0x0E,
+            PolishedConcrete = 0x0F,
+            Rubber = 0x10,
+            Rug = 0x11,
+            Sand = 0x12,
+            Stone = 0x13,
+            Tatami = 0x14,
+            Terrazzo = 0x15,
+            Tile = 0x16,
+            Vinyl = 0x17,
+        }
+}

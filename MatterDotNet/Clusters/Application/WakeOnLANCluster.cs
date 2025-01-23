@@ -14,24 +14,23 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
-using System.Net;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Wake On LAN Cluster
+    /// This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class WakeOnLANCluster : ClusterBase
+    public class WakeonLAN : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0503;
 
         /// <summary>
-        /// Wake On LAN Cluster
+        /// This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
         /// </summary>
-        public WakeOnLANCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public WakeonLAN(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WakeOnLANCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected WakeonLAN(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -44,14 +43,14 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Link Local Address attribute
         /// </summary>
-        public async Task<IPAddress> GetLinkLocalAddress(SecureSession session) {
-            return (IPAddress)(dynamic?)(await GetAttribute(session, 1))!;
+        public async Task<byte[]> GetLinkLocalAddress(SecureSession session) {
+            return (byte[])(dynamic?)(await GetAttribute(session, 1))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Wake On LAN Cluster";
+            return "Wake on LAN";
         }
     }
 }

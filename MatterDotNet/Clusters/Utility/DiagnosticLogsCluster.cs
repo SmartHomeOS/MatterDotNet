@@ -19,87 +19,87 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Diagnostic Logs Cluster
+    /// The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class DiagnosticLogsCluster : ClusterBase
+    public class DiagnosticLogs : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0032;
 
         /// <summary>
-        /// Diagnostic Logs Cluster
+        /// The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
         /// </summary>
-        public DiagnosticLogsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public DiagnosticLogs(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DiagnosticLogsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected DiagnosticLogs(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Intent
         /// </summary>
-        public enum IntentEnum {
+        public enum Intent : byte {
             /// <summary>
             /// Logs to be used for end-user support
             /// </summary>
-            EndUserSupport = 0,
+            EndUserSupport = 0x0,
             /// <summary>
             /// Logs to be used for network diagnostics
             /// </summary>
-            NetworkDiag = 1,
+            NetworkDiag = 0x1,
             /// <summary>
             /// Obtain crash logs from the Node
             /// </summary>
-            CrashLogs = 2,
+            CrashLogs = 0x2,
         }
 
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Successful transfer of logs
             /// </summary>
-            Success = 0,
+            Success = 0x0,
             /// <summary>
             /// All logs has been transferred
             /// </summary>
-            Exhausted = 1,
+            Exhausted = 0x1,
             /// <summary>
             /// No logs of the requested type available
             /// </summary>
-            NoLogs = 2,
+            NoLogs = 0x2,
             /// <summary>
             /// Unable to handle request, retry later
             /// </summary>
-            Busy = 3,
+            Busy = 0x3,
             /// <summary>
             /// The request is denied, no logs being transferred
             /// </summary>
-            Denied = 4,
+            Denied = 0x4,
         }
 
         /// <summary>
         /// Transfer Protocol
         /// </summary>
-        public enum TransferProtocolEnum {
+        public enum TransferProtocol : byte {
             /// <summary>
             /// Logs to be returned as a response
             /// </summary>
-            ResponsePayload = 0,
+            ResponsePayload = 0x0,
             /// <summary>
             /// Logs to be returned using BDX
             /// </summary>
-            BDX = 1,
+            BDX = 0x1,
         }
         #endregion Enums
 
         #region Payloads
         private record RetrieveLogsRequestPayload : TLVPayload {
-            public required IntentEnum Intent { get; set; }
-            public required TransferProtocolEnum RequestedProtocol { get; set; }
+            public required Intent Intent { get; set; }
+            public required TransferProtocol RequestedProtocol { get; set; }
             public string? TransferFileDesignator { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -115,7 +115,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Retrieve Logs Response - Reply from server
         /// </summary>
         public struct RetrieveLogsResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public required byte[] LogContent { get; set; }
             public DateTime? UTCTimeStamp { get; set; }
             public TimeSpan? TimeSinceBoot { get; set; }
@@ -126,17 +126,17 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Retrieve Logs Request
         /// </summary>
-        public async Task<RetrieveLogsResponse?> RetrieveLogsRequest(SecureSession session, IntentEnum Intent, TransferProtocolEnum RequestedProtocol, string? TransferFileDesignator) {
+        public async Task<RetrieveLogsResponse?> RetrieveLogsRequest(SecureSession session, Intent intent, TransferProtocol requestedProtocol, string? transferFileDesignator) {
             RetrieveLogsRequestPayload requestFields = new RetrieveLogsRequestPayload() {
-                Intent = Intent,
-                RequestedProtocol = RequestedProtocol,
-                TransferFileDesignator = TransferFileDesignator,
+                Intent = intent,
+                RequestedProtocol = requestedProtocol,
+                TransferFileDesignator = transferFileDesignator,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new RetrieveLogsResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 LogContent = (byte[])GetField(resp, 1),
                 UTCTimeStamp = (DateTime?)GetOptionalField(resp, 2),
                 TimeSinceBoot = (TimeSpan?)GetOptionalField(resp, 3),
@@ -147,7 +147,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Diagnostic Logs Cluster";
+            return "Diagnostic Logs";
         }
     }
 }

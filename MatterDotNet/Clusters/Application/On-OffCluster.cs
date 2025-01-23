@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// On/Off Cluster
+    /// Attributes and commands for switching devices between 'On' and 'Off' states.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 6)]
-    public class On_OffCluster : ClusterBase
+    public class On_Off : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0006;
 
         /// <summary>
-        /// On/Off Cluster
+        /// Attributes and commands for switching devices between 'On' and 'Off' states.
         /// </summary>
-        public On_OffCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public On_Off(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected On_OffCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected On_Off(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -56,9 +56,41 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
+        /// Start Up On Off
+        /// </summary>
+        public enum StartUpOnOff : byte {
+            /// <summary>
+            /// Set the OnOff attribute to FALSE
+            /// </summary>
+            Off = 0x00,
+            /// <summary>
+            /// Set the OnOff attribute to TRUE
+            /// </summary>
+            On = 0x01,
+            /// <summary>
+            /// If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle).
+            /// </summary>
+            Toggle = 0x02,
+        }
+
+        /// <summary>
+        /// Effect Identifier
+        /// </summary>
+        public enum EffectIdentifier : byte {
+            /// <summary>
+            /// Delayed All Off
+            /// </summary>
+            DelayedAllOff = 0x00,
+            /// <summary>
+            /// Dying Light
+            /// </summary>
+            DyingLight = 0x01,
+        }
+
+        /// <summary>
         /// Delayed All Off Effect Variant
         /// </summary>
-        public enum DelayedAllOffEffectVariantEnum {
+        public enum DelayedAllOffEffectVariant : byte {
             /// <summary>
             /// Fade to off in 0.8 seconds
             /// </summary>
@@ -76,7 +108,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Dying Light Effect Variant
         /// </summary>
-        public enum DyingLightEffectVariantEnum {
+        public enum DyingLightEffectVariant : byte {
             /// <summary>
             /// 20% dim up in 0.5s then fade to off in 1 second
             /// </summary>
@@ -84,42 +116,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Effect Identifier
-        /// </summary>
-        public enum EffectIdentifierEnum {
-            /// <summary>
-            /// Delayed All Off
-            /// </summary>
-            DelayedAllOff = 0x00,
-            /// <summary>
-            /// Dying Light
-            /// </summary>
-            DyingLight = 0x01,
-        }
-
-        /// <summary>
-        /// Start Up On Off
-        /// </summary>
-        public enum StartUpOnOffEnum {
-            /// <summary>
-            /// Set the OnOff attribute to FALSE
-            /// </summary>
-            Off = 0,
-            /// <summary>
-            /// Set the OnOff attribute to TRUE
-            /// </summary>
-            On = 1,
-            /// <summary>
-            /// If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle).
-            /// </summary>
-            Toggle = 2,
-        }
-
-        /// <summary>
-        /// On Off Control Bitmap
+        /// On Off Control
         /// </summary>
         [Flags]
-        public enum OnOffControlBitmap {
+        public enum OnOffControl : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -127,14 +127,14 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicates a command is only accepted when in On state.
             /// </summary>
-            AcceptOnlyWhenOn = 1,
+            AcceptOnlyWhenOn = 0x01,
         }
         #endregion Enums
 
         #region Payloads
         private record OffWithEffectPayload : TLVPayload {
-            public required EffectIdentifierEnum EffectIdentifier { get; set; }
-            public required byte EffectVariant { get; set; } = 0;
+            public required EffectIdentifier EffectIdentifier { get; set; }
+            public required byte EffectVariant { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)EffectIdentifier);
@@ -144,12 +144,12 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record OnWithTimedOffPayload : TLVPayload {
-            public required OnOffControlBitmap OnOffControl { get; set; }
+            public required OnOffControl OnOffControl { get; set; }
             public required ushort OnTime { get; set; }
             public required ushort OffWaitTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)OnOffControl);
+                writer.WriteUInt(0, (uint)OnOffControl);
                 writer.WriteUShort(1, OnTime);
                 writer.WriteUShort(2, OffWaitTime);
                 writer.EndContainer();
@@ -185,10 +185,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Off With Effect
         /// </summary>
-        public async Task<bool> OffWithEffect(SecureSession session, EffectIdentifierEnum EffectIdentifier, byte EffectVariant) {
+        public async Task<bool> OffWithEffect(SecureSession session, EffectIdentifier effectIdentifier, byte effectVariant) {
             OffWithEffectPayload requestFields = new OffWithEffectPayload() {
-                EffectIdentifier = EffectIdentifier,
-                EffectVariant = EffectVariant,
+                EffectIdentifier = effectIdentifier,
+                EffectVariant = effectVariant,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             return ValidateResponse(resp);
@@ -205,11 +205,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// On With Timed Off
         /// </summary>
-        public async Task<bool> OnWithTimedOff(SecureSession session, OnOffControlBitmap OnOffControl, ushort OnTime, ushort OffWaitTime) {
+        public async Task<bool> OnWithTimedOff(SecureSession session, OnOffControl onOffControl, ushort onTime, ushort offWaitTime) {
             OnWithTimedOffPayload requestFields = new OnWithTimedOffPayload() {
-                OnOffControl = OnOffControl,
-                OnTime = OnTime,
-                OffWaitTime = OffWaitTime,
+                OnOffControl = onOffControl,
+                OnTime = onTime,
+                OffWaitTime = offWaitTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x42, requestFields);
             return ValidateResponse(resp);
@@ -283,21 +283,21 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Start Up On Off attribute
         /// </summary>
-        public async Task<StartUpOnOffEnum?> GetStartUpOnOff(SecureSession session) {
-            return (StartUpOnOffEnum?)await GetEnumAttribute(session, 16387, true);
+        public async Task<StartUpOnOff?> GetStartUpOnOff(SecureSession session) {
+            return (StartUpOnOff?)await GetEnumAttribute(session, 16387, true);
         }
 
         /// <summary>
         /// Set the Start Up On Off attribute
         /// </summary>
-        public async Task SetStartUpOnOff (SecureSession session, StartUpOnOffEnum? value) {
+        public async Task SetStartUpOnOff (SecureSession session, StartUpOnOff? value) {
             await SetAttribute(session, 16387, value, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "On/Off Cluster";
+            return "On/Off";
         }
     }
 }

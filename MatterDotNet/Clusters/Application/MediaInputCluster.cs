@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Media Input Cluster
+    /// This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class MediaInputCluster : ClusterBase
+    public class MediaInput : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0507;
 
         /// <summary>
-        /// Media Input Cluster
+        /// This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
         /// </summary>
-        public MediaInputCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public MediaInput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MediaInputCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected MediaInput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -51,22 +51,55 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Input Type
         /// </summary>
-        public enum InputTypeEnum {
+        public enum InputType : byte {
             /// <summary>
             /// Indicates content not coming from a physical input.
             /// </summary>
-            Internal = 0,
-            Aux = 1,
-            Coax = 2,
-            Composite = 3,
-            HDMI = 4,
-            Input = 5,
-            Line = 6,
-            Optical = 7,
-            Video = 8,
-            SCART = 9,
-            USB = 10,
-            Other = 11,
+            Internal = 0x00,
+            /// <summary>
+            /// 
+            /// </summary>
+            Aux = 0x01,
+            /// <summary>
+            /// 
+            /// </summary>
+            Coax = 0x02,
+            /// <summary>
+            /// 
+            /// </summary>
+            Composite = 0x03,
+            /// <summary>
+            /// 
+            /// </summary>
+            HDMI = 0x04,
+            /// <summary>
+            /// 
+            /// </summary>
+            Input = 0x05,
+            /// <summary>
+            /// 
+            /// </summary>
+            Line = 0x06,
+            /// <summary>
+            /// 
+            /// </summary>
+            Optical = 0x07,
+            /// <summary>
+            /// 
+            /// </summary>
+            Video = 0x08,
+            /// <summary>
+            /// 
+            /// </summary>
+            SCART = 0x09,
+            /// <summary>
+            /// 
+            /// </summary>
+            USB = 0x0A,
+            /// <summary>
+            /// 
+            /// </summary>
+            Other = 0x0B,
         }
         #endregion Enums
 
@@ -87,12 +120,12 @@ namespace MatterDotNet.Clusters.Application
             public InputInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Index = reader.GetByte(0)!.Value;
-                InputType = (InputTypeEnum)reader.GetUShort(1)!.Value;
+                InputType = (InputType)reader.GetUShort(1)!.Value;
                 Name = reader.GetString(2, false)!;
                 Description = reader.GetString(3, false)!;
             }
             public required byte Index { get; set; }
-            public required InputTypeEnum InputType { get; set; }
+            public required InputType InputType { get; set; }
             public required string Name { get; set; }
             public required string Description { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -132,9 +165,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Select Input
         /// </summary>
-        public async Task<bool> SelectInput(SecureSession session, byte Index) {
+        public async Task<bool> SelectInput(SecureSession session, byte index) {
             SelectInputPayload requestFields = new SelectInputPayload() {
-                Index = Index,
+                Index = index,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -159,10 +192,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Rename Input
         /// </summary>
-        public async Task<bool> RenameInput(SecureSession session, byte Index, string Name) {
+        public async Task<bool> RenameInput(SecureSession session, byte index, string name) {
             RenameInputPayload requestFields = new RenameInputPayload() {
-                Index = Index,
-                Name = Name,
+                Index = index,
+                Name = name,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
@@ -206,13 +239,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current Input attribute
         /// </summary>
         public async Task<byte> GetCurrentInput(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0x00;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Media Input Cluster";
+            return "Media Input";
         }
     }
 }

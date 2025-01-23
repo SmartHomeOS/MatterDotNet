@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Concentration Measurement Clusters
+    /// Attributes for reporting ozone concentration measurements
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 3)]
-    public class ConcentrationMeasurementClusters : ClusterBase
+    public class OzoneConcentrationMeasurement : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x040C;
+        internal const uint CLUSTER_ID = 0x0415;
 
         /// <summary>
-        /// Concentration Measurement Clusters
+        /// Attributes for reporting ozone concentration measurements
         /// </summary>
-        public ConcentrationMeasurementClusters(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OzoneConcentrationMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ConcentrationMeasurementClusters(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OzoneConcentrationMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -67,83 +67,35 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Level Value
         /// </summary>
-        public enum LevelValueEnum {
-            /// <summary>
-            /// The level is Unknown
-            /// </summary>
-            Unknown = 0,
-            /// <summary>
-            /// The level is considered Low
-            /// </summary>
-            Low = 1,
-            /// <summary>
-            /// The level is considered Medium
-            /// </summary>
-            Medium = 2,
-            /// <summary>
-            /// The level is considered High
-            /// </summary>
-            High = 3,
-            /// <summary>
-            /// The level is considered Critical
-            /// </summary>
-            Critical = 4,
-        }
-
-        /// <summary>
-        /// Measurement Medium
-        /// </summary>
-        public enum MeasurementMediumEnum {
-            /// <summary>
-            /// The measurement is being made in Air
-            /// </summary>
-            Air = 0,
-            /// <summary>
-            /// The measurement is being made in Water
-            /// </summary>
-            Water = 1,
-            /// <summary>
-            /// The measurement is being made in Soil
-            /// </summary>
-            Soil = 2,
+        public enum LevelValue : byte {
+            Unknown = 0x00,
+            Low = 0x01,
+            Medium = 0x02,
+            High = 0x03,
+            Critical = 0x04,
         }
 
         /// <summary>
         /// Measurement Unit
         /// </summary>
-        public enum MeasurementUnitEnum {
-            /// <summary>
-            /// Parts per Million (10)
-            /// </summary>
-            PPM = 0,
-            /// <summary>
-            /// Parts per Billion (10)
-            /// </summary>
-            PPB = 1,
-            /// <summary>
-            /// Parts per Trillion (10)
-            /// </summary>
-            PPT = 2,
-            /// <summary>
-            /// Milligram per m
-            /// </summary>
-            MGM3 = 3,
-            /// <summary>
-            /// Microgram per m
-            /// </summary>
-            UGM3 = 4,
-            /// <summary>
-            /// Nanogram per m
-            /// </summary>
-            NGM3 = 5,
-            /// <summary>
-            /// Particles per m
-            /// </summary>
-            PM3 = 6,
-            /// <summary>
-            /// Becquerel per m
-            /// </summary>
-            BQM3 = 7,
+        public enum MeasurementUnit : byte {
+            PPM = 0x00,
+            PPB = 0x01,
+            PPT = 0x02,
+            MGM3 = 0x03,
+            UGM3 = 0x04,
+            NGM3 = 0x05,
+            PM3 = 0x06,
+            BQM3 = 0x07,
+        }
+
+        /// <summary>
+        /// Measurement Medium
+        /// </summary>
+        public enum MeasurementMedium : byte {
+            Air = 0x00,
+            Water = 0x01,
+            Soil = 0x02,
         }
         #endregion Enums
 
@@ -173,28 +125,28 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Measured Value attribute
         /// </summary>
         public async Task<float?> GetMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (float?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Min Measured Value attribute
         /// </summary>
         public async Task<float?> GetMinMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (float?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Get the Max Measured Value attribute
         /// </summary>
         public async Task<float?> GetMaxMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 2, true) ?? null;
+            return (float?)(dynamic?)await GetAttribute(session, 2, true);
         }
 
         /// <summary>
         /// Get the Peak Measured Value attribute
         /// </summary>
         public async Task<float?> GetPeakMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (float?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
@@ -208,7 +160,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Average Measured Value attribute
         /// </summary>
         public async Task<float?> GetAverageMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 5, true) ?? null;
+            return (float?)(dynamic?)await GetAttribute(session, 5, true);
         }
 
         /// <summary>
@@ -222,34 +174,34 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Uncertainty attribute
         /// </summary>
         public async Task<float> GetUncertainty(SecureSession session) {
-            return (float)(dynamic?)(await GetAttribute(session, 7))!;
+            return (float?)(dynamic?)await GetAttribute(session, 7) ?? 0;
         }
 
         /// <summary>
         /// Get the Measurement Unit attribute
         /// </summary>
-        public async Task<MeasurementUnitEnum> GetMeasurementUnit(SecureSession session) {
-            return (MeasurementUnitEnum)await GetEnumAttribute(session, 8);
+        public async Task<MeasurementUnit> GetMeasurementUnit(SecureSession session) {
+            return (MeasurementUnit)await GetEnumAttribute(session, 8);
         }
 
         /// <summary>
         /// Get the Measurement Medium attribute
         /// </summary>
-        public async Task<MeasurementMediumEnum> GetMeasurementMedium(SecureSession session) {
-            return (MeasurementMediumEnum)await GetEnumAttribute(session, 9);
+        public async Task<MeasurementMedium> GetMeasurementMedium(SecureSession session) {
+            return (MeasurementMedium)await GetEnumAttribute(session, 9);
         }
 
         /// <summary>
         /// Get the Level Value attribute
         /// </summary>
-        public async Task<LevelValueEnum> GetLevelValue(SecureSession session) {
-            return (LevelValueEnum)await GetEnumAttribute(session, 10);
+        public async Task<LevelValue> GetLevelValue(SecureSession session) {
+            return (LevelValue)await GetEnumAttribute(session, 10);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Concentration Measurement Clusters";
+            return "Ozone Concentration Measurement";
         }
     }
 }

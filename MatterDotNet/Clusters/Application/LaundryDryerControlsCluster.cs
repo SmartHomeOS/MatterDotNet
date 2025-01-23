@@ -15,44 +15,44 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// Laundry Dryer Controls Cluster
+    /// This cluster provides a way to access options associated with the operation of a laundry dryer device type.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class LaundryDryerControlsCluster : ClusterBase
+    public class LaundryDryerControls : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x004A;
 
         /// <summary>
-        /// Laundry Dryer Controls Cluster
+        /// This cluster provides a way to access options associated with the operation of a laundry dryer device type.
         /// </summary>
-        public LaundryDryerControlsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public LaundryDryerControls(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LaundryDryerControlsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected LaundryDryerControls(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Dryness Level
         /// </summary>
-        public enum DrynessLevelEnum {
+        public enum DrynessLevel : byte {
             /// <summary>
             /// Provides a low dryness level for the selected mode
             /// </summary>
-            Low = 0,
+            Low = 0x0,
             /// <summary>
             /// Provides the normal level of dryness for the selected mode
             /// </summary>
-            Normal = 1,
+            Normal = 0x1,
             /// <summary>
             /// Provides an extra dryness level for the selected mode
             /// </summary>
-            Extra = 2,
+            Extra = 0x2,
             /// <summary>
             /// Provides the max dryness level for the selected mode
             /// </summary>
-            Max = 3,
+            Max = 0x3,
         }
         #endregion Enums
 
@@ -60,32 +60,32 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Supported Dryness Levels attribute
         /// </summary>
-        public async Task<DrynessLevelEnum[]> GetSupportedDrynessLevels(SecureSession session) {
+        public async Task<DrynessLevel[]> GetSupportedDrynessLevels(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            DrynessLevelEnum[] list = new DrynessLevelEnum[reader.Count];
+            DrynessLevel[] list = new DrynessLevel[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (DrynessLevelEnum)reader.GetUShort(i)!.Value;
+                list[i] = (DrynessLevel)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Selected Dryness Level attribute
         /// </summary>
-        public async Task<DrynessLevelEnum?> GetSelectedDrynessLevel(SecureSession session) {
-            return (DrynessLevelEnum?)await GetEnumAttribute(session, 1, true);
+        public async Task<DrynessLevel?> GetSelectedDrynessLevel(SecureSession session) {
+            return (DrynessLevel?)await GetEnumAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Set the Selected Dryness Level attribute
         /// </summary>
-        public async Task SetSelectedDrynessLevel (SecureSession session, DrynessLevelEnum? value) {
+        public async Task SetSelectedDrynessLevel (SecureSession session, DrynessLevel? value) {
             await SetAttribute(session, 1, value, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Laundry Dryer Controls Cluster";
+            return "Laundry Dryer Controls";
         }
     }
 }

@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Power Topology Cluster
+    /// The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class PowerTopologyCluster : ClusterBase
+    public class PowerTopology : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x009C;
 
         /// <summary>
-        /// Power Topology Cluster
+        /// The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints.
         /// </summary>
-        public PowerTopologyCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public PowerTopology(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerTopologyCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected PowerTopology(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -104,7 +104,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Power Topology Cluster";
+            return "Power Topology";
         }
     }
 }

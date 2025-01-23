@@ -12,28 +12,27 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Descriptor Cluster
+    /// The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class DescriptorCluster : ClusterBase
+    public class Descriptor : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x001D;
+        internal const uint CLUSTER_ID = 0x001d;
 
         /// <summary>
-        /// Descriptor Cluster
+        /// The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.
         /// </summary>
-        public DescriptorCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Descriptor(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DescriptorCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Descriptor(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -72,7 +71,42 @@ namespace MatterDotNet.Clusters.Utility
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, (uint)DeviceTypeField);
-                writer.WriteUShort(1, Revision, ushort.MaxValue, 1);
+                writer.WriteUShort(1, Revision);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Semantic Tag
+        /// </summary>
+        public record SemanticTag : TLVPayload {
+            /// <summary>
+            /// Semantic Tag
+            /// </summary>
+            public SemanticTag() { }
+
+            /// <summary>
+            /// Semantic Tag
+            /// </summary>
+            [SetsRequiredMembers]
+            public SemanticTag(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                MfgCode = reader.GetUShort(0, true);
+                NamespaceID = reader.GetByte(1)!.Value;
+                Tag = reader.GetByte(2)!.Value;
+                Label = reader.GetString(3, true);
+            }
+            public required ushort? MfgCode { get; set; }
+            public required byte NamespaceID { get; set; }
+            public required byte Tag { get; set; }
+            public string? Label { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, MfgCode);
+                writer.WriteByte(1, NamespaceID);
+                writer.WriteByte(2, Tag);
+                if (Label != null)
+                    writer.WriteString(3, Label);
                 writer.EndContainer();
             }
         }
@@ -158,7 +192,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Descriptor Cluster";
+            return "Descriptor";
         }
     }
 }

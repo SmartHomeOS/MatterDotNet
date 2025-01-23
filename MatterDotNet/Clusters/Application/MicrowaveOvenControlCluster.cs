@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// Microwave Oven Control Cluster
+    /// Attributes and commands for configuring the microwave oven control, and reporting cooking stats.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class MicrowaveOvenControlCluster : ClusterBase
+    public class MicrowaveOvenControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x005F;
 
         /// <summary>
-        /// Microwave Oven Control Cluster
+        /// Attributes and commands for configuring the microwave oven control, and reporting cooking stats.
         /// </summary>
-        public MicrowaveOvenControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public MicrowaveOvenControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MicrowaveOvenControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected MicrowaveOvenControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -59,16 +59,16 @@ namespace MatterDotNet.Clusters.Application
         #region Payloads
         private record SetCookingParametersPayload : TLVPayload {
             public byte? CookMode { get; set; }
-            public TimeSpan? CookTime { get; set; } = TimeSpan.FromSeconds(30);
-            public byte? PowerSetting { get; set; } = 100;
+            public TimeSpan? CookTime { get; set; }
+            public byte? PowerSetting { get; set; }
             public byte? WattSettingIndex { get; set; }
-            public bool? StartAfterSetting { get; set; } = false;
+            public bool? StartAfterSetting { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (CookMode != null)
                     writer.WriteByte(0, CookMode);
                 if (CookTime != null)
-                    writer.WriteUInt(1, (uint)CookTime!.Value.TotalSeconds, uint.MaxValue, 1);
+                    writer.WriteUInt(1, (uint)CookTime!.Value.TotalSeconds);
                 if (PowerSetting != null)
                     writer.WriteByte(2, PowerSetting);
                 if (WattSettingIndex != null)
@@ -83,7 +83,7 @@ namespace MatterDotNet.Clusters.Application
             public required TimeSpan TimeToAdd { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, (uint)TimeToAdd.TotalSeconds, uint.MaxValue, 1);
+                writer.WriteUInt(0, (uint)TimeToAdd.TotalSeconds);
                 writer.EndContainer();
             }
         }
@@ -93,13 +93,13 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Cooking Parameters
         /// </summary>
-        public async Task<bool> SetCookingParameters(SecureSession session, byte? CookMode, TimeSpan? CookTime, byte? PowerSetting, byte? WattSettingIndex, bool? StartAfterSetting) {
+        public async Task<bool> SetCookingParameters(SecureSession session, byte? cookMode, TimeSpan? cookTime, byte? powerSetting, byte? wattSettingIndex, bool? startAfterSetting) {
             SetCookingParametersPayload requestFields = new SetCookingParametersPayload() {
-                CookMode = CookMode,
-                CookTime = CookTime,
-                PowerSetting = PowerSetting,
-                WattSettingIndex = WattSettingIndex,
-                StartAfterSetting = StartAfterSetting,
+                CookMode = cookMode,
+                CookTime = cookTime,
+                PowerSetting = powerSetting,
+                WattSettingIndex = wattSettingIndex,
+                StartAfterSetting = startAfterSetting,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -108,9 +108,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add More Time
         /// </summary>
-        public async Task<bool> AddMoreTime(SecureSession session, TimeSpan TimeToAdd) {
+        public async Task<bool> AddMoreTime(SecureSession session, TimeSpan timeToAdd) {
             AddMoreTimePayload requestFields = new AddMoreTimePayload() {
-                TimeToAdd = TimeToAdd,
+                TimeToAdd = timeToAdd,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -157,7 +157,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Power Setting attribute
         /// </summary>
         public async Task<byte> GetPowerSetting(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 100;
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Microwave Oven Control Cluster";
+            return "Microwave Oven Control";
         }
     }
 }

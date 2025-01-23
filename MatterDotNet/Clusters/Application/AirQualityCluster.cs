@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Air Quality Cluster
+    /// Attributes for reporting air quality classification
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class AirQualityCluster : ClusterBase
+    public class AirQuality : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x005B;
 
         /// <summary>
-        /// Air Quality Cluster
+        /// Attributes for reporting air quality classification
         /// </summary>
-        public AirQualityCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public AirQuality(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AirQualityCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected AirQuality(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -59,7 +59,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Air Quality
         /// </summary>
-        public enum AirQualityEnum {
+        public enum AirQualityEnum : byte {
             /// <summary>
             /// The air quality is unknown.
             /// </summary>
@@ -123,7 +123,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Air Quality Cluster";
+            return "Air Quality";
         }
     }
 }

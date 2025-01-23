@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Application Launcher Cluster
+    /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class ApplicationLauncherCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class ApplicationLauncher : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x050C;
+        internal const uint CLUSTER_ID = 0x050c;
 
         /// <summary>
-        /// Application Launcher Cluster
+        /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
         /// </summary>
-        public ApplicationLauncherCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ApplicationLauncher(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ApplicationLauncherCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ApplicationLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -51,31 +51,31 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// Requested app is not available
             /// </summary>
-            AppNotAvailable = 1,
+            AppNotAvailable = 0x01,
             /// <summary>
             /// Video platform unable to honor command
             /// </summary>
-            SystemBusy = 2,
+            SystemBusy = 0x02,
             /// <summary>
             /// User approval for app download is pending
             /// </summary>
-            PendingUserApproval = 3,
+            PendingUserApproval = 0x03,
             /// <summary>
             /// Downloading the requested app
             /// </summary>
-            Downloading = 4,
+            Downloading = 0x04,
             /// <summary>
             /// Installing the requested app
             /// </summary>
-            Installing = 5,
+            Installing = 0x05,
         }
         #endregion Enums
 
@@ -176,7 +176,7 @@ namespace MatterDotNet.Clusters.Application
         /// Launcher Response - Reply from server
         /// </summary>
         public struct LauncherResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public byte[]? Data { get; set; }
         }
         #endregion Payloads
@@ -185,16 +185,16 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Launch App
         /// </summary>
-        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application? Application, byte[]? Data) {
+        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application? application, byte[]? data) {
             LaunchAppPayload requestFields = new LaunchAppPayload() {
-                Application = Application,
-                Data = Data,
+                Application = application,
+                Data = data,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (byte[]?)GetOptionalField(resp, 1),
             };
         }
@@ -202,15 +202,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Stop App
         /// </summary>
-        public async Task<LauncherResponse?> StopApp(SecureSession session, Application? Application) {
+        public async Task<LauncherResponse?> StopApp(SecureSession session, Application? application) {
             StopAppPayload requestFields = new StopAppPayload() {
-                Application = Application,
+                Application = application,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (byte[]?)GetOptionalField(resp, 1),
             };
         }
@@ -218,15 +218,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Hide App
         /// </summary>
-        public async Task<LauncherResponse?> HideApp(SecureSession session, Application? Application) {
+        public async Task<LauncherResponse?> HideApp(SecureSession session, Application? application) {
             HideAppPayload requestFields = new HideAppPayload() {
-                Application = Application,
+                Application = application,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (byte[]?)GetOptionalField(resp, 1),
             };
         }
@@ -269,13 +269,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current App attribute
         /// </summary>
         public async Task<ApplicationEP?> GetCurrentApp(SecureSession session) {
-            return new ApplicationEP((object[])(await GetAttribute(session, 1))!) ?? null;
+            return new ApplicationEP((object[])(await GetAttribute(session, 1))!);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Application Launcher Cluster";
+            return "Application Launcher";
         }
     }
 }

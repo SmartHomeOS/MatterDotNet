@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Resource Monitoring Clusters
+    /// Attributes and commands for monitoring HEPA filters in a device
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ResourceMonitoringClusters : ClusterBase
+    public class HEPAFilterMonitoring : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0071;
 
         /// <summary>
-        /// Resource Monitoring Clusters
+        /// Attributes and commands for monitoring HEPA filters in a device
         /// </summary>
-        public ResourceMonitoringClusters(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public HEPAFilterMonitoring(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ResourceMonitoringClusters(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected HEPAFilterMonitoring(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -58,9 +58,23 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
+        /// Degradation Direction
+        /// </summary>
+        public enum DegradationDirection : byte {
+            /// <summary>
+            /// The degradation of the resource is indicated by an upwards moving/increasing value
+            /// </summary>
+            Up = 0,
+            /// <summary>
+            /// The degradation of the resource is indicated by a downwards moving/decreasing value
+            /// </summary>
+            Down = 1,
+        }
+
+        /// <summary>
         /// Change Indication
         /// </summary>
-        public enum ChangeIndicationEnum {
+        public enum ChangeIndication : byte {
             /// <summary>
             /// Resource is in good condition, no intervention required
             /// </summary>
@@ -76,23 +90,9 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Degradation Direction
-        /// </summary>
-        public enum DegradationDirectionEnum {
-            /// <summary>
-            /// The degradation of the resource is indicated by an upwards moving/increasing value
-            /// </summary>
-            Up = 0,
-            /// <summary>
-            /// The degradation of the resource is indicated by a downwards moving/decreasing value
-            /// </summary>
-            Down = 1,
-        }
-
-        /// <summary>
         /// Product Identifier Type
         /// </summary>
-        public enum ProductIdentifierTypeEnum {
+        public enum ProductIdentifierType : byte {
             /// <summary>
             /// 12-digit Universal Product Code
             /// </summary>
@@ -132,10 +132,10 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public ReplacementProduct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                ProductIdentifierType = (ProductIdentifierTypeEnum)reader.GetUShort(0)!.Value;
-                ProductIdentifierValue = reader.GetString(1, false)!;
+                ProductIdentifierType = (ProductIdentifierType)reader.GetUShort(0)!.Value;
+                ProductIdentifierValue = reader.GetString(1, false, 20)!;
             }
-            public required ProductIdentifierTypeEnum ProductIdentifierType { get; set; }
+            public required ProductIdentifierType ProductIdentifierType { get; set; }
             public required string ProductIdentifierValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -182,7 +182,7 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Condition attribute
+        /// Get the Condition [%] attribute
         /// </summary>
         public async Task<byte> GetCondition(SecureSession session) {
             return (byte)(dynamic?)(await GetAttribute(session, 0))!;
@@ -191,15 +191,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Degradation Direction attribute
         /// </summary>
-        public async Task<DegradationDirectionEnum> GetDegradationDirection(SecureSession session) {
-            return (DegradationDirectionEnum)await GetEnumAttribute(session, 1);
+        public async Task<DegradationDirection> GetDegradationDirection(SecureSession session) {
+            return (DegradationDirection)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Get the Change Indication attribute
         /// </summary>
-        public async Task<ChangeIndicationEnum> GetChangeIndication(SecureSession session) {
-            return (ChangeIndicationEnum)await GetEnumAttribute(session, 2);
+        public async Task<ChangeIndication> GetChangeIndication(SecureSession session) {
+            return (ChangeIndication)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
@@ -213,13 +213,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Last Changed Time attribute
         /// </summary>
         public async Task<DateTime?> GetLastChangedTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4));
         }
 
         /// <summary>
         /// Set the Last Changed Time attribute
         /// </summary>
-        public async Task SetLastChangedTime (SecureSession session, DateTime? value = null) {
+        public async Task SetLastChangedTime (SecureSession session, DateTime? value) {
             await SetAttribute(session, 4, value, true);
         }
 
@@ -237,7 +237,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Resource Monitoring Clusters";
+            return "HEPA Filter Monitoring";
         }
     }
 }

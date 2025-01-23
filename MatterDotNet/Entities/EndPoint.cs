@@ -11,7 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Clusters;
-using MatterDotNet.Clusters.Utility;
+using MatterDotNet.Clusters.General;
 using MatterDotNet.Protocol.Sessions;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -55,7 +55,7 @@ namespace MatterDotNet.Entities
             this.index = index;
             this.clusters = new Dictionary<uint, ClusterBase>();
             this.children = new Dictionary<ushort, EndPoint>();
-            this.clusters.Add(DescriptorCluster.CLUSTER_ID, new DescriptorCluster(index));
+            this.clusters.Add(Descriptor.CLUSTER_ID, new Descriptor(index));
         }
 
         /// <summary>
@@ -131,12 +131,12 @@ namespace MatterDotNet.Entities
 
         internal async Task EnumerateClusters(SecureSession session)
         {
-            uint[] clusterIds = await GetCluster<DescriptorCluster>().GetServerList(session);
+            uint[] clusterIds = await GetCluster<Descriptor>().GetServerList(session);
             foreach (var clusterId in clusterIds) {
-                if (clusterId != DescriptorCluster.CLUSTER_ID)
+                if (clusterId != Descriptor.CLUSTER_ID)
                     AddCluster(ClusterBase.Create(clusterId, index));
             }
-            DescriptorCluster.DeviceType[] devices = await GetCluster<DescriptorCluster>().GetDeviceTypeList(session);
+            Descriptor.DeviceType[] devices = await GetCluster<Descriptor>().GetDeviceTypeList(session);
             DeviceTypes = devices.Select(t => t.DeviceTypeField).ToArray();
 
             foreach (EndPoint ep in children.Values)

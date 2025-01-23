@@ -12,29 +12,28 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Electrical Energy Measurement Cluster
+    /// This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ElectricalEnergyMeasurementCluster : ClusterBase
+    public class ElectricalEnergyMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0091;
 
         /// <summary>
-        /// Electrical Energy Measurement Cluster
+        /// This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.
         /// </summary>
-        public ElectricalEnergyMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ElectricalEnergyMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ElectricalEnergyMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ElectricalEnergyMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -82,10 +81,10 @@ namespace MatterDotNet.Clusters.Application
                 ImportedResetSystime = TimeUtil.FromMillis(reader.GetULong(2, true));
                 ExportedResetSystime = TimeUtil.FromMillis(reader.GetULong(3, true));
             }
-            public DateTime? ImportedResetTimestamp { get; set; } = null;
-            public DateTime? ExportedResetTimestamp { get; set; } = null;
-            public TimeSpan? ImportedResetSystime { get; set; } = null;
-            public TimeSpan? ExportedResetSystime { get; set; } = null;
+            public DateTime? ImportedResetTimestamp { get; set; }
+            public DateTime? ExportedResetTimestamp { get; set; }
+            public TimeSpan? ImportedResetSystime { get; set; }
+            public TimeSpan? ExportedResetSystime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (ImportedResetTimestamp != null)
@@ -128,7 +127,7 @@ namespace MatterDotNet.Clusters.Application
             public TimeSpan? EndSystime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteLong(0, Energy, 2, 0);
+                writer.WriteLong(0, Energy, 4611686018427387904, 0);
                 if (StartTimestamp != null)
                     writer.WriteUInt(1, TimeUtil.ToEpochSeconds(StartTimestamp!.Value));
                 if (EndTimestamp != null)
@@ -175,41 +174,41 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Cumulative Energy Imported attribute
         /// </summary>
         public async Task<EnergyMeasurement?> GetCumulativeEnergyImported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 1))!) ?? null;
+            return new EnergyMeasurement((object[])(await GetAttribute(session, 1))!);
         }
 
         /// <summary>
         /// Get the Cumulative Energy Exported attribute
         /// </summary>
         public async Task<EnergyMeasurement?> GetCumulativeEnergyExported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 2))!) ?? null;
+            return new EnergyMeasurement((object[])(await GetAttribute(session, 2))!);
         }
 
         /// <summary>
         /// Get the Periodic Energy Imported attribute
         /// </summary>
         public async Task<EnergyMeasurement?> GetPeriodicEnergyImported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 3))!) ?? null;
+            return new EnergyMeasurement((object[])(await GetAttribute(session, 3))!);
         }
 
         /// <summary>
         /// Get the Periodic Energy Exported attribute
         /// </summary>
         public async Task<EnergyMeasurement?> GetPeriodicEnergyExported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 4))!) ?? null;
+            return new EnergyMeasurement((object[])(await GetAttribute(session, 4))!);
         }
 
         /// <summary>
         /// Get the Cumulative Energy Reset attribute
         /// </summary>
         public async Task<CumulativeEnergyReset?> GetCumulativeEnergyReset(SecureSession session) {
-            return new CumulativeEnergyReset((object[])(await GetAttribute(session, 5))!) ?? null;
+            return new CumulativeEnergyReset((object[])(await GetAttribute(session, 5))!);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Electrical Energy Measurement Cluster";
+            return "Electrical Energy Measurement";
         }
     }
 }

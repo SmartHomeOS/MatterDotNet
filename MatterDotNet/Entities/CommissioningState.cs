@@ -10,7 +10,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Clusters.Utility;
+using MatterDotNet.Clusters;
+using MatterDotNet.Clusters.CHIP;
 using MatterDotNet.OperationalDiscovery;
 using MatterDotNet.Protocol.Sessions;
 using System.Text;
@@ -27,7 +28,7 @@ namespace MatterDotNet.Entities
             SupportedInterfaces = FabricInterface.None;
         }
 
-        internal CommissioningState(Node node, SecureSession pase, FabricInterface iface, NetworkCommissioningCluster.WiFiInterfaceScanResult[] wiFiNetworks, NetworkCommissioningCluster.ThreadInterfaceScanResult[] threadNetworks, string[] connectedNetworks)
+        internal CommissioningState(Node node, SecureSession pase, FabricInterface iface, NetworkCommissioning.WiFiInterfaceScanResult[] wiFiNetworks, NetworkCommissioning.ThreadInterfaceScanResult[] threadNetworks, string[] connectedNetworks)
         {
             Node = node;
             PASE = pase;
@@ -45,11 +46,11 @@ namespace MatterDotNet.Entities
         /// <summary>
         /// Detected WiFi Networks
         /// </summary>
-        public NetworkCommissioningCluster.WiFiInterfaceScanResult[] WiFiNetworks { get; internal set; } = [];
+        public NetworkCommissioning.WiFiInterfaceScanResult[] WiFiNetworks { get; internal set; } = [];
         /// <summary>
         /// Detected Thread Networks
         /// </summary>
-        public NetworkCommissioningCluster.ThreadInterfaceScanResult[] ThreadNetworks { get; internal set; } = [];
+        public NetworkCommissioning.ThreadInterfaceScanResult[] ThreadNetworks { get; internal set; } = [];
         /// <summary>
         /// A list of networks the node is currently connected to
         /// </summary>
@@ -72,12 +73,12 @@ namespace MatterDotNet.Entities
             ConnectedNetworks = ret;
         }
 
-        public NetworkCommissioningCluster.WiFiInterfaceScanResult? FindWiFi(string ssid)
+        public NetworkCommissioning.WiFiInterfaceScanResult? FindWiFi(string ssid)
         {
             byte[] ssidBytes = Encoding.UTF8.GetBytes(ssid);
             return FindWiFi(ssidBytes);
         }
-        public NetworkCommissioningCluster.WiFiInterfaceScanResult? FindWiFi(byte[] ssid)
+        public NetworkCommissioning.WiFiInterfaceScanResult? FindWiFi(byte[] ssid)
         {
             foreach (var result in WiFiNetworks)
             {
@@ -87,7 +88,7 @@ namespace MatterDotNet.Entities
             return null;
         }
 
-        public NetworkCommissioningCluster.ThreadInterfaceScanResult? FindThread(ulong extendedPanId)
+        public NetworkCommissioning.ThreadInterfaceScanResult? FindThread(ulong extendedPanId)
         {
             foreach (var result in ThreadNetworks)
             {
@@ -96,7 +97,7 @@ namespace MatterDotNet.Entities
             }
             return null;
         }
-        public NetworkCommissioningCluster.ThreadInterfaceScanResult? FindThread(string networkName)
+        public NetworkCommissioning.ThreadInterfaceScanResult? FindThread(string networkName)
         {
             foreach (var result in ThreadNetworks)
             {

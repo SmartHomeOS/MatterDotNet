@@ -18,20 +18,23 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
-using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Mode Base Cluster
+    /// Attributes and commands for selecting a mode from a list of supported options.
     /// </summary>
-    public class ModeBaseCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 2)]
+    public class DishwasherMode : ClusterBase
     {
+        internal const uint CLUSTER_ID = 0x0059;
 
         /// <summary>
-        /// Mode Base Cluster
+        /// Attributes and commands for selecting a mode from a list of supported options.
         /// </summary>
-        public ModeBaseCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        public DishwasherMode(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected DishwasherMode(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -44,81 +47,26 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             OnOff = 1,
         }
-        #endregion Enums
-
-        #region Records
-        /// <summary>
-        /// Mode Option
-        /// </summary>
-        public record ModeOption : TLVPayload {
-            /// <summary>
-            /// Mode Option
-            /// </summary>
-            public ModeOption() { }
-
-            /// <summary>
-            /// Mode Option
-            /// </summary>
-            [SetsRequiredMembers]
-            public ModeOption(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Label = reader.GetString(0, false)!;
-                Mode = reader.GetByte(1)!.Value;
-                {
-                    ModeTags = new ModeTag[((object[])fields[2]).Length];
-                    for (int i = 0; i < ModeTags.Length; i++) {
-                        ModeTags[i] = new ModeTag((object[])fields[-1]);
-                    }
-                }
-            }
-            public required string Label { get; set; }
-            public required byte Mode { get; set; }
-            public required ModeTag[] ModeTags { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, Label, 64);
-                writer.WriteByte(1, Mode);
-                {
-                    Constrain(ModeTags, 0, 8);
-                    writer.StartArray(2);
-                    foreach (var item in ModeTags) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
 
         /// <summary>
         /// Mode Tag
         /// </summary>
-        public record ModeTag : TLVPayload {
-            /// <summary>
-            /// Mode Tag
-            /// </summary>
-            public ModeTag() { }
-
-            /// <summary>
-            /// Mode Tag
-            /// </summary>
-            [SetsRequiredMembers]
-            public ModeTag(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                MfgCode = reader.GetUShort(0, true);
-                Value = reader.GetUShort(1)!.Value;
-            }
-            public ushort? MfgCode { get; set; }
-            public required ushort Value { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                if (MfgCode != null)
-                    writer.WriteUShort(0, MfgCode);
-                writer.WriteUShort(1, Value);
-                writer.EndContainer();
-            }
+        public enum ModeTag : ushort {
+            Auto = 0x0000,
+            Quick = 0x0001,
+            Quiet = 0x0002,
+            LowNoise = 0x0003,
+            LowEnergy = 0x0004,
+            Vacation = 0x0005,
+            Min = 0x0006,
+            Max = 0x0007,
+            Night = 0x0008,
+            Day = 0x0009,
+            Normal = 0x4000,
+            Heavy = 0x4001,
+            Light = 0x4002,
         }
-        #endregion Records
+        #endregion Enums
 
         #region Payloads
         private record ChangeToModePayload : TLVPayload {
@@ -143,16 +91,16 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Change To Mode
         /// </summary>
-        public async Task<ChangeToModeResponse?> ChangeToMode(SecureSession session, byte NewMode) {
+        public async Task<ChangeToModeResponse?> ChangeToMode(SecureSession session, byte newMode) {
             ChangeToModePayload requestFields = new ChangeToModePayload() {
-                NewMode = NewMode,
+                NewMode = newMode,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ChangeToModeResponse() {
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
-                StatusText = (string)GetField(resp, 1),
+                StatusText = (string?)GetOptionalField(resp, 1),
             };
         }
         #endregion Commands
@@ -215,20 +163,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the On Mode attribute
         /// </summary>
         public async Task<byte?> GetOnMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
         /// Set the On Mode attribute
         /// </summary>
-        public async Task SetOnMode (SecureSession session, byte? value = null) {
+        public async Task SetOnMode (SecureSession session, byte? value) {
             await SetAttribute(session, 3, value, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Mode Base Cluster";
+            return "Dishwasher Mode";
         }
     }
 }

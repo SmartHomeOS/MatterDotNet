@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Temperature Measurement Cluster
+    /// Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 4)]
-    public class TemperatureMeasurementCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class TemperatureMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0402;
 
         /// <summary>
-        /// Temperature Measurement Cluster
+        /// Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
         /// </summary>
-        public TemperatureMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public TemperatureMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TemperatureMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected TemperatureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -44,14 +44,14 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Min Measured Value attribute
         /// </summary>
         public async Task<short?> GetMinMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 1, true);
+            return (short?)(dynamic?)await GetAttribute(session, 1, true) ?? short.MinValue;
         }
 
         /// <summary>
         /// Get the Max Measured Value attribute
         /// </summary>
         public async Task<short?> GetMaxMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 2, true);
+            return (short?)(dynamic?)await GetAttribute(session, 2, true) ?? short.MinValue;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Temperature Measurement Cluster";
+            return "Temperature Measurement";
         }
     }
 }

@@ -18,33 +18,34 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.NetworkInfrastructure
 {
     /// <summary>
-    /// Thread Border Router Management Cluster
+    /// Manage the Thread network of Thread Border Router
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ThreadBorderRouterManagementCluster : ClusterBase
+    public class ThreadBorderRouterManagement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0452;
 
         /// <summary>
-        /// Thread Border Router Management Cluster
+        /// Manage the Thread network of Thread Border Router
         /// </summary>
-        public ThreadBorderRouterManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ThreadBorderRouterManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThreadBorderRouterManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ThreadBorderRouterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Supported Features
+        /// Feature
         /// </summary>
         [Flags]
-        public enum Feature {
+        public enum Feature : uint {
             /// <summary>
-            /// The ability to change PAN configuration with pending dataset setting request.
+            /// Nothing Set
             /// </summary>
-            PANChange = 1,
+            None = 0,
+            PANChange = 0x1,
         }
         #endregion Enums
 
@@ -106,49 +107,28 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Active Dataset Request
         /// </summary>
-        public async Task<bool> SetActiveDatasetRequest(SecureSession session, ushort commandTimeoutMS, byte[] ActiveDataset, ulong? Breadcrumb) {
+        public async Task<bool> SetActiveDatasetRequest(SecureSession session, byte[] activeDataset, ulong? breadcrumb) {
             SetActiveDatasetRequestPayload requestFields = new SetActiveDatasetRequestPayload() {
-                ActiveDataset = ActiveDataset,
-                Breadcrumb = Breadcrumb,
+                ActiveDataset = activeDataset,
+                Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Pending Dataset Request
         /// </summary>
-        public async Task<bool> SetPendingDatasetRequest(SecureSession session, ushort commandTimeoutMS, byte[] PendingDataset) {
+        public async Task<bool> SetPendingDatasetRequest(SecureSession session, byte[] pendingDataset) {
             SetPendingDatasetRequestPayload requestFields = new SetPendingDatasetRequestPayload() {
-                PendingDataset = PendingDataset,
+                PendingDataset = pendingDataset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands
 
         #region Attributes
-        /// <summary>
-        /// Features supported by this cluster
-        /// </summary>
-        /// <param name="session"></param>
-        /// <returns></returns>
-        public async Task<Feature> GetSupportedFeatures(SecureSession session)
-        {
-            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
-        }
-
-        /// <summary>
-        /// Returns true when the feature is supported by the cluster
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="feature"></param>
-        /// <returns></returns>
-        public async Task<bool> Supports(SecureSession session, Feature feature)
-        {
-            return ((feature & await GetSupportedFeatures(session)) != 0);
-        }
-
         /// <summary>
         /// Get the Border Router Name attribute
         /// </summary>
@@ -181,20 +161,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Active Dataset Timestamp attribute
         /// </summary>
         public async Task<ulong?> GetActiveDatasetTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 4, true) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
         /// Get the Pending Dataset Timestamp attribute
         /// </summary>
         public async Task<ulong?> GetPendingDatasetTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5, true) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 5, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Thread Border Router Management Cluster";
+            return "Thread Border Router Management";
         }
     }
 }

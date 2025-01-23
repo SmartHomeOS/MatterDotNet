@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Group Key Management Cluster
+    /// The Group Key Management Cluster is the mechanism by which group keys are managed.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class GroupKeyManagementCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class GroupKeyManagement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x003F;
 
         /// <summary>
-        /// Group Key Management Cluster
+        /// The Group Key Management Cluster is the mechanism by which group keys are managed.
         /// </summary>
-        public GroupKeyManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public GroupKeyManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GroupKeyManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected GroupKeyManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -50,79 +50,21 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Group Key Multicast Policy
-        /// </summary>
-        public enum GroupKeyMulticastPolicyEnum {
-            /// <summary>
-            /// Indicates filtering of multicast messages for a specific Group ID
-            /// </summary>
-            PerGroupID = 0,
-            /// <summary>
-            /// Indicates not filtering of multicast messages
-            /// </summary>
-            AllNodes = 1,
-        }
-
-        /// <summary>
         /// Group Key Security Policy
         /// </summary>
-        public enum GroupKeySecurityPolicyEnum {
+        public enum GroupKeySecurityPolicy : byte {
             /// <summary>
             /// Message counter synchronization using trust-first
             /// </summary>
-            TrustFirst = 0,
+            TrustFirst = 0x00,
             /// <summary>
             /// Message counter synchronization using cache-and-sync
             /// </summary>
-            CacheAndSync = 1,
+            CacheAndSync = 0x01,
         }
         #endregion Enums
 
         #region Records
-        /// <summary>
-        /// Group Info Map
-        /// </summary>
-        public record GroupInfoMap : TLVPayload {
-            /// <summary>
-            /// Group Info Map
-            /// </summary>
-            public GroupInfoMap() { }
-
-            /// <summary>
-            /// Group Info Map
-            /// </summary>
-            [SetsRequiredMembers]
-            public GroupInfoMap(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                GroupId = reader.GetUShort(1)!.Value;
-                {
-                    Endpoints = new ushort[((object[])fields[2]).Length];
-                    for (int i = 0; i < Endpoints.Length; i++) {
-                        Endpoints[i] = reader.GetUShort(-1)!.Value;
-                    }
-                }
-                GroupName = reader.GetString(3, true);
-            }
-            public required ushort GroupId { get; set; }
-            public required ushort[] Endpoints { get; set; }
-            public string? GroupName { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(1, GroupId);
-                {
-                    Constrain(Endpoints, 1);
-                    writer.StartArray(2);
-                    foreach (var item in Endpoints) {
-                        writer.WriteUShort(-1, item);
-                    }
-                    writer.EndContainer();
-                }
-                if (GroupName != null)
-                    writer.WriteString(3, GroupName, 16);
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
         /// Group Key Map
         /// </summary>
@@ -146,7 +88,50 @@ namespace MatterDotNet.Clusters.Utility
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(1, GroupId);
-                writer.WriteUShort(2, GroupKeySetID, 65535, 1);
+                writer.WriteUShort(2, GroupKeySetID);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Group Info Map
+        /// </summary>
+        public record GroupInfoMap : TLVPayload {
+            /// <summary>
+            /// Group Info Map
+            /// </summary>
+            public GroupInfoMap() { }
+
+            /// <summary>
+            /// Group Info Map
+            /// </summary>
+            [SetsRequiredMembers]
+            public GroupInfoMap(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                GroupId = reader.GetUShort(1)!.Value;
+                {
+                    Endpoints = new ushort[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < Endpoints.Length; n++) {
+                        Endpoints[n] = reader.GetUShort(n)!.Value;
+                    }
+                }
+                GroupName = reader.GetString(3, true, 16);
+            }
+            public required ushort GroupId { get; set; }
+            public required ushort[] Endpoints { get; set; }
+            public string? GroupName { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(1, GroupId);
+                {
+                    writer.StartArray(2);
+                    foreach (var item in Endpoints) {
+                        writer.WriteUShort(-1, item);
+                    }
+                    writer.EndContainer();
+                }
+                if (GroupName != null)
+                    writer.WriteString(3, GroupName, 16);
                 writer.EndContainer();
             }
         }
@@ -167,24 +152,22 @@ namespace MatterDotNet.Clusters.Utility
             public GroupKeySet(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 GroupKeySetID = reader.GetUShort(0)!.Value;
-                GroupKeySecurityPolicy = (GroupKeySecurityPolicyEnum)reader.GetUShort(1)!.Value;
-                EpochKey0 = reader.GetBytes(2, false)!;
+                GroupKeySecurityPolicy = (GroupKeySecurityPolicy)reader.GetUShort(1)!.Value;
+                EpochKey0 = reader.GetBytes(2, false, 16)!;
                 EpochStartTime0 = TimeUtil.FromEpochUS(reader.GetULong(3, true));
-                EpochKey1 = reader.GetBytes(4, false)!;
+                EpochKey1 = reader.GetBytes(4, false, 16)!;
                 EpochStartTime1 = TimeUtil.FromEpochUS(reader.GetULong(5, true));
-                EpochKey2 = reader.GetBytes(6, false)!;
+                EpochKey2 = reader.GetBytes(6, false, 16)!;
                 EpochStartTime2 = TimeUtil.FromEpochUS(reader.GetULong(7, true));
-                GroupKeyMulticastPolicy = (GroupKeyMulticastPolicyEnum?)reader.GetUShort(8, true);
             }
             public required ushort GroupKeySetID { get; set; }
-            public required GroupKeySecurityPolicyEnum GroupKeySecurityPolicy { get; set; }
+            public required GroupKeySecurityPolicy GroupKeySecurityPolicy { get; set; }
             public required byte[]? EpochKey0 { get; set; }
             public required DateTime? EpochStartTime0 { get; set; }
             public required byte[]? EpochKey1 { get; set; }
             public required DateTime? EpochStartTime1 { get; set; }
             public required byte[]? EpochKey2 { get; set; }
             public required DateTime? EpochStartTime2 { get; set; }
-            public GroupKeyMulticastPolicyEnum? GroupKeyMulticastPolicy { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupKeySetID);
@@ -204,15 +187,13 @@ namespace MatterDotNet.Clusters.Utility
                     writer.WriteNull(7);
                 else
                     writer.WriteULong(7, TimeUtil.ToEpochUS(EpochStartTime2!.Value));
-                if (GroupKeyMulticastPolicy != null)
-                    writer.WriteUShort(8, (ushort)GroupKeyMulticastPolicy);
                 writer.EndContainer();
             }
         }
         #endregion Records
 
         #region Payloads
-        private record KeySetWriteCommandPayload : TLVPayload {
+        private record KeySetWritePayload : TLVPayload {
             public required GroupKeySet GroupKeySet { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -221,7 +202,7 @@ namespace MatterDotNet.Clusters.Utility
             }
         }
 
-        private record KeySetReadCommandPayload : TLVPayload {
+        private record KeySetReadPayload : TLVPayload {
             public required ushort GroupKeySetID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -231,13 +212,13 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Key Set Read Response  Command - Reply from server
+        /// Key Set Read Response - Reply from server
         /// </summary>
-        public struct KeySetReadResponseCommand() {
+        public struct KeySetReadResponse() {
             public required GroupKeySet GroupKeySet { get; set; }
         }
 
-        private record KeySetRemoveCommandPayload : TLVPayload {
+        private record KeySetRemovePayload : TLVPayload {
             public required ushort GroupKeySetID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -246,69 +227,60 @@ namespace MatterDotNet.Clusters.Utility
             }
         }
 
-        private record KeySetReadAllIndicesCommandPayload : TLVPayload {
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
-        /// Key Set Read All Indices Response  Command - Reply from server
+        /// Key Set Read All Indices Response - Reply from server
         /// </summary>
-        public struct KeySetReadAllIndicesResponseCommand() {
+        public struct KeySetReadAllIndicesResponse() {
             public required ushort[] GroupKeySetIDs { get; set; }
         }
         #endregion Payloads
 
         #region Commands
         /// <summary>
-        /// Key Set Write  Command
+        /// Key Set Write
         /// </summary>
-        public async Task<bool> KeySetWriteCommand(SecureSession session, GroupKeySet GroupKeySet) {
-            KeySetWriteCommandPayload requestFields = new KeySetWriteCommandPayload() {
-                GroupKeySet = GroupKeySet,
+        public async Task<bool> KeySetWrite(SecureSession session, GroupKeySet groupKeySet) {
+            KeySetWritePayload requestFields = new KeySetWritePayload() {
+                GroupKeySet = groupKeySet,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
-        /// Key Set Read  Command
+        /// Key Set Read
         /// </summary>
-        public async Task<KeySetReadResponseCommand?> KeySetReadCommand(SecureSession session, ushort GroupKeySetID) {
-            KeySetReadCommandPayload requestFields = new KeySetReadCommandPayload() {
-                GroupKeySetID = GroupKeySetID,
+        public async Task<KeySetReadResponse?> KeySetRead(SecureSession session, ushort groupKeySetID) {
+            KeySetReadPayload requestFields = new KeySetReadPayload() {
+                GroupKeySetID = groupKeySetID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
-            return new KeySetReadResponseCommand() {
+            return new KeySetReadResponse() {
                 GroupKeySet = (GroupKeySet)GetField(resp, 0),
             };
         }
 
         /// <summary>
-        /// Key Set Remove  Command
+        /// Key Set Remove
         /// </summary>
-        public async Task<bool> KeySetRemoveCommand(SecureSession session, ushort GroupKeySetID) {
-            KeySetRemoveCommandPayload requestFields = new KeySetRemoveCommandPayload() {
-                GroupKeySetID = GroupKeySetID,
+        public async Task<bool> KeySetRemove(SecureSession session, ushort groupKeySetID) {
+            KeySetRemovePayload requestFields = new KeySetRemovePayload() {
+                GroupKeySetID = groupKeySetID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
-        /// Key Set Read All Indices  Command
+        /// Key Set Read All Indices
         /// </summary>
-        public async Task<KeySetReadAllIndicesResponseCommand?> KeySetReadAllIndicesCommand(SecureSession session) {
-            KeySetReadAllIndicesCommandPayload requestFields = new KeySetReadAllIndicesCommandPayload() {
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+        public async Task<KeySetReadAllIndicesResponse?> KeySetReadAllIndices(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
             if (!ValidateResponse(resp))
                 return null;
-            return new KeySetReadAllIndicesResponseCommand() {
+            return new KeySetReadAllIndicesResponse() {
                 GroupKeySetIDs = (ushort[])GetField(resp, 0),
             };
         }
@@ -369,20 +341,20 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Max Groups Per Fabric attribute
         /// </summary>
         public async Task<ushort> GetMaxGroupsPerFabric(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0;
+            return (ushort)(dynamic?)(await GetAttribute(session, 2))!;
         }
 
         /// <summary>
         /// Get the Max Group Keys Per Fabric attribute
         /// </summary>
         public async Task<ushort> GetMaxGroupKeysPerFabric(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 1;
+            return (ushort)(dynamic?)(await GetAttribute(session, 3))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Group Key Management Cluster";
+            return "Group Key Management";
         }
     }
 }

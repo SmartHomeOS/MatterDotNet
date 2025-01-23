@@ -17,22 +17,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Occupancy Sensing Cluster
+    /// The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 5)]
-    public class OccupancySensingCluster : ClusterBase
+    public class OccupancySensing : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0406;
 
         /// <summary>
-        /// Occupancy Sensing Cluster
+        /// The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.
         /// </summary>
-        public OccupancySensingCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OccupancySensing(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OccupancySensingCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OccupancySensing(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -77,30 +77,30 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Occupancy Sensor Type
         /// </summary>
-        public enum OccupancySensorTypeEnum {
+        public enum OccupancySensorType : byte {
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>
-            PIR = 0,
+            PIR = 0x0,
             /// <summary>
             /// Indicates a ultrasonic sensor.
             /// </summary>
-            Ultrasonic = 1,
+            Ultrasonic = 0x1,
             /// <summary>
             /// Indicates a passive infrared and ultrasonic sensor.
             /// </summary>
-            PIRAndUltrasonic = 2,
+            PIRAndUltrasonic = 0x2,
             /// <summary>
             /// Indicates a physical contact sensor.
             /// </summary>
-            PhysicalContact = 3,
+            PhysicalContact = 0x3,
         }
 
         /// <summary>
-        /// Occupancy Bitmap
+        /// Occupancy
         /// </summary>
         [Flags]
-        public enum OccupancyBitmap {
+        public enum Occupancy : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -108,14 +108,14 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicates the sensed occupancy state
             /// </summary>
-            Occupied = 1,
+            Occupied = 0x1,
         }
 
         /// <summary>
-        /// Occupancy Sensor Type Bitmap
+        /// Occupancy Sensor Type
         /// </summary>
         [Flags]
-        public enum OccupancySensorTypeBitmap {
+        public enum OccupancySensorTypeBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -123,15 +123,15 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>
-            PIR = 1,
+            PIR = 0x01,
             /// <summary>
             /// Indicates a ultrasonic sensor.
             /// </summary>
-            Ultrasonic = 2,
+            Ultrasonic = 0x02,
             /// <summary>
             /// Indicates a physical contact sensor.
             /// </summary>
-            PhysicalContact = 4,
+            PhysicalContact = 0x04,
         }
         #endregion Enums
 
@@ -160,7 +160,7 @@ namespace MatterDotNet.Clusters.Application
             public required ushort HoldTimeDefault { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, HoldTimeMin, ushort.MaxValue, 1);
+                writer.WriteUShort(0, HoldTimeMin);
                 writer.WriteUShort(1, HoldTimeMax);
                 writer.WriteUShort(2, HoldTimeDefault);
                 writer.EndContainer();
@@ -193,19 +193,19 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Occupancy attribute
         /// </summary>
-        public async Task<OccupancyBitmap> GetOccupancy(SecureSession session) {
-            return (OccupancyBitmap)await GetEnumAttribute(session, 0);
+        public async Task<Occupancy> GetOccupancy(SecureSession session) {
+            return (Occupancy)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Occupancy Sensor Type attribute
         /// </summary>
-        public async Task<OccupancySensorTypeEnum> GetOccupancySensorType(SecureSession session) {
-            return (OccupancySensorTypeEnum)await GetEnumAttribute(session, 1);
+        public async Task<OccupancySensorType> GetOccupancySensorType(SecureSession session) {
+            return (OccupancySensorType)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
-        /// Get the Occupancy Sensor Type Bitmap attribute
+        /// Get the Occupancy Sensor Type attribute
         /// </summary>
         public async Task<OccupancySensorTypeBitmap> GetOccupancySensorTypeBitmap(SecureSession session) {
             return (OccupancySensorTypeBitmap)await GetEnumAttribute(session, 2);
@@ -264,7 +264,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the PIR Unoccupied To Occupied Threshold attribute
         /// </summary>
         public async Task<byte> GetPIRUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 18) ?? 1;
+            return (byte?)(dynamic?)await GetAttribute(session, 18) ?? 0x01;
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Occupancy Sensing Cluster";
+            return "Occupancy Sensing";
         }
     }
 }

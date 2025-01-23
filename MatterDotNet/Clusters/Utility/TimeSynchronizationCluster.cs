@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Time Synchronization Cluster
+    /// Accurate time is required for a number of reasons, including scheduling, display and validating security materials.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class TimeSynchronizationCluster : ClusterBase
+    public class TimeSynchronization : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0038;
 
         /// <summary>
-        /// Time Synchronization Cluster
+        /// Accurate time is required for a number of reasons, including scheduling, display and validating security materials.
         /// </summary>
-        public TimeSynchronizationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public TimeSynchronization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TimeSynchronizationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected TimeSynchronization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -62,155 +62,159 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
+        /// Status Code
+        /// </summary>
+        public enum StatusCode : byte {
+            TimeNotAccepted = 0x02,
+        }
+
+        /// <summary>
         /// Granularity
         /// </summary>
-        public enum GranularityEnum {
+        public enum Granularity : byte {
             /// <summary>
             /// This indicates that the node is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only.
             /// </summary>
-            NoTimeGranularity = 0,
+            NoTimeGranularity = 0x00,
             /// <summary>
-            /// This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now &gt; 5 seconds.
+            /// This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now > 5 seconds.
             /// </summary>
-            MinutesGranularity = 1,
+            MinutesGranularity = 0x01,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds.
             /// </summary>
-            SecondsGranularity = 2,
+            SecondsGranularity = 0x02,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50 ms.
             /// </summary>
-            MillisecondsGranularity = 3,
+            MillisecondsGranularity = 0x03,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs.
             /// </summary>
-            MicrosecondsGranularity = 4,
+            MicrosecondsGranularity = 0x04,
         }
 
         /// <summary>
         /// Time Source
         /// </summary>
-        public enum TimeSourceEnum {
+        public enum TimeSource : byte {
             /// <summary>
             /// Node is not currently synchronized with a UTC Time source.
             /// </summary>
-            None = 0,
+            None = 0x00,
             /// <summary>
             /// Node uses an unlisted time source.
             /// </summary>
-            Unknown = 1,
+            Unknown = 0x01,
             /// <summary>
             /// Node received time from a client using the SetUTCTime Command.
             /// </summary>
-            Admin = 2,
+            Admin = 0x02,
             /// <summary>
             /// Synchronized time by querying the Time Synchronization cluster of another Node.
             /// </summary>
-            NodeTimeCluster = 3,
+            NodeTimeCluster = 0x03,
             /// <summary>
             /// SNTP from a server not in the Matter network. NTS is not used.
             /// </summary>
-            NonMatterSNTP = 4,
+            NonMatterSNTP = 0x04,
             /// <summary>
             /// NTP from servers not in the Matter network. None of the servers used NTS.
             /// </summary>
-            NonMatterNTP = 5,
+            NonMatterNTP = 0x05,
             /// <summary>
             /// SNTP from a server within the Matter network. NTS is not used.
             /// </summary>
-            MatterSNTP = 6,
+            MatterSNTP = 0x06,
             /// <summary>
             /// NTP from servers within the Matter network. None of the servers used NTS.
             /// </summary>
-            MatterNTP = 7,
+            MatterNTP = 0x07,
             /// <summary>
             /// NTP from multiple servers in the Matter network and external. None of the servers used NTS.
             /// </summary>
-            MixedNTP = 8,
+            MixedNTP = 0x08,
             /// <summary>
             /// SNTP from a server not in the Matter network. NTS is used.
             /// </summary>
-            NonMatterSNTPNTS = 9,
+            NonMatterSNTPNTS = 0x09,
             /// <summary>
             /// NTP from servers not in the Matter network. NTS is used on at least one server.
             /// </summary>
-            NonMatterNTPNTS = 10,
+            NonMatterNTPNTS = 0x0A,
             /// <summary>
             /// SNTP from a server within the Matter network. NTS is used.
             /// </summary>
-            MatterSNTPNTS = 11,
+            MatterSNTPNTS = 0x0B,
             /// <summary>
             /// NTP from a server within the Matter network. NTS is used on at least one server.
             /// </summary>
-            MatterNTPNTS = 12,
+            MatterNTPNTS = 0x0C,
             /// <summary>
             /// NTP from multiple servers in the Matter network and external. NTS is used on at least one server.
             /// </summary>
-            MixedNTPNTS = 13,
+            MixedNTPNTS = 0x0D,
             /// <summary>
-            /// Time synchronization comes from a vendor cloud-based source (e.g. &quot;Date&quot; header in authenticated HTTPS connection).
+            /// Time synchronization comes from a vendor cloud-based source (e.g. "Date" header in authenticated HTTPS connection).
             /// </summary>
-            CloudSource = 14,
+            CloudSource = 0x0E,
             /// <summary>
             /// Time synchronization comes from PTP.
             /// </summary>
-            PTP = 15,
+            PTP = 0x0F,
             /// <summary>
             /// Time synchronization comes from a GNSS source.
             /// </summary>
-            GNSS = 16,
+            GNSS = 0x10,
         }
 
         /// <summary>
         /// Time Zone Database
         /// </summary>
-        public enum TimeZoneDatabaseEnum {
+        public enum TimeZoneDatabase : byte {
             /// <summary>
             /// Node has a full list of the available time zones
             /// </summary>
-            Full = 0,
+            Full = 0x00,
             /// <summary>
             /// Node has a partial list of the available time zones
             /// </summary>
-            Partial = 1,
+            Partial = 0x01,
             /// <summary>
             /// Node does not have a time zone database
             /// </summary>
-            None = 2,
+            None = 0x02,
         }
         #endregion Enums
 
         #region Records
         /// <summary>
-        /// DST Offset
+        /// Trusted Time Source
         /// </summary>
-        public record DSTOffset : TLVPayload {
+        public record TrustedTimeSource : TLVPayload {
             /// <summary>
-            /// DST Offset
+            /// Trusted Time Source
             /// </summary>
-            public DSTOffset() { }
+            public TrustedTimeSource() { }
 
             /// <summary>
-            /// DST Offset
+            /// Trusted Time Source
             /// </summary>
             [SetsRequiredMembers]
-            public DSTOffset(object[] fields) {
+            public TrustedTimeSource(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Offset = reader.GetInt(0)!.Value;
-                ValidStarting = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
-                ValidUntil = TimeUtil.FromEpochUS(reader.GetULong(2, true));
+                FabricIndex = reader.GetByte(0)!.Value;
+                NodeID = reader.GetULong(1)!.Value;
+                Endpoint = reader.GetUShort(2)!.Value;
             }
-            public required int Offset { get; set; }
-            public required DateTime ValidStarting { get; set; }
-            public required DateTime? ValidUntil { get; set; }
+            public required byte FabricIndex { get; set; }
+            public required ulong NodeID { get; set; }
+            public required ushort Endpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteInt(0, Offset);
-                writer.WriteULong(1, TimeUtil.ToEpochUS(ValidStarting));
-                if (!ValidUntil.HasValue)
-                    writer.WriteNull(2);
-                else
-                    writer.WriteULong(2, TimeUtil.ToEpochUS(ValidUntil!.Value));
+                writer.WriteByte(0, FabricIndex);
+                writer.WriteULong(1, NodeID);
+                writer.WriteUShort(2, Endpoint);
                 writer.EndContainer();
             }
         }
@@ -260,7 +264,7 @@ namespace MatterDotNet.Clusters.Utility
                 FieldReader reader = new FieldReader(fields);
                 Offset = reader.GetInt(0)!.Value;
                 ValidAt = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
-                Name = reader.GetString(2, true, 64, 0);
+                Name = reader.GetString(2, true, 64);
             }
             public required int Offset { get; set; }
             public required DateTime ValidAt { get; set; }
@@ -270,38 +274,41 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteInt(0, Offset, 50400, -43200);
                 writer.WriteULong(1, TimeUtil.ToEpochUS(ValidAt));
                 if (Name != null)
-                    writer.WriteString(2, Name, 64, 0);
+                    writer.WriteString(2, Name, 64);
                 writer.EndContainer();
             }
         }
 
         /// <summary>
-        /// Trusted Time Source
+        /// DST Offset
         /// </summary>
-        public record TrustedTimeSource : TLVPayload {
+        public record DSTOffset : TLVPayload {
             /// <summary>
-            /// Trusted Time Source
+            /// DST Offset
             /// </summary>
-            public TrustedTimeSource() { }
+            public DSTOffset() { }
 
             /// <summary>
-            /// Trusted Time Source
+            /// DST Offset
             /// </summary>
             [SetsRequiredMembers]
-            public TrustedTimeSource(object[] fields) {
+            public DSTOffset(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                FabricIndex = reader.GetByte(0)!.Value;
-                NodeID = reader.GetULong(1)!.Value;
-                Endpoint = reader.GetUShort(2)!.Value;
+                Offset = reader.GetInt(0)!.Value;
+                ValidStarting = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
+                ValidUntil = TimeUtil.FromEpochUS(reader.GetULong(2, true));
             }
-            public required byte FabricIndex { get; set; }
-            public required ulong NodeID { get; set; }
-            public required ushort Endpoint { get; set; }
+            public required int Offset { get; set; }
+            public required DateTime ValidStarting { get; set; }
+            public required DateTime? ValidUntil { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, FabricIndex);
-                writer.WriteULong(1, NodeID);
-                writer.WriteUShort(2, Endpoint);
+                writer.WriteInt(0, Offset);
+                writer.WriteULong(1, TimeUtil.ToEpochUS(ValidStarting));
+                if (!ValidUntil.HasValue)
+                    writer.WriteNull(2);
+                else
+                    writer.WriteULong(2, TimeUtil.ToEpochUS(ValidUntil!.Value));
                 writer.EndContainer();
             }
         }
@@ -309,9 +316,9 @@ namespace MatterDotNet.Clusters.Utility
 
         #region Payloads
         private record SetUTCTimePayload : TLVPayload {
-            public required DateTime UTCTime { get; set; } = TimeUtil.EPOCH;
-            public required GranularityEnum Granularity { get; set; } = GranularityEnum.NoTimeGranularity;
-            public TimeSourceEnum? TimeSource { get; set; } = TimeSourceEnum.None;
+            public required DateTime UTCTime { get; set; }
+            public required Granularity Granularity { get; set; }
+            public TimeSource? TimeSource { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(0, TimeUtil.ToEpochUS(UTCTime));
@@ -339,7 +346,6 @@ namespace MatterDotNet.Clusters.Utility
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    Constrain(TimeZone, 1, 2);
                     writer.StartArray(0);
                     foreach (var item in TimeZone) {
                         item.Serialize(writer, -1);
@@ -354,7 +360,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Set Time Zone Response - Reply from server
         /// </summary>
         public struct SetTimeZoneResponse() {
-            public required bool DSTOffsetsRequired { get; set; } = true;
+            public required bool DSTOffsetRequired { get; set; }
         }
 
         private record SetDSTOffsetPayload : TLVPayload {
@@ -386,11 +392,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set UTC Time
         /// </summary>
-        public async Task<bool> SetUTCTime(SecureSession session, DateTime UTCTime, GranularityEnum Granularity, TimeSourceEnum? TimeSource) {
+        public async Task<bool> SetUTCTime(SecureSession session, DateTime uTCTime, Granularity granularity, TimeSource? timeSource) {
             SetUTCTimePayload requestFields = new SetUTCTimePayload() {
-                UTCTime = UTCTime,
-                Granularity = Granularity,
-                TimeSource = TimeSource,
+                UTCTime = uTCTime,
+                Granularity = granularity,
+                TimeSource = timeSource,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -399,9 +405,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set Trusted Time Source
         /// </summary>
-        public async Task<bool> SetTrustedTimeSource(SecureSession session, FabricScopedTrustedTimeSource TrustedTimeSource) {
+        public async Task<bool> SetTrustedTimeSource(SecureSession session, FabricScopedTrustedTimeSource? trustedTimeSource) {
             SetTrustedTimeSourcePayload requestFields = new SetTrustedTimeSourcePayload() {
-                TrustedTimeSource = TrustedTimeSource,
+                TrustedTimeSource = trustedTimeSource,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -410,24 +416,24 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set Time Zone
         /// </summary>
-        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZone[] TimeZone) {
+        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZone[] timeZone) {
             SetTimeZonePayload requestFields = new SetTimeZonePayload() {
-                TimeZone = TimeZone,
+                TimeZone = timeZone,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetTimeZoneResponse() {
-                DSTOffsetsRequired = (bool)GetField(resp, 0),
+                DSTOffsetRequired = (bool)GetField(resp, 0),
             };
         }
 
         /// <summary>
         /// Set DST Offset
         /// </summary>
-        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffset[] DSTOffset) {
+        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffset[] dSTOffset) {
             SetDSTOffsetPayload requestFields = new SetDSTOffsetPayload() {
-                DSTOffset = DSTOffset,
+                DSTOffset = dSTOffset,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
@@ -436,9 +442,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set Default NTP
         /// </summary>
-        public async Task<bool> SetDefaultNTP(SecureSession session, string DefaultNTP) {
+        public async Task<bool> SetDefaultNTP(SecureSession session, string? defaultNTP) {
             SetDefaultNTPPayload requestFields = new SetDefaultNTPPayload() {
-                DefaultNTP = DefaultNTP,
+                DefaultNTP = defaultNTP,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -471,35 +477,35 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the UTC Time attribute
         /// </summary>
         public async Task<DateTime?> GetUTCTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Granularity attribute
         /// </summary>
-        public async Task<GranularityEnum> GetGranularity(SecureSession session) {
-            return (GranularityEnum?)await GetEnumAttribute(session, 1) ?? GranularityEnum.NoTimeGranularity;
+        public async Task<Granularity> GetGranularity(SecureSession session) {
+            return (Granularity)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Get the Time Source attribute
         /// </summary>
-        public async Task<TimeSourceEnum> GetTimeSource(SecureSession session) {
-            return (TimeSourceEnum?)await GetEnumAttribute(session, 2) ?? TimeSourceEnum.None;
+        public async Task<TimeSource> GetTimeSource(SecureSession session) {
+            return (TimeSource)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Trusted Time Source attribute
         /// </summary>
         public async Task<TrustedTimeSource?> GetTrustedTimeSource(SecureSession session) {
-            return new TrustedTimeSource((object[])(await GetAttribute(session, 3))!) ?? null;
+            return new TrustedTimeSource((object[])(await GetAttribute(session, 3))!);
         }
 
         /// <summary>
         /// Get the Default NTP attribute
         /// </summary>
         public async Task<string?> GetDefaultNTP(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return (string?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
@@ -528,14 +534,14 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Local Time attribute
         /// </summary>
         public async Task<DateTime?> GetLocalTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? DateTime.MaxValue;
         }
 
         /// <summary>
         /// Get the Time Zone Database attribute
         /// </summary>
-        public async Task<TimeZoneDatabaseEnum> GetTimeZoneDatabase(SecureSession session) {
-            return (TimeZoneDatabaseEnum?)await GetEnumAttribute(session, 8) ?? TimeZoneDatabaseEnum.None;
+        public async Task<TimeZoneDatabase> GetTimeZoneDatabase(SecureSession session) {
+            return (TimeZoneDatabase)await GetEnumAttribute(session, 8);
         }
 
         /// <summary>
@@ -569,7 +575,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Time Synchronization Cluster";
+            return "Time Synchronization";
         }
     }
 }

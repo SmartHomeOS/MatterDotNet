@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.HVAC
 {
     /// <summary>
-    /// Fan Control Cluster
+    /// An interface for controlling a fan in a heating/cooling system.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 4)]
-    public class FanControlCluster : ClusterBase
+    public class FanControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0202;
 
         /// <summary>
-        /// Fan Control Cluster
+        /// An interface for controlling a fan in a heating/cooling system.
         /// </summary>
-        public FanControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public FanControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected FanControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected FanControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -68,99 +68,102 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Airflow Direction
-        /// </summary>
-        public enum AirflowDirectionEnum {
-            /// <summary>
-            /// Airflow is in the forward direction
-            /// </summary>
-            Forward = 0,
-            /// <summary>
-            /// Airflow is in the reverse direction
-            /// </summary>
-            Reverse = 1,
-        }
-
-        /// <summary>
         /// Fan Mode
         /// </summary>
-        public enum FanModeEnum {
+        public enum FanMode : byte {
             /// <summary>
             /// Fan is off
             /// </summary>
-            Off = 0,
+            Off = 0x00,
             /// <summary>
             /// Fan using low speed
             /// </summary>
-            Low = 1,
+            Low = 0x01,
             /// <summary>
             /// Fan using medium speed
             /// </summary>
-            Medium = 2,
+            Medium = 0x02,
             /// <summary>
             /// Fan using high speed
             /// </summary>
-            High = 3,
-            On = 4,
+            High = 0x03,
+            /// <summary>
+            /// 
+            /// </summary>
+            On = 0x04,
             /// <summary>
             /// Fan is using auto mode
             /// </summary>
-            Auto = 5,
+            Auto = 0x05,
             /// <summary>
             /// Fan is using smart mode
             /// </summary>
-            Smart = 6,
+            Smart = 0x06,
         }
 
         /// <summary>
         /// Fan Mode Sequence
         /// </summary>
-        public enum FanModeSequenceEnum {
+        public enum FanModeSequence : byte {
             /// <summary>
             /// Fan is capable of off, low, medium and high modes
             /// </summary>
-            OffLowMedHigh = 0,
+            OffLowMedHigh = 0x00,
             /// <summary>
             /// Fan is capable of off, low and high modes
             /// </summary>
-            OffLowHigh = 1,
+            OffLowHigh = 0x01,
             /// <summary>
             /// Fan is capable of off, low, medium, high and auto modes
             /// </summary>
-            OffLowMedHighAuto = 2,
+            OffLowMedHighAuto = 0x02,
             /// <summary>
             /// Fan is capable of off, low, high and auto modes
             /// </summary>
-            OffLowHighAuto = 3,
+            OffLowHighAuto = 0x03,
             /// <summary>
             /// Fan is capable of off, high and auto modes
             /// </summary>
-            OffHighAuto = 4,
+            OffHighAuto = 0x04,
             /// <summary>
             /// Fan is capable of off and high modes
             /// </summary>
-            OffHigh = 5,
+            OffHigh = 0x05,
         }
 
         /// <summary>
         /// Step Direction
         /// </summary>
-        public enum StepDirectionEnum {
+        public enum StepDirection : byte {
             /// <summary>
             /// Step moves in increasing direction
             /// </summary>
-            Increase = 0,
+            Increase = 0x00,
             /// <summary>
             /// Step moves in decreasing direction
             /// </summary>
-            Decrease = 1,
+            Decrease = 0x01,
         }
 
         /// <summary>
-        /// Rock Bitmap
+        /// Airflow Direction
+        /// </summary>
+        public enum AirflowDirection : byte {
+            /// <summary>
+            /// Airflow is in the forward direction
+            /// </summary>
+            Forward = 0x00,
+            /// <summary>
+            /// Airflow is in the reverse direction
+            /// </summary>
+            Reverse = 0x01,
+        }
+
+        /// <summary>
+        /// Rock
         /// </summary>
         [Flags]
-        public enum RockBitmap {
+        public enum Rock : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -168,22 +171,22 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicate rock left to right
             /// </summary>
-            RockLeftRight = 1,
+            RockLeftRight = 0x01,
             /// <summary>
             /// Indicate rock up and down
             /// </summary>
-            RockUpDown = 2,
+            RockUpDown = 0x02,
             /// <summary>
             /// Indicate rock around
             /// </summary>
-            RockRound = 4,
+            RockRound = 0x04,
         }
 
         /// <summary>
-        /// Wind Bitmap
+        /// Wind
         /// </summary>
         [Flags]
-        public enum WindBitmap {
+        public enum Wind : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -191,19 +194,19 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicate sleep wind
             /// </summary>
-            SleepWind = 1,
+            SleepWind = 0x01,
             /// <summary>
             /// Indicate natural wind
             /// </summary>
-            NaturalWind = 2,
+            NaturalWind = 0x02,
         }
         #endregion Enums
 
         #region Payloads
         private record StepPayload : TLVPayload {
-            public required StepDirectionEnum Direction { get; set; } = StepDirectionEnum.Increase;
-            public bool? Wrap { get; set; } = false;
-            public bool? LowestOff { get; set; } = true;
+            public required StepDirection Direction { get; set; }
+            public bool? Wrap { get; set; }
+            public bool? LowestOff { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Direction);
@@ -220,11 +223,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Step
         /// </summary>
-        public async Task<bool> Step(SecureSession session, StepDirectionEnum Direction, bool? Wrap, bool? LowestOff) {
+        public async Task<bool> Step(SecureSession session, StepDirection direction, bool? wrap, bool? lowestOff) {
             StepPayload requestFields = new StepPayload() {
-                Direction = Direction,
-                Wrap = Wrap,
-                LowestOff = LowestOff,
+                Direction = direction,
+                Wrap = wrap,
+                LowestOff = lowestOff,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -256,26 +259,26 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Fan Mode attribute
         /// </summary>
-        public async Task<FanModeEnum> GetFanMode(SecureSession session) {
-            return (FanModeEnum)await GetEnumAttribute(session, 0);
+        public async Task<FanMode> GetFanMode(SecureSession session) {
+            return (FanMode)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Set the Fan Mode attribute
         /// </summary>
-        public async Task SetFanMode (SecureSession session, FanModeEnum value) {
+        public async Task SetFanMode (SecureSession session, FanMode value) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Fan Mode Sequence attribute
         /// </summary>
-        public async Task<FanModeSequenceEnum> GetFanModeSequence(SecureSession session) {
-            return (FanModeSequenceEnum)await GetEnumAttribute(session, 1);
+        public async Task<FanModeSequence> GetFanModeSequence(SecureSession session) {
+            return (FanModeSequence)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
-        /// Get the Percent Setting attribute
+        /// Get the Percent Setting [%] attribute
         /// </summary>
         public async Task<byte?> GetPercentSetting(SecureSession session) {
             return (byte?)(dynamic?)await GetAttribute(session, 2, true) ?? 0;
@@ -289,17 +292,17 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Percent Current attribute
+        /// Get the Percent Current [%] attribute
         /// </summary>
         public async Task<byte> GetPercentCurrent(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 3))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 3) ?? 0;
         }
 
         /// <summary>
         /// Get the Speed Max attribute
         /// </summary>
         public async Task<byte> GetSpeedMax(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 4))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 1;
         }
 
         /// <summary>
@@ -320,69 +323,69 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Speed Current attribute
         /// </summary>
         public async Task<byte> GetSpeedCurrent(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 6))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 6) ?? 0;
         }
 
         /// <summary>
         /// Get the Rock Support attribute
         /// </summary>
-        public async Task<RockBitmap> GetRockSupport(SecureSession session) {
-            return (RockBitmap)await GetEnumAttribute(session, 7);
+        public async Task<Rock> GetRockSupport(SecureSession session) {
+            return (Rock)await GetEnumAttribute(session, 7);
         }
 
         /// <summary>
         /// Get the Rock Setting attribute
         /// </summary>
-        public async Task<RockBitmap> GetRockSetting(SecureSession session) {
-            return (RockBitmap)await GetEnumAttribute(session, 8);
+        public async Task<Rock> GetRockSetting(SecureSession session) {
+            return (Rock)await GetEnumAttribute(session, 8);
         }
 
         /// <summary>
         /// Set the Rock Setting attribute
         /// </summary>
-        public async Task SetRockSetting (SecureSession session, RockBitmap value) {
+        public async Task SetRockSetting (SecureSession session, Rock value) {
             await SetAttribute(session, 8, value);
         }
 
         /// <summary>
         /// Get the Wind Support attribute
         /// </summary>
-        public async Task<WindBitmap> GetWindSupport(SecureSession session) {
-            return (WindBitmap)await GetEnumAttribute(session, 9);
+        public async Task<Wind> GetWindSupport(SecureSession session) {
+            return (Wind)await GetEnumAttribute(session, 9);
         }
 
         /// <summary>
         /// Get the Wind Setting attribute
         /// </summary>
-        public async Task<WindBitmap> GetWindSetting(SecureSession session) {
-            return (WindBitmap)await GetEnumAttribute(session, 10);
+        public async Task<Wind> GetWindSetting(SecureSession session) {
+            return (Wind)await GetEnumAttribute(session, 10);
         }
 
         /// <summary>
         /// Set the Wind Setting attribute
         /// </summary>
-        public async Task SetWindSetting (SecureSession session, WindBitmap value) {
+        public async Task SetWindSetting (SecureSession session, Wind value) {
             await SetAttribute(session, 10, value);
         }
 
         /// <summary>
         /// Get the Airflow Direction attribute
         /// </summary>
-        public async Task<AirflowDirectionEnum> GetAirflowDirection(SecureSession session) {
-            return (AirflowDirectionEnum)await GetEnumAttribute(session, 11);
+        public async Task<AirflowDirection> GetAirflowDirection(SecureSession session) {
+            return (AirflowDirection)await GetEnumAttribute(session, 11);
         }
 
         /// <summary>
         /// Set the Airflow Direction attribute
         /// </summary>
-        public async Task SetAirflowDirection (SecureSession session, AirflowDirectionEnum value) {
+        public async Task SetAirflowDirection (SecureSession session, AirflowDirection value) {
             await SetAttribute(session, 11, value);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Fan Control Cluster";
+            return "Fan Control";
         }
     }
 }

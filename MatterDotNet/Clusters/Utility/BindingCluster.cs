@@ -17,22 +17,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Binding Cluster
+    /// The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class BindingCluster : ClusterBase
+    public class Binding : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x001E;
+        internal const uint CLUSTER_ID = 0x001e;
 
         /// <summary>
-        /// Binding Cluster
+        /// The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
         /// </summary>
-        public BindingCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Binding(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BindingCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Binding(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Records
         /// <summary>
@@ -50,20 +50,23 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public Target(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Node = reader.GetULong(1)!.Value;
-                Group = reader.GetUShort(2)!.Value;
-                Endpoint = reader.GetUShort(3)!.Value;
+                Node = reader.GetULong(1, true);
+                Group = reader.GetUShort(2, true);
+                Endpoint = reader.GetUShort(3, true);
                 Cluster = reader.GetUInt(4, true);
             }
-            public required ulong Node { get; set; }
-            public required ushort Group { get; set; }
-            public required ushort Endpoint { get; set; }
+            public ulong? Node { get; set; }
+            public ushort? Group { get; set; }
+            public ushort? Endpoint { get; set; }
             public uint? Cluster { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteULong(1, Node);
-                writer.WriteUShort(2, Group, ushort.MaxValue, 1);
-                writer.WriteUShort(3, Endpoint);
+                if (Node != null)
+                    writer.WriteULong(1, Node);
+                if (Group != null)
+                    writer.WriteUShort(2, Group);
+                if (Endpoint != null)
+                    writer.WriteUShort(3, Endpoint);
                 if (Cluster != null)
                     writer.WriteUInt(4, Cluster);
                 writer.EndContainer();
@@ -93,7 +96,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Binding Cluster";
+            return "Binding";
         }
     }
 }

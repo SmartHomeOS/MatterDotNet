@@ -12,29 +12,28 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Electrical Power Measurement Cluster
+    /// This cluster provides a mechanism for querying data about electrical power as measured by the server.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ElectricalPowerMeasurementCluster : ClusterBase
+    public class ElectricalPowerMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0090;
 
         /// <summary>
-        /// Electrical Power Measurement Cluster
+        /// This cluster provides a mechanism for querying data about electrical power as measured by the server.
         /// </summary>
-        public ElectricalPowerMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ElectricalPowerMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ElectricalPowerMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ElectricalPowerMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -67,20 +66,86 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Power Mode
         /// </summary>
-        public enum PowerModeEnum {
-            Unknown = 0,
+        public enum PowerMode : byte {
+            /// <summary>
+            /// 
+            /// </summary>
+            Unknown = 0x00,
             /// <summary>
             /// Direct current
             /// </summary>
-            DC = 1,
+            DC = 0x01,
             /// <summary>
             /// Alternating current, either single-phase or polyphase
             /// </summary>
-            AC = 2,
+            AC = 0x02,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Measurement Range
+        /// </summary>
+        public record MeasurementRange : TLVPayload {
+            /// <summary>
+            /// Measurement Range
+            /// </summary>
+            public MeasurementRange() { }
+
+            /// <summary>
+            /// Measurement Range
+            /// </summary>
+            [SetsRequiredMembers]
+            public MeasurementRange(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                MeasurementType = (MeasurementType)reader.GetUShort(0)!.Value;
+                Min = reader.GetLong(1)!.Value;
+                Max = reader.GetLong(2)!.Value;
+                StartTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(3, true));
+                EndTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(4, true));
+                MinTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(5, true));
+                MaxTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(6, true));
+                StartSystime = TimeUtil.FromMillis(reader.GetULong(7, true));
+                EndSystime = TimeUtil.FromMillis(reader.GetULong(8, true));
+                MinSystime = TimeUtil.FromMillis(reader.GetULong(9, true));
+                MaxSystime = TimeUtil.FromMillis(reader.GetULong(10, true));
+            }
+            public required MeasurementType MeasurementType { get; set; }
+            public required long Min { get; set; }
+            public required long Max { get; set; }
+            public DateTime? StartTimestamp { get; set; }
+            public DateTime? EndTimestamp { get; set; }
+            public DateTime? MinTimestamp { get; set; }
+            public DateTime? MaxTimestamp { get; set; }
+            public TimeSpan? StartSystime { get; set; }
+            public TimeSpan? EndSystime { get; set; }
+            public TimeSpan? MinSystime { get; set; }
+            public TimeSpan? MaxSystime { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)MeasurementType);
+                writer.WriteLong(1, Min, 4611686018427387904, -4611686018427387904);
+                writer.WriteLong(2, Max, 4611686018427387904, -4611686018427387904);
+                if (StartTimestamp != null)
+                    writer.WriteUInt(3, TimeUtil.ToEpochSeconds(StartTimestamp!.Value));
+                if (EndTimestamp != null)
+                    writer.WriteUInt(4, TimeUtil.ToEpochSeconds(EndTimestamp!.Value));
+                if (MinTimestamp != null)
+                    writer.WriteUInt(5, TimeUtil.ToEpochSeconds(MinTimestamp!.Value));
+                if (MaxTimestamp != null)
+                    writer.WriteUInt(6, TimeUtil.ToEpochSeconds(MaxTimestamp!.Value));
+                if (StartSystime != null)
+                    writer.WriteULong(7, (ulong)StartSystime!.Value.TotalMilliseconds);
+                if (EndSystime != null)
+                    writer.WriteULong(8, (ulong)EndSystime!.Value.TotalMilliseconds);
+                if (MinSystime != null)
+                    writer.WriteULong(9, (ulong)MinSystime!.Value.TotalMilliseconds);
+                if (MaxSystime != null)
+                    writer.WriteULong(10, (ulong)MaxSystime!.Value.TotalMilliseconds);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Harmonic Measurement
         /// </summary>
@@ -100,68 +165,11 @@ namespace MatterDotNet.Clusters.Application
                 Measurement = reader.GetLong(1, true);
             }
             public required byte Order { get; set; } = 1;
-            public required long? Measurement { get; set; } = null;
+            public required long? Measurement { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Order, byte.MaxValue, 1);
-                writer.WriteLong(1, Measurement, 2, -2);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Measurement Range
-        /// </summary>
-        public record MeasurementRange : TLVPayload {
-            /// <summary>
-            /// Measurement Range
-            /// </summary>
-            public MeasurementRange() { }
-
-            /// <summary>
-            /// Measurement Range
-            /// </summary>
-            [SetsRequiredMembers]
-            public MeasurementRange(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                MeasurementType = (MeasurementType)reader.GetUShort(0)!.Value;
-                Min = reader.GetLong(1)!.Value;
-                Max = reader.GetLong(2)!.Value;
-                StartTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(3))!.Value;
-                EndTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(4, true));
-                MinTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(5))!.Value;
-                MaxTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(6))!.Value;
-                StartSystime = TimeUtil.FromMillis(reader.GetULong(7))!.Value;
-                EndSystime = TimeUtil.FromMillis(reader.GetULong(8, true));
-                MinSystime = TimeUtil.FromMillis(reader.GetULong(9))!.Value;
-                MaxSystime = TimeUtil.FromMillis(reader.GetULong(10))!.Value;
-            }
-            public required MeasurementType MeasurementType { get; set; }
-            public required long Min { get; set; }
-            public required long Max { get; set; }
-            public required DateTime StartTimestamp { get; set; }
-            public DateTime? EndTimestamp { get; set; }
-            public required DateTime MinTimestamp { get; set; }
-            public required DateTime MaxTimestamp { get; set; }
-            public required TimeSpan StartSystime { get; set; }
-            public TimeSpan? EndSystime { get; set; }
-            public required TimeSpan MinSystime { get; set; }
-            public required TimeSpan MaxSystime { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)MeasurementType);
-                writer.WriteLong(1, Min, 2, -2);
-                writer.WriteLong(2, Max, 2, -2);
-                writer.WriteUInt(3, TimeUtil.ToEpochSeconds(StartTimestamp));
-                if (EndTimestamp != null)
-                    writer.WriteUInt(4, TimeUtil.ToEpochSeconds(EndTimestamp!.Value));
-                writer.WriteUInt(5, TimeUtil.ToEpochSeconds(MinTimestamp));
-                writer.WriteUInt(6, TimeUtil.ToEpochSeconds(MaxTimestamp));
-                writer.WriteULong(7, (ulong)StartSystime.TotalMilliseconds);
-                if (EndSystime != null)
-                    writer.WriteULong(8, (ulong)EndSystime!.Value.TotalMilliseconds);
-                writer.WriteULong(9, (ulong)MinSystime.TotalMilliseconds);
-                writer.WriteULong(10, (ulong)MaxSystime.TotalMilliseconds);
+                writer.WriteLong(1, Measurement, 4611686018427387904, -4611686018427387904);
                 writer.EndContainer();
             }
         }
@@ -192,8 +200,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Power Mode attribute
         /// </summary>
-        public async Task<PowerModeEnum> GetPowerMode(SecureSession session) {
-            return (PowerModeEnum)await GetEnumAttribute(session, 0);
+        public async Task<PowerMode> GetPowerMode(SecureSession session) {
+            return (PowerMode)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
@@ -226,80 +234,80 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Voltage attribute
+        /// Get the Voltage [mV] attribute
         /// </summary>
         public async Task<long?> GetVoltage(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
-        /// Get the Active Current attribute
+        /// Get the Active Current [mA] attribute
         /// </summary>
         public async Task<long?> GetActiveCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 5, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 5, true);
         }
 
         /// <summary>
-        /// Get the Reactive Current attribute
+        /// Get the Reactive Current [mA] attribute
         /// </summary>
         public async Task<long?> GetReactiveCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 6, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 6, true);
         }
 
         /// <summary>
-        /// Get the Apparent Current attribute
+        /// Get the Apparent Current [mA] attribute
         /// </summary>
         public async Task<long?> GetApparentCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 7, true);
         }
 
         /// <summary>
-        /// Get the Active Power attribute
+        /// Get the Active Power [mW] attribute
         /// </summary>
         public async Task<long?> GetActivePower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 8, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 8, true);
         }
 
         /// <summary>
-        /// Get the Reactive Power attribute
+        /// Get the Reactive Power [mW] attribute
         /// </summary>
         public async Task<long?> GetReactivePower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 9, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 9, true);
         }
 
         /// <summary>
-        /// Get the Apparent Power attribute
+        /// Get the Apparent Power [mW] attribute
         /// </summary>
         public async Task<long?> GetApparentPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 10, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 10, true);
         }
 
         /// <summary>
-        /// Get the RMS Voltage attribute
+        /// Get the RMS Voltage [mV] attribute
         /// </summary>
         public async Task<long?> GetRMSVoltage(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 11, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 11, true);
         }
 
         /// <summary>
-        /// Get the RMS Current attribute
+        /// Get the RMS Current [mA] attribute
         /// </summary>
         public async Task<long?> GetRMSCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 12, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 12, true);
         }
 
         /// <summary>
-        /// Get the RMS Power attribute
+        /// Get the RMS Power [mW] attribute
         /// </summary>
         public async Task<long?> GetRMSPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 13, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 13, true);
         }
 
         /// <summary>
         /// Get the Frequency attribute
         /// </summary>
         public async Task<long?> GetFrequency(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 14, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 14, true);
         }
 
         /// <summary>
@@ -328,20 +336,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Power Factor attribute
         /// </summary>
         public async Task<long?> GetPowerFactor(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 17, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 17, true);
         }
 
         /// <summary>
-        /// Get the Neutral Current attribute
+        /// Get the Neutral Current [mA] attribute
         /// </summary>
         public async Task<long?> GetNeutralCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 18, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 18, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Electrical Power Measurement Cluster";
+            return "Electrical Power Measurement";
         }
     }
 }

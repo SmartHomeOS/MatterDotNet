@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// Laundry Washer Controls Cluster
+    /// This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class LaundryWasherControlsCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class LaundryWasherControls : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0053;
 
         /// <summary>
-        /// Laundry Washer Controls Cluster
+        /// This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.
         /// </summary>
-        public LaundryWasherControlsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public LaundryWasherControls(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LaundryWasherControlsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected LaundryWasherControls(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -51,23 +51,23 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Number Of Rinses
         /// </summary>
-        public enum NumberOfRinsesEnum {
+        public enum NumberOfRinses : byte {
             /// <summary>
             /// This laundry washer mode does not perform rinse cycles
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// This laundry washer mode performs normal rinse cycles determined by the manufacturer
             /// </summary>
-            Normal = 1,
+            Normal = 0x1,
             /// <summary>
             /// This laundry washer mode performs an extra rinse cycle
             /// </summary>
-            Extra = 2,
+            Extra = 0x2,
             /// <summary>
             /// This laundry washer mode performs the maximum number of rinse cycles determined by the manufacturer
             /// </summary>
-            Max = 3,
+            Max = 0x3,
         }
         #endregion Enums
 
@@ -121,32 +121,32 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Number Of Rinses attribute
         /// </summary>
-        public async Task<NumberOfRinsesEnum> GetNumberOfRinses(SecureSession session) {
-            return (NumberOfRinsesEnum)await GetEnumAttribute(session, 2);
+        public async Task<NumberOfRinses> GetNumberOfRinses(SecureSession session) {
+            return (NumberOfRinses)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Set the Number Of Rinses attribute
         /// </summary>
-        public async Task SetNumberOfRinses (SecureSession session, NumberOfRinsesEnum value) {
+        public async Task SetNumberOfRinses (SecureSession session, NumberOfRinses value) {
             await SetAttribute(session, 2, value);
         }
 
         /// <summary>
         /// Get the Supported Rinses attribute
         /// </summary>
-        public async Task<NumberOfRinsesEnum[]> GetSupportedRinses(SecureSession session) {
+        public async Task<NumberOfRinses[]> GetSupportedRinses(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            NumberOfRinsesEnum[] list = new NumberOfRinsesEnum[reader.Count];
+            NumberOfRinses[] list = new NumberOfRinses[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (NumberOfRinsesEnum)reader.GetUShort(i)!.Value;
+                list[i] = (NumberOfRinses)reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Laundry Washer Controls Cluster";
+            return "Laundry Washer Controls";
         }
     }
 }

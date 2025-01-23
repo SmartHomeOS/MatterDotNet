@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Time Format Localization Cluster
+    /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for how dates and times are conveyed. As such, Nodes that visually or audibly convey time information need a mechanism by which they can be configured to use a user’s preferred format.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class TimeFormatLocalizationCluster : ClusterBase
+    public class TimeFormatLocalization : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x002C;
+        internal const uint CLUSTER_ID = 0x002c;
 
         /// <summary>
-        /// Time Format Localization Cluster
+        /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for how dates and times are conveyed. As such, Nodes that visually or audibly convey time information need a mechanism by which they can be configured to use a user’s preferred format.
         /// </summary>
-        public TimeFormatLocalizationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public TimeFormatLocalization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TimeFormatLocalizationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected TimeFormatLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -45,79 +45,79 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Calendar Type
-        /// </summary>
-        public enum CalendarTypeEnum {
-            /// <summary>
-            /// Dates conveyed using the Buddhist calendar
-            /// </summary>
-            Buddhist = 0,
-            /// <summary>
-            /// Dates conveyed using the Chinese calendar
-            /// </summary>
-            Chinese = 1,
-            /// <summary>
-            /// Dates conveyed using the Coptic calendar
-            /// </summary>
-            Coptic = 2,
-            /// <summary>
-            /// Dates conveyed using the Ethiopian calendar
-            /// </summary>
-            Ethiopian = 3,
-            /// <summary>
-            /// Dates conveyed using the Gregorian calendar
-            /// </summary>
-            Gregorian = 4,
-            /// <summary>
-            /// Dates conveyed using the Hebrew calendar
-            /// </summary>
-            Hebrew = 5,
-            /// <summary>
-            /// Dates conveyed using the Indian calendar
-            /// </summary>
-            Indian = 6,
-            /// <summary>
-            /// Dates conveyed using the Islamic calendar
-            /// </summary>
-            Islamic = 7,
-            /// <summary>
-            /// Dates conveyed using the Japanese calendar
-            /// </summary>
-            Japanese = 8,
-            /// <summary>
-            /// Dates conveyed using the Korean calendar
-            /// </summary>
-            Korean = 9,
-            /// <summary>
-            /// Dates conveyed using the Persian calendar
-            /// </summary>
-            Persian = 10,
-            /// <summary>
-            /// Dates conveyed using the Taiwanese calendar
-            /// </summary>
-            Taiwanese = 11,
-            /// <summary>
-            /// calendar implied from active locale
-            /// </summary>
-            UseActiveLocale = 255,
-        }
-
-        /// <summary>
         /// Hour Format
         /// </summary>
-        public enum HourFormatEnum {
+        public enum HourFormat : byte {
             /// <summary>
             /// Time conveyed with a 12-hour clock
             /// </summary>
-            _12hr = 0,
+            _12hr = 0x00,
             /// <summary>
             /// Time conveyed with a 24-hour clock
             /// </summary>
-            _24hr = 1,
+            _24hr = 0x01,
             /// <summary>
             /// Use active locale clock
             /// </summary>
-            UseActiveLocale = 255,
+            UseActiveLocale = 0xFF,
+        }
+
+        /// <summary>
+        /// Calendar Type
+        /// </summary>
+        public enum CalendarType : byte {
+            /// <summary>
+            /// Dates conveyed using the Buddhist calendar
+            /// </summary>
+            Buddhist = 0x00,
+            /// <summary>
+            /// Dates conveyed using the Chinese calendar
+            /// </summary>
+            Chinese = 0x01,
+            /// <summary>
+            /// Dates conveyed using the Coptic calendar
+            /// </summary>
+            Coptic = 0x02,
+            /// <summary>
+            /// Dates conveyed using the Ethiopian calendar
+            /// </summary>
+            Ethiopian = 0x03,
+            /// <summary>
+            /// Dates conveyed using the Gregorian calendar
+            /// </summary>
+            Gregorian = 0x04,
+            /// <summary>
+            /// Dates conveyed using the Hebrew calendar
+            /// </summary>
+            Hebrew = 0x05,
+            /// <summary>
+            /// Dates conveyed using the Indian calendar
+            /// </summary>
+            Indian = 0x06,
+            /// <summary>
+            /// Dates conveyed using the Islamic calendar
+            /// </summary>
+            Islamic = 0x07,
+            /// <summary>
+            /// Dates conveyed using the Japanese calendar
+            /// </summary>
+            Japanese = 0x08,
+            /// <summary>
+            /// Dates conveyed using the Korean calendar
+            /// </summary>
+            Korean = 0x09,
+            /// <summary>
+            /// Dates conveyed using the Persian calendar
+            /// </summary>
+            Persian = 0x0A,
+            /// <summary>
+            /// Dates conveyed using the Taiwanese calendar
+            /// </summary>
+            Taiwanese = 0x0B,
+            /// <summary>
+            /// calendar implied from active locale
+            /// </summary>
+            UseActiveLocale = 0xFF,
         }
         #endregion Enums
 
@@ -146,46 +146,46 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Hour Format attribute
         /// </summary>
-        public async Task<HourFormatEnum> GetHourFormat(SecureSession session) {
-            return (HourFormatEnum)await GetEnumAttribute(session, 0);
+        public async Task<HourFormat> GetHourFormat(SecureSession session) {
+            return (HourFormat)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Set the Hour Format attribute
         /// </summary>
-        public async Task SetHourFormat (SecureSession session, HourFormatEnum value) {
+        public async Task SetHourFormat (SecureSession session, HourFormat value) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Active Calendar Type attribute
         /// </summary>
-        public async Task<CalendarTypeEnum> GetActiveCalendarType(SecureSession session) {
-            return (CalendarTypeEnum)await GetEnumAttribute(session, 1);
+        public async Task<CalendarType> GetActiveCalendarType(SecureSession session) {
+            return (CalendarType)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Set the Active Calendar Type attribute
         /// </summary>
-        public async Task SetActiveCalendarType (SecureSession session, CalendarTypeEnum value) {
+        public async Task SetActiveCalendarType (SecureSession session, CalendarType value) {
             await SetAttribute(session, 1, value);
         }
 
         /// <summary>
         /// Get the Supported Calendar Types attribute
         /// </summary>
-        public async Task<CalendarTypeEnum[]> GetSupportedCalendarTypes(SecureSession session) {
+        public async Task<CalendarType[]> GetSupportedCalendarTypes(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            CalendarTypeEnum[] list = new CalendarTypeEnum[reader.Count];
+            CalendarType[] list = new CalendarType[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (CalendarTypeEnum)reader.GetUShort(i)!.Value;
+                list[i] = (CalendarType)reader.GetUShort(i)!.Value;
             return list;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Time Format Localization Cluster";
+            return "Time Format Localization";
         }
     }
 }

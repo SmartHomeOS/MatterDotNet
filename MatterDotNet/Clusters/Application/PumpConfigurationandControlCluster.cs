@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.HVAC
 {
     /// <summary>
-    /// Pump Configuration and Control Cluster
+    /// An interface for configuring and controlling pumps.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 4)]
-    public class PumpConfigurationandControlCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 3)]
+    public class PumpConfigurationandControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0200;
 
         /// <summary>
-        /// Pump Configuration and Control Cluster
+        /// An interface for configuring and controlling pumps.
         /// </summary>
-        public PumpConfigurationandControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public PumpConfigurationandControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PumpConfigurationandControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected PumpConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -69,62 +69,62 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Control Mode
-        /// </summary>
-        public enum ControlModeEnum {
-            /// <summary>
-            /// The pump is running at a constant speed.
-            /// </summary>
-            ConstantSpeed = 0,
-            /// <summary>
-            /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
-            /// </summary>
-            ConstantPressure = 1,
-            /// <summary>
-            /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
-            /// </summary>
-            ProportionalPressure = 2,
-            /// <summary>
-            /// The pump will regulate its speed to maintain a constant flow through the pump.
-            /// </summary>
-            ConstantFlow = 3,
-            /// <summary>
-            /// The pump will regulate its speed to maintain a constant temperature.
-            /// </summary>
-            ConstantTemperature = 5,
-            /// <summary>
-            /// The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.
-            /// </summary>
-            Automatic = 7,
-        }
-
-        /// <summary>
         /// Operation Mode
         /// </summary>
-        public enum OperationModeEnum {
+        public enum OperationMode : byte {
             /// <summary>
             /// The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.
             /// </summary>
-            Normal = 0,
+            Normal = 0x0,
             /// <summary>
             /// This value sets the pump to run at the minimum possible speed it can without being stopped.
             /// </summary>
-            Minimum = 1,
+            Minimum = 0x1,
             /// <summary>
             /// This value sets the pump to run at its maximum possible speed.
             /// </summary>
-            Maximum = 2,
+            Maximum = 0x2,
             /// <summary>
             /// This value sets the pump to run with the local settings of the pump, regardless of what these are.
             /// </summary>
-            Local = 3,
+            Local = 0x3,
         }
 
         /// <summary>
-        /// Pump Status Bitmap
+        /// Control Mode
+        /// </summary>
+        public enum ControlMode : byte {
+            /// <summary>
+            /// The pump is running at a constant speed.
+            /// </summary>
+            ConstantSpeed = 0x0,
+            /// <summary>
+            /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
+            /// </summary>
+            ConstantPressure = 0x1,
+            /// <summary>
+            /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
+            /// </summary>
+            ProportionalPressure = 0x2,
+            /// <summary>
+            /// The pump will regulate its speed to maintain a constant flow through the pump.
+            /// </summary>
+            ConstantFlow = 0x3,
+            /// <summary>
+            /// The pump will regulate its speed to maintain a constant temperature.
+            /// </summary>
+            ConstantTemperature = 0x5,
+            /// <summary>
+            /// The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.
+            /// </summary>
+            Automatic = 0x7,
+        }
+
+        /// <summary>
+        /// Pump Status
         /// </summary>
         [Flags]
-        public enum PumpStatusBitmap {
+        public enum PumpStatus : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -132,39 +132,36 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// A fault related to the system or pump device is detected.
             /// </summary>
-            DeviceFault = 1,
+            DeviceFault = 0x1,
             /// <summary>
             /// A fault related to the supply to the pump is detected.
             /// </summary>
-            SupplyFault = 2,
+            SupplyFault = 0x2,
             /// <summary>
             /// Setpoint is too low to achieve.
             /// </summary>
-            SpeedLow = 4,
+            SpeedLow = 0x4,
             /// <summary>
             /// Setpoint is too high to achieve.
             /// </summary>
-            SpeedHigh = 8,
+            SpeedHigh = 0x8,
             /// <summary>
             /// Device control is overridden by hardware, such as an external STOP button or via a local HMI.
             /// </summary>
-            LocalOverride = 16,
+            LocalOverride = 0x10,
             /// <summary>
             /// Pump is currently running
             /// </summary>
-            Running = 32,
+            Running = 0x20,
             /// <summary>
             /// A remote pressure sensor is used as the sensor for the regulation of the pump.
             /// </summary>
-            RemotePressure = 64,
+            RemotePressure = 0x40,
             /// <summary>
             /// A remote flow sensor is used as the sensor for the regulation of the pump.
             /// </summary>
-            RemoteFlow = 128,
-            /// <summary>
-            /// A remote temperature sensor is used as the sensor for the regulation of the pump.
-            /// </summary>
-            RemoteTemperature = 256,
+            RemoteFlow = 0x80,
+            RemoteTemperature = 0x100,
         }
         #endregion Enums
 
@@ -194,139 +191,139 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Max Pressure attribute
         /// </summary>
         public async Task<short?> GetMaxPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Max Speed attribute
         /// </summary>
         public async Task<ushort?> GetMaxSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Get the Max Flow attribute
         /// </summary>
         public async Task<ushort?> GetMaxFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
         }
 
         /// <summary>
         /// Get the Min Const Pressure attribute
         /// </summary>
         public async Task<short?> GetMinConstPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
         /// Get the Max Const Pressure attribute
         /// </summary>
         public async Task<short?> GetMaxConstPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
         /// Get the Min Comp Pressure attribute
         /// </summary>
         public async Task<short?> GetMinCompPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 5, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 5, true);
         }
 
         /// <summary>
         /// Get the Max Comp Pressure attribute
         /// </summary>
         public async Task<short?> GetMaxCompPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 6, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 6, true);
         }
 
         /// <summary>
         /// Get the Min Const Speed attribute
         /// </summary>
         public async Task<ushort?> GetMinConstSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 7, true);
         }
 
         /// <summary>
         /// Get the Max Const Speed attribute
         /// </summary>
         public async Task<ushort?> GetMaxConstSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 8, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 8, true);
         }
 
         /// <summary>
         /// Get the Min Const Flow attribute
         /// </summary>
         public async Task<ushort?> GetMinConstFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 9, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 9, true);
         }
 
         /// <summary>
         /// Get the Max Const Flow attribute
         /// </summary>
         public async Task<ushort?> GetMaxConstFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 10, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 10, true);
         }
 
         /// <summary>
         /// Get the Min Const Temp attribute
         /// </summary>
         public async Task<short?> GetMinConstTemp(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 11, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 11, true);
         }
 
         /// <summary>
         /// Get the Max Const Temp attribute
         /// </summary>
         public async Task<short?> GetMaxConstTemp(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 12, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 12, true);
         }
 
         /// <summary>
         /// Get the Pump Status attribute
         /// </summary>
-        public async Task<PumpStatusBitmap> GetPumpStatus(SecureSession session) {
-            return (PumpStatusBitmap)await GetEnumAttribute(session, 16);
+        public async Task<PumpStatus> GetPumpStatus(SecureSession session) {
+            return (PumpStatus)await GetEnumAttribute(session, 16);
         }
 
         /// <summary>
         /// Get the Effective Operation Mode attribute
         /// </summary>
-        public async Task<OperationModeEnum> GetEffectiveOperationMode(SecureSession session) {
-            return (OperationModeEnum)await GetEnumAttribute(session, 17);
+        public async Task<OperationMode> GetEffectiveOperationMode(SecureSession session) {
+            return (OperationMode)await GetEnumAttribute(session, 17);
         }
 
         /// <summary>
         /// Get the Effective Control Mode attribute
         /// </summary>
-        public async Task<ControlModeEnum> GetEffectiveControlMode(SecureSession session) {
-            return (ControlModeEnum)await GetEnumAttribute(session, 18);
+        public async Task<ControlMode> GetEffectiveControlMode(SecureSession session) {
+            return (ControlMode)await GetEnumAttribute(session, 18);
         }
 
         /// <summary>
         /// Get the Capacity attribute
         /// </summary>
         public async Task<short?> GetCapacity(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 19, true) ?? null;
+            return (short?)(dynamic?)await GetAttribute(session, 19, true);
         }
 
         /// <summary>
         /// Get the Speed attribute
         /// </summary>
         public async Task<ushort?> GetSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 20, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 20, true);
         }
 
         /// <summary>
         /// Get the Lifetime Running Hours attribute
         /// </summary>
         public async Task<uint?> GetLifetimeRunningHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 21, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 21, true) ?? 0x000000;
         }
 
         /// <summary>
         /// Set the Lifetime Running Hours attribute
         /// </summary>
-        public async Task SetLifetimeRunningHours (SecureSession session, uint? value = 0) {
+        public async Task SetLifetimeRunningHours (SecureSession session, uint? value = 0x000000) {
             await SetAttribute(session, 21, value, true);
         }
 
@@ -334,55 +331,55 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Power attribute
         /// </summary>
         public async Task<uint?> GetPower(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 22, true) ?? null;
+            return (uint?)(dynamic?)await GetAttribute(session, 22, true);
         }
 
         /// <summary>
         /// Get the Lifetime Energy Consumed attribute
         /// </summary>
         public async Task<uint?> GetLifetimeEnergyConsumed(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 23, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 23, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Set the Lifetime Energy Consumed attribute
         /// </summary>
-        public async Task SetLifetimeEnergyConsumed (SecureSession session, uint? value = 0) {
+        public async Task SetLifetimeEnergyConsumed (SecureSession session, uint? value = 0x00000000) {
             await SetAttribute(session, 23, value, true);
         }
 
         /// <summary>
         /// Get the Operation Mode attribute
         /// </summary>
-        public async Task<OperationModeEnum> GetOperationMode(SecureSession session) {
-            return (OperationModeEnum)await GetEnumAttribute(session, 32);
+        public async Task<OperationMode> GetOperationMode(SecureSession session) {
+            return (OperationMode)await GetEnumAttribute(session, 32);
         }
 
         /// <summary>
         /// Set the Operation Mode attribute
         /// </summary>
-        public async Task SetOperationMode (SecureSession session, OperationModeEnum value) {
+        public async Task SetOperationMode (SecureSession session, OperationMode value) {
             await SetAttribute(session, 32, value);
         }
 
         /// <summary>
         /// Get the Control Mode attribute
         /// </summary>
-        public async Task<ControlModeEnum> GetControlMode(SecureSession session) {
-            return (ControlModeEnum)await GetEnumAttribute(session, 33);
+        public async Task<ControlMode> GetControlMode(SecureSession session) {
+            return (ControlMode)await GetEnumAttribute(session, 33);
         }
 
         /// <summary>
         /// Set the Control Mode attribute
         /// </summary>
-        public async Task SetControlMode (SecureSession session, ControlModeEnum value) {
+        public async Task SetControlMode (SecureSession session, ControlMode value) {
             await SetAttribute(session, 33, value);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Pump Configuration and Control Cluster";
+            return "Pump Configuration and Control";
         }
     }
 }

@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Groups Cluster
+    /// Attributes and commands for group configuration and manipulation.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 4)]
-    public class GroupsCluster : ClusterBase
+    public class Groups : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0004;
 
         /// <summary>
-        /// Groups Cluster
+        /// Attributes and commands for group configuration and manipulation.
         /// </summary>
-        public GroupsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Groups(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GroupsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Groups(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -49,10 +49,10 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Name Support Bitmap
+        /// Name Support
         /// </summary>
         [Flags]
-        public enum NameSupportBitmap {
+        public enum NameSupport : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -60,7 +60,7 @@ namespace MatterDotNet.Clusters.Utility
             /// <summary>
             /// The ability to store a name for a group.
             /// </summary>
-            GroupNames = 128,
+            GroupNames = 0x80,
         }
         #endregion Enums
 
@@ -70,36 +70,19 @@ namespace MatterDotNet.Clusters.Utility
             public required string GroupName { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, GroupID, ushort.MaxValue, 1);
+                writer.WriteUShort(0, GroupID);
                 writer.WriteString(1, GroupName, 16);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// Add Group Response - Reply from server
-        /// </summary>
-        public struct AddGroupResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
         }
 
         private record ViewGroupPayload : TLVPayload {
             public required ushort GroupID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, GroupID, ushort.MaxValue, 1);
+                writer.WriteUShort(0, GroupID);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// View Group Response - Reply from server
-        /// </summary>
-        public struct ViewGroupResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-            public required string GroupName { get; set; }
         }
 
         private record GetGroupMembershipPayload : TLVPayload {
@@ -117,21 +100,49 @@ namespace MatterDotNet.Clusters.Utility
             }
         }
 
+        private record RemoveGroupPayload : TLVPayload {
+            public required ushort GroupID { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, GroupID);
+                writer.EndContainer();
+            }
+        }
+
+        private record AddGroupIfIdentifyingPayload : TLVPayload {
+            public required ushort GroupID { get; set; }
+            public required string GroupName { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, GroupID);
+                writer.WriteString(1, GroupName, 16);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Add Group Response - Reply from server
+        /// </summary>
+        public struct AddGroupResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+        }
+
+        /// <summary>
+        /// View Group Response - Reply from server
+        /// </summary>
+        public struct ViewGroupResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+            public required string GroupName { get; set; }
+        }
+
         /// <summary>
         /// Get Group Membership Response - Reply from server
         /// </summary>
         public struct GetGroupMembershipResponse() {
             public required byte? Capacity { get; set; }
             public required ushort[] GroupList { get; set; }
-        }
-
-        private record RemoveGroupPayload : TLVPayload {
-            public required ushort GroupID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, GroupID, ushort.MaxValue, 1);
-                writer.EndContainer();
-            }
         }
 
         /// <summary>
@@ -141,27 +152,16 @@ namespace MatterDotNet.Clusters.Utility
             public required IMStatusCode Status { get; set; }
             public required ushort GroupID { get; set; }
         }
-
-        private record AddGroupIfIdentifyingPayload : TLVPayload {
-            public required ushort GroupID { get; set; }
-            public required string GroupName { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, GroupID, ushort.MaxValue, 1);
-                writer.WriteString(1, GroupName, 16);
-                writer.EndContainer();
-            }
-        }
         #endregion Payloads
 
         #region Commands
         /// <summary>
         /// Add Group
         /// </summary>
-        public async Task<AddGroupResponse?> AddGroup(SecureSession session, ushort GroupID, string GroupName) {
+        public async Task<AddGroupResponse?> AddGroup(SecureSession session, ushort groupID, string groupName) {
             AddGroupPayload requestFields = new AddGroupPayload() {
-                GroupID = GroupID,
-                GroupName = GroupName,
+                GroupID = groupID,
+                GroupName = groupName,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
@@ -175,9 +175,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// View Group
         /// </summary>
-        public async Task<ViewGroupResponse?> ViewGroup(SecureSession session, ushort GroupID) {
+        public async Task<ViewGroupResponse?> ViewGroup(SecureSession session, ushort groupID) {
             ViewGroupPayload requestFields = new ViewGroupPayload() {
-                GroupID = GroupID,
+                GroupID = groupID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
@@ -192,9 +192,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get Group Membership
         /// </summary>
-        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, ushort[] GroupList) {
+        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, ushort[] groupList) {
             GetGroupMembershipPayload requestFields = new GetGroupMembershipPayload() {
-                GroupList = GroupList,
+                GroupList = groupList,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
@@ -208,9 +208,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Remove Group
         /// </summary>
-        public async Task<RemoveGroupResponse?> RemoveGroup(SecureSession session, ushort GroupID) {
+        public async Task<RemoveGroupResponse?> RemoveGroup(SecureSession session, ushort groupID) {
             RemoveGroupPayload requestFields = new RemoveGroupPayload() {
-                GroupID = GroupID,
+                GroupID = groupID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
@@ -232,10 +232,10 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Add Group If Identifying
         /// </summary>
-        public async Task<bool> AddGroupIfIdentifying(SecureSession session, ushort GroupID, string GroupName) {
+        public async Task<bool> AddGroupIfIdentifying(SecureSession session, ushort groupID, string groupName) {
             AddGroupIfIdentifyingPayload requestFields = new AddGroupIfIdentifyingPayload() {
-                GroupID = GroupID,
-                GroupName = GroupName,
+                GroupID = groupID,
+                GroupName = groupName,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -267,14 +267,14 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Name Support attribute
         /// </summary>
-        public async Task<NameSupportBitmap> GetNameSupport(SecureSession session) {
-            return (NameSupportBitmap)await GetEnumAttribute(session, 0);
+        public async Task<NameSupport> GetNameSupport(SecureSession session) {
+            return (NameSupport)await GetEnumAttribute(session, 0);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Groups Cluster";
+            return "Groups";
         }
     }
 }

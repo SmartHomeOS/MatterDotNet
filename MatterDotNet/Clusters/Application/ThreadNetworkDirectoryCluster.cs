@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.NetworkInfrastructure
 {
     /// <summary>
-    /// Thread Network Directory Cluster
+    /// Manages the names and credentials of Thread networks visible to the user.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ThreadNetworkDirectoryCluster : ClusterBase
+    public class ThreadNetworkDirectory : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0453;
 
         /// <summary>
-        /// Thread Network Directory Cluster
+        /// Manages the names and credentials of Thread networks visible to the user.
         /// </summary>
-        public ThreadNetworkDirectoryCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ThreadNetworkDirectory(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThreadNetworkDirectoryCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ThreadNetworkDirectory(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Records
         /// <summary>
@@ -52,8 +52,8 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public ThreadNetwork(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                ExtendedPanID = reader.GetBytes(0, false)!;
-                NetworkName = reader.GetString(1, false, 16, 1)!;
+                ExtendedPanID = reader.GetBytes(0, false, 8)!;
+                NetworkName = reader.GetString(1, false, 16)!;
                 Channel = reader.GetUShort(2)!.Value;
                 ActiveTimestamp = reader.GetULong(3)!.Value;
             }
@@ -64,7 +64,7 @@ namespace MatterDotNet.Clusters.Application
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, ExtendedPanID, 8);
-                writer.WriteString(1, NetworkName, 16, 1);
+                writer.WriteString(1, NetworkName, 16);
                 writer.WriteUShort(2, Channel);
                 writer.WriteULong(3, ActiveTimestamp);
                 writer.EndContainer();
@@ -112,9 +112,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add Network
         /// </summary>
-        public async Task<bool> AddNetwork(SecureSession session, ushort commandTimeoutMS, byte[] OperationalDataset) {
+        public async Task<bool> AddNetwork(SecureSession session, ushort commandTimeoutMS, byte[] operationalDataset) {
             AddNetworkPayload requestFields = new AddNetworkPayload() {
-                OperationalDataset = OperationalDataset,
+                OperationalDataset = operationalDataset,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -123,9 +123,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Remove Network
         /// </summary>
-        public async Task<bool> RemoveNetwork(SecureSession session, ushort commandTimeoutMS, byte[] ExtendedPanID) {
+        public async Task<bool> RemoveNetwork(SecureSession session, ushort commandTimeoutMS, byte[] extendedPanID) {
             RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
-                ExtendedPanID = ExtendedPanID,
+                ExtendedPanID = extendedPanID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -134,9 +134,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get Operational Dataset
         /// </summary>
-        public async Task<OperationalDatasetResponse?> GetOperationalDataset(SecureSession session, byte[] ExtendedPanID) {
+        public async Task<OperationalDatasetResponse?> GetOperationalDataset(SecureSession session, byte[] extendedPanID) {
             GetOperationalDatasetPayload requestFields = new GetOperationalDatasetPayload() {
-                ExtendedPanID = ExtendedPanID,
+                ExtendedPanID = extendedPanID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
@@ -152,13 +152,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Preferred Extended Pan ID attribute
         /// </summary>
         public async Task<byte[]?> GetPreferredExtendedPanID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Set the Preferred Extended Pan ID attribute
         /// </summary>
-        public async Task SetPreferredExtendedPanID (SecureSession session, byte[]? value = null) {
+        public async Task SetPreferredExtendedPanID (SecureSession session, byte[]? value) {
             await SetAttribute(session, 0, value, true);
         }
 
@@ -177,13 +177,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Thread Network Table Size attribute
         /// </summary>
         public async Task<byte> GetThreadNetworkTableSize(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 10;
+            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Thread Network Directory Cluster";
+            return "Thread Network Directory";
         }
     }
 }

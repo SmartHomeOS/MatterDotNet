@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Access Control Cluster
+    /// The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class AccessControlCluster : ClusterBase
+    public class AccessControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x001F;
 
         /// <summary>
-        /// Access Control Cluster
+        /// The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances.
         /// </summary>
-        public AccessControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public AccessControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AccessControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected AccessControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -53,91 +53,122 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Access Control Entry Auth Mode
-        /// </summary>
-        public enum AccessControlEntryAuthModeEnum {
-            /// <summary>
-            /// Passcode authenticated session
-            /// </summary>
-            PASE = 1,
-            /// <summary>
-            /// Certificate authenticated session
-            /// </summary>
-            CASE = 2,
-            /// <summary>
-            /// Group authenticated session
-            /// </summary>
-            Group = 3,
-        }
-
-        /// <summary>
         /// Access Control Entry Privilege
         /// </summary>
-        public enum AccessControlEntryPrivilegeEnum {
+        public enum AccessControlEntryPrivilege : byte {
             /// <summary>
             /// Can read and observe all (except Access Control Cluster and as seen by a non-Proxy)
             /// </summary>
-            View = 1,
+            View = 0x01,
             /// <summary>
             /// Can read and observe all (as seen by a Proxy)
             /// </summary>
-            Proxy = 2,
+            ProxyView = 0x02,
             /// <summary>
             /// View privileges, and can perform the primary function of this Node (except Access Control Cluster)
             /// </summary>
-            Operate = 3,
+            Operate = 0x03,
             /// <summary>
             /// Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)
             /// </summary>
-            Manage = 4,
+            Manage = 0x04,
             /// <summary>
             /// Manage privileges, and can observe and modify the Access Control Cluster
             /// </summary>
-            Administer = 5,
+            Administer = 0x05,
+        }
+
+        /// <summary>
+        /// Access Control Entry Auth Mode
+        /// </summary>
+        public enum AccessControlEntryAuthMode : byte {
+            /// <summary>
+            /// Passcode authenticated session
+            /// </summary>
+            PASE = 0x01,
+            /// <summary>
+            /// Certificate authenticated session
+            /// </summary>
+            CASE = 0x02,
+            /// <summary>
+            /// Group authenticated session
+            /// </summary>
+            Group = 0x03,
         }
 
         /// <summary>
         /// Access Restriction Type
         /// </summary>
-        public enum AccessRestrictionTypeEnum {
+        public enum AccessRestrictionType : byte {
             /// <summary>
             /// Clients on this fabric are currently forbidden from reading and writing an attribute
             /// </summary>
-            AttributeAccessForbidden = 0,
+            AttributeAccessForbidden = 0x00,
             /// <summary>
             /// Clients on this fabric are currently forbidden from writing an attribute
             /// </summary>
-            AttributeWriteForbidden = 1,
+            AttributeWriteForbidden = 0x01,
             /// <summary>
             /// Clients on this fabric are currently forbidden from invoking a command
             /// </summary>
-            CommandForbidden = 2,
+            CommandForbidden = 0x02,
             /// <summary>
             /// Clients on this fabric are currently forbidden from reading an event
             /// </summary>
-            EventForbidden = 3,
+            EventForbidden = 0x03,
         }
 
         /// <summary>
         /// Change Type
         /// </summary>
-        public enum ChangeTypeEnum {
+        public enum ChangeType : byte {
             /// <summary>
             /// Entry or extension was changed
             /// </summary>
-            Changed = 0,
+            Changed = 0x00,
             /// <summary>
             /// Entry or extension was added
             /// </summary>
-            Added = 1,
+            Added = 0x01,
             /// <summary>
             /// Entry or extension was removed
             /// </summary>
-            Removed = 2,
+            Removed = 0x02,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Access Control Target
+        /// </summary>
+        public record AccessControlTarget : TLVPayload {
+            /// <summary>
+            /// Access Control Target
+            /// </summary>
+            public AccessControlTarget() { }
+
+            /// <summary>
+            /// Access Control Target
+            /// </summary>
+            [SetsRequiredMembers]
+            public AccessControlTarget(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Cluster = reader.GetUInt(0, true);
+                Endpoint = reader.GetUShort(1, true);
+                DeviceType = (DeviceTypeEnum)reader.GetUInt(2)!.Value;
+            }
+            public required uint? Cluster { get; set; }
+            public required ushort? Endpoint { get; set; }
+            public required DeviceTypeEnum? DeviceType { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUInt(0, Cluster);
+                writer.WriteUShort(1, Endpoint);
+                writer.WriteUInt(2, (uint?)DeviceType);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Access Control Entry
         /// </summary>
@@ -153,23 +184,23 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public AccessControlEntry(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Privilege = (AccessControlEntryPrivilegeEnum)reader.GetUShort(1)!.Value;
-                AuthMode = (AccessControlEntryAuthModeEnum)reader.GetUShort(2)!.Value;
+                Privilege = (AccessControlEntryPrivilege)reader.GetUShort(1)!.Value;
+                AuthMode = (AccessControlEntryAuthMode)reader.GetUShort(2)!.Value;
                 {
-                    Subjects = new ulong[((object[])fields[3]).Length];
-                    for (int i = 0; i < Subjects.Length; i++) {
-                        Subjects[i] = reader.GetULong(-1)!.Value;
+                    Subjects = new ulong[reader.GetStruct(3)!.Length];
+                    for (int n = 0; n < Subjects.Length; n++) {
+                        Subjects[n] = reader.GetULong(n)!.Value;
                     }
                 }
                 {
-                    Targets = new AccessControlTarget[((object[])fields[4]).Length];
-                    for (int i = 0; i < Targets.Length; i++) {
-                        Targets[i] = new AccessControlTarget((object[])fields[-1]);
+                    Targets = new AccessControlTarget[reader.GetStruct(4)!.Length];
+                    for (int n = 0; n < Targets.Length; n++) {
+                        Targets[n] = new AccessControlTarget((object[])((object[])fields[4])[n]);
                     }
                 }
             }
-            public required AccessControlEntryPrivilegeEnum Privilege { get; set; }
-            public required AccessControlEntryAuthModeEnum AuthMode { get; set; }
+            public required AccessControlEntryPrivilege Privilege { get; set; }
+            public required AccessControlEntryAuthMode AuthMode { get; set; }
             public required ulong[]? Subjects { get; set; }
             public required AccessControlTarget[]? Targets { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -215,43 +246,12 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public AccessControlExtension(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Data = reader.GetBytes(1, false)!;
+                Data = reader.GetBytes(1, false, 128)!;
             }
             public required byte[] Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(1, Data, 128);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Access Control Target
-        /// </summary>
-        public record AccessControlTarget : TLVPayload {
-            /// <summary>
-            /// Access Control Target
-            /// </summary>
-            public AccessControlTarget() { }
-
-            /// <summary>
-            /// Access Control Target
-            /// </summary>
-            [SetsRequiredMembers]
-            public AccessControlTarget(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Cluster = reader.GetUInt(0, true);
-                Endpoint = reader.GetUShort(1, true);
-                DeviceType = (DeviceTypeEnum)reader.GetUInt(2)!.Value;
-            }
-            public required uint? Cluster { get; set; }
-            public required ushort? Endpoint { get; set; }
-            public required DeviceTypeEnum? DeviceType { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUInt(0, Cluster);
-                writer.WriteUShort(1, Endpoint);
-                writer.WriteUInt(2, (uint?)DeviceType);
                 writer.EndContainer();
             }
         }
@@ -274,9 +274,9 @@ namespace MatterDotNet.Clusters.Utility
                 Endpoint = reader.GetUShort(0)!.Value;
                 Cluster = reader.GetUInt(1)!.Value;
                 {
-                    Restrictions = new AccessRestriction[((object[])fields[2]).Length];
-                    for (int i = 0; i < Restrictions.Length; i++) {
-                        Restrictions[i] = new AccessRestriction((object[])fields[-1]);
+                    Restrictions = new AccessRestriction[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < Restrictions.Length; n++) {
+                        Restrictions[n] = new AccessRestriction((object[])((object[])fields[2])[n]);
                     }
                 }
             }
@@ -288,7 +288,6 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteUShort(0, Endpoint);
                 writer.WriteUInt(1, Cluster);
                 {
-                    Constrain(Restrictions, 1);
                     writer.StartArray(2);
                     foreach (var item in Restrictions) {
                         item.Serialize(writer, -1);
@@ -314,10 +313,10 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public AccessRestriction(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Type = (AccessRestrictionTypeEnum)reader.GetUShort(0)!.Value;
+                Type = (AccessRestrictionType)reader.GetUShort(0)!.Value;
                 ID = reader.GetUInt(1, true);
             }
-            public required AccessRestrictionTypeEnum Type { get; set; }
+            public required AccessRestrictionType Type { get; set; }
             public required uint? ID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -345,9 +344,9 @@ namespace MatterDotNet.Clusters.Utility
                 Endpoint = reader.GetUShort(0)!.Value;
                 Cluster = reader.GetUInt(1)!.Value;
                 {
-                    Restrictions = new AccessRestriction[((object[])fields[2]).Length];
-                    for (int i = 0; i < Restrictions.Length; i++) {
-                        Restrictions[i] = new AccessRestriction((object[])fields[-1]);
+                    Restrictions = new AccessRestriction[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < Restrictions.Length; n++) {
+                        Restrictions[n] = new AccessRestriction((object[])((object[])fields[2])[n]);
                     }
                 }
             }
@@ -359,7 +358,6 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteUShort(0, Endpoint);
                 writer.WriteUInt(1, Cluster);
                 {
-                    Constrain(Restrictions, 1);
                     writer.StartArray(2);
                     foreach (var item in Restrictions) {
                         item.Serialize(writer, -1);
@@ -399,9 +397,9 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Review Fabric Restrictions
         /// </summary>
-        public async Task<ReviewFabricRestrictionsResponse?> ReviewFabricRestrictions(SecureSession session, CommissioningAccessRestrictionEntry[] ARL) {
+        public async Task<ReviewFabricRestrictionsResponse?> ReviewFabricRestrictions(SecureSession session, CommissioningAccessRestrictionEntry[] aRL) {
             ReviewFabricRestrictionsPayload requestFields = new ReviewFabricRestrictionsPayload() {
-                ARL = ARL,
+                ARL = aRL,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
@@ -516,7 +514,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Access Control Cluster";
+            return "Access Control";
         }
     }
 }

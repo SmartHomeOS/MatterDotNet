@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Audio Output Cluster
+    /// This cluster provides an interface for controlling the Output on a media device such as a TV.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class AudioOutputCluster : ClusterBase
+    public class AudioOutput : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x050B;
+        internal const uint CLUSTER_ID = 0x050b;
 
         /// <summary>
-        /// Audio Output Cluster
+        /// This cluster provides an interface for controlling the Output on a media device such as a TV.
         /// </summary>
-        public AudioOutputCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public AudioOutput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AudioOutputCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected AudioOutput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -51,16 +51,31 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Output Type
         /// </summary>
-        public enum OutputTypeEnum {
+        public enum OutputType : byte {
             /// <summary>
             /// HDMI
             /// </summary>
-            HDMI = 0,
-            BT = 1,
-            Optical = 2,
-            Headphone = 3,
-            Internal = 4,
-            Other = 5,
+            HDMI = 0x00,
+            /// <summary>
+            /// 
+            /// </summary>
+            BT = 0x01,
+            /// <summary>
+            /// 
+            /// </summary>
+            Optical = 0x02,
+            /// <summary>
+            /// 
+            /// </summary>
+            Headphone = 0x03,
+            /// <summary>
+            /// 
+            /// </summary>
+            Internal = 0x04,
+            /// <summary>
+            /// 
+            /// </summary>
+            Other = 0x05,
         }
         #endregion Enums
 
@@ -81,11 +96,11 @@ namespace MatterDotNet.Clusters.Application
             public OutputInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Index = reader.GetByte(0)!.Value;
-                OutputType = (OutputTypeEnum)reader.GetUShort(1)!.Value;
+                OutputType = (OutputType)reader.GetUShort(1)!.Value;
                 Name = reader.GetString(2, false)!;
             }
             public required byte Index { get; set; }
-            public required OutputTypeEnum OutputType { get; set; }
+            public required OutputType OutputType { get; set; }
             public required string Name { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -123,9 +138,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Select Output
         /// </summary>
-        public async Task<bool> SelectOutput(SecureSession session, byte Index) {
+        public async Task<bool> SelectOutput(SecureSession session, byte index) {
             SelectOutputPayload requestFields = new SelectOutputPayload() {
-                Index = Index,
+                Index = index,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -134,10 +149,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Rename Output
         /// </summary>
-        public async Task<bool> RenameOutput(SecureSession session, byte Index, string Name) {
+        public async Task<bool> RenameOutput(SecureSession session, byte index, string name) {
             RenameOutputPayload requestFields = new RenameOutputPayload() {
-                Index = Index,
-                Name = Name,
+                Index = index,
+                Name = name,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -181,13 +196,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current Output attribute
         /// </summary>
         public async Task<byte> GetCurrentOutput(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0x00;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Audio Output Cluster";
+            return "Audio Output";
         }
     }
 }

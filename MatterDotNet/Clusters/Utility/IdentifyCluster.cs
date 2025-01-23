@@ -18,36 +18,62 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Identify Cluster
+    /// Attributes and commands for putting a device into Identification mode (e.g. flashing a light).
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 5)]
-    public class IdentifyCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 4)]
+    public class Identify : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0003;
 
         /// <summary>
-        /// Identify Cluster
+        /// Attributes and commands for putting a device into Identification mode (e.g. flashing a light).
         /// </summary>
-        public IdentifyCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Identify(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected IdentifyCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Identify(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
+        /// Identify Type
+        /// </summary>
+        public enum IdentifyType : byte {
+            /// <summary>
+            /// No presentation.
+            /// </summary>
+            None = 0x00,
+            /// <summary>
+            /// Light output of a lighting product.
+            /// </summary>
+            LightOutput = 0x01,
+            /// <summary>
+            /// Typically a small LED.
+            /// </summary>
+            VisibleIndicator = 0x02,
+            /// <summary>
+            /// 
+            /// </summary>
+            AudibleBeep = 0x03,
+            /// <summary>
+            /// Presentation will be visible on display screen.
+            /// </summary>
+            Display = 0x04,
+            /// <summary>
+            /// Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay.
+            /// </summary>
+            Actuator = 0x05,
+        }
+
+        /// <summary>
         /// Effect Identifier
         /// </summary>
-        public enum EffectIdentifierEnum {
+        public enum EffectIdentifier : byte {
             /// <summary>
             /// e.g., Light is turned on/off once.
             /// </summary>
             Blink = 0x00,
-            /// <summary>
-            /// e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.
-            /// </summary>
-            ChannelChange = 0x0B,
             /// <summary>
             /// e.g., Light is turned on/off over 1 second and repeated 15 times.
             /// </summary>
@@ -56,6 +82,10 @@ namespace MatterDotNet.Clusters.Utility
             /// e.g., Colored light turns green for 1 second; non-colored light flashes twice.
             /// </summary>
             Okay = 0x02,
+            /// <summary>
+            /// e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.
+            /// </summary>
+            ChannelChange = 0x0B,
             /// <summary>
             /// Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect (as above), first complete the current 1s breathe effect and then terminate the effect.
             /// </summary>
@@ -69,43 +99,16 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Effect Variant
         /// </summary>
-        public enum EffectVariantEnum {
+        public enum EffectVariant : byte {
             /// <summary>
             /// Indicates the default effect is used
             /// </summary>
             Default = 0x00,
         }
-
-        /// <summary>
-        /// Identify Type
-        /// </summary>
-        public enum IdentifyTypeEnum {
-            /// <summary>
-            /// No presentation.
-            /// </summary>
-            None = 0x00,
-            /// <summary>
-            /// Light output of a lighting product.
-            /// </summary>
-            LightOutput = 0x01,
-            /// <summary>
-            /// Typically a small LED.
-            /// </summary>
-            VisibleIndicator = 0x02,
-            AudibleBeep = 0x03,
-            /// <summary>
-            /// Presentation will be visible on display screen.
-            /// </summary>
-            Display = 0x04,
-            /// <summary>
-            /// Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay.
-            /// </summary>
-            Actuator = 0x05,
-        }
         #endregion Enums
 
         #region Payloads
-        private record IdentifyPayload : TLVPayload {
+        private record IdentifyCommandPayload : TLVPayload {
             public required ushort IdentifyTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -115,8 +118,8 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         private record TriggerEffectPayload : TLVPayload {
-            public required EffectIdentifierEnum EffectIdentifier { get; set; }
-            public required EffectVariantEnum EffectVariant { get; set; }
+            public required EffectIdentifier EffectIdentifier { get; set; }
+            public required EffectVariant EffectVariant { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)EffectIdentifier);
@@ -128,11 +131,11 @@ namespace MatterDotNet.Clusters.Utility
 
         #region Commands
         /// <summary>
-        /// Identify
+        /// Identify Command
         /// </summary>
-        public async Task<bool> Identify(SecureSession session, ushort IdentifyTime) {
-            IdentifyPayload requestFields = new IdentifyPayload() {
-                IdentifyTime = IdentifyTime,
+        public async Task<bool> IdentifyCommand(SecureSession session, ushort identifyTime) {
+            IdentifyCommandPayload requestFields = new IdentifyCommandPayload() {
+                IdentifyTime = identifyTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -141,10 +144,10 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Trigger Effect
         /// </summary>
-        public async Task<bool> TriggerEffect(SecureSession session, EffectIdentifierEnum EffectIdentifier, EffectVariantEnum EffectVariant) {
+        public async Task<bool> TriggerEffect(SecureSession session, EffectIdentifier effectIdentifier, EffectVariant effectVariant) {
             TriggerEffectPayload requestFields = new TriggerEffectPayload() {
-                EffectIdentifier = EffectIdentifier,
-                EffectVariant = EffectVariant,
+                EffectIdentifier = effectIdentifier,
+                EffectVariant = effectVariant,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             return ValidateResponse(resp);
@@ -156,27 +159,27 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Identify Time attribute
         /// </summary>
         public async Task<ushort> GetIdentifyTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 0) ?? 0x0;
         }
 
         /// <summary>
         /// Set the Identify Time attribute
         /// </summary>
-        public async Task SetIdentifyTime (SecureSession session, ushort? value = 0) {
+        public async Task SetIdentifyTime (SecureSession session, ushort? value = 0x0) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Identify Type attribute
         /// </summary>
-        public async Task<IdentifyTypeEnum> GetIdentifyType(SecureSession session) {
-            return (IdentifyTypeEnum)await GetEnumAttribute(session, 1);
+        public async Task<IdentifyType> GetIdentifyType(SecureSession session) {
+            return (IdentifyType)await GetEnumAttribute(session, 1);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Identify Cluster";
+            return "Identify";
         }
     }
 }

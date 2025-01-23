@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Power Source Configuration Cluster
+    /// This cluster is used to describe the configuration and capabilities of a Device's power system.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class PowerSourceConfigurationCluster : ClusterBase
+    public class PowerSourceConfiguration : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x002E;
 
         /// <summary>
-        /// Power Source Configuration Cluster
+        /// This cluster is used to describe the configuration and capabilities of a Device's power system.
         /// </summary>
-        public PowerSourceConfigurationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public PowerSourceConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerSourceConfigurationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected PowerSourceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -47,7 +47,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Power Source Configuration Cluster";
+            return "Power Source Configuration";
         }
     }
 }

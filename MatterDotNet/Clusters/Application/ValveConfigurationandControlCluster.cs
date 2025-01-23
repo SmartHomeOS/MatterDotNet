@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.HVAC
 {
     /// <summary>
-    /// Valve Configuration and Control Cluster
+    /// This cluster is used to configure a valve.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ValveConfigurationandControlCluster : ClusterBase
+    public class ValveConfigurationandControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0081;
 
         /// <summary>
-        /// Valve Configuration and Control Cluster
+        /// This cluster is used to configure a valve.
         /// </summary>
-        public ValveConfigurationandControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ValveConfigurationandControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ValveConfigurationandControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ValveConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -55,54 +55,43 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Valve State
         /// </summary>
-        public enum ValveStateEnum {
+        public enum ValveState : byte {
             /// <summary>
             /// Valve is in closed position
             /// </summary>
-            Closed = 0,
+            Closed = 0x0,
             /// <summary>
             /// Valve is in open position
             /// </summary>
-            Open = 1,
+            Open = 0x1,
             /// <summary>
             /// Valve is transitioning between closed and open positions or between levels
             /// </summary>
-            Transitioning = 2,
+            Transitioning = 0x2,
         }
 
         /// <summary>
-        /// Valve Fault Bitmap
+        /// Status Code
+        /// </summary>
+        public enum StatusCode : byte {
+            FailureDueToFault = 0x02,
+        }
+
+        /// <summary>
+        /// Valve Fault
         /// </summary>
         [Flags]
-        public enum ValveFaultBitmap {
+        public enum ValveFault : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Unspecified fault detected
-            /// </summary>
-            GeneralFault = 1,
-            /// <summary>
-            /// Valve is blocked
-            /// </summary>
-            Blocked = 2,
-            /// <summary>
-            /// Valve has detected a leak
-            /// </summary>
-            Leaking = 4,
-            /// <summary>
-            /// No valve is connected to controller
-            /// </summary>
-            NotConnected = 8,
-            /// <summary>
-            /// Short circuit is detected
-            /// </summary>
-            ShortCircuit = 16,
-            /// <summary>
-            /// The available current has been exceeded
-            /// </summary>
-            CurrentExceeded = 32,
+            GeneralFault = 0x01,
+            Blocked = 0x02,
+            Leaking = 0x04,
+            NotConnected = 0x08,
+            ShortCircuit = 0x10,
+            CurrentExceeded = 0x20,
         }
         #endregion Enums
 
@@ -113,9 +102,9 @@ namespace MatterDotNet.Clusters.Application
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (OpenDuration != null)
-                    writer.WriteUInt(0, (uint)OpenDuration!.Value.TotalSeconds, uint.MaxValue, 1);
+                    writer.WriteUInt(0, (uint)OpenDuration!.Value.TotalSeconds);
                 if (TargetLevel != null)
-                    writer.WriteByte(1, TargetLevel, byte.MaxValue, 1);
+                    writer.WriteByte(1, TargetLevel);
                 writer.EndContainer();
             }
         }
@@ -125,10 +114,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Open
         /// </summary>
-        public async Task<bool> Open(SecureSession session, TimeSpan? OpenDuration, byte? TargetLevel) {
+        public async Task<bool> Open(SecureSession session, TimeSpan? openDuration, byte? targetLevel) {
             OpenPayload requestFields = new OpenPayload() {
-                OpenDuration = OpenDuration,
-                TargetLevel = TargetLevel,
+                OpenDuration = openDuration,
+                TargetLevel = targetLevel,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -169,20 +158,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Open Duration attribute
         /// </summary>
         public async Task<TimeSpan?> GetOpenDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Default Open Duration attribute
         /// </summary>
         public async Task<TimeSpan?> GetDefaultOpenDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Set the Default Open Duration attribute
         /// </summary>
-        public async Task SetDefaultOpenDuration (SecureSession session, TimeSpan? value = null) {
+        public async Task SetDefaultOpenDuration (SecureSession session, TimeSpan? value) {
             await SetAttribute(session, 1, value, true);
         }
 
@@ -190,46 +179,46 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Auto Close Time attribute
         /// </summary>
         public async Task<DateTime?> GetAutoCloseTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 2, true) ?? null;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 2, true);
         }
 
         /// <summary>
         /// Get the Remaining Duration attribute
         /// </summary>
         public async Task<TimeSpan?> GetRemainingDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
         /// Get the Current State attribute
         /// </summary>
-        public async Task<ValveStateEnum?> GetCurrentState(SecureSession session) {
-            return (ValveStateEnum?)await GetEnumAttribute(session, 4, true);
+        public async Task<ValveState?> GetCurrentState(SecureSession session) {
+            return (ValveState?)await GetEnumAttribute(session, 4, true);
         }
 
         /// <summary>
         /// Get the Target State attribute
         /// </summary>
-        public async Task<ValveStateEnum?> GetTargetState(SecureSession session) {
-            return (ValveStateEnum?)await GetEnumAttribute(session, 5, true);
+        public async Task<ValveState?> GetTargetState(SecureSession session) {
+            return (ValveState?)await GetEnumAttribute(session, 5, true);
         }
 
         /// <summary>
-        /// Get the Current Level attribute
+        /// Get the Current Level [%] attribute
         /// </summary>
         public async Task<byte?> GetCurrentLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 6, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 6, true);
         }
 
         /// <summary>
-        /// Get the Target Level attribute
+        /// Get the Target Level [%] attribute
         /// </summary>
         public async Task<byte?> GetTargetLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 7, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 7, true);
         }
 
         /// <summary>
-        /// Get the Default Open Level attribute
+        /// Get the Default Open Level [%] attribute
         /// </summary>
         public async Task<byte> GetDefaultOpenLevel(SecureSession session) {
             return (byte?)(dynamic?)await GetAttribute(session, 8) ?? 100;
@@ -245,21 +234,21 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Valve Fault attribute
         /// </summary>
-        public async Task<ValveFaultBitmap> GetValveFault(SecureSession session) {
-            return (ValveFaultBitmap)await GetEnumAttribute(session, 9);
+        public async Task<ValveFault> GetValveFault(SecureSession session) {
+            return (ValveFault)await GetEnumAttribute(session, 9);
         }
 
         /// <summary>
         /// Get the Level Step attribute
         /// </summary>
         public async Task<byte> GetLevelStep(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 10) ?? 1;
+            return (byte)(dynamic?)(await GetAttribute(session, 10))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Valve Configuration and Control Cluster";
+            return "Valve Configuration and Control";
         }
     }
 }

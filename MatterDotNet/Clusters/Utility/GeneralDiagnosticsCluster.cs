@@ -21,22 +21,22 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// General Diagnostics Cluster
+    /// The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class GeneralDiagnosticsCluster : ClusterBase
+    public class GeneralDiagnostics : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0033;
 
         /// <summary>
-        /// General Diagnostics Cluster
+        /// The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public GeneralDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public GeneralDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GeneralDiagnosticsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected GeneralDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -51,169 +51,169 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Boot Reason
-        /// </summary>
-        public enum BootReasonEnum {
-            /// <summary>
-            /// The Node is unable to identify the Power-On reason as one of the other provided enumeration values.
-            /// </summary>
-            Unspecified = 0,
-            /// <summary>
-            /// The Node has booted as the result of physical interaction with the device resulting in a reboot.
-            /// </summary>
-            PowerOnReboot = 1,
-            /// <summary>
-            /// The Node has rebooted as the result of a brown-out of the Node's power supply.
-            /// </summary>
-            BrownOutReset = 2,
-            /// <summary>
-            /// The Node has rebooted as the result of a software watchdog timer.
-            /// </summary>
-            SoftwareWatchdogReset = 3,
-            /// <summary>
-            /// The Node has rebooted as the result of a hardware watchdog timer.
-            /// </summary>
-            HardwareWatchdogReset = 4,
-            /// <summary>
-            /// The Node has rebooted as the result of a completed software update.
-            /// </summary>
-            SoftwareUpdateCompleted = 5,
-            /// <summary>
-            /// The Node has rebooted as the result of a software initiated reboot.
-            /// </summary>
-            SoftwareReset = 6,
-        }
-
-        /// <summary>
         /// Hardware Fault
         /// </summary>
-        public enum HardwareFaultEnum {
+        public enum HardwareFault : byte {
             /// <summary>
             /// The Node has encountered an unspecified fault.
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x00,
             /// <summary>
             /// The Node has encountered a fault with at least one of its radios.
             /// </summary>
-            Radio = 1,
+            Radio = 0x01,
             /// <summary>
             /// The Node has encountered a fault with at least one of its sensors.
             /// </summary>
-            Sensor = 2,
+            Sensor = 0x02,
             /// <summary>
             /// The Node has encountered an over-temperature fault that is resettable.
             /// </summary>
-            ResettableOverTemp = 3,
+            ResettableOverTemp = 0x03,
             /// <summary>
             /// The Node has encountered an over-temperature fault that is not resettable.
             /// </summary>
-            NonResettableOverTemp = 4,
+            NonResettableOverTemp = 0x04,
             /// <summary>
             /// The Node has encountered a fault with at least one of its power sources.
             /// </summary>
-            PowerSource = 5,
+            PowerSource = 0x05,
             /// <summary>
             /// The Node has encountered a fault with at least one of its visual displays.
             /// </summary>
-            VisualDisplayFault = 6,
+            VisualDisplayFault = 0x06,
             /// <summary>
             /// The Node has encountered a fault with at least one of its audio outputs.
             /// </summary>
-            AudioOutputFault = 7,
+            AudioOutputFault = 0x07,
             /// <summary>
             /// The Node has encountered a fault with at least one of its user interfaces.
             /// </summary>
-            UserInterfaceFault = 8,
+            UserInterfaceFault = 0x08,
             /// <summary>
             /// The Node has encountered a fault with its non-volatile memory.
             /// </summary>
-            NonVolatileMemoryError = 9,
+            NonVolatileMemoryError = 0x09,
             /// <summary>
             /// The Node has encountered disallowed physical tampering.
             /// </summary>
-            TamperDetected = 10,
-        }
-
-        /// <summary>
-        /// Interface Type
-        /// </summary>
-        public enum InterfaceTypeEnum {
-            /// <summary>
-            /// Indicates an interface of an unspecified type.
-            /// </summary>
-            Unspecified = 0,
-            /// <summary>
-            /// Indicates a Wi-Fi interface.
-            /// </summary>
-            WiFi = 1,
-            /// <summary>
-            /// Indicates a Ethernet interface.
-            /// </summary>
-            Ethernet = 2,
-            /// <summary>
-            /// Indicates a Cellular interface.
-            /// </summary>
-            Cellular = 3,
-            /// <summary>
-            /// Indicates a Thread interface.
-            /// </summary>
-            Thread = 4,
-        }
-
-        /// <summary>
-        /// Network Fault
-        /// </summary>
-        public enum NetworkFaultEnum {
-            /// <summary>
-            /// The Node has encountered an unspecified fault.
-            /// </summary>
-            Unspecified = 0,
-            /// <summary>
-            /// The Node has encountered a network fault as a result of a hardware failure.
-            /// </summary>
-            HardwareFailure = 1,
-            /// <summary>
-            /// The Node has encountered a network fault as a result of a jammed network.
-            /// </summary>
-            NetworkJammed = 2,
-            /// <summary>
-            /// The Node has encountered a network fault as a result of a failure to establish a connection.
-            /// </summary>
-            ConnectionFailed = 3,
+            TamperDetected = 0x0A,
         }
 
         /// <summary>
         /// Radio Fault
         /// </summary>
-        public enum RadioFaultEnum {
+        public enum RadioFault : byte {
             /// <summary>
             /// The Node has encountered an unspecified radio fault.
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x00,
             /// <summary>
             /// The Node has encountered a fault with its Wi-Fi radio.
             /// </summary>
-            WiFiFault = 1,
+            WiFiFault = 0x01,
             /// <summary>
             /// The Node has encountered a fault with its cellular radio.
             /// </summary>
-            CellularFault = 2,
+            CellularFault = 0x02,
             /// <summary>
             /// The Node has encountered a fault with its 802.15.4 radio.
             /// </summary>
-            ThreadFault = 3,
+            ThreadFault = 0x03,
             /// <summary>
             /// The Node has encountered a fault with its NFC radio.
             /// </summary>
-            NFCFault = 4,
+            NFCFault = 0x04,
             /// <summary>
             /// The Node has encountered a fault with its BLE radio.
             /// </summary>
-            BLEFault = 5,
+            BLEFault = 0x05,
             /// <summary>
             /// The Node has encountered a fault with its Ethernet controller.
             /// </summary>
-            EthernetFault = 6,
+            EthernetFault = 0x06,
+        }
+
+        /// <summary>
+        /// Network Fault
+        /// </summary>
+        public enum NetworkFault : byte {
+            /// <summary>
+            /// The Node has encountered an unspecified fault.
+            /// </summary>
+            Unspecified = 0x00,
+            /// <summary>
+            /// The Node has encountered a network fault as a result of a hardware failure.
+            /// </summary>
+            HardwareFailure = 0x01,
+            /// <summary>
+            /// The Node has encountered a network fault as a result of a jammed network.
+            /// </summary>
+            NetworkJammed = 0x02,
+            /// <summary>
+            /// The Node has encountered a network fault as a result of a failure to establish a connection.
+            /// </summary>
+            ConnectionFailed = 0x03,
+        }
+
+        /// <summary>
+        /// Boot Reason
+        /// </summary>
+        public enum BootReason : byte {
+            /// <summary>
+            /// The Node is unable to identify the Power-On reason as one of the other provided enumeration values.
+            /// </summary>
+            Unspecified = 0x00,
+            /// <summary>
+            /// The Node has booted as the result of physical interaction with the device resulting in a reboot.
+            /// </summary>
+            PowerOnReboot = 0x01,
+            /// <summary>
+            /// The Node has rebooted as the result of a brown-out of the Node's power supply.
+            /// </summary>
+            BrownOutReset = 0x02,
+            /// <summary>
+            /// The Node has rebooted as the result of a software watchdog timer.
+            /// </summary>
+            SoftwareWatchdogReset = 0x03,
+            /// <summary>
+            /// The Node has rebooted as the result of a hardware watchdog timer.
+            /// </summary>
+            HardwareWatchdogReset = 0x04,
+            /// <summary>
+            /// The Node has rebooted as the result of a completed software update.
+            /// </summary>
+            SoftwareUpdateCompleted = 0x05,
+            /// <summary>
+            /// The Node has rebooted as the result of a software initiated reboot.
+            /// </summary>
+            SoftwareReset = 0x06,
+        }
+
+        /// <summary>
+        /// Interface Type
+        /// </summary>
+        public enum InterfaceType : byte {
+            /// <summary>
+            /// Indicates an interface of an unspecified type.
+            /// </summary>
+            Unspecified = 0x00,
+            /// <summary>
+            /// Indicates a Wi-Fi interface.
+            /// </summary>
+            WiFi = 0x01,
+            /// <summary>
+            /// Indicates a Ethernet interface.
+            /// </summary>
+            Ethernet = 0x02,
+            /// <summary>
+            /// Indicates a Cellular interface.
+            /// </summary>
+            Cellular = 0x03,
+            /// <summary>
+            /// Indicates a Thread interface.
+            /// </summary>
+            Thread = 0x04,
         }
         #endregion Enums
 
@@ -233,33 +233,33 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public NetworkInterface(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Name = reader.GetString(0, false)!;
+                Name = reader.GetString(0, false, 32)!;
                 IsOperational = reader.GetBool(1)!.Value;
                 OffPremiseServicesReachableIPv4 = reader.GetBool(2, true);
                 OffPremiseServicesReachableIPv6 = reader.GetBool(3, true);
                 HardwareAddress = new PhysicalAddress(reader.GetBytes(4, false, 8, 6)!);
                 {
-                    IPv4Addresses = new IPAddress[((object[])fields[5]).Length];
-                    for (int i = 0; i < IPv4Addresses.Length; i++) {
-                        IPv4Addresses[i] = new IPAddress(reader.GetBytes(-1, false, 4, 4)!);;
+                    IPv4Addresses = new IPAddress[reader.GetStruct(5)!.Length];
+                    for (int n = 0; n < IPv4Addresses.Length; n++) {
+                        IPv4Addresses[n] = new IPAddress(reader.GetBytes(n, false, 4, 4)!);;
                     }
                 }
                 {
-                    IPv6Addresses = new IPAddress[((object[])fields[6]).Length];
-                    for (int i = 0; i < IPv6Addresses.Length; i++) {
-                        IPv6Addresses[i] = new IPAddress(reader.GetBytes(-1, false, 16, 16)!);;
+                    IPv6Addresses = new IPAddress[reader.GetStruct(6)!.Length];
+                    for (int n = 0; n < IPv6Addresses.Length; n++) {
+                        IPv6Addresses[n] = new IPAddress(reader.GetBytes(n, false, 16, 16)!);;
                     }
                 }
-                Type = (InterfaceTypeEnum)reader.GetUShort(7)!.Value;
+                Type = (InterfaceType)reader.GetUShort(7)!.Value;
             }
             public required string Name { get; set; }
             public required bool IsOperational { get; set; }
-            public required bool? OffPremiseServicesReachableIPv4 { get; set; } = false;
-            public required bool? OffPremiseServicesReachableIPv6 { get; set; } = false;
+            public required bool? OffPremiseServicesReachableIPv4 { get; set; }
+            public required bool? OffPremiseServicesReachableIPv6 { get; set; }
             public required PhysicalAddress HardwareAddress { get; set; }
             public required IPAddress[] IPv4Addresses { get; set; }
             public required IPAddress[] IPv6Addresses { get; set; }
-            public required InterfaceTypeEnum Type { get; set; }
+            public required InterfaceType Type { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Name, 32);
@@ -268,7 +268,6 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteBool(3, OffPremiseServicesReachableIPv6);
                 writer.WriteBytes(4, HardwareAddress.GetAddressBytes());
                 {
-                    Constrain(IPv4Addresses, 0, 4);
                     writer.StartArray(5);
                     foreach (var item in IPv4Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
@@ -276,7 +275,6 @@ namespace MatterDotNet.Clusters.Utility
                     writer.EndContainer();
                 }
                 {
-                    Constrain(IPv6Addresses, 0, 8);
                     writer.StartArray(6);
                     foreach (var item in IPv6Addresses) {
                         writer.WriteBytes(-1, item.GetAddressBytes());
@@ -306,7 +304,7 @@ namespace MatterDotNet.Clusters.Utility
         /// </summary>
         public struct TimeSnapshotResponse() {
             public required TimeSpan SystemTimeMs { get; set; }
-            public required DateTimeOffset? PosixTimeMs { get; set; } = null;
+            public required DateTimeOffset? PosixTimeMs { get; set; }
         }
 
         private record PayloadTestRequestPayload : TLVPayload {
@@ -334,10 +332,10 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Test Event Trigger
         /// </summary>
-        public async Task<bool> TestEventTrigger(SecureSession session, byte[] EnableKey, ulong EventTrigger) {
+        public async Task<bool> TestEventTrigger(SecureSession session, byte[] enableKey, ulong eventTrigger) {
             TestEventTriggerPayload requestFields = new TestEventTriggerPayload() {
-                EnableKey = EnableKey,
-                EventTrigger = EventTrigger,
+                EnableKey = enableKey,
+                EventTrigger = eventTrigger,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -359,11 +357,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Payload Test Request
         /// </summary>
-        public async Task<PayloadTestResponse?> PayloadTestRequest(SecureSession session, byte[] EnableKey, byte Value, ushort Count) {
+        public async Task<PayloadTestResponse?> PayloadTestRequest(SecureSession session, byte[] enableKey, byte value, ushort count) {
             PayloadTestRequestPayload requestFields = new PayloadTestRequestPayload() {
-                EnableKey = EnableKey,
-                Value = Value,
-                Count = Count,
+                EnableKey = enableKey,
+                Value = value,
+                Count = count,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
@@ -411,60 +409,60 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Reboot Count attribute
         /// </summary>
         public async Task<ushort> GetRebootCount(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 1))!;
+            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Up Time attribute
         /// </summary>
         public async Task<ulong> GetUpTime(SecureSession session) {
-            return (ulong)(dynamic?)(await GetAttribute(session, 2))!;
+            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Total Operational Hours attribute
         /// </summary>
         public async Task<uint> GetTotalOperationalHours(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 3))!;
+            return (uint?)(dynamic?)await GetAttribute(session, 3) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Boot Reason attribute
         /// </summary>
-        public async Task<BootReasonEnum> GetBootReason(SecureSession session) {
-            return (BootReasonEnum)await GetEnumAttribute(session, 4);
+        public async Task<BootReason> GetBootReason(SecureSession session) {
+            return (BootReason)await GetEnumAttribute(session, 4);
         }
 
         /// <summary>
         /// Get the Active Hardware Faults attribute
         /// </summary>
-        public async Task<HardwareFaultEnum[]> GetActiveHardwareFaults(SecureSession session) {
+        public async Task<HardwareFault[]> GetActiveHardwareFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            HardwareFaultEnum[] list = new HardwareFaultEnum[reader.Count];
+            HardwareFault[] list = new HardwareFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (HardwareFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (HardwareFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Active Radio Faults attribute
         /// </summary>
-        public async Task<RadioFaultEnum[]> GetActiveRadioFaults(SecureSession session) {
+        public async Task<RadioFault[]> GetActiveRadioFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
-            RadioFaultEnum[] list = new RadioFaultEnum[reader.Count];
+            RadioFault[] list = new RadioFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (RadioFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (RadioFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
         /// <summary>
         /// Get the Active Network Faults attribute
         /// </summary>
-        public async Task<NetworkFaultEnum[]> GetActiveNetworkFaults(SecureSession session) {
+        public async Task<NetworkFault[]> GetActiveNetworkFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
-            NetworkFaultEnum[] list = new NetworkFaultEnum[reader.Count];
+            NetworkFault[] list = new NetworkFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (NetworkFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (NetworkFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
@@ -478,7 +476,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "General Diagnostics Cluster";
+            return "General Diagnostics";
         }
     }
 }

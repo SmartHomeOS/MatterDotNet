@@ -19,28 +19,28 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Actions Cluster
+    /// This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ActionsCluster : ClusterBase
+    public class Actions : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0025;
 
         /// <summary>
-        /// Actions Cluster
+        /// This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
         /// </summary>
-        public ActionsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Actions(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ActionsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Actions(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Action Error
         /// </summary>
-        public enum ActionErrorEnum {
+        public enum ActionError : byte {
             /// <summary>
             /// Other reason not listed in the row(s) below
             /// </summary>
@@ -54,7 +54,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Action State
         /// </summary>
-        public enum ActionStateEnum {
+        public enum ActionState : byte {
             /// <summary>
             /// The action is not active
             /// </summary>
@@ -76,7 +76,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Action Type
         /// </summary>
-        public enum ActionTypeEnum {
+        public enum ActionType : byte {
             /// <summary>
             /// Use this only when none of the other values applies
             /// </summary>
@@ -110,7 +110,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Endpoint List Type
         /// </summary>
-        public enum EndpointListTypeEnum {
+        public enum EndpointListType : byte {
             /// <summary>
             /// Another group of endpoints
             /// </summary>
@@ -129,7 +129,7 @@ namespace MatterDotNet.Clusters.Application
         /// Command Bits
         /// </summary>
         [Flags]
-        public enum CommandBits {
+        public enum CommandBits : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -137,51 +137,51 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Indicate support for InstantAction command
             /// </summary>
-            InstantAction = 1,
+            InstantAction = 0x0001,
             /// <summary>
             /// Indicate support for InstantActionWithTransition command
             /// </summary>
-            InstantActionWithTransition = 2,
+            InstantActionWithTransition = 0x0002,
             /// <summary>
             /// Indicate support for StartAction command
             /// </summary>
-            StartAction = 4,
+            StartAction = 0x0004,
             /// <summary>
             /// Indicate support for StartActionWithDuration command
             /// </summary>
-            StartActionWithDuration = 8,
+            StartActionWithDuration = 0x0008,
             /// <summary>
             /// Indicate support for StopAction command
             /// </summary>
-            StopAction = 16,
+            StopAction = 0x0010,
             /// <summary>
             /// Indicate support for PauseAction command
             /// </summary>
-            PauseAction = 32,
+            PauseAction = 0x0020,
             /// <summary>
             /// Indicate support for PauseActionWithDuration command
             /// </summary>
-            PauseActionWithDuration = 64,
+            PauseActionWithDuration = 0x0040,
             /// <summary>
             /// Indicate support for ResumeAction command
             /// </summary>
-            ResumeAction = 128,
+            ResumeAction = 0x0080,
             /// <summary>
             /// Indicate support for EnableAction command
             /// </summary>
-            EnableAction = 256,
+            EnableAction = 0x0100,
             /// <summary>
             /// Indicate support for EnableActionWithDuration command
             /// </summary>
-            EnableActionWithDuration = 512,
+            EnableActionWithDuration = 0x0200,
             /// <summary>
             /// Indicate support for DisableAction command
             /// </summary>
-            DisableAction = 1024,
+            DisableAction = 0x0400,
             /// <summary>
             /// Indicate support for DisableActionWithDuration command
             /// </summary>
-            DisableActionWithDuration = 2048,
+            DisableActionWithDuration = 0x0800,
         }
         #endregion Enums
 
@@ -202,25 +202,25 @@ namespace MatterDotNet.Clusters.Application
             public Action(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ActionID = reader.GetUShort(0)!.Value;
-                Name = reader.GetString(1, false)!;
-                Type = (ActionTypeEnum)reader.GetUShort(2)!.Value;
+                Name = reader.GetString(1, false, 32)!;
+                Type = (ActionType)reader.GetUShort(2)!.Value;
                 EndpointListID = reader.GetUShort(3)!.Value;
-                SupportedCommands = (CommandBits)reader.GetUShort(4)!.Value;
-                State = (ActionStateEnum)reader.GetUShort(5)!.Value;
+                SupportedCommands = (CommandBits)reader.GetUInt(4)!.Value;
+                State = (ActionState)reader.GetUShort(5)!.Value;
             }
             public required ushort ActionID { get; set; }
             public required string Name { get; set; }
-            public required ActionTypeEnum Type { get; set; }
+            public required ActionType Type { get; set; }
             public required ushort EndpointListID { get; set; }
             public required CommandBits SupportedCommands { get; set; }
-            public required ActionStateEnum State { get; set; }
+            public required ActionState State { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, ActionID);
-                writer.WriteString(1, Name);
+                writer.WriteString(1, Name, 32);
                 writer.WriteUShort(2, (ushort)Type);
                 writer.WriteUShort(3, EndpointListID);
-                writer.WriteUShort(4, (ushort)SupportedCommands);
+                writer.WriteUInt(4, (uint)SupportedCommands);
                 writer.WriteUShort(5, (ushort)State);
                 writer.EndContainer();
             }
@@ -242,23 +242,23 @@ namespace MatterDotNet.Clusters.Application
             public EndpointList(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 EndpointListID = reader.GetUShort(0)!.Value;
-                Name = reader.GetString(1, false)!;
-                Type = (EndpointListTypeEnum)reader.GetUShort(2)!.Value;
+                Name = reader.GetString(1, false, 32)!;
+                Type = (EndpointListType)reader.GetUShort(2)!.Value;
                 {
-                    Endpoints = new ushort[((object[])fields[3]).Length];
-                    for (int i = 0; i < Endpoints.Length; i++) {
-                        Endpoints[i] = reader.GetUShort(-1)!.Value;
+                    Endpoints = new ushort[reader.GetStruct(3)!.Length];
+                    for (int n = 0; n < Endpoints.Length; n++) {
+                        Endpoints[n] = reader.GetUShort(n)!.Value;
                     }
                 }
             }
             public required ushort EndpointListID { get; set; }
             public required string Name { get; set; }
-            public required EndpointListTypeEnum Type { get; set; }
+            public required EndpointListType Type { get; set; }
             public required ushort[] Endpoints { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, EndpointListID);
-                writer.WriteString(1, Name);
+                writer.WriteString(1, Name, 32);
                 writer.WriteUShort(2, (ushort)Type);
                 {
                     Constrain(Endpoints, 0, 256);
@@ -433,10 +433,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Instant Action
         /// </summary>
-        public async Task<bool> InstantAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> InstantAction(SecureSession session, ushort actionID, uint? invokeID) {
             InstantActionPayload requestFields = new InstantActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -445,11 +445,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Instant Action With Transition
         /// </summary>
-        public async Task<bool> InstantActionWithTransition(SecureSession session, ushort ActionID, uint? InvokeID, ushort TransitionTime) {
+        public async Task<bool> InstantActionWithTransition(SecureSession session, ushort actionID, uint? invokeID, ushort transitionTime) {
             InstantActionWithTransitionPayload requestFields = new InstantActionWithTransitionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
-                TransitionTime = TransitionTime,
+                ActionID = actionID,
+                InvokeID = invokeID,
+                TransitionTime = transitionTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -458,10 +458,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Start Action
         /// </summary>
-        public async Task<bool> StartAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> StartAction(SecureSession session, ushort actionID, uint? invokeID) {
             StartActionPayload requestFields = new StartActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             return ValidateResponse(resp);
@@ -470,11 +470,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Start Action With Duration
         /// </summary>
-        public async Task<bool> StartActionWithDuration(SecureSession session, ushort ActionID, uint? InvokeID, uint Duration) {
+        public async Task<bool> StartActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
             StartActionWithDurationPayload requestFields = new StartActionWithDurationPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
-                Duration = Duration,
+                ActionID = actionID,
+                InvokeID = invokeID,
+                Duration = duration,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
@@ -483,10 +483,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Stop Action
         /// </summary>
-        public async Task<bool> StopAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> StopAction(SecureSession session, ushort actionID, uint? invokeID) {
             StopActionPayload requestFields = new StopActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
@@ -495,10 +495,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Pause Action
         /// </summary>
-        public async Task<bool> PauseAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> PauseAction(SecureSession session, ushort actionID, uint? invokeID) {
             PauseActionPayload requestFields = new PauseActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -507,11 +507,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Pause Action With Duration
         /// </summary>
-        public async Task<bool> PauseActionWithDuration(SecureSession session, ushort ActionID, uint? InvokeID, uint Duration) {
+        public async Task<bool> PauseActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
             PauseActionWithDurationPayload requestFields = new PauseActionWithDurationPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
-                Duration = Duration,
+                ActionID = actionID,
+                InvokeID = invokeID,
+                Duration = duration,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             return ValidateResponse(resp);
@@ -520,10 +520,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Resume Action
         /// </summary>
-        public async Task<bool> ResumeAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> ResumeAction(SecureSession session, ushort actionID, uint? invokeID) {
             ResumeActionPayload requestFields = new ResumeActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             return ValidateResponse(resp);
@@ -532,10 +532,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable Action
         /// </summary>
-        public async Task<bool> EnableAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> EnableAction(SecureSession session, ushort actionID, uint? invokeID) {
             EnableActionPayload requestFields = new EnableActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             return ValidateResponse(resp);
@@ -544,11 +544,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable Action With Duration
         /// </summary>
-        public async Task<bool> EnableActionWithDuration(SecureSession session, ushort ActionID, uint? InvokeID, uint Duration) {
+        public async Task<bool> EnableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
             EnableActionWithDurationPayload requestFields = new EnableActionWithDurationPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
-                Duration = Duration,
+                ActionID = actionID,
+                InvokeID = invokeID,
+                Duration = duration,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             return ValidateResponse(resp);
@@ -557,10 +557,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Disable Action
         /// </summary>
-        public async Task<bool> DisableAction(SecureSession session, ushort ActionID, uint? InvokeID) {
+        public async Task<bool> DisableAction(SecureSession session, ushort actionID, uint? invokeID) {
             DisableActionPayload requestFields = new DisableActionPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
+                ActionID = actionID,
+                InvokeID = invokeID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
             return ValidateResponse(resp);
@@ -569,11 +569,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Disable Action With Duration
         /// </summary>
-        public async Task<bool> DisableActionWithDuration(SecureSession session, ushort ActionID, uint? InvokeID, uint Duration) {
+        public async Task<bool> DisableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
             DisableActionWithDurationPayload requestFields = new DisableActionWithDurationPayload() {
-                ActionID = ActionID,
-                InvokeID = InvokeID,
-                Duration = Duration,
+                ActionID = actionID,
+                InvokeID = invokeID,
+                Duration = duration,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
             return ValidateResponse(resp);
@@ -607,13 +607,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Setup URL attribute
         /// </summary>
         public async Task<string> GetSetupURL(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 2) ?? "";
+            return (string)(dynamic?)(await GetAttribute(session, 2))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Actions Cluster";
+            return "Actions";
         }
     }
 }

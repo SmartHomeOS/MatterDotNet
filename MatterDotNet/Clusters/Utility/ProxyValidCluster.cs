@@ -12,45 +12,30 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
-using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Low Power Cluster
+    /// Cluster to control Proxy Valid
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class LowPowerCluster : ClusterBase
+    public class ProxyValid : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x0508;
+        internal const uint CLUSTER_ID = 0x0044;
 
         /// <summary>
-        /// Low Power Cluster
+        /// Cluster to control Proxy Valid
         /// </summary>
-        public LowPowerCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ProxyValid(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LowPowerCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
-
-        #region Payloads
-        #endregion Payloads
-
-        #region Commands
-        /// <summary>
-        /// Sleep
-        /// </summary>
-        public async Task<bool> Sleep(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
-            return ValidateResponse(resp);
-        }
-        #endregion Commands
+        protected ProxyValid(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Low Power Cluster";
+            return "Proxy Valid";
         }
     }
 }

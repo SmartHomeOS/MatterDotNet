@@ -12,7 +12,6 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -21,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Service Area Cluster
+    /// The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ServiceAreaCluster : ClusterBase
+    public class ServiceArea : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0150;
 
         /// <summary>
-        /// Service Area Cluster
+        /// The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.
         /// </summary>
-        public ServiceAreaCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ServiceArea(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ServiceAreaCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ServiceArea(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -61,7 +60,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Operational Status
         /// </summary>
-        public enum OperationalStatusEnum {
+        public enum OperationalStatus : byte {
             /// <summary>
             /// The device has not yet started operating at the given area, or has not finished operating at that area but it is not currently operating at the area
             /// </summary>
@@ -83,18 +82,17 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Select Areas Status
         /// </summary>
-        public enum SelectAreasStatus {
+        public enum SelectAreasStatus : byte {
             Success = 0x00,
             UnsupportedArea = 0x01,
-            DuplicatedAreas = 0x02,
-            InvalidInMode = 0x03,
-            InvalidSet = 0x04,
+            InvalidInMode = 0x02,
+            InvalidSet = 0x03,
         }
 
         /// <summary>
         /// Skip Area Status
         /// </summary>
-        public enum SkipAreaStatus {
+        public enum SkipAreaStatus : byte {
             Success = 0x00,
             InvalidAreaList = 0x01,
             InvalidInMode = 0x02,
@@ -103,6 +101,34 @@ namespace MatterDotNet.Clusters.Application
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Landmark Info
+        /// </summary>
+        public record LandmarkInfo : TLVPayload {
+            /// <summary>
+            /// Landmark Info
+            /// </summary>
+            public LandmarkInfo() { }
+
+            /// <summary>
+            /// Landmark Info
+            /// </summary>
+            [SetsRequiredMembers]
+            public LandmarkInfo(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                LandmarkTag = (LandmarkTag)reader.GetUShort(0)!.Value;
+                RelativePositionTag = (RelativePositionTag)reader.GetUShort(1)!.Value;
+            }
+            public required LandmarkTag LandmarkTag { get; set; }
+            public required RelativePositionTag? RelativePositionTag { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUShort(0, (ushort)LandmarkTag);
+                writer.WriteUShort(1, (ushort?)RelativePositionTag);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Area Info
         /// </summary>
@@ -133,6 +159,34 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteNull(1);
                 else
                     LandmarkInfo.Serialize(writer, 1);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Map
+        /// </summary>
+        public record Map : TLVPayload {
+            /// <summary>
+            /// Map
+            /// </summary>
+            public Map() { }
+
+            /// <summary>
+            /// Map
+            /// </summary>
+            [SetsRequiredMembers]
+            public Map(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                MapID = reader.GetUInt(0)!.Value;
+                Name = reader.GetString(1, false, 64)!;
+            }
+            public required uint MapID { get; set; }
+            public required string Name { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUInt(0, MapID);
+                writer.WriteString(1, Name, 64);
                 writer.EndContainer();
             }
         }
@@ -169,62 +223,6 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Landmark Info
-        /// </summary>
-        public record LandmarkInfo : TLVPayload {
-            /// <summary>
-            /// Landmark Info
-            /// </summary>
-            public LandmarkInfo() { }
-
-            /// <summary>
-            /// Landmark Info
-            /// </summary>
-            [SetsRequiredMembers]
-            public LandmarkInfo(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                LandmarkTag = reader.GetByte(0)!.Value;
-                RelativePositionTag = reader.GetByte(1, true);
-            }
-            public required byte LandmarkTag { get; set; }
-            public required byte? RelativePositionTag { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteByte(0, LandmarkTag);
-                writer.WriteByte(1, RelativePositionTag);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Map
-        /// </summary>
-        public record Map : TLVPayload {
-            /// <summary>
-            /// Map
-            /// </summary>
-            public Map() { }
-
-            /// <summary>
-            /// Map
-            /// </summary>
-            [SetsRequiredMembers]
-            public Map(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                MapID = reader.GetUInt(0)!.Value;
-                Name = reader.GetString(1, false)!;
-            }
-            public required uint MapID { get; set; }
-            public required string Name { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUInt(0, MapID);
-                writer.WriteString(1, Name, 64);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
         /// Progress
         /// </summary>
         public record Progress : TLVPayload {
@@ -240,22 +238,22 @@ namespace MatterDotNet.Clusters.Application
             public Progress(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 AreaID = reader.GetUInt(0)!.Value;
-                Status = (OperationalStatusEnum)reader.GetUShort(1)!.Value;
+                Status = (OperationalStatus)reader.GetUShort(1)!.Value;
                 TotalOperationalTime = TimeUtil.FromSeconds(reader.GetUInt(2, true));
-                InitialTimeEstimate = TimeUtil.FromSeconds(reader.GetUInt(3, true));
+                EstimatedTime = TimeUtil.FromSeconds(reader.GetUInt(3, true));
             }
             public required uint AreaID { get; set; }
-            public required OperationalStatusEnum Status { get; set; }
+            public required OperationalStatus Status { get; set; }
             public TimeSpan? TotalOperationalTime { get; set; }
-            public TimeSpan? InitialTimeEstimate { get; set; }
+            public TimeSpan? EstimatedTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, AreaID);
                 writer.WriteUShort(1, (ushort)Status);
                 if (TotalOperationalTime != null)
                     writer.WriteUInt(2, (uint)TotalOperationalTime!.Value.TotalSeconds);
-                if (InitialTimeEstimate != null)
-                    writer.WriteUInt(3, (uint)InitialTimeEstimate!.Value.TotalSeconds);
+                if (EstimatedTime != null)
+                    writer.WriteUInt(3, (uint)EstimatedTime!.Value.TotalSeconds);
                 writer.EndContainer();
             }
         }
@@ -307,9 +305,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Select Areas
         /// </summary>
-        public async Task<SelectAreasResponse?> SelectAreas(SecureSession session, uint[] NewAreas) {
+        public async Task<SelectAreasResponse?> SelectAreas(SecureSession session, uint[] newAreas) {
             SelectAreasPayload requestFields = new SelectAreasPayload() {
-                NewAreas = NewAreas,
+                NewAreas = newAreas,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
@@ -323,9 +321,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Skip Area
         /// </summary>
-        public async Task<SkipAreaResponse?> SkipArea(SecureSession session, uint SkippedArea) {
+        public async Task<SkipAreaResponse?> SkipArea(SecureSession session, uint skippedArea) {
             SkipAreaPayload requestFields = new SkipAreaPayload() {
-                SkippedArea = SkippedArea,
+                SkippedArea = skippedArea,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
@@ -396,14 +394,14 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current Area attribute
         /// </summary>
         public async Task<uint?> GetCurrentArea(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (uint?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
         /// Get the Estimated End Time attribute
         /// </summary>
         public async Task<DateTime?> GetEstimatedEndTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4));
         }
 
         /// <summary>
@@ -420,7 +418,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Service Area Cluster";
+            return "Service Area";
         }
     }
 }

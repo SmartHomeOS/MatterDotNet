@@ -17,22 +17,22 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Wi-Fi Network Diagnostics Cluster
+    /// The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class WiFiNetworkDiagnosticsCluster : ClusterBase
+    public class WiFiNetworkDiagnostics : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0036;
 
         /// <summary>
-        /// Wi-Fi Network Diagnostics Cluster
+        /// The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public WiFiNetworkDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public WiFiNetworkDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WiFiNetworkDiagnosticsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected WiFiNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -41,113 +41,113 @@ namespace MatterDotNet.Clusters.Utility
         [Flags]
         public enum Feature {
             /// <summary>
-            /// Node makes available the counts for the number of received and transmitted packets on the Wi-Fi interface.
+            /// Node makes available the counts for the number of received and transmitted packets on the ethernet interface.
             /// </summary>
             PacketCounts = 1,
             /// <summary>
-            /// Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the Wi-Fi interface.
+            /// Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the ethernet interface.
             /// </summary>
             ErrorCounts = 2,
         }
 
         /// <summary>
-        /// Association Failure Cause
-        /// </summary>
-        public enum AssociationFailureCauseEnum {
-            /// <summary>
-            /// The reason for the failure is unknown.
-            /// </summary>
-            Unknown = 0,
-            /// <summary>
-            /// An error occurred during association.
-            /// </summary>
-            AssociationFailed = 1,
-            /// <summary>
-            /// An error occurred during authentication.
-            /// </summary>
-            AuthenticationFailed = 2,
-            /// <summary>
-            /// The specified SSID could not be found.
-            /// </summary>
-            SsidNotFound = 3,
-        }
-
-        /// <summary>
-        /// Connection Status
-        /// </summary>
-        public enum ConnectionStatusEnum {
-            /// <summary>
-            /// Indicate the node is connected
-            /// </summary>
-            Connected = 0,
-            /// <summary>
-            /// Indicate the node is not connected
-            /// </summary>
-            NotConnected = 1,
-        }
-
-        /// <summary>
         /// Security Type
         /// </summary>
-        public enum SecurityTypeEnum {
+        public enum SecurityType : byte {
             /// <summary>
             /// Indicate the usage of an unspecified Wi-Fi security type
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x00,
             /// <summary>
             /// Indicate the usage of no Wi-Fi security
             /// </summary>
-            None = 1,
+            None = 0x01,
             /// <summary>
             /// Indicate the usage of WEP Wi-Fi security
             /// </summary>
-            WEP = 2,
+            WEP = 0x02,
             /// <summary>
             /// Indicate the usage of WPA Wi-Fi security
             /// </summary>
-            WPA = 3,
+            WPA = 0x03,
             /// <summary>
             /// Indicate the usage of WPA2 Wi-Fi security
             /// </summary>
-            WPA2 = 4,
+            WPA2 = 0x04,
             /// <summary>
             /// Indicate the usage of WPA3 Wi-Fi security
             /// </summary>
-            WPA3 = 5,
+            WPA3 = 0x05,
         }
 
         /// <summary>
         /// WiFi Version
         /// </summary>
-        public enum WiFiVersionEnum {
+        public enum WiFiVersion : byte {
             /// <summary>
             /// Indicate the network interface is currently using 802.11a against the wireless access point.
             /// </summary>
-            A = 0,
+            A = 0x00,
             /// <summary>
             /// Indicate the network interface is currently using 802.11b against the wireless access point.
             /// </summary>
-            B = 1,
+            B = 0x01,
             /// <summary>
             /// Indicate the network interface is currently using 802.11g against the wireless access point.
             /// </summary>
-            G = 2,
+            G = 0x02,
             /// <summary>
             /// Indicate the network interface is currently using 802.11n against the wireless access point.
             /// </summary>
-            N = 3,
+            N = 0x03,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ac against the wireless access point.
             /// </summary>
-            Ac = 4,
+            Ac = 0x04,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ax against the wireless access point.
             /// </summary>
-            Ax = 5,
+            Ax = 0x05,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ah against the wireless access point.
             /// </summary>
-            Ah = 6,
+            Ah = 0x06,
+        }
+
+        /// <summary>
+        /// Association Failure Cause
+        /// </summary>
+        public enum AssociationFailureCause : byte {
+            /// <summary>
+            /// The reason for the failure is unknown.
+            /// </summary>
+            Unknown = 0x00,
+            /// <summary>
+            /// An error occurred during association.
+            /// </summary>
+            AssociationFailed = 0x01,
+            /// <summary>
+            /// An error occurred during authentication.
+            /// </summary>
+            AuthenticationFailed = 0x02,
+            /// <summary>
+            /// The specified SSID could not be found.
+            /// </summary>
+            SsidNotFound = 0x03,
+        }
+
+        /// <summary>
+        /// Connection Status
+        /// </summary>
+        public enum ConnectionStatus : byte {
+            /// <summary>
+            /// Indicate the node is connected
+            /// </summary>
+            Connected = 0x00,
+            /// <summary>
+            /// Indicate the node is not connected
+            /// </summary>
+            NotConnected = 0x01,
         }
         #endregion Enums
 
@@ -190,97 +190,97 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the BSSID attribute
         /// </summary>
         public async Task<byte[]?> GetBSSID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Security Type attribute
         /// </summary>
-        public async Task<SecurityTypeEnum?> GetSecurityType(SecureSession session) {
-            return (SecurityTypeEnum?)await GetEnumAttribute(session, 1, true);
+        public async Task<SecurityType?> GetSecurityType(SecureSession session) {
+            return (SecurityType?)await GetEnumAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Get the WiFi Version attribute
         /// </summary>
-        public async Task<WiFiVersionEnum?> GetWiFiVersion(SecureSession session) {
-            return (WiFiVersionEnum?)await GetEnumAttribute(session, 2, true);
+        public async Task<WiFiVersion?> GetWiFiVersion(SecureSession session) {
+            return (WiFiVersion?)await GetEnumAttribute(session, 2, true);
         }
 
         /// <summary>
         /// Get the Channel Number attribute
         /// </summary>
         public async Task<ushort?> GetChannelNumber(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 3, true) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the RSSI attribute
         /// </summary>
         public async Task<sbyte?> GetRSSI(SecureSession session) {
-            return (sbyte?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return (sbyte?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
         /// Get the Beacon Lost Count attribute
         /// </summary>
         public async Task<uint?> GetBeaconLostCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 5, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 5, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Beacon Rx Count attribute
         /// </summary>
         public async Task<uint?> GetBeaconRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 6, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 6, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Packet Multicast Rx Count attribute
         /// </summary>
         public async Task<uint?> GetPacketMulticastRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 7, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 7, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Packet Multicast Tx Count attribute
         /// </summary>
         public async Task<uint?> GetPacketMulticastTxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 8, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 8, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Packet Unicast Rx Count attribute
         /// </summary>
         public async Task<uint?> GetPacketUnicastRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 9, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Packet Unicast Tx Count attribute
         /// </summary>
         public async Task<uint?> GetPacketUnicastTxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 10, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 10, true) ?? 0x00000000;
         }
 
         /// <summary>
         /// Get the Current Max Rate attribute
         /// </summary>
         public async Task<ulong?> GetCurrentMaxRate(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 11, true) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 11, true) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Overrun Count attribute
         /// </summary>
         public async Task<ulong?> GetOverrunCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 12, true) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 12, true) ?? 0x0000000000000000;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Wi-Fi Network Diagnostics Cluster";
+            return "Wi-Fi Network Diagnostics";
         }
     }
 }

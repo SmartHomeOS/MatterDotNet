@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// Temperature Control Cluster
+    /// Attributes and commands for configuring the temperature control, and reporting temperature.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class TemperatureControlCluster : ClusterBase
+    public class TemperatureControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0056;
 
         /// <summary>
-        /// Temperature Control Cluster
+        /// Attributes and commands for configuring the temperature control, and reporting temperature.
         /// </summary>
-        public TemperatureControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public TemperatureControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TemperatureControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected TemperatureControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -75,10 +75,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Temperature
         /// </summary>
-        public async Task<bool> SetTemperature(SecureSession session, short? TargetTemperature, byte? TargetTemperatureLevel) {
+        public async Task<bool> SetTemperature(SecureSession session, short? targetTemperature, byte? targetTemperatureLevel) {
             SetTemperaturePayload requestFields = new SetTemperaturePayload() {
-                TargetTemperature = TargetTemperature,
-                TargetTemperatureLevel = TargetTemperatureLevel,
+                TargetTemperature = targetTemperature,
+                TargetTemperatureLevel = targetTemperatureLevel,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -156,7 +156,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Temperature Control Cluster";
+            return "Temperature Control";
         }
     }
 }

@@ -13,94 +13,62 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Protocol.Parsers;
-using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
-using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Application Basic Cluster
+    /// This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ApplicationBasicCluster : ClusterBase
+    public class ApplicationBasic : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x050D;
+        internal const uint CLUSTER_ID = 0x050d;
 
         /// <summary>
-        /// Application Basic Cluster
+        /// This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.
         /// </summary>
-        public ApplicationBasicCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ApplicationBasic(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ApplicationBasicCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ApplicationBasic(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Application Status
         /// </summary>
-        public enum ApplicationStatusEnum {
+        public enum ApplicationStatus : byte {
             /// <summary>
             /// Application is not running.
             /// </summary>
-            Stopped = 0,
+            Stopped = 0x00,
             /// <summary>
             /// Application is running, is visible to the user, and is the active target for input.
             /// </summary>
-            ActiveVisibleFocus = 1,
+            ActiveVisibleFocus = 0x01,
             /// <summary>
             /// Application is running but not visible to the user.
             /// </summary>
-            ActiveHidden = 2,
+            ActiveHidden = 0x02,
             /// <summary>
             /// Application is running and visible, but is not the active target for input.
             /// </summary>
-            ActiveVisibleNotFocus = 3,
+            ActiveVisibleNotFocus = 0x03,
         }
         #endregion Enums
-
-        #region Records
-        /// <summary>
-        /// Application
-        /// </summary>
-        public record Application : TLVPayload {
-            /// <summary>
-            /// Application
-            /// </summary>
-            public Application() { }
-
-            /// <summary>
-            /// Application
-            /// </summary>
-            [SetsRequiredMembers]
-            public Application(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                CatalogVendorID = reader.GetUShort(0)!.Value;
-                ApplicationID = reader.GetString(1, false)!;
-            }
-            public required ushort CatalogVendorID { get; set; }
-            public required string ApplicationID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, CatalogVendorID);
-                writer.WriteString(1, ApplicationID);
-                writer.EndContainer();
-            }
-        }
-        #endregion Records
 
         #region Attributes
         /// <summary>
         /// Get the Vendor Name attribute
         /// </summary>
         public async Task<string> GetVendorName(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 0) ?? "";
+            return (string)(dynamic?)(await GetAttribute(session, 0))!;
         }
 
         /// <summary>
         /// Get the Vendor ID attribute
         /// </summary>
         public async Task<ushort> GetVendorID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 1))!;
+            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0;
         }
 
         /// <summary>
@@ -114,21 +82,21 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Product ID attribute
         /// </summary>
         public async Task<ushort> GetProductID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 3))!;
+            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 0x0;
         }
 
         /// <summary>
         /// Get the Application attribute
         /// </summary>
-        public async Task<Application> GetApplication(SecureSession session) {
-            return new Application((object[])(await GetAttribute(session, 4))!);
+        public async Task<ApplicationLauncher.Application> GetApplication(SecureSession session) {
+            return (ApplicationLauncher.Application)(dynamic?)(await GetAttribute(session, 4))!;
         }
 
         /// <summary>
         /// Get the Status attribute
         /// </summary>
-        public async Task<ApplicationStatusEnum> GetStatus(SecureSession session) {
-            return (ApplicationStatusEnum)await GetEnumAttribute(session, 5);
+        public async Task<ApplicationStatus> GetStatus(SecureSession session) {
+            return (ApplicationStatus)await GetEnumAttribute(session, 5);
         }
 
         /// <summary>
@@ -152,7 +120,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Application Basic Cluster";
+            return "Application Basic";
         }
     }
 }

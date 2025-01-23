@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Content Control Cluster
+    /// This cluster is used for managing the content control (including &quot;parental control&quot;) settings on a media device such as a TV, or Set-top Box.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ContentControlCluster : ClusterBase
+    public class ContentControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x050F;
 
         /// <summary>
-        /// Content Control Cluster
+        /// This cluster is used for managing the content control (including &quot;parental control&quot;) settings on a media device such as a TV, or Set-top Box.
         /// </summary>
-        public ContentControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ContentControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ContentControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ContentControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -62,124 +62,10 @@ namespace MatterDotNet.Clusters.Application
             /// Supports managing content controls based upon rating threshold for scheduled content.
             /// </summary>
             ScheduledContentRating = 16,
-            /// <summary>
-            /// Supports managing a set of channels that are prohibited.
-            /// </summary>
-            BlockChannels = 32,
-            /// <summary>
-            /// Supports managing a set of applications that are prohibited.
-            /// </summary>
-            BlockApplications = 64,
-            /// <summary>
-            /// Supports managing content controls based upon setting time window in which all contents and applications SHALL be blocked.
-            /// </summary>
-            BlockContentTimeWindow = 128,
-        }
-
-        /// <summary>
-        /// Day Of Week Bitmap type
-        /// </summary>
-        [Flags]
-        public enum DayOfWeekBitmapType {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Sunday
-            /// </summary>
-            Sunday = 1,
-            /// <summary>
-            /// Monday
-            /// </summary>
-            Monday = 2,
-            /// <summary>
-            /// Tuesday
-            /// </summary>
-            Tuesday = 4,
-            /// <summary>
-            /// Wednesday
-            /// </summary>
-            Wednesday = 8,
-            /// <summary>
-            /// Thursday
-            /// </summary>
-            Thursday = 16,
-            /// <summary>
-            /// Friday
-            /// </summary>
-            Friday = 32,
-            /// <summary>
-            /// Saturday
-            /// </summary>
-            Saturday = 64,
         }
         #endregion Enums
 
         #region Records
-        /// <summary>
-        /// App Info
-        /// </summary>
-        public record AppInfo : TLVPayload {
-            /// <summary>
-            /// App Info
-            /// </summary>
-            public AppInfo() { }
-
-            /// <summary>
-            /// App Info
-            /// </summary>
-            [SetsRequiredMembers]
-            public AppInfo(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                CatalogVendorID = reader.GetUShort(0)!.Value;
-                ApplicationID = reader.GetString(1, false)!;
-            }
-            public required ushort CatalogVendorID { get; set; }
-            public required string ApplicationID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, CatalogVendorID);
-                writer.WriteString(1, ApplicationID);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Block Channel
-        /// </summary>
-        public record BlockChannel : TLVPayload {
-            /// <summary>
-            /// Block Channel
-            /// </summary>
-            public BlockChannel() { }
-
-            /// <summary>
-            /// Block Channel
-            /// </summary>
-            [SetsRequiredMembers]
-            public BlockChannel(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                BlockChannelIndex = reader.GetUShort(0, true);
-                MajorNumber = reader.GetUShort(1)!.Value;
-                MinorNumber = reader.GetUShort(2)!.Value;
-                Identifier = reader.GetString(3, true);
-            }
-            public required ushort? BlockChannelIndex { get; set; }
-            public required ushort MajorNumber { get; set; }
-            public required ushort MinorNumber { get; set; }
-            public string? Identifier { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, BlockChannelIndex);
-                writer.WriteUShort(1, MajorNumber);
-                writer.WriteUShort(2, MinorNumber);
-                if (Identifier != null)
-                    writer.WriteString(3, Identifier);
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
         /// Rating Name
         /// </summary>
@@ -202,85 +88,9 @@ namespace MatterDotNet.Clusters.Application
             public string? RatingNameDesc { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, RatingNameField, 8);
+                writer.WriteString(0, RatingNameField);
                 if (RatingNameDesc != null)
-                    writer.WriteString(1, RatingNameDesc, 64);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Time Period Struct type
-        /// </summary>
-        public record TimePeriodStructType : TLVPayload {
-            /// <summary>
-            /// Time Period Struct type
-            /// </summary>
-            public TimePeriodStructType() { }
-
-            /// <summary>
-            /// Time Period Struct type
-            /// </summary>
-            [SetsRequiredMembers]
-            public TimePeriodStructType(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                StartHour = reader.GetByte(0)!.Value;
-                StartMinute = reader.GetByte(1)!.Value;
-                EndHour = reader.GetByte(2)!.Value;
-                EndMinute = reader.GetByte(3)!.Value;
-            }
-            public required byte StartHour { get; set; }
-            public required byte StartMinute { get; set; }
-            public required byte EndHour { get; set; }
-            public required byte EndMinute { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteByte(0, StartHour, 23);
-                writer.WriteByte(1, StartMinute, 59);
-                writer.WriteByte(2, EndHour, 23);
-                writer.WriteByte(3, EndMinute, 59);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Time Window
-        /// </summary>
-        public record TimeWindow : TLVPayload {
-            /// <summary>
-            /// Time Window
-            /// </summary>
-            public TimeWindow() { }
-
-            /// <summary>
-            /// Time Window
-            /// </summary>
-            [SetsRequiredMembers]
-            public TimeWindow(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                TimeWindowIndex = reader.GetUShort(0, true);
-                DayOfWeek = (DayOfWeekBitmapType)reader.GetUShort(1)!.Value;
-                {
-                    TimePeriod = new TimePeriodStructType[((object[])fields[2]).Length];
-                    for (int i = 0; i < TimePeriod.Length; i++) {
-                        TimePeriod[i] = new TimePeriodStructType((object[])fields[-1]);
-                    }
-                }
-            }
-            public required ushort? TimeWindowIndex { get; set; }
-            public required DayOfWeekBitmapType DayOfWeek { get; set; }
-            public required TimePeriodStructType[] TimePeriod { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, TimeWindowIndex);
-                writer.WriteUShort(1, (ushort)DayOfWeek);
-                {
-                    writer.StartArray(2);
-                    foreach (var item in TimePeriod) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
+                    writer.WriteString(1, RatingNameDesc);
                 writer.EndContainer();
             }
         }
@@ -288,11 +98,12 @@ namespace MatterDotNet.Clusters.Application
 
         #region Payloads
         private record UpdatePINPayload : TLVPayload {
-            public required string OldPIN { get; set; }
+            public string? OldPIN { get; set; }
             public required string NewPIN { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, OldPIN, 6);
+                if (OldPIN != null)
+                    writer.WriteString(0, OldPIN, 6);
                 writer.WriteString(1, NewPIN, 6);
                 writer.EndContainer();
             }
@@ -307,12 +118,13 @@ namespace MatterDotNet.Clusters.Application
 
         private record AddBonusTimePayload : TLVPayload {
             public string? PINCode { get; set; }
-            public required TimeSpan BonusTime { get; set; } = TimeSpan.FromSeconds(300);
+            public TimeSpan? BonusTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (PINCode != null)
                     writer.WriteString(0, PINCode, 6);
-                writer.WriteUInt(1, (uint)BonusTime.TotalSeconds);
+                if (BonusTime != null)
+                    writer.WriteUInt(1, (uint)BonusTime!.Value.TotalSeconds);
                 writer.EndContainer();
             }
         }
@@ -321,7 +133,7 @@ namespace MatterDotNet.Clusters.Application
             public required TimeSpan ScreenTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, (uint)ScreenTime.TotalSeconds, 86400);
+                writer.WriteUInt(0, (uint)ScreenTime.TotalSeconds);
                 writer.EndContainer();
             }
         }
@@ -343,110 +155,26 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
-
-        private record AddBlockChannelsPayload : TLVPayload {
-            public required BlockChannel[] Channels { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in Channels) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        private record RemoveBlockChannelsPayload : TLVPayload {
-            public required ushort[] ChannelIndexes { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in ChannelIndexes) {
-                        writer.WriteUShort(-1, item);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        private record AddBlockApplicationsPayload : TLVPayload {
-            public required AppInfo[] Applications { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in Applications) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        private record RemoveBlockApplicationsPayload : TLVPayload {
-            public required AppInfo[] Applications { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in Applications) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        private record SetBlockContentTimeWindowPayload : TLVPayload {
-            public required TimeWindow TimeWindow { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                TimeWindow.Serialize(writer, 0);
-                writer.EndContainer();
-            }
-        }
-
-        private record RemoveBlockContentTimeWindowPayload : TLVPayload {
-            public required ushort[] TimeWindowIndexes { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in TimeWindowIndexes) {
-                        writer.WriteUShort(-1, item);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
         #endregion Payloads
 
         #region Commands
         /// <summary>
         /// Update PIN
         /// </summary>
-        public async Task<bool> UpdatePIN(SecureSession session, ushort commandTimeoutMS, string OldPIN, string NewPIN) {
+        public async Task<bool> UpdatePIN(SecureSession session, string? oldPIN, string newPIN) {
             UpdatePINPayload requestFields = new UpdatePINPayload() {
-                OldPIN = OldPIN,
-                NewPIN = NewPIN,
+                OldPIN = oldPIN,
+                NewPIN = newPIN,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Reset PIN
         /// </summary>
-        public async Task<ResetPINResponse?> ResetPIN(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS);
+        public async Task<ResetPINResponse?> ResetPIN(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
             if (!ValidateResponse(resp))
                 return null;
             return new ResetPINResponse() {
@@ -457,26 +185,26 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable
         /// </summary>
-        public async Task<bool> Enable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS);
+        public async Task<bool> Enable(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Disable
         /// </summary>
-        public async Task<bool> Disable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS);
+        public async Task<bool> Disable(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add Bonus Time
         /// </summary>
-        public async Task<bool> AddBonusTime(SecureSession session, string? PINCode, TimeSpan BonusTime) {
+        public async Task<bool> AddBonusTime(SecureSession session, string? pINCode, TimeSpan? bonusTime) {
             AddBonusTimePayload requestFields = new AddBonusTimePayload() {
-                PINCode = PINCode,
-                BonusTime = BonusTime,
+                PINCode = pINCode,
+                BonusTime = bonusTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -485,9 +213,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Screen Daily Time
         /// </summary>
-        public async Task<bool> SetScreenDailyTime(SecureSession session, TimeSpan ScreenTime) {
+        public async Task<bool> SetScreenDailyTime(SecureSession session, TimeSpan screenTime) {
             SetScreenDailyTimePayload requestFields = new SetScreenDailyTimePayload() {
-                ScreenTime = ScreenTime,
+                ScreenTime = screenTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             return ValidateResponse(resp);
@@ -512,9 +240,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set On Demand Rating Threshold
         /// </summary>
-        public async Task<bool> SetOnDemandRatingThreshold(SecureSession session, string Rating) {
+        public async Task<bool> SetOnDemandRatingThreshold(SecureSession session, string rating) {
             SetOnDemandRatingThresholdPayload requestFields = new SetOnDemandRatingThresholdPayload() {
-                Rating = Rating,
+                Rating = rating,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             return ValidateResponse(resp);
@@ -523,77 +251,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Scheduled Content Rating Threshold
         /// </summary>
-        public async Task<bool> SetScheduledContentRatingThreshold(SecureSession session, string Rating) {
+        public async Task<bool> SetScheduledContentRatingThreshold(SecureSession session, string rating) {
             SetScheduledContentRatingThresholdPayload requestFields = new SetScheduledContentRatingThresholdPayload() {
-                Rating = Rating,
+                Rating = rating,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Add Block Channels
-        /// </summary>
-        public async Task<bool> AddBlockChannels(SecureSession session, BlockChannel[] Channels) {
-            AddBlockChannelsPayload requestFields = new AddBlockChannelsPayload() {
-                Channels = Channels,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Remove Block Channels
-        /// </summary>
-        public async Task<bool> RemoveBlockChannels(SecureSession session, ushort[] ChannelIndexes) {
-            RemoveBlockChannelsPayload requestFields = new RemoveBlockChannelsPayload() {
-                ChannelIndexes = ChannelIndexes,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0C, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Add Block Applications
-        /// </summary>
-        public async Task<bool> AddBlockApplications(SecureSession session, AppInfo[] Applications) {
-            AddBlockApplicationsPayload requestFields = new AddBlockApplicationsPayload() {
-                Applications = Applications,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0D, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Remove Block Applications
-        /// </summary>
-        public async Task<bool> RemoveBlockApplications(SecureSession session, AppInfo[] Applications) {
-            RemoveBlockApplicationsPayload requestFields = new RemoveBlockApplicationsPayload() {
-                Applications = Applications,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0E, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Set Block Content Time Window
-        /// </summary>
-        public async Task<bool> SetBlockContentTimeWindow(SecureSession session, TimeWindow TimeWindow) {
-            SetBlockContentTimeWindowPayload requestFields = new SetBlockContentTimeWindowPayload() {
-                TimeWindow = TimeWindow,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0F, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Remove Block Content Time Window
-        /// </summary>
-        public async Task<bool> RemoveBlockContentTimeWindow(SecureSession session, ushort[] TimeWindowIndexes) {
-            RemoveBlockContentTimeWindowPayload requestFields = new RemoveBlockContentTimeWindowPayload() {
-                TimeWindowIndexes = TimeWindowIndexes,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x10, requestFields);
             return ValidateResponse(resp);
         }
         #endregion Commands
@@ -683,44 +345,11 @@ namespace MatterDotNet.Clusters.Application
         public async Task<bool> GetBlockUnrated(SecureSession session) {
             return (bool)(dynamic?)(await GetAttribute(session, 7))!;
         }
-
-        /// <summary>
-        /// Get the Block Channel List attribute
-        /// </summary>
-        public async Task<BlockChannel[]> GetBlockChannelList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
-            BlockChannel[] list = new BlockChannel[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new BlockChannel(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Block Application List attribute
-        /// </summary>
-        public async Task<AppInfo[]> GetBlockApplicationList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 9))!);
-            AppInfo[] list = new AppInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new AppInfo(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Block Content Time Window attribute
-        /// </summary>
-        public async Task<TimeWindow[]> GetBlockContentTimeWindow(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
-            TimeWindow[] list = new TimeWindow[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new TimeWindow(reader.GetStruct(i)!);
-            return list;
-        }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Content Control Cluster";
+            return "Content Control";
         }
     }
 }

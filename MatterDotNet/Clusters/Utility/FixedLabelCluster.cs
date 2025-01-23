@@ -13,22 +13,56 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Protocol.Parsers;
+using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Fixed Label Cluster
+    /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read onlylabels.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class FixedLabelCluster : LabelCluster
+    public class FixedLabel : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0040;
 
         /// <summary>
-        /// Fixed Label Cluster
+        /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read onlylabels.
         /// </summary>
-        public FixedLabelCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public FixedLabel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected FixedLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+
+        #region Records
+        /// <summary>
+        /// Label
+        /// </summary>
+        public record Label : TLVPayload {
+            /// <summary>
+            /// Label
+            /// </summary>
+            public Label() { }
+
+            /// <summary>
+            /// Label
+            /// </summary>
+            [SetsRequiredMembers]
+            public Label(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                LabelField = reader.GetString(0, false, 16)!;
+                Value = reader.GetString(1, false, 16)!;
+            }
+            public required string LabelField { get; set; }
+            public required string Value { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, LabelField, 16);
+                writer.WriteString(1, Value, 16);
+                writer.EndContainer();
+            }
+        }
+        #endregion Records
 
         #region Attributes
         /// <summary>
@@ -45,7 +79,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Fixed Label Cluster";
+            return "Fixed Label";
         }
     }
 }

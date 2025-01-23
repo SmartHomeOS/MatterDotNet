@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Channel Cluster
+    /// This cluster provides an interface for controlling the current Channel on a device.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class ChannelCluster : ClusterBase
+    public class Channel : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0504;
 
         /// <summary>
-        /// Channel Cluster
+        /// This cluster provides an interface for controlling the current Channel on a device.
         /// </summary>
-        public ChannelCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Channel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ChannelCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Channel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -62,60 +62,60 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Channel Type
-        /// </summary>
-        public enum ChannelTypeEnum {
-            /// <summary>
-            /// The channel is sourced from a satellite provider.
-            /// </summary>
-            Satellite = 0,
-            /// <summary>
-            /// The channel is sourced from a cable provider.
-            /// </summary>
-            Cable = 1,
-            /// <summary>
-            /// The channel is sourced from a terrestrial provider.
-            /// </summary>
-            Terrestrial = 2,
-            /// <summary>
-            /// The channel is sourced from an OTT provider.
-            /// </summary>
-            OTT = 3,
-        }
-
-        /// <summary>
         /// Lineup Info Type
         /// </summary>
-        public enum LineupInfoTypeEnum {
+        public enum LineupInfoType : byte {
             /// <summary>
             /// Multi System Operator
             /// </summary>
-            MSO = 0,
+            MSO = 0x00,
         }
 
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// More than one equal match for the ChannelInfoStruct passed in.
             /// </summary>
-            MultipleMatches = 1,
+            MultipleMatches = 0x01,
             /// <summary>
             /// No matches for the ChannelInfoStruct passed in.
             /// </summary>
-            NoMatches = 2,
+            NoMatches = 0x02,
         }
 
         /// <summary>
-        /// Recording Flag Bitmap
+        /// Channel Type
+        /// </summary>
+        public enum ChannelType : byte {
+            /// <summary>
+            /// The channel is sourced from a satellite provider.
+            /// </summary>
+            Satellite = 0x00,
+            /// <summary>
+            /// The channel is sourced from a cable provider.
+            /// </summary>
+            Cable = 0x01,
+            /// <summary>
+            /// The channel is sourced from a terrestrial provider.
+            /// </summary>
+            Terrestrial = 0x02,
+            /// <summary>
+            /// The channel is sourced from an OTT provider.
+            /// </summary>
+            OTT = 0x03,
+        }
+
+        /// <summary>
+        /// Recording Flag
         /// </summary>
         [Flags]
-        public enum RecordingFlagBitmap {
+        public enum RecordingFlag : uint {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -123,15 +123,15 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// The program is scheduled for recording.
             /// </summary>
-            Scheduled = 1,
+            Scheduled = 0x1,
             /// <summary>
             /// The program series is scheduled for recording.
             /// </summary>
-            RecordSeries = 2,
+            RecordSeries = 0x2,
             /// <summary>
             /// The program is recorded and available to be played.
             /// </summary>
-            Recorded = 4,
+            Recorded = 0x4,
         }
         #endregion Enums
 
@@ -157,15 +157,15 @@ namespace MatterDotNet.Clusters.Application
                 CallSign = reader.GetString(3, true);
                 AffiliateCallSign = reader.GetString(4, true);
                 Identifier = reader.GetString(5, true);
-                Type = (ChannelTypeEnum?)reader.GetUShort(6, true);
+                Type = (ChannelType?)reader.GetUShort(6, true);
             }
             public required ushort MajorNumber { get; set; }
             public required ushort MinorNumber { get; set; }
-            public string? Name { get; set; } = "";
-            public string? CallSign { get; set; } = "";
-            public string? AffiliateCallSign { get; set; } = "";
-            public string? Identifier { get; set; } = "";
-            public ChannelTypeEnum? Type { get; set; }
+            public string? Name { get; set; }
+            public string? CallSign { get; set; }
+            public string? AffiliateCallSign { get; set; }
+            public string? Identifier { get; set; }
+            public ChannelType? Type { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, MajorNumber);
@@ -180,36 +180,6 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteString(5, Identifier);
                 if (Type != null)
                     writer.WriteUShort(6, (ushort)Type);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Channel Paging
-        /// </summary>
-        public record ChannelPaging : TLVPayload {
-            /// <summary>
-            /// Channel Paging
-            /// </summary>
-            public ChannelPaging() { }
-
-            /// <summary>
-            /// Channel Paging
-            /// </summary>
-            [SetsRequiredMembers]
-            public ChannelPaging(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                PreviousToken = new PageToken((object[])fields[0]);
-                NextToken = new PageToken((object[])fields[1]);
-            }
-            public PageToken? PreviousToken { get; set; } = null;
-            public PageToken? NextToken { get; set; } = null;
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                if (PreviousToken != null)
-                    PreviousToken.Serialize(writer, 0);
-                if (NextToken != null)
-                    NextToken.Serialize(writer, 1);
                 writer.EndContainer();
             }
         }
@@ -232,12 +202,12 @@ namespace MatterDotNet.Clusters.Application
                 OperatorName = reader.GetString(0, false)!;
                 LineupName = reader.GetString(1, true);
                 PostalCode = reader.GetString(2, true);
-                LineupInfoType = (LineupInfoTypeEnum)reader.GetUShort(3)!.Value;
+                LineupInfoType = (LineupInfoType)reader.GetUShort(3)!.Value;
             }
             public required string OperatorName { get; set; }
-            public string? LineupName { get; set; } = "";
-            public string? PostalCode { get; set; } = "";
-            public required LineupInfoTypeEnum LineupInfoType { get; set; }
+            public string? LineupName { get; set; }
+            public string? PostalCode { get; set; }
+            public required LineupInfoType LineupInfoType { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, OperatorName);
@@ -246,97 +216,6 @@ namespace MatterDotNet.Clusters.Application
                 if (PostalCode != null)
                     writer.WriteString(2, PostalCode);
                 writer.WriteUShort(3, (ushort)LineupInfoType);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Page Token
-        /// </summary>
-        public record PageToken : TLVPayload {
-            /// <summary>
-            /// Page Token
-            /// </summary>
-            public PageToken() { }
-
-            /// <summary>
-            /// Page Token
-            /// </summary>
-            [SetsRequiredMembers]
-            public PageToken(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Limit = reader.GetUShort(0, true);
-                After = reader.GetString(1, true);
-                Before = reader.GetString(2, true);
-            }
-            public ushort? Limit { get; set; } = 0;
-            public string? After { get; set; } = "";
-            public string? Before { get; set; } = "";
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                if (Limit != null)
-                    writer.WriteUShort(0, Limit);
-                if (After != null)
-                    writer.WriteString(1, After, 8192);
-                if (Before != null)
-                    writer.WriteString(2, Before, 8192);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Program Cast
-        /// </summary>
-        public record ProgramCast : TLVPayload {
-            /// <summary>
-            /// Program Cast
-            /// </summary>
-            public ProgramCast() { }
-
-            /// <summary>
-            /// Program Cast
-            /// </summary>
-            [SetsRequiredMembers]
-            public ProgramCast(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Name = reader.GetString(0, false)!;
-                Role = reader.GetString(1, false)!;
-            }
-            public required string Name { get; set; }
-            public required string Role { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, Name, 256);
-                writer.WriteString(1, Role, 256);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Program Category
-        /// </summary>
-        public record ProgramCategory : TLVPayload {
-            /// <summary>
-            /// Program Category
-            /// </summary>
-            public ProgramCategory() { }
-
-            /// <summary>
-            /// Program Category
-            /// </summary>
-            [SetsRequiredMembers]
-            public ProgramCategory(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Category = reader.GetString(0, false)!;
-                SubCategory = reader.GetString(1, true);
-            }
-            public required string Category { get; set; }
-            public string? SubCategory { get; set; } = "";
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, Category, 256);
-                if (SubCategory != null)
-                    writer.WriteString(1, SubCategory, 256);
                 writer.EndContainer();
             }
         }
@@ -356,48 +235,48 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public Program(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Identifier = reader.GetString(0, false)!;
+                Identifier = reader.GetString(0, false, 255)!;
                 Channel = new ChannelInfo((object[])fields[1]);
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(2))!.Value;
                 EndTime = TimeUtil.FromEpochSeconds(reader.GetUInt(3))!.Value;
-                Title = reader.GetString(4, false)!;
-                Subtitle = reader.GetString(5, true);
-                Description = reader.GetString(6, true);
+                Title = reader.GetString(4, false, 255)!;
+                Subtitle = reader.GetString(5, true, 255);
+                Description = reader.GetString(6, true, 8192);
                 {
-                    AudioLanguages = new string[((object[])fields[7]).Length];
-                    for (int i = 0; i < AudioLanguages.Length; i++) {
-                        AudioLanguages[i] = reader.GetString(-1, false)!;
+                    AudioLanguages = new string[reader.GetStruct(7)!.Length];
+                    for (int n = 0; n < AudioLanguages.Length; n++) {
+                        AudioLanguages[n] = reader.GetString(n, false)!;
                     }
                 }
                 {
-                    Ratings = new string[((object[])fields[8]).Length];
-                    for (int i = 0; i < Ratings.Length; i++) {
-                        Ratings[i] = reader.GetString(-1, false)!;
+                    Ratings = new string[reader.GetStruct(8)!.Length];
+                    for (int n = 0; n < Ratings.Length; n++) {
+                        Ratings[n] = reader.GetString(n, false)!;
                     }
                 }
-                ThumbnailUrl = reader.GetString(9, true);
-                PosterArtUrl = reader.GetString(10, true);
-                DvbiUrl = reader.GetString(11, true);
-                ReleaseDate = reader.GetString(12, true);
-                ParentalGuidanceText = reader.GetString(13, true);
-                RecordingFlag = (RecordingFlagBitmap?)reader.GetUShort(14, true);
+                ThumbnailUrl = reader.GetString(9, true, 8192);
+                PosterArtUrl = reader.GetString(10, true, 8192);
+                DvbiUrl = reader.GetString(11, true, 8192);
+                ReleaseDate = reader.GetString(12, true, 30);
+                ParentalGuidanceText = reader.GetString(13, true, 255);
+                RecordingFlag = (RecordingFlag?)reader.GetUInt(14, true);
                 SeriesInfo = new SeriesInfo((object[])fields[15]);
                 {
-                    CategoryList = new ProgramCategory[((object[])fields[16]).Length];
-                    for (int i = 0; i < CategoryList.Length; i++) {
-                        CategoryList[i] = new ProgramCategory((object[])fields[-1]);
+                    CategoryList = new ProgramCategory[reader.GetStruct(16)!.Length];
+                    for (int n = 0; n < CategoryList.Length; n++) {
+                        CategoryList[n] = new ProgramCategory((object[])((object[])fields[16])[n]);
                     }
                 }
                 {
-                    CastList = new ProgramCast[((object[])fields[17]).Length];
-                    for (int i = 0; i < CastList.Length; i++) {
-                        CastList[i] = new ProgramCast((object[])fields[-1]);
+                    CastList = new ProgramCast[reader.GetStruct(17)!.Length];
+                    for (int n = 0; n < CastList.Length; n++) {
+                        CastList[n] = new ProgramCast((object[])((object[])fields[17])[n]);
                     }
                 }
                 {
-                    ExternalIDList = new ContentLauncherCluster.AdditionalInfo[((object[])fields[18]).Length];
-                    for (int i = 0; i < ExternalIDList.Length; i++) {
-                        ExternalIDList[i] = new ContentLauncherCluster.AdditionalInfo((object[])fields[-1]);
+                    ExternalIDList = new ProgramCast[reader.GetStruct(18)!.Length];
+                    for (int n = 0; n < ExternalIDList.Length; n++) {
+                        ExternalIDList[n] = new ProgramCast((object[])((object[])fields[18])[n]);
                     }
                 }
             }
@@ -406,20 +285,20 @@ namespace MatterDotNet.Clusters.Application
             public required DateTime StartTime { get; set; }
             public required DateTime EndTime { get; set; }
             public required string Title { get; set; }
-            public string? Subtitle { get; set; } = "";
-            public string? Description { get; set; } = "";
-            public string[]? AudioLanguages { get; set; } = Array.Empty<string>();
-            public string[]? Ratings { get; set; } = Array.Empty<string>();
-            public string? ThumbnailUrl { get; set; } = "";
-            public string? PosterArtUrl { get; set; } = "";
-            public string? DvbiUrl { get; set; } = "";
-            public string? ReleaseDate { get; set; } = "";
-            public string? ParentalGuidanceText { get; set; } = "";
-            public required RecordingFlagBitmap? RecordingFlag { get; set; }
-            public SeriesInfo? SeriesInfo { get; set; } = null;
-            public ProgramCategory[]? CategoryList { get; set; } = Array.Empty<ProgramCategory>();
-            public ProgramCast[]? CastList { get; set; } = Array.Empty<ProgramCast>();
-            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
+            public string? Subtitle { get; set; }
+            public string? Description { get; set; }
+            public string[]? AudioLanguages { get; set; }
+            public string[]? Ratings { get; set; }
+            public string? ThumbnailUrl { get; set; }
+            public string? PosterArtUrl { get; set; }
+            public string? DvbiUrl { get; set; }
+            public string? ReleaseDate { get; set; }
+            public string? ParentalGuidanceText { get; set; }
+            public RecordingFlag? RecordingFlag { get; set; }
+            public SeriesInfo? SeriesInfo { get; set; }
+            public ProgramCategory[]? CategoryList { get; set; }
+            public ProgramCast[]? CastList { get; set; }
+            public ProgramCast[]? ExternalIDList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Identifier, 255);
@@ -460,7 +339,7 @@ namespace MatterDotNet.Clusters.Application
                 if (ParentalGuidanceText != null)
                     writer.WriteString(13, ParentalGuidanceText, 255);
                 if (RecordingFlag != null)
-                    writer.WriteUShort(14, (ushort)RecordingFlag);
+                    writer.WriteUInt(14, (uint)RecordingFlag);
                 if (SeriesInfo != null)
                     SeriesInfo.Serialize(writer, 15);
                 if (CategoryList != null)
@@ -509,8 +388,8 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public SeriesInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Season = reader.GetString(0, false)!;
-                Episode = reader.GetString(1, false)!;
+                Season = reader.GetString(0, false, 256)!;
+                Episode = reader.GetString(1, false, 256)!;
             }
             public required string Season { get; set; }
             public required string Episode { get; set; }
@@ -518,6 +397,155 @@ namespace MatterDotNet.Clusters.Application
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Season, 256);
                 writer.WriteString(1, Episode, 256);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Program Category
+        /// </summary>
+        public record ProgramCategory : TLVPayload {
+            /// <summary>
+            /// Program Category
+            /// </summary>
+            public ProgramCategory() { }
+
+            /// <summary>
+            /// Program Category
+            /// </summary>
+            [SetsRequiredMembers]
+            public ProgramCategory(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Category = reader.GetString(0, false, 256)!;
+                SubCategory = reader.GetString(1, true, 256);
+            }
+            public required string Category { get; set; }
+            public string? SubCategory { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, Category, 256);
+                if (SubCategory != null)
+                    writer.WriteString(1, SubCategory, 256);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Program Cast
+        /// </summary>
+        public record ProgramCast : TLVPayload {
+            /// <summary>
+            /// Program Cast
+            /// </summary>
+            public ProgramCast() { }
+
+            /// <summary>
+            /// Program Cast
+            /// </summary>
+            [SetsRequiredMembers]
+            public ProgramCast(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Name = reader.GetString(0, false, 256)!;
+                Role = reader.GetString(1, false, 256)!;
+            }
+            public required string Name { get; set; }
+            public required string Role { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, Name, 256);
+                writer.WriteString(1, Role, 256);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Page Token
+        /// </summary>
+        public record PageToken : TLVPayload {
+            /// <summary>
+            /// Page Token
+            /// </summary>
+            public PageToken() { }
+
+            /// <summary>
+            /// Page Token
+            /// </summary>
+            [SetsRequiredMembers]
+            public PageToken(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Limit = reader.GetUShort(0, true);
+                After = reader.GetString(1, true, 8192);
+                Before = reader.GetString(2, true, 8192);
+            }
+            public ushort? Limit { get; set; } = 0;
+            public string? After { get; set; }
+            public string? Before { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (Limit != null)
+                    writer.WriteUShort(0, Limit);
+                if (After != null)
+                    writer.WriteString(1, After, 8192);
+                if (Before != null)
+                    writer.WriteString(2, Before, 8192);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Channel Paging
+        /// </summary>
+        public record ChannelPaging : TLVPayload {
+            /// <summary>
+            /// Channel Paging
+            /// </summary>
+            public ChannelPaging() { }
+
+            /// <summary>
+            /// Channel Paging
+            /// </summary>
+            [SetsRequiredMembers]
+            public ChannelPaging(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                PreviousToken = new PageToken((object[])fields[0]);
+                NextToken = new PageToken((object[])fields[1]);
+            }
+            public PageToken? PreviousToken { get; set; }
+            public PageToken? NextToken { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (PreviousToken != null)
+                    PreviousToken.Serialize(writer, 0);
+                if (NextToken != null)
+                    NextToken.Serialize(writer, 1);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Additional Info
+        /// </summary>
+        public record AdditionalInfo : TLVPayload {
+            /// <summary>
+            /// Additional Info
+            /// </summary>
+            public AdditionalInfo() { }
+
+            /// <summary>
+            /// Additional Info
+            /// </summary>
+            [SetsRequiredMembers]
+            public AdditionalInfo(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Name = reader.GetString(0, false)!;
+                Value = reader.GetString(1, false)!;
+            }
+            public required string Name { get; set; }
+            public required string Value { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, Name);
+                writer.WriteString(1, Value);
                 writer.EndContainer();
             }
         }
@@ -531,14 +559,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.WriteString(0, Match);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// Change Channel Response - Reply from server
-        /// </summary>
-        public struct ChangeChannelResponse() {
-            public required StatusEnum Status { get; set; }
-            public string? Data { get; set; }
         }
 
         private record ChangeChannelByNumberPayload : TLVPayload {
@@ -561,21 +581,30 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
+        /// <summary>
+        /// Change Channel Response - Reply from server
+        /// </summary>
+        public struct ChangeChannelResponse() {
+            public required Status Status { get; set; }
+            public string? Data { get; set; }
+        }
+
         private record GetProgramGuidePayload : TLVPayload {
-            public required DateTime StartTime { get; set; }
-            public required DateTime EndTime { get; set; }
-            public ChannelInfo[]? ChannelList { get; set; } = Array.Empty<ChannelInfo>();
-            public PageToken? PageToken { get; set; } = null;
-            public RecordingFlagBitmap? RecordingFlag { get; set; } = null;
-            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
+            public DateTime? StartTime { get; set; }
+            public DateTime? EndTime { get; set; }
+            public ChannelInfo[]? ChannelList { get; set; }
+            public PageToken? PageToken { get; set; }
+            public RecordingFlag? RecordingFlag { get; set; }
+            public AdditionalInfo[]? ExternalIDList { get; set; }
             public byte[]? Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, TimeUtil.ToEpochSeconds(StartTime));
-                writer.WriteUInt(1, TimeUtil.ToEpochSeconds(EndTime));
+                if (StartTime != null)
+                    writer.WriteUInt(0, TimeUtil.ToEpochSeconds(StartTime!.Value));
+                if (EndTime != null)
+                    writer.WriteUInt(1, TimeUtil.ToEpochSeconds(EndTime!.Value));
                 if (ChannelList != null)
                 {
-                    Constrain(ChannelList, 0, 255);
                     writer.StartArray(2);
                     foreach (var item in ChannelList) {
                         item.Serialize(writer, -1);
@@ -585,18 +614,17 @@ namespace MatterDotNet.Clusters.Application
                 if (PageToken != null)
                     PageToken.Serialize(writer, 3);
                 if (RecordingFlag != null)
-                    writer.WriteUShort(5, (ushort?)RecordingFlag);
+                    writer.WriteUInt(4, (uint)RecordingFlag);
                 if (ExternalIDList != null)
                 {
-                    Constrain(ExternalIDList, 0, 255);
-                    writer.StartArray(6);
+                    writer.StartArray(5);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
                     writer.EndContainer();
                 }
                 if (Data != null)
-                    writer.WriteBytes(7, Data, 8092);
+                    writer.WriteBytes(6, Data);
                 writer.EndContainer();
             }
         }
@@ -606,29 +634,26 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public struct ProgramGuideResponse() {
             public required ChannelPaging Paging { get; set; }
-            public required Program[] ProgramList { get; set; } = Array.Empty<Program>();
+            public required Program[] ProgramList { get; set; }
         }
 
         private record RecordProgramPayload : TLVPayload {
             public required string ProgramIdentifier { get; set; }
             public required bool ShouldRecordSeries { get; set; }
-            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
-            public byte[]? Data { get; set; }
+            public required AdditionalInfo[] ExternalIDList { get; set; }
+            public required byte[] Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, ProgramIdentifier, 255);
+                writer.WriteString(0, ProgramIdentifier);
                 writer.WriteBool(1, ShouldRecordSeries);
-                if (ExternalIDList != null)
                 {
-                    Constrain(ExternalIDList, 0, 255);
                     writer.StartArray(2);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
                     writer.EndContainer();
                 }
-                if (Data != null)
-                    writer.WriteBytes(3, Data, 8092);
+                writer.WriteBytes(3, Data);
                 writer.EndContainer();
             }
         }
@@ -636,23 +661,20 @@ namespace MatterDotNet.Clusters.Application
         private record CancelRecordProgramPayload : TLVPayload {
             public required string ProgramIdentifier { get; set; }
             public required bool ShouldRecordSeries { get; set; }
-            public ContentLauncherCluster.AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<ContentLauncherCluster.AdditionalInfo>();
-            public byte[]? Data { get; set; }
+            public required AdditionalInfo[] ExternalIDList { get; set; }
+            public required byte[] Data { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, ProgramIdentifier, 255);
+                writer.WriteString(0, ProgramIdentifier);
                 writer.WriteBool(1, ShouldRecordSeries);
-                if (ExternalIDList != null)
                 {
-                    Constrain(ExternalIDList, 0, 255);
                     writer.StartArray(2);
                     foreach (var item in ExternalIDList) {
                         item.Serialize(writer, -1);
                     }
                     writer.EndContainer();
                 }
-                if (Data != null)
-                    writer.WriteBytes(3, Data, 8092);
+                writer.WriteBytes(3, Data);
                 writer.EndContainer();
             }
         }
@@ -662,15 +684,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Change Channel
         /// </summary>
-        public async Task<ChangeChannelResponse?> ChangeChannel(SecureSession session, string Match) {
+        public async Task<ChangeChannelResponse?> ChangeChannel(SecureSession session, string match) {
             ChangeChannelPayload requestFields = new ChangeChannelPayload() {
-                Match = Match,
+                Match = match,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ChangeChannelResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -678,10 +700,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Change Channel By Number
         /// </summary>
-        public async Task<bool> ChangeChannelByNumber(SecureSession session, ushort MajorNumber, ushort MinorNumber) {
+        public async Task<bool> ChangeChannelByNumber(SecureSession session, ushort majorNumber, ushort minorNumber) {
             ChangeChannelByNumberPayload requestFields = new ChangeChannelByNumberPayload() {
-                MajorNumber = MajorNumber,
-                MinorNumber = MinorNumber,
+                MajorNumber = majorNumber,
+                MinorNumber = minorNumber,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             return ValidateResponse(resp);
@@ -690,9 +712,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Skip Channel
         /// </summary>
-        public async Task<bool> SkipChannel(SecureSession session, short Count) {
+        public async Task<bool> SkipChannel(SecureSession session, short count) {
             SkipChannelPayload requestFields = new SkipChannelPayload() {
-                Count = Count,
+                Count = count,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             return ValidateResponse(resp);
@@ -701,15 +723,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get Program Guide
         /// </summary>
-        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime StartTime, DateTime EndTime, ChannelInfo[]? ChannelList, PageToken? PageToken, RecordingFlagBitmap? RecordingFlag, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
+        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime? startTime, DateTime? endTime, ChannelInfo[]? channelList, PageToken? pageToken, RecordingFlag? recordingFlag, AdditionalInfo[]? externalIDList, byte[]? data) {
             GetProgramGuidePayload requestFields = new GetProgramGuidePayload() {
-                StartTime = StartTime,
-                EndTime = EndTime,
-                ChannelList = ChannelList,
-                PageToken = PageToken,
-                RecordingFlag = RecordingFlag,
-                ExternalIDList = ExternalIDList,
-                Data = Data,
+                StartTime = startTime,
+                EndTime = endTime,
+                ChannelList = channelList,
+                PageToken = pageToken,
+                RecordingFlag = recordingFlag,
+                ExternalIDList = externalIDList,
+                Data = data,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
@@ -723,12 +745,12 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Record Program
         /// </summary>
-        public async Task<bool> RecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
+        public async Task<bool> RecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data) {
             RecordProgramPayload requestFields = new RecordProgramPayload() {
-                ProgramIdentifier = ProgramIdentifier,
-                ShouldRecordSeries = ShouldRecordSeries,
-                ExternalIDList = ExternalIDList,
-                Data = Data,
+                ProgramIdentifier = programIdentifier,
+                ShouldRecordSeries = shouldRecordSeries,
+                ExternalIDList = externalIDList,
+                Data = data,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             return ValidateResponse(resp);
@@ -737,12 +759,12 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Cancel Record Program
         /// </summary>
-        public async Task<bool> CancelRecordProgram(SecureSession session, string ProgramIdentifier, bool ShouldRecordSeries, ContentLauncherCluster.AdditionalInfo[]? ExternalIDList, byte[]? Data) {
+        public async Task<bool> CancelRecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data) {
             CancelRecordProgramPayload requestFields = new CancelRecordProgramPayload() {
-                ProgramIdentifier = ProgramIdentifier,
-                ShouldRecordSeries = ShouldRecordSeries,
-                ExternalIDList = ExternalIDList,
-                Data = Data,
+                ProgramIdentifier = programIdentifier,
+                ShouldRecordSeries = shouldRecordSeries,
+                ExternalIDList = externalIDList,
+                Data = data,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             return ValidateResponse(resp);
@@ -786,20 +808,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lineup attribute
         /// </summary>
         public async Task<LineupInfo?> GetLineup(SecureSession session) {
-            return new LineupInfo((object[])(await GetAttribute(session, 1))!) ?? null;
+            return new LineupInfo((object[])(await GetAttribute(session, 1))!);
         }
 
         /// <summary>
         /// Get the Current Channel attribute
         /// </summary>
         public async Task<ChannelInfo?> GetCurrentChannel(SecureSession session) {
-            return new ChannelInfo((object[])(await GetAttribute(session, 2))!) ?? null;
+            return new ChannelInfo((object[])(await GetAttribute(session, 2))!);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Channel Cluster";
+            return "Channel";
         }
     }
 }

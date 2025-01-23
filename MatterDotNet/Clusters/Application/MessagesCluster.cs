@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Messages Cluster
+    /// This cluster provides an interface for passing messages to be presented by a device.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 3)]
-    public class MessagesCluster : ClusterBase
+    public class Messages : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0097;
 
         /// <summary>
-        /// Messages Cluster
+        /// This cluster provides an interface for passing messages to be presented by a device.
         /// </summary>
-        public MessagesCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Messages(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MessagesCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Messages(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -52,56 +52,56 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Future Message Preference
         /// </summary>
-        public enum FutureMessagePreferenceEnum {
+        public enum FutureMessagePreference : byte {
             /// <summary>
             /// Similar messages are allowed
             /// </summary>
-            Allowed = 0,
+            Allowed = 0x00,
             /// <summary>
             /// Similar messages should be sent more often
             /// </summary>
-            Increased = 1,
+            Increased = 0x01,
             /// <summary>
             /// Similar messages should be sent less often
             /// </summary>
-            Reduced = 2,
+            Reduced = 0x02,
             /// <summary>
             /// Similar messages should not be sent
             /// </summary>
-            Disallowed = 3,
+            Disallowed = 0x03,
             /// <summary>
             /// No further messages should be sent
             /// </summary>
-            Banned = 4,
+            Banned = 0x04,
         }
 
         /// <summary>
         /// Message Priority
         /// </summary>
-        public enum MessagePriorityEnum {
+        public enum MessagePriority : byte {
             /// <summary>
             /// Message to be transferred with a low level of importance
             /// </summary>
-            Low = 0,
+            Low = 0x00,
             /// <summary>
             /// Message to be transferred with a medium level of importance
             /// </summary>
-            Medium = 1,
+            Medium = 0x01,
             /// <summary>
             /// Message to be transferred with a high level of importance
             /// </summary>
-            High = 2,
+            High = 0x02,
             /// <summary>
             /// Message to be transferred with a critical level of importance
             /// </summary>
-            Critical = 3,
+            Critical = 0x03,
         }
 
         /// <summary>
-        /// Message Control Bitmap
+        /// Message Control
         /// </summary>
         [Flags]
-        public enum MessageControlBitmap {
+        public enum MessageControl : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -109,55 +109,27 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Message requires confirmation from user
             /// </summary>
-            ConfirmationRequired = 1,
+            ConfirmationRequired = 0x1,
             /// <summary>
             /// Message requires response from user
             /// </summary>
-            ResponseRequired = 2,
+            ResponseRequired = 0x2,
             /// <summary>
             /// Message supports reply message from user
             /// </summary>
-            ReplyMessage = 4,
+            ReplyMessage = 0x4,
             /// <summary>
             /// Message has already been confirmed
             /// </summary>
-            MessageConfirmed = 8,
+            MessageConfirmed = 0x8,
             /// <summary>
             /// Message required PIN/password protection
             /// </summary>
-            MessageProtected = 16,
+            MessageProtected = 0x10,
         }
         #endregion Enums
 
         #region Records
-        /// <summary>
-        /// Message Response Option
-        /// </summary>
-        public record MessageResponseOption : TLVPayload {
-            /// <summary>
-            /// Message Response Option
-            /// </summary>
-            public MessageResponseOption() { }
-
-            /// <summary>
-            /// Message Response Option
-            /// </summary>
-            [SetsRequiredMembers]
-            public MessageResponseOption(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                MessageResponseID = reader.GetUInt(0)!.Value;
-                Label = reader.GetString(1, false)!;
-            }
-            public required uint MessageResponseID { get; set; }
-            public required string Label { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUInt(0, MessageResponseID, uint.MaxValue, 1);
-                writer.WriteString(1, Label, 32);
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
         /// Message
         /// </summary>
@@ -174,30 +146,30 @@ namespace MatterDotNet.Clusters.Application
             public Message(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 MessageID = new Guid(reader.GetBytes(0, false, 16, 16)!);
-                Priority = (MessagePriorityEnum)reader.GetUShort(1)!.Value;
-                MessageControl = (MessageControlBitmap)reader.GetUShort(2)!.Value;
+                Priority = (MessagePriority)reader.GetUShort(1)!.Value;
+                MessageControl = (MessageControl)reader.GetUInt(2)!.Value;
                 StartTime = TimeUtil.FromEpochSeconds(reader.GetUInt(3, true));
                 Duration = reader.GetULong(4, true);
-                MessageText = reader.GetString(5, false)!;
+                MessageText = reader.GetString(5, false, 256)!;
                 {
-                    Responses = new MessageResponseOption[((object[])fields[6]).Length];
-                    for (int i = 0; i < Responses.Length; i++) {
-                        Responses[i] = new MessageResponseOption((object[])fields[-1]);
+                    Responses = new MessageResponseOption[reader.GetStruct(6)!.Length];
+                    for (int n = 0; n < Responses.Length; n++) {
+                        Responses[n] = new MessageResponseOption((object[])((object[])fields[6])[n]);
                     }
                 }
             }
             public required Guid MessageID { get; set; }
-            public required MessagePriorityEnum Priority { get; set; }
-            public required MessageControlBitmap MessageControl { get; set; }
+            public required MessagePriority Priority { get; set; }
+            public required MessageControl MessageControl { get; set; }
             public required DateTime? StartTime { get; set; } = TimeUtil.EPOCH;
             public required ulong? Duration { get; set; } = 0;
             public required string MessageText { get; set; }
-            public required MessageResponseOption[]? Responses { get; set; } = Array.Empty<MessageResponseOption>();
+            public MessageResponseOption[]? Responses { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, MessageID.ToByteArray());
                 writer.WriteUShort(1, (ushort)Priority);
-                writer.WriteUShort(2, (ushort)MessageControl);
+                writer.WriteUInt(2, (uint)MessageControl);
                 if (!StartTime.HasValue)
                     writer.WriteNull(3);
                 else
@@ -216,22 +188,52 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
+
+        /// <summary>
+        /// Message Response Option
+        /// </summary>
+        public record MessageResponseOption : TLVPayload {
+            /// <summary>
+            /// Message Response Option
+            /// </summary>
+            public MessageResponseOption() { }
+
+            /// <summary>
+            /// Message Response Option
+            /// </summary>
+            [SetsRequiredMembers]
+            public MessageResponseOption(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                MessageResponseID = reader.GetUInt(0, true);
+                Label = reader.GetString(1, true, 32);
+            }
+            public uint? MessageResponseID { get; set; }
+            public string? Label { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (MessageResponseID != null)
+                    writer.WriteUInt(0, MessageResponseID);
+                if (Label != null)
+                    writer.WriteString(1, Label, 32);
+                writer.EndContainer();
+            }
+        }
         #endregion Records
 
         #region Payloads
         private record PresentMessagesRequestPayload : TLVPayload {
             public required Guid MessageID { get; set; }
-            public required MessagePriorityEnum Priority { get; set; } = 0;
-            public required MessageControlBitmap MessageControl { get; set; } = 0;
-            public required DateTime? StartTime { get; set; } = TimeUtil.EPOCH;
-            public required ulong? Duration { get; set; } = 0;
+            public required MessagePriority Priority { get; set; }
+            public required MessageControl MessageControl { get; set; }
+            public required DateTime? StartTime { get; set; }
+            public required ulong? Duration { get; set; }
             public required string MessageText { get; set; }
-            public MessageResponseOption[]? Responses { get; set; } = Array.Empty<MessageResponseOption>();
+            public MessageResponseOption[]? Responses { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteBytes(0, MessageID.ToByteArray());
                 writer.WriteUShort(1, (ushort)Priority);
-                writer.WriteUShort(2, (ushort)MessageControl);
+                writer.WriteUInt(2, (uint)MessageControl);
                 if (!StartTime.HasValue)
                     writer.WriteNull(3);
                 else
@@ -252,14 +254,13 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record CancelMessagesRequestPayload : TLVPayload {
-            public required Guid[] MessageIDs { get; set; }
+            public required byte[][] MessageIDs { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
-                    Constrain(MessageIDs, 0, 8);
                     writer.StartArray(0);
                     foreach (var item in MessageIDs) {
-                        writer.WriteBytes(-1, item.ToByteArray());
+                        writer.WriteBytes(-1, item);
                     }
                     writer.EndContainer();
                 }
@@ -272,15 +273,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Present Messages Request
         /// </summary>
-        public async Task<bool> PresentMessagesRequest(SecureSession session, Guid MessageID, MessagePriorityEnum Priority, MessageControlBitmap MessageControl, DateTime StartTime, ulong Duration, string MessageText, MessageResponseOption[]? Responses) {
+        public async Task<bool> PresentMessagesRequest(SecureSession session, Guid messageID, MessagePriority priority, MessageControl messageControl, DateTime? startTime, ulong? duration, string messageText, MessageResponseOption[]? responses) {
             PresentMessagesRequestPayload requestFields = new PresentMessagesRequestPayload() {
-                MessageID = MessageID,
-                Priority = Priority,
-                MessageControl = MessageControl,
-                StartTime = StartTime,
-                Duration = Duration,
-                MessageText = MessageText,
-                Responses = Responses,
+                MessageID = messageID,
+                Priority = priority,
+                MessageControl = messageControl,
+                StartTime = startTime,
+                Duration = duration,
+                MessageText = messageText,
+                Responses = responses,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -289,9 +290,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Cancel Messages Request
         /// </summary>
-        public async Task<bool> CancelMessagesRequest(SecureSession session, Guid[] MessageIDs) {
+        public async Task<bool> CancelMessagesRequest(SecureSession session, byte[][] messageIDs) {
             CancelMessagesRequestPayload requestFields = new CancelMessagesRequestPayload() {
-                MessageIDs = MessageIDs,
+                MessageIDs = messageIDs,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -334,18 +335,18 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Active Message I Ds attribute
         /// </summary>
-        public async Task<Guid[]> GetActiveMessageIDs(SecureSession session) {
+        public async Task<byte[][]> GetActiveMessageIDs(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            Guid[] list = new Guid[reader.Count];
+            byte[][] list = new byte[reader.Count][];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new Guid(reader.GetBytes(i, false, 16, 16)!);
+                list[i] = reader.GetBytes(i, false, 8)!;
             return list;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Messages Cluster";
+            return "Messages";
         }
     }
 }

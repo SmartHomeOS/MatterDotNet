@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Media Playback Cluster
+    /// This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class MediaPlaybackCluster : ClusterBase
+    public class MediaPlayback : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0506;
 
         /// <summary>
-        /// Media Playback Cluster
+        /// This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.
         /// </summary>
-        public MediaPlaybackCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public MediaPlayback(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MediaPlaybackCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected MediaPlayback(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -66,137 +66,197 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Characteristic
-        /// </summary>
-        public enum CharacteristicEnum {
-            /// <summary>
-            /// Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.
-            /// </summary>
-            ForcedSubtitles = 0,
-            /// <summary>
-            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
-            /// </summary>
-            DescribesVideo = 1,
-            /// <summary>
-            /// Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].
-            /// </summary>
-            EasyToRead = 2,
-            /// <summary>
-            /// A media characteristic that indicates that a track selection option includes frame-based content.
-            /// </summary>
-            FrameBased = 3,
-            /// <summary>
-            /// Main media component(s) which is/are intended for presentation if no other information is provided
-            /// </summary>
-            MainProgram = 4,
-            /// <summary>
-            /// A media characteristic that indicates that a track or media selection option contains original content.
-            /// </summary>
-            OriginalContent = 5,
-            /// <summary>
-            /// A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.
-            /// </summary>
-            VoiceOverTranslation = 6,
-            /// <summary>
-            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
-            /// </summary>
-            Caption = 7,
-            /// <summary>
-            /// Textual transcriptions of spoken dialog.
-            /// </summary>
-            Subtitle = 8,
-            /// <summary>
-            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
-            /// </summary>
-            Alternate = 9,
-            /// <summary>
-            /// Media content component that is supplementary to a media content component of a different media component type.
-            /// </summary>
-            Supplementary = 10,
-            /// <summary>
-            /// Experience that contains a commentary (e.g. director’s commentary) (typically audio)
-            /// </summary>
-            Commentary = 11,
-            /// <summary>
-            /// Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)
-            /// </summary>
-            DubbedTranslation = 12,
-            /// <summary>
-            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
-            /// </summary>
-            Description = 13,
-            /// <summary>
-            /// Media component containing information intended to be processed by application specific elements.
-            /// </summary>
-            Metadata = 14,
-            /// <summary>
-            /// Experience containing an element for improved intelligibility of the dialogue.
-            /// </summary>
-            EnhancedAudioIntelligibility = 15,
-            /// <summary>
-            /// Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.
-            /// </summary>
-            Emergency = 16,
-            /// <summary>
-            /// Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].
-            /// </summary>
-            Karaoke = 17,
-        }
-
-        /// <summary>
         /// Playback State
         /// </summary>
-        public enum PlaybackStateEnum {
+        public enum PlaybackState : byte {
             /// <summary>
             /// Media is currently playing (includes FF and REW)
             /// </summary>
-            Playing = 0,
+            Playing = 0x00,
             /// <summary>
             /// Media is currently paused
             /// </summary>
-            Paused = 1,
+            Paused = 0x01,
             /// <summary>
             /// Media is not currently playing
             /// </summary>
-            NotPlaying = 2,
+            NotPlaying = 0x02,
             /// <summary>
             /// Media is not currently buffering and playback will start when buffer has been filled
             /// </summary>
-            Buffering = 3,
+            Buffering = 0x03,
         }
 
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// Requested playback command is invalid in the current playback state.
             /// </summary>
-            InvalidStateForCommand = 1,
+            InvalidStateForCommand = 0x01,
             /// <summary>
             /// Requested playback command is not allowed in the current playback state. For example, attempting to fast-forward during a commercial might return NotAllowed.
             /// </summary>
-            NotAllowed = 2,
+            NotAllowed = 0x02,
             /// <summary>
             /// This endpoint is not active for playback.
             /// </summary>
-            NotActive = 3,
+            NotActive = 0x03,
             /// <summary>
             /// The FastForward or Rewind Command was issued but the media is already playing back at the fastest speed supported by the server in the respective direction.
             /// </summary>
-            SpeedOutOfRange = 4,
+            SpeedOutOfRange = 0x04,
             /// <summary>
             /// The Seek Command was issued with a value of position outside of the allowed seek range of the media.
             /// </summary>
-            SeekOutOfRange = 5,
+            SeekOutOfRange = 0x05,
+        }
+
+        /// <summary>
+        /// Characteristic
+        /// </summary>
+        public enum Characteristic : byte {
+            /// <summary>
+            /// Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.
+            /// </summary>
+            ForcedSubtitles = 0x00,
+            /// <summary>
+            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
+            /// </summary>
+            DescribesVideo = 0x01,
+            /// <summary>
+            /// Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].
+            /// </summary>
+            EasyToRead = 0x02,
+            /// <summary>
+            /// A media characteristic that indicates that a track selection option includes frame-based content.
+            /// </summary>
+            FrameBased = 0x03,
+            /// <summary>
+            /// Main media component(s) which is/are intended for presentation if no other information is provided
+            /// </summary>
+            MainProgram = 0x04,
+            /// <summary>
+            /// A media characteristic that indicates that a track or media selection option contains original content.
+            /// </summary>
+            OriginalContent = 0x05,
+            /// <summary>
+            /// A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.
+            /// </summary>
+            VoiceOverTranslation = 0x06,
+            /// <summary>
+            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
+            /// </summary>
+            Caption = 0x07,
+            /// <summary>
+            /// Textual transcriptions of spoken dialog.
+            /// </summary>
+            Subtitle = 0x08,
+            /// <summary>
+            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
+            /// </summary>
+            Alternate = 0x09,
+            /// <summary>
+            /// Media content component that is supplementary to a media content component of a different media component type.
+            /// </summary>
+            Supplementary = 0x0A,
+            /// <summary>
+            /// Experience that contains a commentary (e.g. director’s commentary) (typically audio)
+            /// </summary>
+            Commentary = 0x0B,
+            /// <summary>
+            /// Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)
+            /// </summary>
+            DubbedTranslation = 0x0C,
+            /// <summary>
+            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
+            /// </summary>
+            Description = 0x0D,
+            /// <summary>
+            /// Media component containing information intended to be processed by application specific elements.
+            /// </summary>
+            Metadata = 0x0E,
+            /// <summary>
+            /// Experience containing an element for improved intelligibility of the dialogue.
+            /// </summary>
+            EnhancedAudioIntelligibility = 0x0F,
+            /// <summary>
+            /// Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.
+            /// </summary>
+            Emergency = 0x10,
+            /// <summary>
+            /// Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].
+            /// </summary>
+            Karaoke = 0x11,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Track
+        /// </summary>
+        public record Track : TLVPayload {
+            /// <summary>
+            /// Track
+            /// </summary>
+            public Track() { }
+
+            /// <summary>
+            /// Track
+            /// </summary>
+            [SetsRequiredMembers]
+            public Track(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                ID = reader.GetString(0, false, 32)!;
+                TrackAttributes = new TrackAttributes((object[])fields[1]);
+            }
+            public required string ID { get; set; }
+            public required TrackAttributes? TrackAttributes { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, ID, 32);
+                if (TrackAttributes == null)
+                    writer.WriteNull(1);
+                else
+                    TrackAttributes.Serialize(writer, 1);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Track Attributes
+        /// </summary>
+        public record TrackAttributes : TLVPayload {
+            /// <summary>
+            /// Track Attributes
+            /// </summary>
+            public TrackAttributes() { }
+
+            /// <summary>
+            /// Track Attributes
+            /// </summary>
+            [SetsRequiredMembers]
+            public TrackAttributes(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                LanguageCode = reader.GetString(0, false, 32)!;
+                DisplayName = reader.GetString(1, true);
+            }
+            public required string LanguageCode { get; set; }
+            public string? DisplayName { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, LanguageCode, 32);
+                if (DisplayName != null)
+                    writer.WriteString(1, DisplayName);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Playback Position
         /// </summary>
@@ -224,86 +284,11 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
-
-        /// <summary>
-        /// Track Attributes
-        /// </summary>
-        public record TrackAttributes : TLVPayload {
-            /// <summary>
-            /// Track Attributes
-            /// </summary>
-            public TrackAttributes() { }
-
-            /// <summary>
-            /// Track Attributes
-            /// </summary>
-            [SetsRequiredMembers]
-            public TrackAttributes(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                LanguageCode = reader.GetString(0, false)!;
-                {
-                    Characteristics = new CharacteristicEnum[((object[])fields[1]).Length];
-                    for (int i = 0; i < Characteristics.Length; i++) {
-                        Characteristics[i] = (CharacteristicEnum)reader.GetUShort(-1)!.Value;
-                    }
-                }
-                DisplayName = reader.GetString(2, true);
-            }
-            public required string LanguageCode { get; set; }
-            public CharacteristicEnum[]? Characteristics { get; set; } = null;
-            public string? DisplayName { get; set; } = null;
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, LanguageCode, 32);
-                if (Characteristics != null)
-                if (Characteristics != null)
-                {
-                    writer.StartArray(1);
-                    foreach (var item in Characteristics) {
-                        writer.WriteUShort(-1, (ushort)item);
-                    }
-                    writer.EndContainer();
-                }
-                else
-                    writer.WriteNull(1);
-                if (DisplayName != null)
-                    writer.WriteString(2, DisplayName, 256);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Track
-        /// </summary>
-        public record Track : TLVPayload {
-            /// <summary>
-            /// Track
-            /// </summary>
-            public Track() { }
-
-            /// <summary>
-            /// Track
-            /// </summary>
-            [SetsRequiredMembers]
-            public Track(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                ID = reader.GetString(0, false)!;
-                TrackAttributes = new TrackAttributes((object[])fields[1]);
-            }
-            public required string ID { get; set; }
-            public required TrackAttributes TrackAttributes { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, ID, 32);
-                TrackAttributes.Serialize(writer, 1);
-                writer.EndContainer();
-            }
-        }
         #endregion Records
 
         #region Payloads
         private record RewindPayload : TLVPayload {
-            public bool? AudioAdvanceUnmuted { get; set; } = false;
+            public bool? AudioAdvanceUnmuted { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (AudioAdvanceUnmuted != null)
@@ -313,7 +298,7 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record FastForwardPayload : TLVPayload {
-            public bool? AudioAdvanceUnmuted { get; set; } = false;
+            public bool? AudioAdvanceUnmuted { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (AudioAdvanceUnmuted != null)
@@ -340,14 +325,6 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
-        /// <summary>
-        /// Playback Response - Reply from server
-        /// </summary>
-        public struct PlaybackResponse() {
-            public required StatusEnum Status { get; set; }
-            public string? Data { get; set; }
-        }
-
         private record SeekPayload : TLVPayload {
             public required ulong Position { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -357,14 +334,21 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
+        /// <summary>
+        /// Playback Response - Reply from server
+        /// </summary>
+        public struct PlaybackResponse() {
+            public required Status Status { get; set; }
+            public string? Data { get; set; }
+        }
+
         private record ActivateAudioTrackPayload : TLVPayload {
             public required string TrackID { get; set; }
-            public byte? AudioOutputIndex { get; set; }
+            public required byte AudioOutputIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, TrackID, 32);
-                if (AudioOutputIndex != null)
-                    writer.WriteByte(1, AudioOutputIndex);
+                writer.WriteString(0, TrackID);
+                writer.WriteByte(1, AudioOutputIndex);
                 writer.EndContainer();
             }
         }
@@ -373,7 +357,7 @@ namespace MatterDotNet.Clusters.Application
             public required string TrackID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, TrackID, 32);
+                writer.WriteString(0, TrackID);
                 writer.EndContainer();
             }
         }
@@ -388,7 +372,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -401,7 +385,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -414,7 +398,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -427,7 +411,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -440,7 +424,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -453,7 +437,7 @@ namespace MatterDotNet.Clusters.Application
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -461,15 +445,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Rewind
         /// </summary>
-        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool? AudioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool? audioAdvanceUnmuted) {
             RewindPayload requestFields = new RewindPayload() {
-                AudioAdvanceUnmuted = AudioAdvanceUnmuted,
+                AudioAdvanceUnmuted = audioAdvanceUnmuted,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -477,15 +461,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Fast Forward
         /// </summary>
-        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool? AudioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool? audioAdvanceUnmuted) {
             FastForwardPayload requestFields = new FastForwardPayload() {
-                AudioAdvanceUnmuted = AudioAdvanceUnmuted,
+                AudioAdvanceUnmuted = audioAdvanceUnmuted,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -493,15 +477,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Skip Forward
         /// </summary>
-        public async Task<PlaybackResponse?> SkipForward(SecureSession session, ulong DeltaPositionMilliseconds) {
+        public async Task<PlaybackResponse?> SkipForward(SecureSession session, ulong deltaPositionMilliseconds) {
             SkipForwardPayload requestFields = new SkipForwardPayload() {
-                DeltaPositionMilliseconds = DeltaPositionMilliseconds,
+                DeltaPositionMilliseconds = deltaPositionMilliseconds,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -509,15 +493,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Skip Backward
         /// </summary>
-        public async Task<PlaybackResponse?> SkipBackward(SecureSession session, ulong DeltaPositionMilliseconds) {
+        public async Task<PlaybackResponse?> SkipBackward(SecureSession session, ulong deltaPositionMilliseconds) {
             SkipBackwardPayload requestFields = new SkipBackwardPayload() {
-                DeltaPositionMilliseconds = DeltaPositionMilliseconds,
+                DeltaPositionMilliseconds = deltaPositionMilliseconds,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -525,15 +509,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Seek
         /// </summary>
-        public async Task<PlaybackResponse?> Seek(SecureSession session, ulong Position) {
+        public async Task<PlaybackResponse?> Seek(SecureSession session, ulong position) {
             SeekPayload requestFields = new SeekPayload() {
-                Position = Position,
+                Position = position,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -541,10 +525,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Activate Audio Track
         /// </summary>
-        public async Task<bool> ActivateAudioTrack(SecureSession session, string TrackID, byte? AudioOutputIndex) {
+        public async Task<bool> ActivateAudioTrack(SecureSession session, string trackID, byte audioOutputIndex) {
             ActivateAudioTrackPayload requestFields = new ActivateAudioTrackPayload() {
-                TrackID = TrackID,
-                AudioOutputIndex = AudioOutputIndex,
+                TrackID = trackID,
+                AudioOutputIndex = audioOutputIndex,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0C, requestFields);
             return ValidateResponse(resp);
@@ -553,9 +537,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Activate Text Track
         /// </summary>
-        public async Task<bool> ActivateTextTrack(SecureSession session, string TrackID) {
+        public async Task<bool> ActivateTextTrack(SecureSession session, string trackID) {
             ActivateTextTrackPayload requestFields = new ActivateTextTrackPayload() {
-                TrackID = TrackID,
+                TrackID = trackID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0D, requestFields);
             return ValidateResponse(resp);
@@ -595,29 +579,29 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Current State attribute
         /// </summary>
-        public async Task<PlaybackStateEnum> GetCurrentState(SecureSession session) {
-            return (PlaybackStateEnum)await GetEnumAttribute(session, 0);
+        public async Task<PlaybackState> GetCurrentState(SecureSession session) {
+            return (PlaybackState)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Start Time attribute
         /// </summary>
         public async Task<DateTime?> GetStartTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? TimeUtil.EPOCH;
         }
 
         /// <summary>
         /// Get the Duration attribute
         /// </summary>
         public async Task<ulong?> GetDuration(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2, true) ?? null;
+            return (ulong?)(dynamic?)await GetAttribute(session, 2, true) ?? 0;
         }
 
         /// <summary>
         /// Get the Sampled Position attribute
         /// </summary>
         public async Task<PlaybackPosition?> GetSampledPosition(SecureSession session) {
-            return new PlaybackPosition((object[])(await GetAttribute(session, 3))!) ?? null;
+            return new PlaybackPosition((object[])(await GetAttribute(session, 3))!);
         }
 
         /// <summary>
@@ -631,21 +615,21 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Seek Range End attribute
         /// </summary>
         public async Task<ulong?> GetSeekRangeEnd(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5, true) ?? null;
+            return (ulong?)(dynamic?)await GetAttribute(session, 5, true);
         }
 
         /// <summary>
         /// Get the Seek Range Start attribute
         /// </summary>
         public async Task<ulong?> GetSeekRangeStart(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 6, true) ?? null;
+            return (ulong?)(dynamic?)await GetAttribute(session, 6, true);
         }
 
         /// <summary>
         /// Get the Active Audio Track attribute
         /// </summary>
         public async Task<Track?> GetActiveAudioTrack(SecureSession session) {
-            return new Track((object[])(await GetAttribute(session, 7))!) ?? null;
+            return new Track((object[])(await GetAttribute(session, 7))!);
         }
 
         /// <summary>
@@ -663,7 +647,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Active Text Track attribute
         /// </summary>
         public async Task<Track?> GetActiveTextTrack(SecureSession session) {
-            return new Track((object[])(await GetAttribute(session, 9))!) ?? null;
+            return new Track((object[])(await GetAttribute(session, 9))!);
         }
 
         /// <summary>
@@ -680,7 +664,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Media Playback Cluster";
+            return "Media Playback";
         }
     }
 }

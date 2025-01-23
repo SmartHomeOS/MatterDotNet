@@ -17,97 +17,163 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// OTA Software Update Provider Cluster
+    /// Provides an interface for providing OTA software updates
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class OTASoftwareUpdateProviderCluster : ClusterBase
+    public class OTASoftwareUpdateProvider : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0029;
 
         /// <summary>
-        /// OTA Software Update Provider Cluster
+        /// Provides an interface for providing OTA software updates
         /// </summary>
-        public OTASoftwareUpdateProviderCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OTASoftwareUpdateProvider(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OTASoftwareUpdateProviderCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OTASoftwareUpdateProvider(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
+        /// Status
+        /// </summary>
+        public enum Status : byte {
+            /// <summary>
+            /// Indicates that the OTA Provider has an update available.
+            /// </summary>
+            UpdateAvailable = 0x0,
+            /// <summary>
+            /// Indicates OTA Provider may have an update, but it is not ready yet.
+            /// </summary>
+            Busy = 0x1,
+            /// <summary>
+            /// Indicates that there is definitely no update currently available from the OTA Provider.
+            /// </summary>
+            NotAvailable = 0x2,
+            /// <summary>
+            /// Indicates that the requested download protocol is not supported by the OTA Provider.
+            /// </summary>
+            DownloadProtocolNotSupported = 0x3,
+        }
+
+        /// <summary>
         /// Apply Update Action
         /// </summary>
-        public enum ApplyUpdateActionEnum {
+        public enum ApplyUpdateAction : byte {
             /// <summary>
             /// Apply the update.
             /// </summary>
-            Proceed = 0,
+            Proceed = 0x0,
             /// <summary>
             /// Wait at least the given delay time.
             /// </summary>
-            AwaitNextAction = 1,
+            AwaitNextAction = 0x1,
             /// <summary>
             /// The OTA Provider is conveying a desire to rescind a previously provided Software Image.
             /// </summary>
-            Discontinue = 2,
+            Discontinue = 0x2,
         }
 
         /// <summary>
         /// Download Protocol
         /// </summary>
-        public enum DownloadProtocolEnum {
+        public enum DownloadProtocol : byte {
             /// <summary>
             /// Indicates support for synchronous BDX.
             /// </summary>
-            BDXSynchronous = 0,
+            BDXSynchronous = 0x0,
             /// <summary>
             /// Indicates support for asynchronous BDX.
             /// </summary>
-            BDXAsynchronous = 1,
+            BDXAsynchronous = 0x1,
             /// <summary>
             /// Indicates support for HTTPS.
             /// </summary>
-            HTTPS = 2,
+            HTTPS = 0x2,
             /// <summary>
             /// Indicates support for vendor specific protocol.
             /// </summary>
-            VendorSpecific = 3,
+            VendorSpecific = 0x3,
         }
 
         /// <summary>
-        /// Status
+        /// Announcement Reason
         /// </summary>
-        public enum StatusEnum {
-            /// <summary>
-            /// Indicates that the OTA Provider has an update available.
-            /// </summary>
-            UpdateAvailable = 0,
-            /// <summary>
-            /// Indicates OTA Provider may have an update, but it is not ready yet.
-            /// </summary>
-            Busy = 1,
-            /// <summary>
-            /// Indicates that there is definitely no update currently available from the OTA Provider.
-            /// </summary>
-            NotAvailable = 2,
-            /// <summary>
-            /// Indicates that the requested download protocol is not supported by the OTA Provider.
-            /// </summary>
-            DownloadProtocolNotSupported = 3,
+        public enum AnnouncementReason : byte {
+            SimpleAnnouncement = 0x0,
+            UpdateAvailable = 0x1,
+            UrgentUpdateAvailable = 0x2,
+        }
+
+        /// <summary>
+        /// Update State
+        /// </summary>
+        public enum UpdateState : byte {
+            Unknown = 0x0,
+            Idle = 0x1,
+            Querying = 0x2,
+            DelayedOnQuery = 0x3,
+            Downloading = 0x4,
+            Applying = 0x5,
+            DelayedOnApply = 0x6,
+            RollingBack = 0x7,
+            DelayedOnUserConsent = 0x8,
+        }
+
+        /// <summary>
+        /// Change Reason
+        /// </summary>
+        public enum ChangeReason : byte {
+            Unknown = 0x0,
+            Success = 0x1,
+            Failure = 0x2,
+            TimeOut = 0x3,
+            DelayByProvider = 0x4,
         }
         #endregion Enums
+
+        #region Records
+        /// <summary>
+        /// Provider Location
+        /// </summary>
+        public record ProviderLocation : TLVPayload {
+            /// <summary>
+            /// Provider Location
+            /// </summary>
+            public ProviderLocation() { }
+
+            /// <summary>
+            /// Provider Location
+            /// </summary>
+            [SetsRequiredMembers]
+            public ProviderLocation(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                ProviderNodeID = reader.GetULong(1)!.Value;
+                Endpoint = reader.GetUShort(2)!.Value;
+            }
+            public required ulong ProviderNodeID { get; set; }
+            public required ushort Endpoint { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteULong(1, ProviderNodeID);
+                writer.WriteUShort(2, Endpoint);
+                writer.EndContainer();
+            }
+        }
+        #endregion Records
 
         #region Payloads
         private record QueryImagePayload : TLVPayload {
             public required ushort VendorID { get; set; }
             public required ushort ProductID { get; set; }
             public required uint SoftwareVersion { get; set; }
-            public required DownloadProtocolEnum[] ProtocolsSupported { get; set; }
+            public required DownloadProtocol[] ProtocolsSupported { get; set; }
             public ushort? HardwareVersion { get; set; }
             public string? Location { get; set; }
-            public bool? RequestorCanConsent { get; set; } = false;
+            public bool? RequestorCanConsent { get; set; }
             public byte[]? MetadataForProvider { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -115,7 +181,6 @@ namespace MatterDotNet.Clusters.Utility
                 writer.WriteUShort(1, ProductID);
                 writer.WriteUInt(2, SoftwareVersion);
                 {
-                    Constrain(ProtocolsSupported, 0, 8);
                     writer.StartArray(3);
                     foreach (var item in ProtocolsSupported) {
                         writer.WriteUShort(-1, (ushort)item);
@@ -138,13 +203,13 @@ namespace MatterDotNet.Clusters.Utility
         /// Query Image Response - Reply from server
         /// </summary>
         public struct QueryImageResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public uint? DelayedActionTime { get; set; }
             public string? ImageURI { get; set; }
             public uint? SoftwareVersion { get; set; }
             public string? SoftwareVersionString { get; set; }
             public byte[]? UpdateToken { get; set; }
-            public bool? UserConsentNeeded { get; set; } = false;
+            public bool? UserConsentNeeded { get; set; }
             public byte[]? MetadataForRequestor { get; set; }
         }
 
@@ -153,7 +218,7 @@ namespace MatterDotNet.Clusters.Utility
             public required uint NewVersion { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, UpdateToken, 32, 8);
+                writer.WriteBytes(0, UpdateToken, 32);
                 writer.WriteUInt(1, NewVersion);
                 writer.EndContainer();
             }
@@ -163,7 +228,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Apply Update Response - Reply from server
         /// </summary>
         public struct ApplyUpdateResponse() {
-            public required ApplyUpdateActionEnum Action { get; set; }
+            public required ApplyUpdateAction Action { get; set; }
             public required uint DelayedActionTime { get; set; }
         }
 
@@ -172,7 +237,7 @@ namespace MatterDotNet.Clusters.Utility
             public required uint SoftwareVersion { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteBytes(0, UpdateToken, 32, 8);
+                writer.WriteBytes(0, UpdateToken, 32);
                 writer.WriteUInt(1, SoftwareVersion);
                 writer.EndContainer();
             }
@@ -183,22 +248,22 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Query Image
         /// </summary>
-        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort VendorID, ushort ProductID, uint SoftwareVersion, DownloadProtocolEnum[] ProtocolsSupported, ushort? HardwareVersion, string? Location, bool? RequestorCanConsent, byte[]? MetadataForProvider) {
+        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort vendorID, ushort productID, uint softwareVersion, DownloadProtocol[] protocolsSupported, ushort? hardwareVersion, string? location, bool? requestorCanConsent, byte[]? metadataForProvider) {
             QueryImagePayload requestFields = new QueryImagePayload() {
-                VendorID = VendorID,
-                ProductID = ProductID,
-                SoftwareVersion = SoftwareVersion,
-                ProtocolsSupported = ProtocolsSupported,
-                HardwareVersion = HardwareVersion,
-                Location = Location,
-                RequestorCanConsent = RequestorCanConsent,
-                MetadataForProvider = MetadataForProvider,
+                VendorID = vendorID,
+                ProductID = productID,
+                SoftwareVersion = softwareVersion,
+                ProtocolsSupported = protocolsSupported,
+                HardwareVersion = hardwareVersion,
+                Location = location,
+                RequestorCanConsent = requestorCanConsent,
+                MetadataForProvider = metadataForProvider,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new QueryImageResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 DelayedActionTime = (uint?)GetOptionalField(resp, 1),
                 ImageURI = (string?)GetOptionalField(resp, 2),
                 SoftwareVersion = (uint?)GetOptionalField(resp, 3),
@@ -212,16 +277,16 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Apply Update Request
         /// </summary>
-        public async Task<ApplyUpdateResponse?> ApplyUpdateRequest(SecureSession session, byte[] UpdateToken, uint NewVersion) {
+        public async Task<ApplyUpdateResponse?> ApplyUpdateRequest(SecureSession session, byte[] updateToken, uint newVersion) {
             ApplyUpdateRequestPayload requestFields = new ApplyUpdateRequestPayload() {
-                UpdateToken = UpdateToken,
-                NewVersion = NewVersion,
+                UpdateToken = updateToken,
+                NewVersion = newVersion,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ApplyUpdateResponse() {
-                Action = (ApplyUpdateActionEnum)(byte)GetField(resp, 0),
+                Action = (ApplyUpdateAction)(byte)GetField(resp, 0),
                 DelayedActionTime = (uint)GetField(resp, 1),
             };
         }
@@ -229,10 +294,10 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Notify Update Applied
         /// </summary>
-        public async Task<bool> NotifyUpdateApplied(SecureSession session, byte[] UpdateToken, uint SoftwareVersion) {
+        public async Task<bool> NotifyUpdateApplied(SecureSession session, byte[] updateToken, uint softwareVersion) {
             NotifyUpdateAppliedPayload requestFields = new NotifyUpdateAppliedPayload() {
-                UpdateToken = UpdateToken,
-                SoftwareVersion = SoftwareVersion,
+                UpdateToken = updateToken,
+                SoftwareVersion = softwareVersion,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
@@ -242,7 +307,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "OTA Software Update Provider Cluster";
+            return "OTA Software Update Provider";
         }
     }
 }

@@ -17,22 +17,22 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Ethernet Network Diagnostics Cluster
+    /// The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class EthernetNetworkDiagnosticsCluster : ClusterBase
+    public class EthernetNetworkDiagnostics : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0037;
 
         /// <summary>
-        /// Ethernet Network Diagnostics Cluster
+        /// The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public EthernetNetworkDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public EthernetNetworkDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EthernetNetworkDiagnosticsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected EthernetNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -53,47 +53,47 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// PHY Rate
         /// </summary>
-        public enum PHYRateEnum {
+        public enum PHYRate : byte {
             /// <summary>
             /// PHY rate is 10Mbps
             /// </summary>
-            Rate10M = 0,
+            Rate10M = 0x00,
             /// <summary>
             /// PHY rate is 100Mbps
             /// </summary>
-            Rate100M = 1,
+            Rate100M = 0x01,
             /// <summary>
             /// PHY rate is 1Gbps
             /// </summary>
-            Rate1G = 2,
+            Rate1G = 0x02,
             /// <summary>
             /// PHY rate is 2.5Gbps
             /// </summary>
-            Rate2_5G = 3,
+            Rate2_5G = 0x03,
             /// <summary>
             /// PHY rate is 5Gbps
             /// </summary>
-            Rate5G = 4,
+            Rate5G = 0x04,
             /// <summary>
             /// PHY rate is 10Gbps
             /// </summary>
-            Rate10G = 5,
+            Rate10G = 0x05,
             /// <summary>
             /// PHY rate is 40Gbps
             /// </summary>
-            Rate40G = 6,
+            Rate40G = 0x06,
             /// <summary>
             /// PHY rate is 100Gbps
             /// </summary>
-            Rate100G = 7,
+            Rate100G = 0x07,
             /// <summary>
             /// PHY rate is 200Gbps
             /// </summary>
-            Rate200G = 8,
+            Rate200G = 0x08,
             /// <summary>
             /// PHY rate is 400Gbps
             /// </summary>
-            Rate400G = 9,
+            Rate400G = 0x09,
         }
         #endregion Enums
 
@@ -135,70 +135,70 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the PHY Rate attribute
         /// </summary>
-        public async Task<PHYRateEnum?> GetPHYRate(SecureSession session) {
-            return (PHYRateEnum?)await GetEnumAttribute(session, 0, true);
+        public async Task<PHYRate?> GetPHYRate(SecureSession session) {
+            return (PHYRate?)await GetEnumAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Full Duplex attribute
         /// </summary>
         public async Task<bool?> GetFullDuplex(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 1, true) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
         /// Get the Packet Rx Count attribute
         /// </summary>
         public async Task<ulong> GetPacketRxCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Packet Tx Count attribute
         /// </summary>
         public async Task<ulong> GetPacketTxCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 3) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 3) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Tx Err Count attribute
         /// </summary>
         public async Task<ulong> GetTxErrCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 4) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 4) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Collision Count attribute
         /// </summary>
         public async Task<ulong> GetCollisionCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 5) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Overrun Count attribute
         /// </summary>
         public async Task<ulong> GetOverrunCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 6) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Carrier Detect attribute
         /// </summary>
         public async Task<bool?> GetCarrierDetect(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 7, true) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 7, true);
         }
 
         /// <summary>
         /// Get the Time Since Reset attribute
         /// </summary>
         public async Task<ulong> GetTimeSinceReset(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 8) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 8) ?? 0x0000000000000000;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Ethernet Network Diagnostics Cluster";
+            return "Ethernet Network Diagnostics";
         }
     }
 }

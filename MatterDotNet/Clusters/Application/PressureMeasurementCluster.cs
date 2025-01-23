@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Pressure Measurement Cluster
+    /// Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 3)]
-    public class PressureMeasurementCluster : ClusterBase
+    public class PressureMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0403;
 
         /// <summary>
-        /// Pressure Measurement Cluster
+        /// Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
         /// </summary>
-        public PressureMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public PressureMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PressureMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected PressureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -133,7 +133,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Pressure Measurement Cluster";
+            return "Pressure Measurement";
         }
     }
 }

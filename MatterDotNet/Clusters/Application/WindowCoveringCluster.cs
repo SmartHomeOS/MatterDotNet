@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Closures
 {
     /// <summary>
-    /// Window Covering Cluster
+    /// Provides an interface for controlling and adjusting automatic window coverings. 
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 5)]
-    public class WindowCoveringCluster : ClusterBase
+    public class WindowCovering : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0102;
 
         /// <summary>
-        /// Window Covering Cluster
+        /// Provides an interface for controlling and adjusting automatic window coverings. 
         /// </summary>
-        public WindowCoveringCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public WindowCovering(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WindowCoveringCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected WindowCovering(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -64,9 +64,59 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
+        /// Type
+        /// </summary>
+        public enum Type : byte {
+            /// <summary>
+            /// RollerShade
+            /// </summary>
+            RollerShade = 0,
+            /// <summary>
+            /// RollerShade - 2 Motor
+            /// </summary>
+            RollerShade2Motor = 1,
+            /// <summary>
+            /// RollerShade - Exterior
+            /// </summary>
+            RollerShadeExterior = 2,
+            /// <summary>
+            /// RollerShade - Exterior - 2 Motor
+            /// </summary>
+            RollerShadeExterior2Motor = 3,
+            /// <summary>
+            /// Drapery (curtain)
+            /// </summary>
+            Drapery = 4,
+            /// <summary>
+            /// Awning
+            /// </summary>
+            Awning = 5,
+            /// <summary>
+            /// Shutter
+            /// </summary>
+            Shutter = 6,
+            /// <summary>
+            /// Tilt Blind - Tilt Only
+            /// </summary>
+            TiltBlindTiltOnly = 7,
+            /// <summary>
+            /// Tilt Blind - Lift & Tilt
+            /// </summary>
+            TiltBlindLiftAndTilt = 8,
+            /// <summary>
+            /// Projector Screen
+            /// </summary>
+            ProjectorScreen = 9,
+            /// <summary>
+            /// Unknown
+            /// </summary>
+            Unknown = 255,
+        }
+
+        /// <summary>
         /// End Product Type
         /// </summary>
-        public enum EndProductTypeEnum {
+        public enum EndProductType : byte {
             /// <summary>
             /// Simple Roller Shade
             /// </summary>
@@ -170,99 +220,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Type
-        /// </summary>
-        public enum TypeEnum {
-            /// <summary>
-            /// RollerShade
-            /// </summary>
-            RollerShade = 0,
-            /// <summary>
-            /// RollerShade - 2 Motor
-            /// </summary>
-            RollerShade2Motor = 1,
-            /// <summary>
-            /// RollerShade - Exterior
-            /// </summary>
-            RollerShadeExterior = 2,
-            /// <summary>
-            /// RollerShade - Exterior - 2 Motor
-            /// </summary>
-            RollerShadeExterior2Motor = 3,
-            /// <summary>
-            /// Drapery (curtain)
-            /// </summary>
-            Drapery = 4,
-            /// <summary>
-            /// Awning
-            /// </summary>
-            Awning = 5,
-            /// <summary>
-            /// Shutter
-            /// </summary>
-            Shutter = 6,
-            /// <summary>
-            /// Tilt Blind - Tilt Only
-            /// </summary>
-            TiltBlindTiltOnly = 7,
-            /// <summary>
-            /// Tilt Blind - Lift &amp; Tilt
-            /// </summary>
-            TiltBlindLiftAndTilt = 8,
-            /// <summary>
-            /// Projector Screen
-            /// </summary>
-            ProjectorScreen = 9,
-            /// <summary>
-            /// Unknown
-            /// </summary>
-            Unknown = 255,
-        }
-
-        /// <summary>
-        /// Config Status Bitmap
+        /// Mode
         /// </summary>
         [Flags]
-        public enum ConfigStatusBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Device is operational.
-            /// </summary>
-            Operational = 1,
-            /// <summary>
-            /// Deprecated and reserved.
-            /// </summary>
-            OnlineReserved = 2,
-            /// <summary>
-            /// The lift movement is reversed.
-            /// </summary>
-            LiftMovementReversed = 4,
-            /// <summary>
-            /// Supports the PositionAwareLift feature (PA_LF).
-            /// </summary>
-            LiftPositionAware = 8,
-            /// <summary>
-            /// Supports the PositionAwareTilt feature (PA_TL).
-            /// </summary>
-            TiltPositionAware = 16,
-            /// <summary>
-            /// Uses an encoder for lift.
-            /// </summary>
-            LiftEncoderControlled = 32,
-            /// <summary>
-            /// Uses an encoder for tilt.
-            /// </summary>
-            TiltEncoderControlled = 64,
-        }
-
-        /// <summary>
-        /// Mode Bitmap
-        /// </summary>
-        [Flags]
-        public enum ModeBitmap {
+        public enum Mode : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -270,26 +231,26 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Reverse the lift direction.
             /// </summary>
-            MotorDirectionReversed = 1,
+            MotorDirectionReversed = 0x01,
             /// <summary>
             /// Perform a calibration.
             /// </summary>
-            CalibrationMode = 2,
+            CalibrationMode = 0x02,
             /// <summary>
             /// Freeze all motions for maintenance.
             /// </summary>
-            MaintenanceMode = 4,
+            MaintenanceMode = 0x04,
             /// <summary>
             /// Control the LEDs feedback.
             /// </summary>
-            LedFeedback = 8,
+            LedFeedback = 0x08,
         }
 
         /// <summary>
-        /// Operational Status Bitmap
+        /// Operational Status
         /// </summary>
         [Flags]
-        public enum OperationalStatusBitmap {
+        public enum OperationalStatus : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -297,22 +258,61 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Global operational state.
             /// </summary>
-            Global = 1,
+            Global = 0x03,
             /// <summary>
             /// Lift operational state.
             /// </summary>
-            Lift = 1,
+            Lift = 0x0C,
             /// <summary>
             /// Tilt operational state.
             /// </summary>
-            Tilt = 1,
+            Tilt = 0x30,
         }
 
         /// <summary>
-        /// Safety Status Bitmap
+        /// Config Status
         /// </summary>
         [Flags]
-        public enum SafetyStatusBitmap {
+        public enum ConfigStatus : byte {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Device is operational.
+            /// </summary>
+            Operational = 0x01,
+            /// <summary>
+            /// 
+            /// </summary>
+            OnlineReserved = 0x02,
+            /// <summary>
+            /// The lift movement is reversed.
+            /// </summary>
+            LiftMovementReversed = 0x04,
+            /// <summary>
+            /// Supports the PositionAwareLift feature (PA_LF).
+            /// </summary>
+            LiftPositionAware = 0x08,
+            /// <summary>
+            /// Supports the PositionAwareTilt feature (PA_TL).
+            /// </summary>
+            TiltPositionAware = 0x10,
+            /// <summary>
+            /// Uses an encoder for lift.
+            /// </summary>
+            LiftEncoderControlled = 0x20,
+            /// <summary>
+            /// Uses an encoder for tilt.
+            /// </summary>
+            TiltEncoderControlled = 0x40,
+        }
+
+        /// <summary>
+        /// Safety Status
+        /// </summary>
+        [Flags]
+        public enum SafetyStatus : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -320,51 +320,51 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range.
             /// </summary>
-            RemoteLockout = 1,
+            RemoteLockout = 0x0001,
             /// <summary>
             /// Tampering detected on sensors or any other safety equipment. Ex: a device has been forcedly moved without its actuator(s).
             /// </summary>
-            TamperDetection = 2,
+            TamperDetection = 0x0002,
             /// <summary>
             /// Communication failure to sensors or other safety equipment.
             /// </summary>
-            FailedCommunication = 4,
+            FailedCommunication = 0x0004,
             /// <summary>
             /// Device has failed to reach the desired position. e.g. with position aware device, time expired before TargetPosition is reached.
             /// </summary>
-            PositionFailure = 8,
+            PositionFailure = 0x0008,
             /// <summary>
             /// Motor(s) and/or electric circuit thermal protection activated.
             /// </summary>
-            ThermalProtection = 16,
+            ThermalProtection = 0x0010,
             /// <summary>
             /// An obstacle is preventing actuator movement.
             /// </summary>
-            ObstacleDetected = 32,
+            ObstacleDetected = 0x0020,
             /// <summary>
             /// Device has power related issue or limitation e.g. device is running w/ the help of a backup battery or power might not be fully available at the moment.
             /// </summary>
-            Power = 64,
+            Power = 0x0040,
             /// <summary>
             /// Local safety sensor (not a direct obstacle) is preventing movements (e.g. Safety EU Standard EN60335).
             /// </summary>
-            StopInput = 128,
+            StopInput = 0x0080,
             /// <summary>
             /// Mechanical problem related to the motor(s) detected.
             /// </summary>
-            MotorJammed = 256,
+            MotorJammed = 0x0100,
             /// <summary>
             /// PCB, fuse and other electrics problems.
             /// </summary>
-            HardwareFailure = 512,
+            HardwareFailure = 0x0200,
             /// <summary>
             /// Actuator is manually operated and is preventing actuator movement (e.g. actuator is disengaged/decoupled).
             /// </summary>
-            ManualOperation = 1024,
+            ManualOperation = 0x0400,
             /// <summary>
             /// Protection is activated.
             /// </summary>
-            Protection = 2048,
+            Protection = 0x0800,
         }
         #endregion Enums
 
@@ -379,10 +379,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record GoToLiftPercentagePayload : TLVPayload {
-            public required ushort LiftPercent100thsValue { get; set; }
+            public required decimal LiftPercentValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, LiftPercent100thsValue);
+                writer.WriteDecimal(0, LiftPercentValue);
                 writer.EndContainer();
             }
         }
@@ -397,10 +397,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record GoToTiltPercentagePayload : TLVPayload {
-            public required ushort TiltPercent100thsValue { get; set; }
+            public required decimal TiltPercentValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, TiltPercent100thsValue);
+                writer.WriteDecimal(0, TiltPercentValue);
                 writer.EndContainer();
             }
         }
@@ -434,9 +434,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Lift Value
         /// </summary>
-        public async Task<bool> GoToLiftValue(SecureSession session, ushort LiftValue) {
+        public async Task<bool> GoToLiftValue(SecureSession session, ushort liftValue) {
             GoToLiftValuePayload requestFields = new GoToLiftValuePayload() {
-                LiftValue = LiftValue,
+                LiftValue = liftValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             return ValidateResponse(resp);
@@ -445,9 +445,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Lift Percentage
         /// </summary>
-        public async Task<bool> GoToLiftPercentage(SecureSession session, ushort LiftPercent100thsValue) {
+        public async Task<bool> GoToLiftPercentage(SecureSession session, decimal liftPercentValue) {
             GoToLiftPercentagePayload requestFields = new GoToLiftPercentagePayload() {
-                LiftPercent100thsValue = LiftPercent100thsValue,
+                LiftPercentValue = liftPercentValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -456,9 +456,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Tilt Value
         /// </summary>
-        public async Task<bool> GoToTiltValue(SecureSession session, ushort TiltValue) {
+        public async Task<bool> GoToTiltValue(SecureSession session, ushort tiltValue) {
             GoToTiltValuePayload requestFields = new GoToTiltValuePayload() {
-                TiltValue = TiltValue,
+                TiltValue = tiltValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
             return ValidateResponse(resp);
@@ -467,9 +467,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Go To Tilt Percentage
         /// </summary>
-        public async Task<bool> GoToTiltPercentage(SecureSession session, ushort TiltPercent100thsValue) {
+        public async Task<bool> GoToTiltPercentage(SecureSession session, decimal tiltPercentValue) {
             GoToTiltPercentagePayload requestFields = new GoToTiltPercentagePayload() {
-                TiltPercent100thsValue = TiltPercent100thsValue,
+                TiltPercentValue = tiltPercentValue,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
             return ValidateResponse(resp);
@@ -501,168 +501,168 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Type attribute
         /// </summary>
-        public async Task<TypeEnum> GetType(SecureSession session) {
-            return (TypeEnum)await GetEnumAttribute(session, 0);
+        public async Task<Type> GetType(SecureSession session) {
+            return (Type)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Physical Closed Limit Lift attribute
         /// </summary>
         public async Task<ushort> GetPhysicalClosedLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Physical Closed Limit Tilt attribute
         /// </summary>
         public async Task<ushort> GetPhysicalClosedLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Current Position Lift attribute
         /// </summary>
         public async Task<ushort?> GetCurrentPositionLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 3, true);
         }
 
         /// <summary>
         /// Get the Current Position Tilt attribute
         /// </summary>
         public async Task<ushort?> GetCurrentPositionTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 4, true);
         }
 
         /// <summary>
         /// Get the Number Of Actuations Lift attribute
         /// </summary>
         public async Task<ushort> GetNumberOfActuationsLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 5) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 5) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Number Of Actuations Tilt attribute
         /// </summary>
         public async Task<ushort> GetNumberOfActuationsTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 6) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Config Status attribute
         /// </summary>
-        public async Task<ConfigStatusBitmap> GetConfigStatus(SecureSession session) {
-            return (ConfigStatusBitmap)await GetEnumAttribute(session, 7);
+        public async Task<ConfigStatus> GetConfigStatus(SecureSession session) {
+            return (ConfigStatus)await GetEnumAttribute(session, 7);
         }
 
         /// <summary>
-        /// Get the Current Position Lift Percentage attribute
+        /// Get the Current Position Lift Percentage [%] attribute
         /// </summary>
         public async Task<byte?> GetCurrentPositionLiftPercentage(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 8, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 8, true);
         }
 
         /// <summary>
-        /// Get the Current Position Tilt Percentage attribute
+        /// Get the Current Position Tilt Percentage [%] attribute
         /// </summary>
         public async Task<byte?> GetCurrentPositionTiltPercentage(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 9, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 9, true);
         }
 
         /// <summary>
         /// Get the Operational Status attribute
         /// </summary>
-        public async Task<OperationalStatusBitmap> GetOperationalStatus(SecureSession session) {
-            return (OperationalStatusBitmap)await GetEnumAttribute(session, 10);
+        public async Task<OperationalStatus> GetOperationalStatus(SecureSession session) {
+            return (OperationalStatus)await GetEnumAttribute(session, 10);
         }
 
         /// <summary>
-        /// Get the Target Position Lift Percent100ths attribute
+        /// Get the Target Position Lift Percent100ths [%] attribute
         /// </summary>
-        public async Task<ushort?> GetTargetPositionLiftPercent100ths(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 11, true) ?? null;
+        public async Task<decimal?> GetTargetPositionLiftPercent100ths(SecureSession session) {
+            return (decimal?)(dynamic?)await GetAttribute(session, 11, true);
         }
 
         /// <summary>
-        /// Get the Target Position Tilt Percent100ths attribute
+        /// Get the Target Position Tilt Percent100ths [%] attribute
         /// </summary>
-        public async Task<ushort?> GetTargetPositionTiltPercent100ths(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 12, true) ?? null;
+        public async Task<decimal?> GetTargetPositionTiltPercent100ths(SecureSession session) {
+            return (decimal?)(dynamic?)await GetAttribute(session, 12, true);
         }
 
         /// <summary>
         /// Get the End Product Type attribute
         /// </summary>
-        public async Task<EndProductTypeEnum> GetEndProductType(SecureSession session) {
-            return (EndProductTypeEnum)await GetEnumAttribute(session, 13);
+        public async Task<EndProductType> GetEndProductType(SecureSession session) {
+            return (EndProductType)await GetEnumAttribute(session, 13);
         }
 
         /// <summary>
-        /// Get the Current Position Lift Percent100ths attribute
+        /// Get the Current Position Lift Percent100ths [%] attribute
         /// </summary>
-        public async Task<ushort?> GetCurrentPositionLiftPercent100ths(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 14, true) ?? null;
+        public async Task<decimal?> GetCurrentPositionLiftPercent100ths(SecureSession session) {
+            return (decimal?)(dynamic?)await GetAttribute(session, 14, true);
         }
 
         /// <summary>
-        /// Get the Current Position Tilt Percent100ths attribute
+        /// Get the Current Position Tilt Percent100ths [%] attribute
         /// </summary>
-        public async Task<ushort?> GetCurrentPositionTiltPercent100ths(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 15, true) ?? null;
+        public async Task<decimal?> GetCurrentPositionTiltPercent100ths(SecureSession session) {
+            return (decimal?)(dynamic?)await GetAttribute(session, 15, true);
         }
 
         /// <summary>
         /// Get the Installed Open Limit Lift attribute
         /// </summary>
         public async Task<ushort> GetInstalledOpenLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Installed Closed Limit Lift attribute
         /// </summary>
         public async Task<ushort> GetInstalledClosedLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 65534;
+            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0xFFFF;
         }
 
         /// <summary>
         /// Get the Installed Open Limit Tilt attribute
         /// </summary>
         public async Task<ushort> GetInstalledOpenLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 18) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 18) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the Installed Closed Limit Tilt attribute
         /// </summary>
         public async Task<ushort> GetInstalledClosedLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 65534;
+            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 0xFFFF;
         }
 
         /// <summary>
         /// Get the Mode attribute
         /// </summary>
-        public async Task<ModeBitmap> GetMode(SecureSession session) {
-            return (ModeBitmap?)(dynamic?)await GetAttribute(session, 23) ?? 0;
+        public async Task<Mode> GetMode(SecureSession session) {
+            return (Mode)await GetEnumAttribute(session, 23);
         }
 
         /// <summary>
         /// Set the Mode attribute
         /// </summary>
-        public async Task SetMode (SecureSession session, ModeBitmap? value = 0) {
+        public async Task SetMode (SecureSession session, Mode value) {
             await SetAttribute(session, 23, value);
         }
 
         /// <summary>
         /// Get the Safety Status attribute
         /// </summary>
-        public async Task<SafetyStatusBitmap> GetSafetyStatus(SecureSession session) {
-            return (SafetyStatusBitmap)await GetEnumAttribute(session, 26);
+        public async Task<SafetyStatus> GetSafetyStatus(SecureSession session) {
+            return (SafetyStatus)await GetEnumAttribute(session, 26);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Window Covering Cluster";
+            return "Window Covering";
         }
     }
 }

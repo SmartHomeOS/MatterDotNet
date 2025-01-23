@@ -19,108 +19,137 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// OTA Software Update Requestor Cluster
+    /// Provides an interface for downloading and applying OTA software updates
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class OTASoftwareUpdateRequestorCluster : ClusterBase
+    public class OTASoftwareUpdateRequestor : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x002A;
+        internal const uint CLUSTER_ID = 0x002a;
 
         /// <summary>
-        /// OTA Software Update Requestor Cluster
+        /// Provides an interface for downloading and applying OTA software updates
         /// </summary>
-        public OTASoftwareUpdateRequestorCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OTASoftwareUpdateRequestor(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OTASoftwareUpdateRequestorCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OTASoftwareUpdateRequestor(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Announcement Reason
+        /// Status
         /// </summary>
-        public enum AnnouncementReasonEnum {
-            /// <summary>
-            /// An OTA Provider is announcing its presence.
-            /// </summary>
-            SimpleAnnouncement = 0,
-            /// <summary>
-            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available.
-            /// </summary>
-            UpdateAvailable = 1,
-            /// <summary>
-            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.
-            /// </summary>
-            UrgentUpdateAvailable = 2,
+        public enum Status : byte {
+            UpdateAvailable = 0x0,
+            Busy = 0x1,
+            NotAvailable = 0x2,
+            DownloadProtocolNotSupported = 0x3,
         }
 
         /// <summary>
-        /// Change Reason
+        /// Apply Update Action
         /// </summary>
-        public enum ChangeReasonEnum {
+        public enum ApplyUpdateAction : byte {
+            Proceed = 0x0,
+            AwaitNextAction = 0x1,
+            Discontinue = 0x2,
+        }
+
+        /// <summary>
+        /// Download Protocol
+        /// </summary>
+        public enum DownloadProtocol : byte {
+            BDXSynchronous = 0x0,
+            BDXAsynchronous = 0x1,
+            HTTPS = 0x2,
+            VendorSpecific = 0x3,
+        }
+
+        /// <summary>
+        /// Announcement Reason
+        /// </summary>
+        public enum AnnouncementReason : byte {
             /// <summary>
-            /// The reason for a state change is unknown.
+            /// An OTA Provider is announcing its presence.
             /// </summary>
-            Unknown = 0,
+            SimpleAnnouncement = 0x0,
             /// <summary>
-            /// The reason for a state change is the success of a prior operation.
+            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available.
             /// </summary>
-            Success = 1,
+            UpdateAvailable = 0x1,
             /// <summary>
-            /// The reason for a state change is the failure of a prior operation.
+            /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.
             /// </summary>
-            Failure = 2,
-            /// <summary>
-            /// The reason for a state change is a time-out.
-            /// </summary>
-            TimeOut = 3,
-            /// <summary>
-            /// The reason for a state change is a request by the OTA Provider to wait.
-            /// </summary>
-            DelayByProvider = 4,
+            UrgentUpdateAvailable = 0x2,
         }
 
         /// <summary>
         /// Update State
         /// </summary>
-        public enum UpdateStateEnum {
+        public enum UpdateState : byte {
             /// <summary>
             /// Current state is not yet determined.
             /// </summary>
-            Unknown = 0,
+            Unknown = 0x0,
             /// <summary>
             /// Indicate a Node not yet in the process of software update.
             /// </summary>
-            Idle = 1,
+            Idle = 0x1,
             /// <summary>
             /// Indicate a Node in the process of querying an OTA Provider.
             /// </summary>
-            Querying = 2,
+            Querying = 0x2,
             /// <summary>
             /// Indicate a Node waiting after a Busy response.
             /// </summary>
-            DelayedOnQuery = 3,
+            DelayedOnQuery = 0x3,
             /// <summary>
             /// Indicate a Node currently in the process of downloading a software update.
             /// </summary>
-            Downloading = 4,
+            Downloading = 0x4,
             /// <summary>
             /// Indicate a Node currently in the process of verifying and applying a software update.
             /// </summary>
-            Applying = 5,
+            Applying = 0x5,
             /// <summary>
             /// Indicate a Node waiting caused by AwaitNextAction response.
             /// </summary>
-            DelayedOnApply = 6,
+            DelayedOnApply = 0x6,
             /// <summary>
             /// Indicate a Node in the process of recovering to a previous version.
             /// </summary>
-            RollingBack = 7,
+            RollingBack = 0x7,
             /// <summary>
             /// Indicate a Node is capable of user consent.
             /// </summary>
-            DelayedOnUserConsent = 8,
+            DelayedOnUserConsent = 0x8,
+        }
+
+        /// <summary>
+        /// Change Reason
+        /// </summary>
+        public enum ChangeReason : byte {
+            /// <summary>
+            /// The reason for a state change is unknown.
+            /// </summary>
+            Unknown = 0x0,
+            /// <summary>
+            /// The reason for a state change is the success of a prior operation.
+            /// </summary>
+            Success = 0x1,
+            /// <summary>
+            /// The reason for a state change is the failure of a prior operation.
+            /// </summary>
+            Failure = 0x2,
+            /// <summary>
+            /// The reason for a state change is a time-out.
+            /// </summary>
+            TimeOut = 0x3,
+            /// <summary>
+            /// The reason for a state change is a request by the OTA Provider to wait.
+            /// </summary>
+            DelayByProvider = 0x4,
         }
         #endregion Enums
 
@@ -158,7 +187,7 @@ namespace MatterDotNet.Clusters.Utility
         private record AnnounceOTAProviderPayload : TLVPayload {
             public required ulong ProviderNodeID { get; set; }
             public required ushort VendorID { get; set; }
-            public required AnnouncementReasonEnum AnnouncementReason { get; set; }
+            public required AnnouncementReason AnnouncementReason { get; set; }
             public byte[]? MetadataForNode { get; set; }
             public required ushort Endpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -178,13 +207,13 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Announce OTA Provider
         /// </summary>
-        public async Task<bool> AnnounceOTAProvider(SecureSession session, ulong ProviderNodeID, ushort VendorID, AnnouncementReasonEnum AnnouncementReason, byte[]? MetadataForNode, ushort Endpoint) {
+        public async Task<bool> AnnounceOTAProvider(SecureSession session, ulong providerNodeID, ushort vendorID, AnnouncementReason announcementReason, byte[]? metadataForNode, ushort endpoint) {
             AnnounceOTAProviderPayload requestFields = new AnnounceOTAProviderPayload() {
-                ProviderNodeID = ProviderNodeID,
-                VendorID = VendorID,
-                AnnouncementReason = AnnouncementReason,
-                MetadataForNode = MetadataForNode,
-                Endpoint = Endpoint,
+                ProviderNodeID = providerNodeID,
+                VendorID = vendorID,
+                AnnouncementReason = announcementReason,
+                MetadataForNode = metadataForNode,
+                Endpoint = endpoint,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -220,21 +249,21 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Update State attribute
         /// </summary>
-        public async Task<UpdateStateEnum> GetUpdateState(SecureSession session) {
-            return (UpdateStateEnum?)await GetEnumAttribute(session, 2) ?? UpdateStateEnum.Unknown;
+        public async Task<UpdateState> GetUpdateState(SecureSession session) {
+            return (UpdateState?)await GetEnumAttribute(session, 2) ?? UpdateState.Unknown;
         }
 
         /// <summary>
         /// Get the Update State Progress attribute
         /// </summary>
         public async Task<byte?> GetUpdateStateProgress(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 3, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "OTA Software Update Requestor Cluster";
+            return "OTA Software Update Requestor";
         }
     }
 }

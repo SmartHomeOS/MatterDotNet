@@ -15,29 +15,29 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Lighting
 {
     /// <summary>
-    /// Ballast Configuration Cluster
+    /// Attributes and commands for configuring a lighting ballast.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 4)]
-    public class BallastConfigurationCluster : ClusterBase
+    public class BallastConfiguration : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0301;
 
         /// <summary>
-        /// Ballast Configuration Cluster
+        /// Attributes and commands for configuring a lighting ballast.
         /// </summary>
-        public BallastConfigurationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public BallastConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BallastConfigurationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected BallastConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Ballast Status Bitmap
+        /// Ballast Status
         /// </summary>
         [Flags]
-        public enum BallastStatusBitmap {
+        public enum BallastStatus : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -45,18 +45,18 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Operational state of the ballast.
             /// </summary>
-            BallastNonOperational = 1,
+            BallastNonOperational = 0x01,
             /// <summary>
             /// Operational state of the lamps.
             /// </summary>
-            LampFailure = 2,
+            LampFailure = 0x02,
         }
 
         /// <summary>
-        /// Lamp Alarm Mode Bitmap
+        /// Lamp Alarm Mode
         /// </summary>
         [Flags]
-        public enum LampAlarmModeBitmap {
+        public enum LampAlarmMode : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -64,7 +64,7 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// State of LampBurnHours alarm generation
             /// </summary>
-            LampBurnHours = 1,
+            LampBurnHours = 0x01,
         }
         #endregion Enums
 
@@ -73,34 +73,34 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Physical Min Level attribute
         /// </summary>
         public async Task<byte> GetPhysicalMinLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 0) ?? 1;
+            return (byte?)(dynamic?)await GetAttribute(session, 0) ?? 0x01;
         }
 
         /// <summary>
         /// Get the Physical Max Level attribute
         /// </summary>
         public async Task<byte> GetPhysicalMaxLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 254;
+            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0xFE;
         }
 
         /// <summary>
         /// Get the Ballast Status attribute
         /// </summary>
-        public async Task<BallastStatusBitmap> GetBallastStatus(SecureSession session) {
-            return (BallastStatusBitmap)await GetEnumAttribute(session, 2);
+        public async Task<BallastStatus> GetBallastStatus(SecureSession session) {
+            return (BallastStatus)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Min Level attribute
         /// </summary>
         public async Task<byte> GetMinLevel(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 16))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 16) ?? 0x01;
         }
 
         /// <summary>
         /// Set the Min Level attribute
         /// </summary>
-        public async Task SetMinLevel (SecureSession session, byte value) {
+        public async Task SetMinLevel (SecureSession session, byte? value = 0x01) {
             await SetAttribute(session, 16, value);
         }
 
@@ -108,13 +108,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Max Level attribute
         /// </summary>
         public async Task<byte> GetMaxLevel(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 17))!;
+            return (byte?)(dynamic?)await GetAttribute(session, 17) ?? 0xFE;
         }
 
         /// <summary>
         /// Set the Max Level attribute
         /// </summary>
-        public async Task SetMaxLevel (SecureSession session, byte value) {
+        public async Task SetMaxLevel (SecureSession session, byte? value = 0xFE) {
             await SetAttribute(session, 17, value);
         }
 
@@ -136,13 +136,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Ballast Factor Adjustment attribute
         /// </summary>
         public async Task<byte?> GetBallastFactorAdjustment(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 21, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 21, true) ?? 0xFF;
         }
 
         /// <summary>
         /// Set the Ballast Factor Adjustment attribute
         /// </summary>
-        public async Task SetBallastFactorAdjustment (SecureSession session, byte? value = null) {
+        public async Task SetBallastFactorAdjustment (SecureSession session, byte? value = 0xFF) {
             await SetAttribute(session, 21, value, true);
         }
 
@@ -157,13 +157,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lamp Type attribute
         /// </summary>
         public async Task<string> GetLampType(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 48) ?? "";
+            return (string)(dynamic?)(await GetAttribute(session, 48))!;
         }
 
         /// <summary>
         /// Set the Lamp Type attribute
         /// </summary>
-        public async Task SetLampType (SecureSession session, string? value = "") {
+        public async Task SetLampType (SecureSession session, string value) {
             await SetAttribute(session, 48, value);
         }
 
@@ -171,13 +171,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lamp Manufacturer attribute
         /// </summary>
         public async Task<string> GetLampManufacturer(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 49) ?? "";
+            return (string)(dynamic?)(await GetAttribute(session, 49))!;
         }
 
         /// <summary>
         /// Set the Lamp Manufacturer attribute
         /// </summary>
-        public async Task SetLampManufacturer (SecureSession session, string? value = "") {
+        public async Task SetLampManufacturer (SecureSession session, string value) {
             await SetAttribute(session, 49, value);
         }
 
@@ -185,13 +185,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lamp Rated Hours attribute
         /// </summary>
         public async Task<uint?> GetLampRatedHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 50, true) ?? null;
+            return (uint?)(dynamic?)await GetAttribute(session, 50, true) ?? 0xFFFFFF;
         }
 
         /// <summary>
         /// Set the Lamp Rated Hours attribute
         /// </summary>
-        public async Task SetLampRatedHours (SecureSession session, uint? value = null) {
+        public async Task SetLampRatedHours (SecureSession session, uint? value = 0xFFFFFF) {
             await SetAttribute(session, 50, value, true);
         }
 
@@ -199,27 +199,27 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lamp Burn Hours attribute
         /// </summary>
         public async Task<uint?> GetLampBurnHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 51, true) ?? 0;
+            return (uint?)(dynamic?)await GetAttribute(session, 51, true) ?? 0x000000;
         }
 
         /// <summary>
         /// Set the Lamp Burn Hours attribute
         /// </summary>
-        public async Task SetLampBurnHours (SecureSession session, uint? value = 0) {
+        public async Task SetLampBurnHours (SecureSession session, uint? value = 0x000000) {
             await SetAttribute(session, 51, value, true);
         }
 
         /// <summary>
         /// Get the Lamp Alarm Mode attribute
         /// </summary>
-        public async Task<LampAlarmModeBitmap> GetLampAlarmMode(SecureSession session) {
-            return (LampAlarmModeBitmap)await GetEnumAttribute(session, 52);
+        public async Task<LampAlarmMode> GetLampAlarmMode(SecureSession session) {
+            return (LampAlarmMode)await GetEnumAttribute(session, 52);
         }
 
         /// <summary>
         /// Set the Lamp Alarm Mode attribute
         /// </summary>
-        public async Task SetLampAlarmMode (SecureSession session, LampAlarmModeBitmap value) {
+        public async Task SetLampAlarmMode (SecureSession session, LampAlarmMode value) {
             await SetAttribute(session, 52, value);
         }
 
@@ -227,20 +227,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Lamp Burn Hours Trip Point attribute
         /// </summary>
         public async Task<uint?> GetLampBurnHoursTripPoint(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 53, true) ?? null;
+            return (uint?)(dynamic?)await GetAttribute(session, 53, true) ?? 0xFFFFFF;
         }
 
         /// <summary>
         /// Set the Lamp Burn Hours Trip Point attribute
         /// </summary>
-        public async Task SetLampBurnHoursTripPoint (SecureSession session, uint? value = null) {
+        public async Task SetLampBurnHoursTripPoint (SecureSession session, uint? value = 0xFFFFFF) {
             await SetAttribute(session, 53, value, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Ballast Configuration Cluster";
+            return "Ballast Configuration";
         }
     }
 }

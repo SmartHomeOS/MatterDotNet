@@ -19,170 +19,164 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Content Launcher Cluster
+    /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class ContentLauncherCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class ContentLauncher : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x050A;
+        internal const uint CLUSTER_ID = 0x050a;
 
         /// <summary>
-        /// Content Launcher Cluster
+        /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
         /// </summary>
-        public ContentLauncherCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ContentLauncher(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ContentLauncherCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ContentLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Supported Features
-        /// </summary>
-        [Flags]
-        public enum Feature {
-            /// <summary>
-            /// Device supports content search (non-app specific)
-            /// </summary>
-            ContentSearch = 1,
-            /// <summary>
-            /// Device supports basic URL-based file playback
-            /// </summary>
-            URLPlayback = 2,
-            /// <summary>
-            /// Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.
-            /// </summary>
-            AdvancedSeek = 4,
-            /// <summary>
-            /// Device or app supports Text Tracks.
-            /// </summary>
-            TextTracks = 8,
-            /// <summary>
-            /// Device or app supports Audio Tracks.
-            /// </summary>
-            AudioTracks = 16,
-        }
-
-        /// <summary>
         /// Metric Type
         /// </summary>
-        public enum MetricTypeEnum {
+        public enum MetricType : byte {
             /// <summary>
             /// Dimensions defined in a number of Pixels
             /// </summary>
-            Pixels = 0,
+            Pixels = 0x00,
             /// <summary>
             /// Dimensions defined as a percentage
             /// </summary>
-            Percentage = 1,
+            Percentage = 0x01,
         }
 
         /// <summary>
         /// Parameter
         /// </summary>
-        public enum ParameterEnum {
+        public enum ParameterEnum : byte {
             /// <summary>
             /// Actor represents an actor credited in video media content; for example, “Gaby Hoffman”
             /// </summary>
-            Actor = 0,
+            Actor = 0x00,
             /// <summary>
-            /// Channel represents the identifying data for a television channel; for example, &quot;PBS&quot;
+            /// Channel represents the identifying data for a television channel; for example, "PBS"
             /// </summary>
-            Channel = 1,
+            Channel = 0x01,
             /// <summary>
             /// A character represented in video media content; for example, “Snow White”
             /// </summary>
-            Character = 2,
+            Character = 0x02,
             /// <summary>
             /// A director of the video media content; for example, “Spike Lee”
             /// </summary>
-            Director = 3,
+            Director = 0x03,
             /// <summary>
-            /// An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for &quot;Football games&quot; would search for a 'game' event entity and a 'football' sport entity.
+            /// An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for "Football games" would search for a 'game' event entity and a 'football' sport entity.
             /// </summary>
-            Event = 4,
+            Event = 0x04,
             /// <summary>
-            /// A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise &quot;Intergalactic Wars&quot; which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as &quot;Find Intergalactic Wars movies&quot;, which would search for all 'Intergalactic Wars' programs of the MOVIE MediaType, rather than attempting to match to a single title.
+            /// A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise "Intergalactic Wars" which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as "Find Intergalactic Wars movies", which would search for all 'Intergalactic Wars' programs of the MOVIE MediaType, rather than attempting to match to a single title.
             /// </summary>
-            Franchise = 5,
+            Franchise = 0x05,
             /// <summary>
             /// Genre represents the genre of video media content such as action, drama or comedy.
             /// </summary>
-            Genre = 6,
+            Genre = 0x06,
             /// <summary>
-            /// League represents the categorical information for a sporting league; for example, &quot;NCAA&quot;
+            /// League represents the categorical information for a sporting league; for example, "NCAA"
             /// </summary>
-            League = 7,
+            League = 0x07,
             /// <summary>
             /// Popularity indicates whether the user asks for popular content.
             /// </summary>
-            Popularity = 8,
+            Popularity = 0x08,
             /// <summary>
-            /// The provider (MSP) the user wants this media to be played on; for example, &quot;Netflix&quot;.
+            /// The provider (MSP) the user wants this media to be played on; for example, "Netflix".
             /// </summary>
-            Provider = 9,
+            Provider = 0x09,
             /// <summary>
             /// Sport represents the categorical information of a sport; for example, football
             /// </summary>
-            Sport = 10,
+            Sport = 0x0A,
+            SportsTeam = 0x00B,
             /// <summary>
-            /// SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;
+            /// The type of content requested. Supported types are "Movie", "MovieSeries", "TVSeries", "TVSeason", "TVEpisode", "Trailer", "SportsEvent", "LiveEvent", and "Video"
             /// </summary>
-            SportsTeam = 11,
+            Type = 0x0C,
             /// <summary>
-            /// The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;Trailer&quot;, &quot;SportsEvent&quot;, &quot;LiveEvent&quot;, and &quot;Video&quot;
+            /// Video represents the identifying data for a specific piece of video content; for example, "Manchester by the Sea".
             /// </summary>
-            Type = 12,
-            /// <summary>
-            /// Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;.
-            /// </summary>
-            Video = 13,
+            Video = 0x0D,
             /// <summary>
             /// Season represents the specific season number within a TV series.
             /// </summary>
-            Season = 14,
+            Season = 0x0E,
             /// <summary>
             /// Episode represents a specific episode number within a Season in a TV series.
             /// </summary>
-            Episode = 15,
+            Episode = 0x0F,
             /// <summary>
             /// Represents a search text input across many parameter types or even outside of the defined param types.
             /// </summary>
-            Any = 16,
+            Any = 0x10,
         }
 
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// Requested URL could not be reached by device.
             /// </summary>
-            URLNotAvailable = 1,
+            URLNotAvailable = 0x01,
             /// <summary>
             /// Requested URL returned 401 error code.
             /// </summary>
-            AuthFailed = 2,
+            AuthFailed = 0x02,
             /// <summary>
             /// Requested Text Track (in PlaybackPreferences) not available
             /// </summary>
-            TextTrackNotAvailable = 3,
+            TextTrackNotAvailable = 0x03,
             /// <summary>
             /// Requested Audio Track (in PlaybackPreferences) not available
             /// </summary>
-            AudioTrackNotAvailable = 4,
+            AudioTrackNotAvailable = 0x04,
         }
 
         /// <summary>
-        /// Supported Protocols Bitmap
+        /// Characteristic
+        /// </summary>
+        public enum Characteristic : byte {
+            ForcedSubtitles = 0x00,
+            DescribesVideo = 0x01,
+            EasyToRead = 0x02,
+            FrameBased = 0x03,
+            MainProgram = 0x04,
+            OriginalContent = 0x05,
+            VoiceOverTranslation = 0x06,
+            Caption = 0x07,
+            Subtitle = 0x08,
+            Alternate = 0x09,
+            Supplementary = 0x0A,
+            Commentary = 0x0B,
+            DubbedTranslation = 0x0C,
+            Description = 0x0D,
+            Metadata = 0x0E,
+            EnhancedAudioIntelligibility = 0x0F,
+            Emergency = 0x10,
+            Karaoke = 0x11,
+        }
+
+        /// <summary>
+        /// Supported Protocols
         /// </summary>
         [Flags]
-        public enum SupportedProtocolsBitmap {
+        public enum SupportedProtocols : uint {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -190,15 +184,67 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Device supports Dynamic Adaptive Streaming over HTTP (DASH)
             /// </summary>
-            DASH = 1,
+            DASH = 0x1,
             /// <summary>
             /// Device supports HTTP Live Streaming (HLS)
             /// </summary>
-            HLS = 2,
+            HLS = 0x2,
+        }
+
+        /// <summary>
+        /// Feature
+        /// </summary>
+        [Flags]
+        public enum Feature : uint {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            ContentSearch = 0x01,
+            URLPlayback = 0x02,
+            AdvancedSeek = 0x04,
+            TextTracks = 0x08,
+            AudioTracks = 0x10,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Content Search
+        /// </summary>
+        public record ContentSearch : TLVPayload {
+            /// <summary>
+            /// Content Search
+            /// </summary>
+            public ContentSearch() { }
+
+            /// <summary>
+            /// Content Search
+            /// </summary>
+            [SetsRequiredMembers]
+            public ContentSearch(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                {
+                    ParameterList = new Parameter[reader.GetStruct(0)!.Length];
+                    for (int n = 0; n < ParameterList.Length; n++) {
+                        ParameterList[n] = new Parameter((object[])((object[])fields[0])[n]);
+                    }
+                }
+            }
+            public required Parameter[] ParameterList { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                {
+                    writer.StartArray(0);
+                    foreach (var item in ParameterList) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Additional Info
         /// </summary>
@@ -214,8 +260,8 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public AdditionalInfo(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Name = reader.GetString(0, false)!;
-                Value = reader.GetString(1, false)!;
+                Name = reader.GetString(0, false, 256)!;
+                Value = reader.GetString(1, false, 8192)!;
             }
             public required string Name { get; set; }
             public required string Value { get; set; }
@@ -223,6 +269,71 @@ namespace MatterDotNet.Clusters.Application
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, Name, 256);
                 writer.WriteString(1, Value, 8192);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Dimension
+        /// </summary>
+        public record Dimension : TLVPayload {
+            /// <summary>
+            /// Dimension
+            /// </summary>
+            public Dimension() { }
+
+            /// <summary>
+            /// Dimension
+            /// </summary>
+            [SetsRequiredMembers]
+            public Dimension(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Width = reader.GetDouble(0)!.Value;
+                Height = reader.GetDouble(1)!.Value;
+                Metric = (MetricType)reader.GetUShort(2)!.Value;
+            }
+            public required double Width { get; set; }
+            public required double Height { get; set; }
+            public required MetricType Metric { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteDouble(0, Width);
+                writer.WriteDouble(1, Height);
+                writer.WriteUShort(2, (ushort)Metric);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Style Information
+        /// </summary>
+        public record StyleInformation : TLVPayload {
+            /// <summary>
+            /// Style Information
+            /// </summary>
+            public StyleInformation() { }
+
+            /// <summary>
+            /// Style Information
+            /// </summary>
+            [SetsRequiredMembers]
+            public StyleInformation(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                ImageURL = reader.GetString(0, true, 8192);
+                Color = reader.GetString(1, true, 9);
+                Size = new Dimension((object[])fields[2]);
+            }
+            public string? ImageURL { get; set; }
+            public string? Color { get; set; }
+            public Dimension? Size { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (ImageURL != null)
+                    writer.WriteString(0, ImageURL, 8192);
+                if (Color != null)
+                    writer.WriteString(1, Color, 9);
+                if (Size != null)
+                    Size.Serialize(writer, 2);
                 writer.EndContainer();
             }
         }
@@ -242,7 +353,7 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public BrandingInformation(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                ProviderName = reader.GetString(0, false)!;
+                ProviderName = reader.GetString(0, false, 256)!;
                 Background = new StyleInformation((object[])fields[1]);
                 Logo = new StyleInformation((object[])fields[2]);
                 ProgressBar = new StyleInformation((object[])fields[3]);
@@ -273,73 +384,6 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Content Search
-        /// </summary>
-        public record ContentSearch : TLVPayload {
-            /// <summary>
-            /// Content Search
-            /// </summary>
-            public ContentSearch() { }
-
-            /// <summary>
-            /// Content Search
-            /// </summary>
-            [SetsRequiredMembers]
-            public ContentSearch(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                {
-                    ParameterList = new Parameter[((object[])fields[0]).Length];
-                    for (int i = 0; i < ParameterList.Length; i++) {
-                        ParameterList[i] = new Parameter((object[])fields[-1]);
-                    }
-                }
-            }
-            public required Parameter[] ParameterList { get; set; } = Array.Empty<Parameter>();
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                {
-                    writer.StartArray(0);
-                    foreach (var item in ParameterList) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Dimension
-        /// </summary>
-        public record Dimension : TLVPayload {
-            /// <summary>
-            /// Dimension
-            /// </summary>
-            public Dimension() { }
-
-            /// <summary>
-            /// Dimension
-            /// </summary>
-            [SetsRequiredMembers]
-            public Dimension(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Width = reader.GetDouble(0)!.Value;
-                Height = reader.GetDouble(1)!.Value;
-                Metric = (MetricTypeEnum)reader.GetUShort(2)!.Value;
-            }
-            public required double Width { get; set; }
-            public required double Height { get; set; }
-            public required MetricTypeEnum Metric { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteDouble(0, Width);
-                writer.WriteDouble(1, Height);
-                writer.WriteUShort(2, (ushort)Metric);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
         /// Parameter
         /// </summary>
         public record Parameter : TLVPayload {
@@ -355,17 +399,17 @@ namespace MatterDotNet.Clusters.Application
             public Parameter(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Type = (ParameterEnum)reader.GetUShort(0)!.Value;
-                Value = reader.GetString(1, false)!;
+                Value = reader.GetString(1, false, 1024)!;
                 {
-                    ExternalIDList = new AdditionalInfo[((object[])fields[2]).Length];
-                    for (int i = 0; i < ExternalIDList.Length; i++) {
-                        ExternalIDList[i] = new AdditionalInfo((object[])fields[-1]);
+                    ExternalIDList = new AdditionalInfo[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < ExternalIDList.Length; n++) {
+                        ExternalIDList[n] = new AdditionalInfo((object[])((object[])fields[2])[n]);
                     }
                 }
             }
             public required ParameterEnum Type { get; set; }
             public required string Value { get; set; }
-            public AdditionalInfo[]? ExternalIDList { get; set; } = Array.Empty<AdditionalInfo>();
+            public AdditionalInfo[]? ExternalIDList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Type);
@@ -397,26 +441,22 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public PlaybackPreferences(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                PlaybackPosition = reader.GetULong(0, true);
+                PlaybackPosition = reader.GetULong(0)!.Value;
                 TextTrack = new TrackPreference((object[])fields[1]);
                 {
-                    AudioTracks = new TrackPreference[((object[])fields[2]).Length];
-                    for (int i = 0; i < AudioTracks.Length; i++) {
-                        AudioTracks[i] = new TrackPreference((object[])fields[-1]);
+                    AudioTracks = new TrackPreference[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < AudioTracks.Length; n++) {
+                        AudioTracks[n] = new TrackPreference((object[])((object[])fields[2])[n]);
                     }
                 }
             }
-            public required ulong? PlaybackPosition { get; set; }
-            public required TrackPreference? TextTrack { get; set; }
-            public required TrackPreference[]? AudioTracks { get; set; }
+            public required ulong PlaybackPosition { get; set; }
+            public required TrackPreference TextTrack { get; set; }
+            public TrackPreference[]? AudioTracks { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                if (PlaybackPosition != null)
-                    writer.WriteULong(0, PlaybackPosition);
-                if (TextTrack == null)
-                    writer.WriteNull(1);
-                else
-                    TextTrack.Serialize(writer, 1);
+                writer.WriteULong(0, PlaybackPosition);
+                TextTrack.Serialize(writer, 1);
                 if (AudioTracks != null)
                 {
                     writer.StartArray(2);
@@ -425,42 +465,6 @@ namespace MatterDotNet.Clusters.Application
                     }
                     writer.EndContainer();
                 }
-                else
-                    writer.WriteNull(2);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Style Information
-        /// </summary>
-        public record StyleInformation : TLVPayload {
-            /// <summary>
-            /// Style Information
-            /// </summary>
-            public StyleInformation() { }
-
-            /// <summary>
-            /// Style Information
-            /// </summary>
-            [SetsRequiredMembers]
-            public StyleInformation(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                ImageURL = reader.GetString(0, true);
-                Color = reader.GetString(1, true);
-                Size = new Dimension((object[])fields[2]);
-            }
-            public string? ImageURL { get; set; }
-            public string? Color { get; set; }
-            public Dimension? Size { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                if (ImageURL != null)
-                    writer.WriteString(0, ImageURL, 8192);
-                if (Color != null)
-                    writer.WriteString(1, Color, 7);
-                if (Size != null)
-                    Size.Serialize(writer, 2);
                 writer.EndContainer();
             }
         }
@@ -480,22 +484,21 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public TrackPreference(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                LanguageCode = reader.GetString(0, false)!;
+                LanguageCode = reader.GetString(0, false, 32)!;
                 {
-                    Characteristics = new MediaPlaybackCluster.CharacteristicEnum[((object[])fields[1]).Length];
-                    for (int i = 0; i < Characteristics.Length; i++) {
-                        Characteristics[i] = (MediaPlaybackCluster.CharacteristicEnum)reader.GetUShort(-1)!.Value;
+                    Characteristics = new Characteristic[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < Characteristics.Length; n++) {
+                        Characteristics[n] = (Characteristic)reader.GetUShort(n)!.Value;
                     }
                 }
-                AudioOutputIndex = reader.GetByte(2, true);
+                AudioOutputIndex = reader.GetByte(2)!.Value;
             }
             public required string LanguageCode { get; set; }
-            public MediaPlaybackCluster.CharacteristicEnum[]? Characteristics { get; set; } = null;
-            public required byte? AudioOutputIndex { get; set; }
+            public Characteristic[]? Characteristics { get; set; }
+            public required byte AudioOutputIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, LanguageCode, 32);
-                if (Characteristics != null)
                 if (Characteristics != null)
                 {
                     writer.StartArray(1);
@@ -504,10 +507,7 @@ namespace MatterDotNet.Clusters.Application
                     }
                     writer.EndContainer();
                 }
-                else
-                    writer.WriteNull(1);
-                if (AudioOutputIndex != null)
-                    writer.WriteByte(2, AudioOutputIndex);
+                writer.WriteByte(2, AudioOutputIndex);
                 writer.EndContainer();
             }
         }
@@ -519,7 +519,7 @@ namespace MatterDotNet.Clusters.Application
             public required bool AutoPlay { get; set; }
             public string? Data { get; set; }
             public PlaybackPreferences? PlaybackPreferences { get; set; }
-            public bool? UseCurrentContext { get; set; } = true;
+            public bool? UseCurrentContext { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 Search.Serialize(writer, 0);
@@ -538,7 +538,6 @@ namespace MatterDotNet.Clusters.Application
             public required string ContentURL { get; set; }
             public string? DisplayString { get; set; }
             public BrandingInformation? BrandingInformation { get; set; }
-            public PlaybackPreferences? PlaybackPreferences { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteString(0, ContentURL);
@@ -546,8 +545,6 @@ namespace MatterDotNet.Clusters.Application
                     writer.WriteString(1, DisplayString);
                 if (BrandingInformation != null)
                     BrandingInformation.Serialize(writer, 2);
-                if (PlaybackPreferences != null)
-                    PlaybackPreferences.Serialize(writer, 3);
                 writer.EndContainer();
             }
         }
@@ -556,7 +553,7 @@ namespace MatterDotNet.Clusters.Application
         /// Launcher Response - Reply from server
         /// </summary>
         public struct LauncherResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public string? Data { get; set; }
         }
         #endregion Payloads
@@ -565,19 +562,19 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Launch Content
         /// </summary>
-        public async Task<LauncherResponse?> LaunchContent(SecureSession session, ContentSearch Search, bool AutoPlay, string? Data, PlaybackPreferences? PlaybackPreferences, bool? UseCurrentContext) {
+        public async Task<LauncherResponse?> LaunchContent(SecureSession session, ContentSearch search, bool autoPlay, string? data, PlaybackPreferences? playbackPreferences, bool? useCurrentContext) {
             LaunchContentPayload requestFields = new LaunchContentPayload() {
-                Search = Search,
-                AutoPlay = AutoPlay,
-                Data = Data,
-                PlaybackPreferences = PlaybackPreferences,
-                UseCurrentContext = UseCurrentContext,
+                Search = search,
+                AutoPlay = autoPlay,
+                Data = data,
+                PlaybackPreferences = playbackPreferences,
+                UseCurrentContext = useCurrentContext,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -585,18 +582,17 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Launch URL
         /// </summary>
-        public async Task<LauncherResponse?> LaunchURL(SecureSession session, string ContentURL, string? DisplayString, BrandingInformation? BrandingInformation, PlaybackPreferences? PlaybackPreferences) {
+        public async Task<LauncherResponse?> LaunchURL(SecureSession session, string contentURL, string? displayString, BrandingInformation? brandingInformation) {
             LaunchURLPayload requestFields = new LaunchURLPayload() {
-                ContentURL = ContentURL,
-                DisplayString = DisplayString,
-                BrandingInformation = BrandingInformation,
-                PlaybackPreferences = PlaybackPreferences,
+                ContentURL = contentURL,
+                DisplayString = displayString,
+                BrandingInformation = brandingInformation,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -604,48 +600,27 @@ namespace MatterDotNet.Clusters.Application
 
         #region Attributes
         /// <summary>
-        /// Features supported by this cluster
-        /// </summary>
-        /// <param name="session"></param>
-        /// <returns></returns>
-        public async Task<Feature> GetSupportedFeatures(SecureSession session)
-        {
-            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;
-        }
-
-        /// <summary>
-        /// Returns true when the feature is supported by the cluster
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="feature"></param>
-        /// <returns></returns>
-        public async Task<bool> Supports(SecureSession session, Feature feature)
-        {
-            return ((feature & await GetSupportedFeatures(session)) != 0);
-        }
-
-        /// <summary>
         /// Get the Accept Header attribute
         /// </summary>
         public async Task<string[]> GetAcceptHeader(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
             string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false)!;
+                list[i] = reader.GetString(i, false, 254)!;
             return list;
         }
 
         /// <summary>
         /// Get the Supported Streaming Protocols attribute
         /// </summary>
-        public async Task<SupportedProtocolsBitmap> GetSupportedStreamingProtocols(SecureSession session) {
-            return (SupportedProtocolsBitmap)await GetEnumAttribute(session, 1);
+        public async Task<SupportedProtocols> GetSupportedStreamingProtocols(SecureSession session) {
+            return (SupportedProtocols)await GetEnumAttribute(session, 1);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Content Launcher Cluster";
+            return "Content Launcher";
         }
     }
 }

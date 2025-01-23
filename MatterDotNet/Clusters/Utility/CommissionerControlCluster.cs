@@ -18,29 +18,29 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Commissioner Control Cluster
+    /// Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class CommissionerControlCluster : ClusterBase
+    public class CommissionerControl : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0751;
 
         /// <summary>
-        /// Commissioner Control Cluster
+        /// Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto.
         /// </summary>
-        public CommissionerControlCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public CommissionerControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected CommissionerControlCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected CommissionerControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Supported Device Category Bitmap
+        /// Supported Device Category
         /// </summary>
         [Flags]
-        public enum SupportedDeviceCategoryBitmap {
+        public enum SupportedDeviceCategory : uint {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -48,7 +48,7 @@ namespace MatterDotNet.Clusters.Utility
             /// <summary>
             /// Aggregators which support Fabric Synchronization may be commissioned.
             /// </summary>
-            FabricSynchronization = 1,
+            FabricSynchronization = 0x1,
         }
         #endregion Enums
 
@@ -71,7 +71,7 @@ namespace MatterDotNet.Clusters.Utility
 
         private record CommissionNodePayload : TLVPayload {
             public required ulong RequestID { get; set; }
-            public required ushort ResponseTimeoutSeconds { get; set; } = 30;
+            public required ushort ResponseTimeoutSeconds { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(0, RequestID);
@@ -96,12 +96,12 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Request Commissioning Approval
         /// </summary>
-        public async Task<bool> RequestCommissioningApproval(SecureSession session, ulong RequestID, ushort VendorID, ushort ProductID, string? Label) {
+        public async Task<bool> RequestCommissioningApproval(SecureSession session, ulong requestID, ushort vendorID, ushort productID, string? label) {
             RequestCommissioningApprovalPayload requestFields = new RequestCommissioningApprovalPayload() {
-                RequestID = RequestID,
-                VendorID = VendorID,
-                ProductID = ProductID,
-                Label = Label,
+                RequestID = requestID,
+                VendorID = vendorID,
+                ProductID = productID,
+                Label = label,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -110,10 +110,10 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Commission Node
         /// </summary>
-        public async Task<ReverseOpenCommissioningWindow?> CommissionNode(SecureSession session, ulong RequestID, ushort ResponseTimeoutSeconds) {
+        public async Task<ReverseOpenCommissioningWindow?> CommissionNode(SecureSession session, ulong requestID, ushort responseTimeoutSeconds) {
             CommissionNodePayload requestFields = new CommissionNodePayload() {
-                RequestID = RequestID,
-                ResponseTimeoutSeconds = ResponseTimeoutSeconds,
+                RequestID = requestID,
+                ResponseTimeoutSeconds = responseTimeoutSeconds,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
@@ -132,14 +132,14 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Supported Device Categories attribute
         /// </summary>
-        public async Task<SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories(SecureSession session) {
-            return (SupportedDeviceCategoryBitmap)await GetEnumAttribute(session, 0);
+        public async Task<SupportedDeviceCategory> GetSupportedDeviceCategories(SecureSession session) {
+            return (SupportedDeviceCategory)await GetEnumAttribute(session, 0);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Commissioner Control Cluster";
+            return "Commissioner Control";
         }
     }
 }

@@ -19,38 +19,75 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Operational State Cluster
+    /// This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
-    public class OperationalStateCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class OperationalState : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0060;
 
         /// <summary>
-        /// Operational State Cluster
+        /// This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.
         /// </summary>
-        public OperationalStateCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OperationalStateCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
-        /// Error State
+        /// Operational State
         /// </summary>
-        public enum ErrorStateEnum {
+        public enum OperationalStateEnum : byte {
+            Stopped = 0x00,
+            Running = 0x01,
+            Paused = 0x02,
+            Error = 0x03,
         }
 
         /// <summary>
-        /// Operational State
+        /// Error State
         /// </summary>
-        public enum OperationalStateEnum {
+        public enum ErrorStateEnum : byte {
+            NoError = 0x00,
+            UnableToStartOrResume = 0x01,
+            UnableToCompleteOperation = 0x02,
+            CommandInvalidInState = 0x03,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Operational State
+        /// </summary>
+        public record OperationalStatePayload : TLVPayload {
+            /// <summary>
+            /// Operational State
+            /// </summary>
+            public OperationalStatePayload() { }
+
+            /// <summary>
+            /// Operational State
+            /// </summary>
+            [SetsRequiredMembers]
+            public OperationalStatePayload(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                OperationalStateID = reader.GetByte(0)!.Value;
+                OperationalStateLabel = reader.GetString(1, true, 64);
+            }
+            public required byte OperationalStateID { get; set; }
+            public string? OperationalStateLabel { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteByte(0, OperationalStateID);
+                if (OperationalStateLabel != null)
+                    writer.WriteString(1, OperationalStateLabel, 64);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Error State
         /// </summary>
@@ -66,49 +103,20 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public ErrorState(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                ErrorStateID = (ErrorStateEnum)reader.GetUShort(0)!.Value;
-                ErrorStateLabel = reader.GetString(1, true);
-                ErrorStateDetails = reader.GetString(2, true);
+                ErrorStateID = reader.GetByte(0)!.Value;
+                ErrorStateLabel = reader.GetString(1, true, 64);
+                ErrorStateDetails = reader.GetString(2, true, 64);
             }
-            public required ErrorStateEnum ErrorStateID { get; set; }
-            public string? ErrorStateLabel { get; set; } = "";
-            public string? ErrorStateDetails { get; set; } = "";
+            public required byte ErrorStateID { get; set; }
+            public string? ErrorStateLabel { get; set; }
+            public string? ErrorStateDetails { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)ErrorStateID);
+                writer.WriteByte(0, ErrorStateID);
                 if (ErrorStateLabel != null)
                     writer.WriteString(1, ErrorStateLabel, 64);
                 if (ErrorStateDetails != null)
                     writer.WriteString(2, ErrorStateDetails, 64);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Operational State
-        /// </summary>
-        public record OperationalState : TLVPayload {
-            /// <summary>
-            /// Operational State
-            /// </summary>
-            public OperationalState() { }
-
-            /// <summary>
-            /// Operational State
-            /// </summary>
-            [SetsRequiredMembers]
-            public OperationalState(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                OperationalStateID = (OperationalStateEnum)reader.GetUShort(0)!.Value;
-                OperationalStateLabel = reader.GetString(1, true);
-            }
-            public required OperationalStateEnum OperationalStateID { get; set; }
-            public string? OperationalStateLabel { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)OperationalStateID);
-                if (OperationalStateLabel != null)
-                    writer.WriteString(1, OperationalStateLabel, 64);
                 writer.EndContainer();
             }
         }
@@ -196,17 +204,17 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Countdown Time attribute
         /// </summary>
         public async Task<TimeSpan?> GetCountdownTime(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 2, true) ?? null;
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 2, true);
         }
 
         /// <summary>
         /// Get the Operational State List attribute
         /// </summary>
-        public async Task<OperationalState[]> GetOperationalStateList(SecureSession session) {
+        public async Task<OperationalStatePayload[]> GetOperationalStateList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            OperationalState[] list = new OperationalState[reader.Count];
+            OperationalStatePayload[] list = new OperationalStatePayload[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new OperationalState(reader.GetStruct(i)!);
+                list[i] = new OperationalStatePayload(reader.GetStruct(i)!);
             return list;
         }
 
@@ -227,7 +235,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Operational State Cluster";
+            return "Operational State";
         }
     }
 }

@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Water Content Measurement Clusters
+    /// Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 3)]
-    public class WaterContentMeasurementClusters : ClusterBase
+    public class RelativeHumidityMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0405;
 
         /// <summary>
-        /// Water Content Measurement Clusters
+        /// Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.
         /// </summary>
-        public WaterContentMeasurementClusters(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public RelativeHumidityMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WaterContentMeasurementClusters(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected RelativeHumidityMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -64,7 +64,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Water Content Measurement Clusters";
+            return "Relative Humidity Measurement";
         }
     }
 }

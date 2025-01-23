@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.EnergyManagement
 {
     /// <summary>
-    /// Water Heater Management Cluster
+    /// This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class WaterHeaterManagementCluster : ClusterBase
+    public class WaterHeaterManagement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0094;
 
         /// <summary>
-        /// Water Heater Management Cluster
+        /// This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management.
         /// </summary>
-        public WaterHeaterManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public WaterHeaterManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WaterHeaterManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected WaterHeaterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -56,22 +56,22 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Boost State
         /// </summary>
-        public enum BoostStateEnum {
+        public enum BoostState : byte {
             /// <summary>
             /// Boost is not currently active
             /// </summary>
-            Inactive = 0,
+            Inactive = 0x00,
             /// <summary>
             /// Boost is currently active
             /// </summary>
-            Active = 1,
+            Active = 0x01,
         }
 
         /// <summary>
-        /// Water Heater Heat Source Bitmap
+        /// Water Heater Heat Source
         /// </summary>
         [Flags]
-        public enum WaterHeaterHeatSourceBitmap {
+        public enum WaterHeaterHeatSource : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -79,23 +79,23 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Immersion Heating Element 1
             /// </summary>
-            ImmersionElement1 = 1,
+            ImmersionElement1 = 0x01,
             /// <summary>
             /// Immersion Heating Element 2
             /// </summary>
-            ImmersionElement2 = 2,
+            ImmersionElement2 = 0x02,
             /// <summary>
             /// Heat pump Heating
             /// </summary>
-            HeatPump = 4,
+            HeatPump = 0x04,
             /// <summary>
             /// Boiler Heating (e.g. Gas or Oil)
             /// </summary>
-            Boiler = 8,
+            Boiler = 0x08,
             /// <summary>
             /// Other Heating
             /// </summary>
-            Other = 16,
+            Other = 0x10,
         }
         #endregion Enums
 
@@ -161,9 +161,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Boost
         /// </summary>
-        public async Task<bool> Boost(SecureSession session, WaterHeaterBoostInfo BoostInfo) {
+        public async Task<bool> Boost(SecureSession session, WaterHeaterBoostInfo boostInfo) {
             BoostPayload requestFields = new BoostPayload() {
-                BoostInfo = BoostInfo,
+                BoostInfo = boostInfo,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -203,15 +203,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Heater Types attribute
         /// </summary>
-        public async Task<WaterHeaterHeatSourceBitmap> GetHeaterTypes(SecureSession session) {
-            return (WaterHeaterHeatSourceBitmap)await GetEnumAttribute(session, 0);
+        public async Task<WaterHeaterHeatSource> GetHeaterTypes(SecureSession session) {
+            return (WaterHeaterHeatSource)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Heat Demand attribute
         /// </summary>
-        public async Task<WaterHeaterHeatSourceBitmap> GetHeatDemand(SecureSession session) {
-            return (WaterHeaterHeatSourceBitmap)await GetEnumAttribute(session, 1);
+        public async Task<WaterHeaterHeatSource> GetHeatDemand(SecureSession session) {
+            return (WaterHeaterHeatSource)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
@@ -222,14 +222,14 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Get the Estimated Heat Required attribute
+        /// Get the Estimated Heat Required [mWh] attribute
         /// </summary>
         public async Task<long> GetEstimatedHeatRequired(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 3) ?? 0;
         }
 
         /// <summary>
-        /// Get the Tank Percentage attribute
+        /// Get the Tank Percentage [%] attribute
         /// </summary>
         public async Task<byte> GetTankPercentage(SecureSession session) {
             return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 0;
@@ -238,14 +238,14 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Boost State attribute
         /// </summary>
-        public async Task<BoostStateEnum> GetBoostState(SecureSession session) {
-            return (BoostStateEnum?)await GetEnumAttribute(session, 5) ?? BoostStateEnum.Inactive;
+        public async Task<BoostState> GetBoostState(SecureSession session) {
+            return (BoostState)await GetEnumAttribute(session, 5);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Water Heater Management Cluster";
+            return "Water Heater Management";
         }
     }
 }

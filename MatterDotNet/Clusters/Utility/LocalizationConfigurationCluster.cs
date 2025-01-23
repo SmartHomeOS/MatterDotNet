@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Localization Configuration Cluster
+    /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing common languages, units of measurements, and numerical formatting standards. As such, Nodes that visually or audibly convey information need a mechanism by which they can be configured to use a user’s preferred language, units, etc
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class LocalizationConfigurationCluster : ClusterBase
+    public class LocalizationConfiguration : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x002B;
+        internal const uint CLUSTER_ID = 0x002b;
 
         /// <summary>
-        /// Localization Configuration Cluster
+        /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing common languages, units of measurements, and numerical formatting standards. As such, Nodes that visually or audibly convey information need a mechanism by which they can be configured to use a user’s preferred language, units, etc
         /// </summary>
-        public LocalizationConfigurationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public LocalizationConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LocalizationConfigurationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected LocalizationConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -54,14 +54,14 @@ namespace MatterDotNet.Clusters.Utility
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
             string[] list = new string[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false)!;
+                list[i] = reader.GetString(i, false, 254)!;
             return list;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Localization Configuration Cluster";
+            return "Localization Configuration";
         }
     }
 }

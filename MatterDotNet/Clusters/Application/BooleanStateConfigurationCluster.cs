@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Boolean State Configuration Cluster
+    /// This cluster is used to configure a boolean sensor.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class BooleanStateConfigurationCluster : ClusterBase
+    public class BooleanStateConfiguration : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0080;
 
         /// <summary>
-        /// Boolean State Configuration Cluster
+        /// This cluster is used to configure a boolean sensor.
         /// </summary>
-        public BooleanStateConfigurationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public BooleanStateConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BooleanStateConfigurationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected BooleanStateConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -60,10 +60,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Alarm Mode Bitmap
+        /// Alarm Mode
         /// </summary>
         [Flags]
-        public enum AlarmModeBitmap {
+        public enum AlarmMode : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -71,44 +71,41 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Visual alarming
             /// </summary>
-            Visual = 1,
+            Visual = 0x1,
             /// <summary>
             /// Audible alarming
             /// </summary>
-            Audible = 2,
+            Audible = 0x2,
         }
 
         /// <summary>
-        /// Sensor Fault Bitmap
+        /// Sensor Fault
         /// </summary>
         [Flags]
-        public enum SensorFaultBitmap {
+        public enum SensorFault : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Unspecified fault detected
-            /// </summary>
-            GeneralFault = 1,
+            GeneralFault = 0x1,
         }
         #endregion Enums
 
         #region Payloads
         private record SuppressAlarmPayload : TLVPayload {
-            public required AlarmModeBitmap AlarmsToSuppress { get; set; }
+            public required AlarmMode AlarmsToSuppress { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)AlarmsToSuppress);
+                writer.WriteUInt(0, (uint)AlarmsToSuppress);
                 writer.EndContainer();
             }
         }
 
         private record EnableDisableAlarmPayload : TLVPayload {
-            public required AlarmModeBitmap AlarmsToEnableDisable { get; set; }
+            public required AlarmMode AlarmsToEnableDisable { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)AlarmsToEnableDisable);
+                writer.WriteUInt(0, (uint)AlarmsToEnableDisable);
                 writer.EndContainer();
             }
         }
@@ -118,9 +115,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Suppress Alarm
         /// </summary>
-        public async Task<bool> SuppressAlarm(SecureSession session, AlarmModeBitmap AlarmsToSuppress) {
+        public async Task<bool> SuppressAlarm(SecureSession session, AlarmMode alarmsToSuppress) {
             SuppressAlarmPayload requestFields = new SuppressAlarmPayload() {
-                AlarmsToSuppress = AlarmsToSuppress,
+                AlarmsToSuppress = alarmsToSuppress,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -129,9 +126,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable Disable Alarm
         /// </summary>
-        public async Task<bool> EnableDisableAlarm(SecureSession session, AlarmModeBitmap AlarmsToEnableDisable) {
+        public async Task<bool> EnableDisableAlarm(SecureSession session, AlarmMode alarmsToEnableDisable) {
             EnableDisableAlarmPayload requestFields = new EnableDisableAlarmPayload() {
-                AlarmsToEnableDisable = AlarmsToEnableDisable,
+                AlarmsToEnableDisable = alarmsToEnableDisable,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -191,42 +188,42 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Alarms Active attribute
         /// </summary>
-        public async Task<AlarmModeBitmap> GetAlarmsActive(SecureSession session) {
-            return (AlarmModeBitmap)await GetEnumAttribute(session, 3);
+        public async Task<AlarmMode> GetAlarmsActive(SecureSession session) {
+            return (AlarmMode)await GetEnumAttribute(session, 3);
         }
 
         /// <summary>
         /// Get the Alarms Suppressed attribute
         /// </summary>
-        public async Task<AlarmModeBitmap> GetAlarmsSuppressed(SecureSession session) {
-            return (AlarmModeBitmap)await GetEnumAttribute(session, 4);
+        public async Task<AlarmMode> GetAlarmsSuppressed(SecureSession session) {
+            return (AlarmMode)await GetEnumAttribute(session, 4);
         }
 
         /// <summary>
         /// Get the Alarms Enabled attribute
         /// </summary>
-        public async Task<AlarmModeBitmap> GetAlarmsEnabled(SecureSession session) {
-            return (AlarmModeBitmap)await GetEnumAttribute(session, 5);
+        public async Task<AlarmMode> GetAlarmsEnabled(SecureSession session) {
+            return (AlarmMode)await GetEnumAttribute(session, 5);
         }
 
         /// <summary>
         /// Get the Alarms Supported attribute
         /// </summary>
-        public async Task<AlarmModeBitmap> GetAlarmsSupported(SecureSession session) {
-            return (AlarmModeBitmap)await GetEnumAttribute(session, 6);
+        public async Task<AlarmMode> GetAlarmsSupported(SecureSession session) {
+            return (AlarmMode)await GetEnumAttribute(session, 6);
         }
 
         /// <summary>
         /// Get the Sensor Fault attribute
         /// </summary>
-        public async Task<SensorFaultBitmap> GetSensorFault(SecureSession session) {
-            return (SensorFaultBitmap)await GetEnumAttribute(session, 7);
+        public async Task<SensorFault> GetSensorFault(SecureSession session) {
+            return (SensorFault)await GetEnumAttribute(session, 7);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Boolean State Configuration Cluster";
+            return "Boolean State Configuration";
         }
     }
 }

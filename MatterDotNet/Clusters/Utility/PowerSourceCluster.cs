@@ -13,24 +13,26 @@
 // WARNING: This file was auto-generated. Do not edit.
 
 using MatterDotNet.Protocol.Parsers;
+using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Power Source Cluster
+    /// This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
-    public class PowerSourceCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class PowerSource : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x002F;
 
         /// <summary>
-        /// Power Source Cluster
+        /// This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.
         /// </summary>
-        public PowerSourceCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public PowerSource(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerSourceCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected PowerSource(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -57,237 +59,193 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Bat Approved Chemistry
+        /// Wired Fault
         /// </summary>
-        public enum BatApprovedChemistryEnum {
+        public enum WiredFault : byte {
             /// <summary>
-            /// Cell chemistry is unspecified or unknown
+            /// The Node detects an unspecified fault on this wired power source.
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x00,
             /// <summary>
-            /// Cell chemistry is alkaline
+            /// The Node detects the supplied voltage is above maximum supported value for this wired power source.
             /// </summary>
-            Alkaline = 1,
+            OverVoltage = 0x01,
             /// <summary>
-            /// Cell chemistry is lithium carbon fluoride
+            /// The Node detects the supplied voltage is below maximum supported value for this wired power source.
             /// </summary>
-            LithiumCarbonFluoride = 2,
+            UnderVoltage = 0x02,
+        }
+
+        /// <summary>
+        /// Bat Fault
+        /// </summary>
+        public enum BatFault : byte {
             /// <summary>
-            /// Cell chemistry is lithium chromium oxide
+            /// The Node detects an unspecified fault on this battery power source.
             /// </summary>
-            LithiumChromiumOxide = 3,
+            Unspecified = 0x00,
             /// <summary>
-            /// Cell chemistry is lithium copper oxide
+            /// The Node detects the temperature of this battery power source is above ideal operating conditions.
             /// </summary>
-            LithiumCopperOxide = 4,
+            OverTemp = 0x01,
             /// <summary>
-            /// Cell chemistry is lithium iron disulfide
+            /// The Node detects the temperature of this battery power source is below ideal operating conditions.
             /// </summary>
-            LithiumIronDisulfide = 5,
-            /// <summary>
-            /// Cell chemistry is lithium manganese dioxide
-            /// </summary>
-            LithiumManganeseDioxide = 6,
-            /// <summary>
-            /// Cell chemistry is lithium thionyl chloride
-            /// </summary>
-            LithiumThionylChloride = 7,
-            /// <summary>
-            /// Cell chemistry is magnesium
-            /// </summary>
-            Magnesium = 8,
-            /// <summary>
-            /// Cell chemistry is mercury oxide
-            /// </summary>
-            MercuryOxide = 9,
-            /// <summary>
-            /// Cell chemistry is nickel oxyhydride
-            /// </summary>
-            NickelOxyhydride = 10,
-            /// <summary>
-            /// Cell chemistry is silver oxide
-            /// </summary>
-            SilverOxide = 11,
-            /// <summary>
-            /// Cell chemistry is zinc air
-            /// </summary>
-            ZincAir = 12,
-            /// <summary>
-            /// Cell chemistry is zinc carbon
-            /// </summary>
-            ZincCarbon = 13,
-            /// <summary>
-            /// Cell chemistry is zinc chloride
-            /// </summary>
-            ZincChloride = 14,
-            /// <summary>
-            /// Cell chemistry is zinc manganese dioxide
-            /// </summary>
-            ZincManganeseDioxide = 15,
-            /// <summary>
-            /// Cell chemistry is lead acid
-            /// </summary>
-            LeadAcid = 16,
-            /// <summary>
-            /// Cell chemistry is lithium cobalt oxide
-            /// </summary>
-            LithiumCobaltOxide = 17,
-            /// <summary>
-            /// Cell chemistry is lithium ion
-            /// </summary>
-            LithiumIon = 18,
-            /// <summary>
-            /// Cell chemistry is lithium ion polymer
-            /// </summary>
-            LithiumIonPolymer = 19,
-            /// <summary>
-            /// Cell chemistry is lithium iron phosphate
-            /// </summary>
-            LithiumIronPhosphate = 20,
-            /// <summary>
-            /// Cell chemistry is lithium sulfur
-            /// </summary>
-            LithiumSulfur = 21,
-            /// <summary>
-            /// Cell chemistry is lithium titanate
-            /// </summary>
-            LithiumTitanate = 22,
-            /// <summary>
-            /// Cell chemistry is nickel cadmium
-            /// </summary>
-            NickelCadmium = 23,
-            /// <summary>
-            /// Cell chemistry is nickel hydrogen
-            /// </summary>
-            NickelHydrogen = 24,
-            /// <summary>
-            /// Cell chemistry is nickel iron
-            /// </summary>
-            NickelIron = 25,
-            /// <summary>
-            /// Cell chemistry is nickel metal hydride
-            /// </summary>
-            NickelMetalHydride = 26,
-            /// <summary>
-            /// Cell chemistry is nickel zinc
-            /// </summary>
-            NickelZinc = 27,
-            /// <summary>
-            /// Cell chemistry is silver zinc
-            /// </summary>
-            SilverZinc = 28,
-            /// <summary>
-            /// Cell chemistry is sodium ion
-            /// </summary>
-            SodiumIon = 29,
-            /// <summary>
-            /// Cell chemistry is sodium sulfur
-            /// </summary>
-            SodiumSulfur = 30,
-            /// <summary>
-            /// Cell chemistry is zinc bromide
-            /// </summary>
-            ZincBromide = 31,
-            /// <summary>
-            /// Cell chemistry is zinc cerium
-            /// </summary>
-            ZincCerium = 32,
+            UnderTemp = 0x02,
         }
 
         /// <summary>
         /// Bat Charge Fault
         /// </summary>
-        public enum BatChargeFaultEnum {
+        public enum BatChargeFault : byte {
             /// <summary>
             /// The Node detects an unspecified fault on this battery source.
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x00,
             /// <summary>
             /// The Node detects the ambient temperature is above the nominal range for this battery source.
             /// </summary>
-            AmbientTooHot = 1,
+            AmbientTooHot = 0x01,
             /// <summary>
             /// The Node detects the ambient temperature is below the nominal range for this battery source.
             /// </summary>
-            AmbientTooCold = 2,
+            AmbientTooCold = 0x02,
             /// <summary>
             /// The Node detects the temperature of this battery source is above the nominal range.
             /// </summary>
-            BatteryTooHot = 3,
+            BatteryTooHot = 0x03,
             /// <summary>
             /// The Node detects the temperature of this battery source is below the nominal range.
             /// </summary>
-            BatteryTooCold = 4,
+            BatteryTooCold = 0x04,
             /// <summary>
             /// The Node detects this battery source is not present.
             /// </summary>
-            BatteryAbsent = 5,
+            BatteryAbsent = 0x05,
             /// <summary>
             /// The Node detects this battery source is over voltage.
             /// </summary>
-            BatteryOverVoltage = 6,
+            BatteryOverVoltage = 0x06,
             /// <summary>
             /// The Node detects this battery source is under voltage.
             /// </summary>
-            BatteryUnderVoltage = 7,
+            BatteryUnderVoltage = 0x07,
             /// <summary>
             /// The Node detects the charger for this battery source is over voltage.
             /// </summary>
-            ChargerOverVoltage = 8,
+            ChargerOverVoltage = 0x08,
             /// <summary>
             /// The Node detects the charger for this battery source is under voltage.
             /// </summary>
-            ChargerUnderVoltage = 9,
+            ChargerUnderVoltage = 0x09,
             /// <summary>
             /// The Node detects a charging safety timeout for this battery source.
             /// </summary>
-            SafetyTimeout = 10,
+            SafetyTimeout = 0x0A,
+        }
+
+        /// <summary>
+        /// Power Source Status
+        /// </summary>
+        public enum PowerSourceStatus : byte {
+            /// <summary>
+            /// Indicate the source status is not specified
+            /// </summary>
+            Unspecified = 0x00,
+            /// <summary>
+            /// Indicate the source is available and currently supplying power
+            /// </summary>
+            Active = 0x01,
+            /// <summary>
+            /// Indicate the source is available, but is not currently supplying power
+            /// </summary>
+            Standby = 0x02,
+            /// <summary>
+            /// Indicate the source is not currently available to supply power
+            /// </summary>
+            Unavailable = 0x03,
+        }
+
+        /// <summary>
+        /// Wired Current Type
+        /// </summary>
+        public enum WiredCurrentType : byte {
+            /// <summary>
+            /// Indicates AC current
+            /// </summary>
+            AC = 0x00,
+            /// <summary>
+            /// Indicates DC current
+            /// </summary>
+            DC = 0x01,
         }
 
         /// <summary>
         /// Bat Charge Level
         /// </summary>
-        public enum BatChargeLevelEnum {
+        public enum BatChargeLevel : byte {
             /// <summary>
             /// Charge level is nominal
             /// </summary>
-            OK = 0,
+            OK = 0x00,
             /// <summary>
             /// Charge level is low, intervention may soon be required.
             /// </summary>
-            Warning = 1,
+            Warning = 0x01,
             /// <summary>
             /// Charge level is critical, immediate intervention is required
             /// </summary>
-            Critical = 2,
+            Critical = 0x02,
+        }
+
+        /// <summary>
+        /// Bat Replaceability
+        /// </summary>
+        public enum BatReplaceability : byte {
+            /// <summary>
+            /// The replaceability is unspecified or unknown.
+            /// </summary>
+            Unspecified = 0x00,
+            /// <summary>
+            /// The battery is not replaceable.
+            /// </summary>
+            NotReplaceable = 0x01,
+            /// <summary>
+            /// The battery is replaceable by the user or customer.
+            /// </summary>
+            UserReplaceable = 0x02,
+            /// <summary>
+            /// The battery is replaceable by an authorized factory technician.
+            /// </summary>
+            FactoryReplaceable = 0x03,
         }
 
         /// <summary>
         /// Bat Charge State
         /// </summary>
-        public enum BatChargeStateEnum {
+        public enum BatChargeState : byte {
             /// <summary>
             /// Unable to determine the charging state
             /// </summary>
-            Unknown = 0,
+            Unknown = 0x00,
             /// <summary>
             /// The battery is charging
             /// </summary>
-            IsCharging = 1,
+            IsCharging = 0x01,
             /// <summary>
             /// The battery is at full charge
             /// </summary>
-            IsAtFullCharge = 2,
+            IsAtFullCharge = 0x02,
             /// <summary>
             /// The battery is not charging
             /// </summary>
-            IsNotCharging = 3,
+            IsNotCharging = 0x03,
         }
 
         /// <summary>
         /// Bat Common Designation
         /// </summary>
-        public enum BatCommonDesignationEnum {
+        public enum BatCommonDesignation : ushort {
             /// <summary>
             /// Common type is unknown or unspecified
             /// </summary>
@@ -615,99 +573,301 @@ namespace MatterDotNet.Clusters.Utility
         }
 
         /// <summary>
-        /// Bat Fault
+        /// Bat Approved Chemistry
         /// </summary>
-        public enum BatFaultEnum {
+        public enum BatApprovedChemistry : ushort {
             /// <summary>
-            /// The Node detects an unspecified fault on this battery power source.
+            /// Cell chemistry is unspecified or unknown
             /// </summary>
             Unspecified = 0,
             /// <summary>
-            /// The Node detects the temperature of this battery power source is above ideal operating conditions.
+            /// Cell chemistry is alkaline
             /// </summary>
-            OverTemp = 1,
+            Alkaline = 1,
             /// <summary>
-            /// The Node detects the temperature of this battery power source is below ideal operating conditions.
+            /// Cell chemistry is lithium carbon fluoride
             /// </summary>
-            UnderTemp = 2,
-        }
-
-        /// <summary>
-        /// Bat Replaceability
-        /// </summary>
-        public enum BatReplaceabilityEnum {
+            LithiumCarbonFluoride = 2,
             /// <summary>
-            /// The replaceability is unspecified or unknown.
+            /// Cell chemistry is lithium chromium oxide
             /// </summary>
-            Unspecified = 0,
+            LithiumChromiumOxide = 3,
             /// <summary>
-            /// The battery is not replaceable.
+            /// Cell chemistry is lithium copper oxide
             /// </summary>
-            NotReplaceable = 1,
+            LithiumCopperOxide = 4,
             /// <summary>
-            /// The battery is replaceable by the user or customer.
+            /// Cell chemistry is lithium iron disulfide
             /// </summary>
-            UserReplaceable = 2,
+            LithiumIronDisulfide = 5,
             /// <summary>
-            /// The battery is replaceable by an authorized factory technician.
+            /// Cell chemistry is lithium manganese dioxide
             /// </summary>
-            FactoryReplaceable = 3,
-        }
-
-        /// <summary>
-        /// Power Source Status
-        /// </summary>
-        public enum PowerSourceStatusEnum {
+            LithiumManganeseDioxide = 6,
             /// <summary>
-            /// Indicate the source status is not specified
+            /// Cell chemistry is lithium thionyl chloride
             /// </summary>
-            Unspecified = 0,
+            LithiumThionylChloride = 7,
             /// <summary>
-            /// Indicate the source is available and currently supplying power
+            /// Cell chemistry is magnesium
             /// </summary>
-            Active = 1,
+            Magnesium = 8,
             /// <summary>
-            /// Indicate the source is available, but is not currently supplying power
+            /// Cell chemistry is mercury oxide
             /// </summary>
-            Standby = 2,
+            MercuryOxide = 9,
             /// <summary>
-            /// Indicate the source is not currently available to supply power
+            /// Cell chemistry is nickel oxyhydride
             /// </summary>
-            Unavailable = 3,
-        }
-
-        /// <summary>
-        /// Wired Current Type
-        /// </summary>
-        public enum WiredCurrentTypeEnum {
+            NickelOxyhydride = 10,
             /// <summary>
-            /// Indicates AC current
+            /// Cell chemistry is silver oxide
             /// </summary>
-            AC = 0,
+            SilverOxide = 11,
             /// <summary>
-            /// Indicates DC current
+            /// Cell chemistry is zinc air
             /// </summary>
-            DC = 1,
-        }
-
-        /// <summary>
-        /// Wired Fault
-        /// </summary>
-        public enum WiredFaultEnum {
+            ZincAir = 12,
             /// <summary>
-            /// The Node detects an unspecified fault on this wired power source.
+            /// Cell chemistry is zinc carbon
             /// </summary>
-            Unspecified = 0,
+            ZincCarbon = 13,
             /// <summary>
-            /// The Node detects the supplied voltage is above maximum supported value for this wired power source.
+            /// Cell chemistry is zinc chloride
             /// </summary>
-            OverVoltage = 1,
+            ZincChloride = 14,
             /// <summary>
-            /// The Node detects the supplied voltage is below maximum supported value for this wired power source.
+            /// Cell chemistry is zinc manganese dioxide
             /// </summary>
-            UnderVoltage = 2,
+            ZincManganeseDioxide = 15,
+            /// <summary>
+            /// Cell chemistry is lead acid
+            /// </summary>
+            LeadAcid = 16,
+            /// <summary>
+            /// Cell chemistry is lithium cobalt oxide
+            /// </summary>
+            LithiumCobaltOxide = 17,
+            /// <summary>
+            /// Cell chemistry is lithium ion
+            /// </summary>
+            LithiumIon = 18,
+            /// <summary>
+            /// Cell chemistry is lithium ion polymer
+            /// </summary>
+            LithiumIonPolymer = 19,
+            /// <summary>
+            /// Cell chemistry is lithium iron phosphate
+            /// </summary>
+            LithiumIronPhosphate = 20,
+            /// <summary>
+            /// Cell chemistry is lithium sulfur
+            /// </summary>
+            LithiumSulfur = 21,
+            /// <summary>
+            /// Cell chemistry is lithium titanate
+            /// </summary>
+            LithiumTitanate = 22,
+            /// <summary>
+            /// Cell chemistry is nickel cadmium
+            /// </summary>
+            NickelCadmium = 23,
+            /// <summary>
+            /// Cell chemistry is nickel hydrogen
+            /// </summary>
+            NickelHydrogen = 24,
+            /// <summary>
+            /// Cell chemistry is nickel iron
+            /// </summary>
+            NickelIron = 25,
+            /// <summary>
+            /// Cell chemistry is nickel metal hydride
+            /// </summary>
+            NickelMetalHydride = 26,
+            /// <summary>
+            /// Cell chemistry is nickel zinc
+            /// </summary>
+            NickelZinc = 27,
+            /// <summary>
+            /// Cell chemistry is silver zinc
+            /// </summary>
+            SilverZinc = 28,
+            /// <summary>
+            /// Cell chemistry is sodium ion
+            /// </summary>
+            SodiumIon = 29,
+            /// <summary>
+            /// Cell chemistry is sodium sulfur
+            /// </summary>
+            SodiumSulfur = 30,
+            /// <summary>
+            /// Cell chemistry is zinc bromide
+            /// </summary>
+            ZincBromide = 31,
+            /// <summary>
+            /// Cell chemistry is zinc cerium
+            /// </summary>
+            ZincCerium = 32,
         }
         #endregion Enums
+
+        #region Records
+        /// <summary>
+        /// Wired Fault Change Type
+        /// </summary>
+        public record WiredFaultChangeType : TLVPayload {
+            /// <summary>
+            /// Wired Fault Change Type
+            /// </summary>
+            public WiredFaultChangeType() { }
+
+            /// <summary>
+            /// Wired Fault Change Type
+            /// </summary>
+            [SetsRequiredMembers]
+            public WiredFaultChangeType(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                {
+                    Current = new WiredFault[reader.GetStruct(0)!.Length];
+                    for (int n = 0; n < Current.Length; n++) {
+                        Current[n] = (WiredFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+                {
+                    Previous = new WiredFault[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < Previous.Length; n++) {
+                        Previous[n] = (WiredFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+            }
+            public required WiredFault[] Current { get; set; }
+            public required WiredFault[] Previous { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                {
+                    Constrain(Current, 0, 8);
+                    writer.StartArray(0);
+                    foreach (var item in Current) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                {
+                    Constrain(Previous, 0, 8);
+                    writer.StartArray(1);
+                    foreach (var item in Previous) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Bat Fault Change Type
+        /// </summary>
+        public record BatFaultChangeType : TLVPayload {
+            /// <summary>
+            /// Bat Fault Change Type
+            /// </summary>
+            public BatFaultChangeType() { }
+
+            /// <summary>
+            /// Bat Fault Change Type
+            /// </summary>
+            [SetsRequiredMembers]
+            public BatFaultChangeType(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                {
+                    Current = new BatFault[reader.GetStruct(0)!.Length];
+                    for (int n = 0; n < Current.Length; n++) {
+                        Current[n] = (BatFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+                {
+                    Previous = new BatFault[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < Previous.Length; n++) {
+                        Previous[n] = (BatFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+            }
+            public required BatFault[] Current { get; set; }
+            public required BatFault[] Previous { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                {
+                    Constrain(Current, 0, 8);
+                    writer.StartArray(0);
+                    foreach (var item in Current) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                {
+                    Constrain(Previous, 0, 8);
+                    writer.StartArray(1);
+                    foreach (var item in Previous) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Bat Charge Fault Change Type
+        /// </summary>
+        public record BatChargeFaultChangeType : TLVPayload {
+            /// <summary>
+            /// Bat Charge Fault Change Type
+            /// </summary>
+            public BatChargeFaultChangeType() { }
+
+            /// <summary>
+            /// Bat Charge Fault Change Type
+            /// </summary>
+            [SetsRequiredMembers]
+            public BatChargeFaultChangeType(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                {
+                    Current = new BatChargeFault[reader.GetStruct(0)!.Length];
+                    for (int n = 0; n < Current.Length; n++) {
+                        Current[n] = (BatChargeFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+                {
+                    Previous = new BatChargeFault[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < Previous.Length; n++) {
+                        Previous[n] = (BatChargeFault)reader.GetUShort(n)!.Value;
+                    }
+                }
+            }
+            public required BatChargeFault[] Current { get; set; }
+            public required BatChargeFault[] Previous { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                {
+                    Constrain(Current, 0, 16);
+                    writer.StartArray(0);
+                    foreach (var item in Current) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                {
+                    Constrain(Previous, 0, 16);
+                    writer.StartArray(1);
+                    foreach (var item in Previous) {
+                        writer.WriteUShort(-1, (ushort)item);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
+        #endregion Records
 
         #region Attributes
         /// <summary>
@@ -734,8 +894,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Status attribute
         /// </summary>
-        public async Task<PowerSourceStatusEnum> GetStatus(SecureSession session) {
-            return (PowerSourceStatusEnum)await GetEnumAttribute(session, 0);
+        public async Task<PowerSourceStatus> GetStatus(SecureSession session) {
+            return (PowerSourceStatus)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
@@ -769,8 +929,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Wired Current Type attribute
         /// </summary>
-        public async Task<WiredCurrentTypeEnum> GetWiredCurrentType(SecureSession session) {
-            return (WiredCurrentTypeEnum)await GetEnumAttribute(session, 5);
+        public async Task<WiredCurrentType> GetWiredCurrentType(SecureSession session) {
+            return (WiredCurrentType)await GetEnumAttribute(session, 5);
         }
 
         /// <summary>
@@ -804,11 +964,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Active Wired Faults attribute
         /// </summary>
-        public async Task<WiredFaultEnum[]> GetActiveWiredFaults(SecureSession session) {
+        public async Task<WiredFault[]> GetActiveWiredFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
-            WiredFaultEnum[] list = new WiredFaultEnum[reader.Count];
+            WiredFault[] list = new WiredFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (WiredFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (WiredFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
@@ -836,8 +996,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Bat Charge Level attribute
         /// </summary>
-        public async Task<BatChargeLevelEnum> GetBatChargeLevel(SecureSession session) {
-            return (BatChargeLevelEnum)await GetEnumAttribute(session, 14);
+        public async Task<BatChargeLevel> GetBatChargeLevel(SecureSession session) {
+            return (BatChargeLevel)await GetEnumAttribute(session, 14);
         }
 
         /// <summary>
@@ -850,8 +1010,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Bat Replaceability attribute
         /// </summary>
-        public async Task<BatReplaceabilityEnum> GetBatReplaceability(SecureSession session) {
-            return (BatReplaceabilityEnum)await GetEnumAttribute(session, 16);
+        public async Task<BatReplaceability> GetBatReplaceability(SecureSession session) {
+            return (BatReplaceability)await GetEnumAttribute(session, 16);
         }
 
         /// <summary>
@@ -864,11 +1024,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Active Bat Faults attribute
         /// </summary>
-        public async Task<BatFaultEnum[]> GetActiveBatFaults(SecureSession session) {
+        public async Task<BatFault[]> GetActiveBatFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 18))!);
-            BatFaultEnum[] list = new BatFaultEnum[reader.Count];
+            BatFault[] list = new BatFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (BatFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (BatFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
@@ -882,8 +1042,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Bat Common Designation attribute
         /// </summary>
-        public async Task<BatCommonDesignationEnum> GetBatCommonDesignation(SecureSession session) {
-            return (BatCommonDesignationEnum)await GetEnumAttribute(session, 20);
+        public async Task<BatCommonDesignation> GetBatCommonDesignation(SecureSession session) {
+            return (BatCommonDesignation)await GetEnumAttribute(session, 20);
         }
 
         /// <summary>
@@ -903,8 +1063,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Bat Approved Chemistry attribute
         /// </summary>
-        public async Task<BatApprovedChemistryEnum> GetBatApprovedChemistry(SecureSession session) {
-            return (BatApprovedChemistryEnum)await GetEnumAttribute(session, 23);
+        public async Task<BatApprovedChemistry> GetBatApprovedChemistry(SecureSession session) {
+            return (BatApprovedChemistry)await GetEnumAttribute(session, 23);
         }
 
         /// <summary>
@@ -924,8 +1084,8 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Bat Charge State attribute
         /// </summary>
-        public async Task<BatChargeStateEnum> GetBatChargeState(SecureSession session) {
-            return (BatChargeStateEnum)await GetEnumAttribute(session, 26);
+        public async Task<BatChargeState> GetBatChargeState(SecureSession session) {
+            return (BatChargeState)await GetEnumAttribute(session, 26);
         }
 
         /// <summary>
@@ -952,11 +1112,11 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Active Bat Charge Faults attribute
         /// </summary>
-        public async Task<BatChargeFaultEnum[]> GetActiveBatChargeFaults(SecureSession session) {
+        public async Task<BatChargeFault[]> GetActiveBatChargeFaults(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 30))!);
-            BatChargeFaultEnum[] list = new BatChargeFaultEnum[reader.Count];
+            BatChargeFault[] list = new BatChargeFault[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = (BatChargeFaultEnum)reader.GetUShort(i)!.Value;
+                list[i] = (BatChargeFault)reader.GetUShort(i)!.Value;
             return list;
         }
 
@@ -974,7 +1134,7 @@ namespace MatterDotNet.Clusters.Utility
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Power Source Cluster";
+            return "Power Source";
         }
     }
 }

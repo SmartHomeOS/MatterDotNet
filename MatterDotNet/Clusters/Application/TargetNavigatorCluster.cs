@@ -19,40 +19,40 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Target Navigator Cluster
+    /// This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class TargetNavigatorCluster : ClusterBase
+    public class TargetNavigator : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0505;
 
         /// <summary>
-        /// Target Navigator Cluster
+        /// This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
         /// </summary>
-        public TargetNavigatorCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public TargetNavigator(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TargetNavigatorCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected TargetNavigator(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// Requested target was not found in the TargetList
             /// </summary>
-            TargetNotFound = 1,
+            TargetNotFound = 0x01,
             /// <summary>
             /// Target request is not allowed in current state.
             /// </summary>
-            NotAllowed = 2,
+            NotAllowed = 0x02,
         }
         #endregion Enums
 
@@ -103,7 +103,7 @@ namespace MatterDotNet.Clusters.Application
         /// Navigate Target Response - Reply from server
         /// </summary>
         public struct NavigateTargetResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public string? Data { get; set; }
         }
         #endregion Payloads
@@ -112,16 +112,16 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Navigate Target
         /// </summary>
-        public async Task<NavigateTargetResponse?> NavigateTarget(SecureSession session, byte Target, string? Data) {
+        public async Task<NavigateTargetResponse?> NavigateTarget(SecureSession session, byte target, string? data) {
             NavigateTargetPayload requestFields = new NavigateTargetPayload() {
-                Target = Target,
-                Data = Data,
+                Target = target,
+                Data = data,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new NavigateTargetResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
             };
         }
@@ -143,13 +143,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current Target attribute
         /// </summary>
         public async Task<byte> GetCurrentTarget(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0xFF;
+            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Target Navigator Cluster";
+            return "Target Navigator";
         }
     }
 }

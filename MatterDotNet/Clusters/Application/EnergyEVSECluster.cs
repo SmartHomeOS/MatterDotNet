@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.EnergyManagement
 {
     /// <summary>
-    /// Energy EVSE Cluster
+    /// Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
-    public class EnergyEVSECluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 4)]
+    public class EnergyEVSE : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0099;
 
         /// <summary>
-        /// Energy EVSE Cluster
+        /// Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.
         /// </summary>
-        public EnergyEVSECluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public EnergyEVSE(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EnergyEVSECluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected EnergyEVSE(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -66,166 +66,166 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Energy Transfer Stopped Reason
-        /// </summary>
-        public enum EnergyTransferStoppedReasonEnum {
-            /// <summary>
-            /// The EV decided to stop
-            /// </summary>
-            EVStopped = 0,
-            /// <summary>
-            /// The EVSE decided to stop
-            /// </summary>
-            EVSEStopped = 1,
-            /// <summary>
-            /// An other unknown reason
-            /// </summary>
-            Other = 2,
-        }
-
-        /// <summary>
-        /// Fault State
-        /// </summary>
-        public enum FaultStateEnum {
-            /// <summary>
-            /// The EVSE is not in an error state.
-            /// </summary>
-            NoError = 0,
-            /// <summary>
-            /// The EVSE is unable to obtain electrical measurements.
-            /// </summary>
-            MeterFailure = 1,
-            /// <summary>
-            /// The EVSE input voltage level is too high.
-            /// </summary>
-            OverVoltage = 2,
-            /// <summary>
-            /// The EVSE input voltage level is too low.
-            /// </summary>
-            UnderVoltage = 3,
-            /// <summary>
-            /// The EVSE detected charging current higher than allowed by charger.
-            /// </summary>
-            OverCurrent = 4,
-            /// <summary>
-            /// The EVSE detected voltage on charging pins when the contactor is open.
-            /// </summary>
-            ContactWetFailure = 5,
-            /// <summary>
-            /// The EVSE detected absence of voltage after enabling contactor.
-            /// </summary>
-            ContactDryFailure = 6,
-            /// <summary>
-            /// The EVSE has an unbalanced current supply.
-            /// </summary>
-            GroundFault = 7,
-            /// <summary>
-            /// The EVSE has detected a loss in power.
-            /// </summary>
-            PowerLoss = 8,
-            /// <summary>
-            /// The EVSE has detected another power quality issue (e.g. phase imbalance).
-            /// </summary>
-            PowerQuality = 9,
-            /// <summary>
-            /// The EVSE pilot signal amplitude short circuited to ground.
-            /// </summary>
-            PilotShortCircuit = 10,
-            /// <summary>
-            /// The emergency stop button was pressed.
-            /// </summary>
-            EmergencyStop = 11,
-            /// <summary>
-            /// The EVSE detected that the cable has been disconnected.
-            /// </summary>
-            EVDisconnected = 12,
-            /// <summary>
-            /// The EVSE could not determine proper power supply level.
-            /// </summary>
-            WrongPowerSupply = 13,
-            /// <summary>
-            /// The EVSE detected Live and Neutral are swapped.
-            /// </summary>
-            LiveNeutralSwap = 14,
-            /// <summary>
-            /// The EVSE internal temperature is too high.
-            /// </summary>
-            OverTemperature = 15,
-            /// <summary>
-            /// Any other reason.
-            /// </summary>
-            Other = 255,
-        }
-
-        /// <summary>
         /// State
         /// </summary>
-        public enum StateEnum {
+        public enum State : byte {
             /// <summary>
             /// The EV is not plugged in.
             /// </summary>
-            NotPluggedIn = 0,
+            NotPluggedIn = 0x00,
             /// <summary>
             /// The EV is plugged in, but not demanding current.
             /// </summary>
-            PluggedInNoDemand = 1,
+            PluggedInNoDemand = 0x01,
             /// <summary>
             /// The EV is plugged in and is demanding current, but EVSE is not allowing current to flow.
             /// </summary>
-            PluggedInDemand = 2,
+            PluggedInDemand = 0x02,
             /// <summary>
             /// The EV is plugged in, charging is in progress, and current is flowing
             /// </summary>
-            PluggedInCharging = 3,
+            PluggedInCharging = 0x03,
             /// <summary>
             /// The EV is plugged in, discharging is in progress, and current is flowing
             /// </summary>
-            PluggedInDischarging = 4,
+            PluggedInDischarging = 0x04,
             /// <summary>
             /// The EVSE is transitioning from any plugged-in state to NotPluggedIn
             /// </summary>
-            SessionEnding = 5,
+            SessionEnding = 0x05,
             /// <summary>
             /// There is a fault (see FaultState Attribute attribute)
             /// </summary>
-            Fault = 6,
+            Fault = 0x06,
         }
 
         /// <summary>
         /// Supply State
         /// </summary>
-        public enum SupplyStateEnum {
+        public enum SupplyState : byte {
             /// <summary>
             /// The EV is not currently allowed to charge or discharge
             /// </summary>
-            Disabled = 0,
+            Disabled = 0x00,
             /// <summary>
             /// The EV is currently allowed to charge
             /// </summary>
-            ChargingEnabled = 1,
+            ChargingEnabled = 0x01,
             /// <summary>
             /// The EV is currently allowed to discharge
             /// </summary>
-            DischargingEnabled = 2,
+            DischargingEnabled = 0x02,
             /// <summary>
             /// The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue.
             /// </summary>
-            DisabledError = 3,
+            DisabledError = 0x03,
             /// <summary>
             /// The EV is not currently allowed to charge or discharge due to self-diagnostics mode.
             /// </summary>
-            DisabledDiagnostics = 4,
+            DisabledDiagnostics = 0x04,
             /// <summary>
             /// The EV is currently allowed to charge and discharge
             /// </summary>
-            Enabled = 5,
+            Enabled = 0x05,
         }
 
         /// <summary>
-        /// Target Day Of Week Bitmap
+        /// Fault State
+        /// </summary>
+        public enum FaultState : byte {
+            /// <summary>
+            /// The EVSE is not in an error state.
+            /// </summary>
+            NoError = 0x00,
+            /// <summary>
+            /// The EVSE is unable to obtain electrical measurements.
+            /// </summary>
+            MeterFailure = 0x01,
+            /// <summary>
+            /// The EVSE input voltage level is too high.
+            /// </summary>
+            OverVoltage = 0x02,
+            /// <summary>
+            /// The EVSE input voltage level is too low.
+            /// </summary>
+            UnderVoltage = 0x03,
+            /// <summary>
+            /// The EVSE detected charging current higher than allowed by charger.
+            /// </summary>
+            OverCurrent = 0x04,
+            /// <summary>
+            /// The EVSE detected voltage on charging pins when the contactor is open.
+            /// </summary>
+            ContactWetFailure = 0x05,
+            /// <summary>
+            /// The EVSE detected absence of voltage after enabling contactor.
+            /// </summary>
+            ContactDryFailure = 0x06,
+            /// <summary>
+            /// The EVSE has an unbalanced current supply.
+            /// </summary>
+            GroundFault = 0x07,
+            /// <summary>
+            /// The EVSE has detected a loss in power.
+            /// </summary>
+            PowerLoss = 0x08,
+            /// <summary>
+            /// The EVSE has detected another power quality issue (e.g. phase imbalance).
+            /// </summary>
+            PowerQuality = 0x09,
+            /// <summary>
+            /// The EVSE pilot signal amplitude short circuited to ground.
+            /// </summary>
+            PilotShortCircuit = 0x0A,
+            /// <summary>
+            /// The emergency stop button was pressed.
+            /// </summary>
+            EmergencyStop = 0x0B,
+            /// <summary>
+            /// The EVSE detected that the cable has been disconnected.
+            /// </summary>
+            EVDisconnected = 0x0C,
+            /// <summary>
+            /// The EVSE could not determine proper power supply level.
+            /// </summary>
+            WrongPowerSupply = 0x0D,
+            /// <summary>
+            /// The EVSE detected Live and Neutral are swapped.
+            /// </summary>
+            LiveNeutralSwap = 0x0E,
+            /// <summary>
+            /// The EVSE internal temperature is too high.
+            /// </summary>
+            OverTemperature = 0x0F,
+            /// <summary>
+            /// Any other reason.
+            /// </summary>
+            Other = 0xFF,
+        }
+
+        /// <summary>
+        /// Energy Transfer Stopped Reason
+        /// </summary>
+        public enum EnergyTransferStoppedReason : byte {
+            /// <summary>
+            /// The EV decided to stop
+            /// </summary>
+            EVStopped = 0x00,
+            /// <summary>
+            /// The EVSE decided to stop
+            /// </summary>
+            EVSEStopped = 0x01,
+            /// <summary>
+            /// An other unknown reason
+            /// </summary>
+            Other = 0x02,
+        }
+
+        /// <summary>
+        /// Target Day Of Week
         /// </summary>
         [Flags]
-        public enum TargetDayOfWeekBitmap {
+        public enum TargetDayOfWeek : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -233,75 +233,35 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Sunday
             /// </summary>
-            Sunday = 1,
+            Sunday = 0x01,
             /// <summary>
             /// Monday
             /// </summary>
-            Monday = 2,
+            Monday = 0x02,
             /// <summary>
             /// Tuesday
             /// </summary>
-            Tuesday = 4,
+            Tuesday = 0x04,
             /// <summary>
             /// Wednesday
             /// </summary>
-            Wednesday = 8,
+            Wednesday = 0x08,
             /// <summary>
             /// Thursday
             /// </summary>
-            Thursday = 16,
+            Thursday = 0x10,
             /// <summary>
             /// Friday
             /// </summary>
-            Friday = 32,
+            Friday = 0x20,
             /// <summary>
             /// Saturday
             /// </summary>
-            Saturday = 64,
+            Saturday = 0x40,
         }
         #endregion Enums
 
         #region Records
-        /// <summary>
-        /// Charging Target Schedule
-        /// </summary>
-        public record ChargingTargetSchedule : TLVPayload {
-            /// <summary>
-            /// Charging Target Schedule
-            /// </summary>
-            public ChargingTargetSchedule() { }
-
-            /// <summary>
-            /// Charging Target Schedule
-            /// </summary>
-            [SetsRequiredMembers]
-            public ChargingTargetSchedule(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                DayOfWeekForSequence = (TargetDayOfWeekBitmap)reader.GetUShort(0)!.Value;
-                {
-                    ChargingTargets = new ChargingTarget[((object[])fields[1]).Length];
-                    for (int i = 0; i < ChargingTargets.Length; i++) {
-                        ChargingTargets[i] = new ChargingTarget((object[])fields[-1]);
-                    }
-                }
-            }
-            public required TargetDayOfWeekBitmap DayOfWeekForSequence { get; set; }
-            public required ChargingTarget[] ChargingTargets { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)DayOfWeekForSequence);
-                {
-                    Constrain(ChargingTargets, 0, 10);
-                    writer.StartArray(1);
-                    foreach (var item in ChargingTargets) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
         /// Charging Target
         /// </summary>
@@ -334,18 +294,51 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
+
+        /// <summary>
+        /// Charging Target Schedule
+        /// </summary>
+        public record ChargingTargetSchedule : TLVPayload {
+            /// <summary>
+            /// Charging Target Schedule
+            /// </summary>
+            public ChargingTargetSchedule() { }
+
+            /// <summary>
+            /// Charging Target Schedule
+            /// </summary>
+            [SetsRequiredMembers]
+            public ChargingTargetSchedule(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                DayOfWeekForSequence = (TargetDayOfWeek)reader.GetUInt(0)!.Value;
+                {
+                    ChargingTargets = new ChargingTarget[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < ChargingTargets.Length; n++) {
+                        ChargingTargets[n] = new ChargingTarget((object[])((object[])fields[1])[n]);
+                    }
+                }
+            }
+            public required TargetDayOfWeek DayOfWeekForSequence { get; set; }
+            public required ChargingTarget[] ChargingTargets { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUInt(0, (uint)DayOfWeekForSequence);
+                {
+                    Constrain(ChargingTargets, 0, 10);
+                    writer.StartArray(1);
+                    foreach (var item in ChargingTargets) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
         #endregion Records
 
         #region Payloads
-        /// <summary>
-        /// Get Targets Response - Reply from server
-        /// </summary>
-        public struct GetTargetsResponse() {
-            public required ChargingTargetSchedule[] ChargingTargetSchedules { get; set; }
-        }
-
         private record EnableChargingPayload : TLVPayload {
-            public required DateTime? ChargingEnabledUntil { get; set; } = null;
+            public required DateTime? ChargingEnabledUntil { get; set; }
             public required long MinimumChargeCurrent { get; set; }
             public required long MaximumChargeCurrent { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -361,7 +354,7 @@ namespace MatterDotNet.Clusters.Application
         }
 
         private record EnableDischargingPayload : TLVPayload {
-            public required DateTime? DischargingEnabledUntil { get; set; } = null;
+            public required DateTime? DischargingEnabledUntil { get; set; }
             public required long MaximumDischargeCurrent { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -389,6 +382,13 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
+
+        /// <summary>
+        /// Get Targets Response - Reply from server
+        /// </summary>
+        public struct GetTargetsResponse() {
+            public required ChargingTargetSchedule[] ChargingTargetSchedules { get; set; }
+        }
         #endregion Payloads
 
         #region Commands
@@ -403,11 +403,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable Charging
         /// </summary>
-        public async Task<bool> EnableCharging(SecureSession session, ushort commandTimeoutMS, DateTime ChargingEnabledUntil, long MinimumChargeCurrent, long MaximumChargeCurrent) {
+        public async Task<bool> EnableCharging(SecureSession session, ushort commandTimeoutMS, DateTime? chargingEnabledUntil, long minimumChargeCurrent, long maximumChargeCurrent) {
             EnableChargingPayload requestFields = new EnableChargingPayload() {
-                ChargingEnabledUntil = ChargingEnabledUntil,
-                MinimumChargeCurrent = MinimumChargeCurrent,
-                MaximumChargeCurrent = MaximumChargeCurrent,
+                ChargingEnabledUntil = chargingEnabledUntil,
+                MinimumChargeCurrent = minimumChargeCurrent,
+                MaximumChargeCurrent = maximumChargeCurrent,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -416,10 +416,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Enable Discharging
         /// </summary>
-        public async Task<bool> EnableDischarging(SecureSession session, ushort commandTimeoutMS, DateTime DischargingEnabledUntil, long MaximumDischargeCurrent) {
+        public async Task<bool> EnableDischarging(SecureSession session, ushort commandTimeoutMS, DateTime? dischargingEnabledUntil, long maximumDischargeCurrent) {
             EnableDischargingPayload requestFields = new EnableDischargingPayload() {
-                DischargingEnabledUntil = DischargingEnabledUntil,
-                MaximumDischargeCurrent = MaximumDischargeCurrent,
+                DischargingEnabledUntil = dischargingEnabledUntil,
+                MaximumDischargeCurrent = maximumDischargeCurrent,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -436,9 +436,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Set Targets
         /// </summary>
-        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, ChargingTargetSchedule[] ChargingTargetSchedules) {
+        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, ChargingTargetSchedule[] chargingTargetSchedules) {
             SetTargetsPayload requestFields = new SetTargetsPayload() {
-                ChargingTargetSchedules = ChargingTargetSchedules,
+                ChargingTargetSchedules = chargingTargetSchedules,
             };
             InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
@@ -490,68 +490,68 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the State attribute
         /// </summary>
-        public async Task<StateEnum?> GetState(SecureSession session) {
-            return (StateEnum?)await GetEnumAttribute(session, 0, true);
+        public async Task<State?> GetState(SecureSession session) {
+            return (State?)await GetEnumAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Supply State attribute
         /// </summary>
-        public async Task<SupplyStateEnum> GetSupplyState(SecureSession session) {
-            return (SupplyStateEnum)await GetEnumAttribute(session, 1);
+        public async Task<SupplyState> GetSupplyState(SecureSession session) {
+            return (SupplyState)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Get the Fault State attribute
         /// </summary>
-        public async Task<FaultStateEnum> GetFaultState(SecureSession session) {
-            return (FaultStateEnum)await GetEnumAttribute(session, 2);
+        public async Task<FaultState> GetFaultState(SecureSession session) {
+            return (FaultState)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Charging Enabled Until attribute
         /// </summary>
         public async Task<DateTime?> GetChargingEnabledUntil(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 3, true) ?? TimeUtil.EPOCH;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 3)) ?? TimeUtil.EPOCH;
         }
 
         /// <summary>
         /// Get the Discharging Enabled Until attribute
         /// </summary>
         public async Task<DateTime?> GetDischargingEnabledUntil(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 4, true) ?? TimeUtil.EPOCH;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4)) ?? TimeUtil.EPOCH;
         }
 
         /// <summary>
-        /// Get the Circuit Capacity attribute
+        /// Get the Circuit Capacity [mA] attribute
         /// </summary>
         public async Task<long> GetCircuitCapacity(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 5) ?? 0;
         }
 
         /// <summary>
-        /// Get the Minimum Charge Current attribute
+        /// Get the Minimum Charge Current [mA] attribute
         /// </summary>
         public async Task<long> GetMinimumChargeCurrent(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 6) ?? 6000;
         }
 
         /// <summary>
-        /// Get the Maximum Charge Current attribute
+        /// Get the Maximum Charge Current [mA] attribute
         /// </summary>
         public async Task<long> GetMaximumChargeCurrent(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 7) ?? 0;
         }
 
         /// <summary>
-        /// Get the Maximum Discharge Current attribute
+        /// Get the Maximum Discharge Current [mA] attribute
         /// </summary>
         public async Task<long> GetMaximumDischargeCurrent(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 8) ?? 0;
         }
 
         /// <summary>
-        /// Get the User Maximum Charge Current attribute
+        /// Get the User Maximum Charge Current [mA] attribute
         /// </summary>
         public async Task<long> GetUserMaximumChargeCurrent(SecureSession session) {
             return (long?)(dynamic?)await GetAttribute(session, 9) ?? 0;
@@ -582,97 +582,97 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Next Charge Start Time attribute
         /// </summary>
         public async Task<DateTime?> GetNextChargeStartTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 35, true) ?? null;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 35));
         }
 
         /// <summary>
         /// Get the Next Charge Target Time attribute
         /// </summary>
         public async Task<DateTime?> GetNextChargeTargetTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 36, true) ?? null;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 36));
         }
 
         /// <summary>
-        /// Get the Next Charge Required Energy attribute
+        /// Get the Next Charge Required Energy [mWh] attribute
         /// </summary>
         public async Task<long?> GetNextChargeRequiredEnergy(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 37, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 37, true);
         }
 
         /// <summary>
-        /// Get the Next Charge Target SoC attribute
+        /// Get the Next Charge Target SoC [%] attribute
         /// </summary>
         public async Task<byte?> GetNextChargeTargetSoC(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 38, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 38, true);
         }
 
         /// <summary>
         /// Get the Approximate EV Efficiency attribute
         /// </summary>
         public async Task<ushort?> GetApproximateEVEfficiency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 39, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 39, true);
         }
 
         /// <summary>
         /// Set the Approximate EV Efficiency attribute
         /// </summary>
-        public async Task SetApproximateEVEfficiency (SecureSession session, ushort? value = null) {
+        public async Task SetApproximateEVEfficiency (SecureSession session, ushort? value) {
             await SetAttribute(session, 39, value, true);
         }
 
         /// <summary>
-        /// Get the State Of Charge attribute
+        /// Get the State Of Charge [%] attribute
         /// </summary>
         public async Task<byte?> GetStateOfCharge(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 48, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 48, true);
         }
 
         /// <summary>
-        /// Get the Battery Capacity attribute
+        /// Get the Battery Capacity [mWh] attribute
         /// </summary>
         public async Task<long?> GetBatteryCapacity(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 49, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 49, true);
         }
 
         /// <summary>
         /// Get the Vehicle ID attribute
         /// </summary>
         public async Task<string?> GetVehicleID(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 50, true) ?? null;
+            return (string?)(dynamic?)await GetAttribute(session, 50, true);
         }
 
         /// <summary>
         /// Get the Session ID attribute
         /// </summary>
         public async Task<uint?> GetSessionID(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 64, true) ?? null;
+            return (uint?)(dynamic?)await GetAttribute(session, 64, true);
         }
 
         /// <summary>
         /// Get the Session Duration attribute
         /// </summary>
         public async Task<TimeSpan?> GetSessionDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 65, true) ?? null;
+            return (TimeSpan?)(dynamic?)await GetAttribute(session, 65, true);
         }
 
         /// <summary>
-        /// Get the Session Energy Charged attribute
+        /// Get the Session Energy Charged [mWh] attribute
         /// </summary>
         public async Task<long?> GetSessionEnergyCharged(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 66, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 66, true);
         }
 
         /// <summary>
-        /// Get the Session Energy Discharged attribute
+        /// Get the Session Energy Discharged [mWh] attribute
         /// </summary>
         public async Task<long?> GetSessionEnergyDischarged(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 67, true) ?? null;
+            return (long?)(dynamic?)await GetAttribute(session, 67, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Energy EVSE Cluster";
+            return "Energy EVSE";
         }
     }
 }

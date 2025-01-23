@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Boolean State Cluster
+    /// This cluster provides an interface to a boolean state called StateValue.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class BooleanStateCluster : ClusterBase
+    public class BooleanState : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0045;
 
         /// <summary>
-        /// Boolean State Cluster
+        /// This cluster provides an interface to a boolean state called StateValue.
         /// </summary>
-        public BooleanStateCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public BooleanState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BooleanStateCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected BooleanState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
@@ -43,7 +43,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Boolean State Cluster";
+            return "Boolean State";
         }
     }
 }

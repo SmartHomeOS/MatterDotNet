@@ -18,18 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// Alarm Base Cluster
+    /// Attributes and commands for configuring the Dishwasher alarm.
     /// </summary>
-    public class AlarmBaseCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class DishwasherAlarm : ClusterBase
     {
+        internal const uint CLUSTER_ID = 0x005D;
 
         /// <summary>
-        /// Alarm Base Cluster
+        /// Attributes and commands for configuring the Dishwasher alarm.
         /// </summary>
-        public AlarmBaseCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        public DishwasherAlarm(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        /// <inheritdoc />
+        protected DishwasherAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -42,23 +46,58 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             Reset = 1,
         }
+
+        /// <summary>
+        /// Alarm
+        /// </summary>
+        [Flags]
+        public enum Alarm : uint {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Water inflow is abnormal
+            /// </summary>
+            InflowError = 0x01,
+            /// <summary>
+            /// Water draining is abnormal
+            /// </summary>
+            DrainError = 0x02,
+            /// <summary>
+            /// Door or door lock is abnormal
+            /// </summary>
+            DoorError = 0x04,
+            /// <summary>
+            /// Unable to reach normal temperature
+            /// </summary>
+            TempTooLow = 0x08,
+            /// <summary>
+            /// Temperature is too high
+            /// </summary>
+            TempTooHigh = 0x10,
+            /// <summary>
+            /// Water level is abnormal
+            /// </summary>
+            WaterLevelError = 0x20,
+        }
         #endregion Enums
 
         #region Payloads
         private record ResetPayload : TLVPayload {
-            public required uint Alarms { get; set; } = 0;
+            public required Alarm Alarms { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, Alarms);
+                writer.WriteUInt(0, (uint)Alarms);
                 writer.EndContainer();
             }
         }
 
         private record ModifyEnabledAlarmsPayload : TLVPayload {
-            public required uint Mask { get; set; } = 0;
+            public required Alarm Mask { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUInt(0, Mask);
+                writer.WriteUInt(0, (uint)Mask);
                 writer.EndContainer();
             }
         }
@@ -68,9 +107,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Reset
         /// </summary>
-        public async Task<bool> Reset(SecureSession session, uint Alarms) {
+        public async Task<bool> Reset(SecureSession session, Alarm alarms) {
             ResetPayload requestFields = new ResetPayload() {
-                Alarms = Alarms,
+                Alarms = alarms,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -79,9 +118,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Modify Enabled Alarms
         /// </summary>
-        public async Task<bool> ModifyEnabledAlarms(SecureSession session, uint Mask) {
+        public async Task<bool> ModifyEnabledAlarms(SecureSession session, Alarm mask) {
             ModifyEnabledAlarmsPayload requestFields = new ModifyEnabledAlarmsPayload() {
-                Mask = Mask,
+                Mask = mask,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             return ValidateResponse(resp);
@@ -113,35 +152,35 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Mask attribute
         /// </summary>
-        public async Task<uint> GetMask(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 0) ?? 0;
+        public async Task<Alarm> GetMask(SecureSession session) {
+            return (Alarm)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Latch attribute
         /// </summary>
-        public async Task<uint> GetLatch(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 1) ?? 0;
+        public async Task<Alarm> GetLatch(SecureSession session) {
+            return (Alarm)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Get the State attribute
         /// </summary>
-        public async Task<uint> GetState(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 2) ?? 0;
+        public async Task<Alarm> GetState(SecureSession session) {
+            return (Alarm)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Supported attribute
         /// </summary>
-        public async Task<uint> GetSupported(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 3) ?? 0;
+        public async Task<Alarm> GetSupported(SecureSession session) {
+            return (Alarm)await GetEnumAttribute(session, 3);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Alarm Base Cluster";
+            return "Dishwasher Alarm";
         }
     }
 }

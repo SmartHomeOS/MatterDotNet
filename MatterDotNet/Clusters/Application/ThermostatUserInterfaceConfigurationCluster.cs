@@ -15,80 +15,80 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.HVAC
 {
     /// <summary>
-    /// Thermostat User Interface Configuration Cluster
+    /// An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class ThermostatUserInterfaceConfigurationCluster : ClusterBase
+    public class ThermostatUserInterfaceConfiguration : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0204;
 
         /// <summary>
-        /// Thermostat User Interface Configuration Cluster
+        /// An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
         /// </summary>
-        public ThermostatUserInterfaceConfigurationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ThermostatUserInterfaceConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThermostatUserInterfaceConfigurationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ThermostatUserInterfaceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Keypad Lockout
         /// </summary>
-        public enum KeypadLockoutEnum {
+        public enum KeypadLockout : byte {
             /// <summary>
             /// All functionality available to the user
             /// </summary>
-            NoLockout = 0,
+            NoLockout = 0x00,
             /// <summary>
             /// Level 1 reduced functionality
             /// </summary>
-            Lockout1 = 1,
+            Lockout1 = 0x01,
             /// <summary>
             /// Level 2 reduced functionality
             /// </summary>
-            Lockout2 = 2,
+            Lockout2 = 0x02,
             /// <summary>
             /// Level 3 reduced functionality
             /// </summary>
-            Lockout3 = 3,
+            Lockout3 = 0x03,
             /// <summary>
             /// Level 4 reduced functionality
             /// </summary>
-            Lockout4 = 4,
+            Lockout4 = 0x04,
             /// <summary>
             /// Least functionality available to the user
             /// </summary>
-            Lockout5 = 5,
+            Lockout5 = 0x05,
         }
 
         /// <summary>
         /// Schedule Programming Visibility
         /// </summary>
-        public enum ScheduleProgrammingVisibilityEnum {
+        public enum ScheduleProgrammingVisibility : byte {
             /// <summary>
             /// Local schedule programming functionality is enabled at the thermostat
             /// </summary>
-            ScheduleProgrammingPermitted = 0,
+            ScheduleProgrammingPermitted = 0x00,
             /// <summary>
             /// Local schedule programming functionality is disabled at the thermostat
             /// </summary>
-            ScheduleProgrammingDenied = 1,
+            ScheduleProgrammingDenied = 0x01,
         }
 
         /// <summary>
         /// Temperature Display Mode
         /// </summary>
-        public enum TemperatureDisplayModeEnum {
+        public enum TemperatureDisplayMode : byte {
             /// <summary>
             /// Temperature displayed in °C
             /// </summary>
-            Celsius = 0,
+            Celsius = 0x00,
             /// <summary>
             /// Temperature displayed in °F
             /// </summary>
-            Fahrenheit = 1,
+            Fahrenheit = 0x01,
         }
         #endregion Enums
 
@@ -96,49 +96,49 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Temperature Display Mode attribute
         /// </summary>
-        public async Task<TemperatureDisplayModeEnum> GetTemperatureDisplayMode(SecureSession session) {
-            return (TemperatureDisplayModeEnum?)await GetEnumAttribute(session, 0) ?? TemperatureDisplayModeEnum.Celsius;
+        public async Task<TemperatureDisplayMode> GetTemperatureDisplayMode(SecureSession session) {
+            return (TemperatureDisplayMode)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Set the Temperature Display Mode attribute
         /// </summary>
-        public async Task SetTemperatureDisplayMode (SecureSession session, TemperatureDisplayModeEnum? value = TemperatureDisplayModeEnum.Celsius) {
+        public async Task SetTemperatureDisplayMode (SecureSession session, TemperatureDisplayMode value) {
             await SetAttribute(session, 0, value);
         }
 
         /// <summary>
         /// Get the Keypad Lockout attribute
         /// </summary>
-        public async Task<KeypadLockoutEnum> GetKeypadLockout(SecureSession session) {
-            return (KeypadLockoutEnum?)await GetEnumAttribute(session, 1) ?? KeypadLockoutEnum.NoLockout;
+        public async Task<KeypadLockout> GetKeypadLockout(SecureSession session) {
+            return (KeypadLockout)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Set the Keypad Lockout attribute
         /// </summary>
-        public async Task SetKeypadLockout (SecureSession session, KeypadLockoutEnum? value = KeypadLockoutEnum.NoLockout) {
+        public async Task SetKeypadLockout (SecureSession session, KeypadLockout value) {
             await SetAttribute(session, 1, value);
         }
 
         /// <summary>
         /// Get the Schedule Programming Visibility attribute
         /// </summary>
-        public async Task<ScheduleProgrammingVisibilityEnum> GetScheduleProgrammingVisibility(SecureSession session) {
-            return (ScheduleProgrammingVisibilityEnum?)await GetEnumAttribute(session, 2) ?? ScheduleProgrammingVisibilityEnum.ScheduleProgrammingPermitted;
+        public async Task<ScheduleProgrammingVisibility> GetScheduleProgrammingVisibility(SecureSession session) {
+            return (ScheduleProgrammingVisibility)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Set the Schedule Programming Visibility attribute
         /// </summary>
-        public async Task SetScheduleProgrammingVisibility (SecureSession session, ScheduleProgrammingVisibilityEnum? value = ScheduleProgrammingVisibilityEnum.ScheduleProgrammingPermitted) {
+        public async Task SetScheduleProgrammingVisibility (SecureSession session, ScheduleProgrammingVisibility value) {
             await SetAttribute(session, 2, value);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Thermostat User Interface Configuration Cluster";
+            return "Thermostat User Interface Configuration";
         }
     }
 }

@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Mode Select Cluster
+    /// Attributes and commands for selecting a mode from a list of supported options.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class ModeSelectCluster : ClusterBase
+    public class ModeSelect : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0050;
 
         /// <summary>
-        /// Mode Select Cluster
+        /// Attributes and commands for selecting a mode from a list of supported options.
         /// </summary>
-        public ModeSelectCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ModeSelect(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ModeSelectCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ModeSelect(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -50,49 +50,6 @@ namespace MatterDotNet.Clusters.Application
         #endregion Enums
 
         #region Records
-        /// <summary>
-        /// Mode Option
-        /// </summary>
-        public record ModeOption : TLVPayload {
-            /// <summary>
-            /// Mode Option
-            /// </summary>
-            public ModeOption() { }
-
-            /// <summary>
-            /// Mode Option
-            /// </summary>
-            [SetsRequiredMembers]
-            public ModeOption(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                Label = reader.GetString(0, false)!;
-                Mode = reader.GetByte(1)!.Value;
-                {
-                    SemanticTags = new SemanticTag[((object[])fields[2]).Length];
-                    for (int i = 0; i < SemanticTags.Length; i++) {
-                        SemanticTags[i] = new SemanticTag((object[])fields[-1]);
-                    }
-                }
-            }
-            public required string Label { get; set; }
-            public required byte Mode { get; set; }
-            public required SemanticTag[] SemanticTags { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteString(0, Label, 64);
-                writer.WriteByte(1, Mode);
-                {
-                    Constrain(SemanticTags, 0, 64);
-                    writer.StartArray(2);
-                    foreach (var item in SemanticTags) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
         /// <summary>
         /// Semantic Tag
         /// </summary>
@@ -120,6 +77,49 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
+
+        /// <summary>
+        /// Mode Option
+        /// </summary>
+        public record ModeOption : TLVPayload {
+            /// <summary>
+            /// Mode Option
+            /// </summary>
+            public ModeOption() { }
+
+            /// <summary>
+            /// Mode Option
+            /// </summary>
+            [SetsRequiredMembers]
+            public ModeOption(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Label = reader.GetString(0, false, 64)!;
+                Mode = reader.GetByte(1)!.Value;
+                {
+                    SemanticTags = new SemanticTag[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < SemanticTags.Length; n++) {
+                        SemanticTags[n] = new SemanticTag((object[])((object[])fields[2])[n]);
+                    }
+                }
+            }
+            public required string Label { get; set; }
+            public required byte Mode { get; set; }
+            public required SemanticTag[] SemanticTags { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, Label, 64);
+                writer.WriteByte(1, Mode);
+                {
+                    Constrain(SemanticTags, 0, 64);
+                    writer.StartArray(2);
+                    foreach (var item in SemanticTags) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
+                }
+                writer.EndContainer();
+            }
+        }
         #endregion Records
 
         #region Payloads
@@ -137,9 +137,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Change To Mode
         /// </summary>
-        public async Task<bool> ChangeToMode(SecureSession session, byte NewMode) {
+        public async Task<bool> ChangeToMode(SecureSession session, byte newMode) {
             ChangeToModePayload requestFields = new ChangeToModePayload() {
-                NewMode = NewMode,
+                NewMode = newMode,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             return ValidateResponse(resp);
@@ -179,7 +179,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Standard Namespace attribute
         /// </summary>
         public async Task<ushort?> GetStandardNamespace(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 1, true);
         }
 
         /// <summary>
@@ -218,20 +218,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the On Mode attribute
         /// </summary>
         public async Task<byte?> GetOnMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 5, true) ?? null;
+            return (byte?)(dynamic?)await GetAttribute(session, 5, true);
         }
 
         /// <summary>
         /// Set the On Mode attribute
         /// </summary>
-        public async Task SetOnMode (SecureSession session, byte? value = null) {
+        public async Task SetOnMode (SecureSession session, byte? value) {
             await SetAttribute(session, 5, value, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Mode Select Cluster";
+            return "Mode Select";
         }
     }
 }

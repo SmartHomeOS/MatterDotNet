@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Smoke CO Alarm Cluster
+    /// This cluster provides an interface for observing and managing the state of smoke and CO alarms.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class SmokeCOAlarmCluster : ClusterBase
+    public class SmokeCOAlarm : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x005C;
 
         /// <summary>
-        /// Smoke CO Alarm Cluster
+        /// This cluster provides an interface for observing and managing the state of smoke and CO alarms.
         /// </summary>
-        public SmokeCOAlarmCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public SmokeCOAlarm(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected SmokeCOAlarmCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected SmokeCOAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -54,7 +54,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Alarm State
         /// </summary>
-        public enum AlarmStateEnum {
+        public enum AlarmState : byte {
             /// <summary>
             /// Nominal state, the device is not alarming
             /// </summary>
@@ -70,45 +70,27 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Contamination State
+        /// Sensitivity
         /// </summary>
-        public enum ContaminationStateEnum {
+        public enum Sensitivity : byte {
             /// <summary>
-            /// Nominal state, the sensor is not contaminated
+            /// High sensitivity
             /// </summary>
-            Normal = 0,
+            High = 0,
             /// <summary>
-            /// Low contamination
+            /// Standard Sensitivity
             /// </summary>
-            Low = 1,
+            Standard = 1,
             /// <summary>
-            /// Warning state
+            /// Low sensitivity
             /// </summary>
-            Warning = 2,
-            /// <summary>
-            /// Critical state, will cause nuisance alarms
-            /// </summary>
-            Critical = 3,
-        }
-
-        /// <summary>
-        /// End Of Service
-        /// </summary>
-        public enum EndOfServiceEnum {
-            /// <summary>
-            /// Device has not expired
-            /// </summary>
-            Normal = 0,
-            /// <summary>
-            /// Device has reached its end of service
-            /// </summary>
-            Expired = 1,
+            Low = 2,
         }
 
         /// <summary>
         /// Expressed State
         /// </summary>
-        public enum ExpressedStateEnum {
+        public enum ExpressedState : byte {
             /// <summary>
             /// Nominal state, the device is not alarming
             /// </summary>
@@ -150,7 +132,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Mute State
         /// </summary>
-        public enum MuteStateEnum {
+        public enum MuteState : byte {
             /// <summary>
             /// Not Muted
             /// </summary>
@@ -162,21 +144,39 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Sensitivity
+        /// End Of Service
         /// </summary>
-        public enum SensitivityEnum {
+        public enum EndOfService : byte {
             /// <summary>
-            /// High sensitivity
+            /// Device has not expired
             /// </summary>
-            High = 0,
+            Normal = 0,
             /// <summary>
-            /// Standard Sensitivity
+            /// Device has reached its end of service
             /// </summary>
-            Standard = 1,
+            Expired = 1,
+        }
+
+        /// <summary>
+        /// Contamination State
+        /// </summary>
+        public enum ContaminationState : byte {
             /// <summary>
-            /// Low sensitivity
+            /// Nominal state, the sensor is not contaminated
             /// </summary>
-            Low = 2,
+            Normal = 0,
+            /// <summary>
+            /// Low contamination
+            /// </summary>
+            Low = 1,
+            /// <summary>
+            /// Warning state
+            /// </summary>
+            Warning = 2,
+            /// <summary>
+            /// Critical state, will cause nuisance alarms
+            /// </summary>
+            Critical = 3,
         }
         #endregion Enums
 
@@ -218,36 +218,36 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Expressed State attribute
         /// </summary>
-        public async Task<ExpressedStateEnum> GetExpressedState(SecureSession session) {
-            return (ExpressedStateEnum)await GetEnumAttribute(session, 0);
+        public async Task<ExpressedState> GetExpressedState(SecureSession session) {
+            return (ExpressedState)await GetEnumAttribute(session, 0);
         }
 
         /// <summary>
         /// Get the Smoke State attribute
         /// </summary>
-        public async Task<AlarmStateEnum> GetSmokeState(SecureSession session) {
-            return (AlarmStateEnum)await GetEnumAttribute(session, 1);
+        public async Task<AlarmState> GetSmokeState(SecureSession session) {
+            return (AlarmState)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
         /// Get the CO State attribute
         /// </summary>
-        public async Task<AlarmStateEnum> GetCOState(SecureSession session) {
-            return (AlarmStateEnum)await GetEnumAttribute(session, 2);
+        public async Task<AlarmState> GetCOState(SecureSession session) {
+            return (AlarmState)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Battery Alert attribute
         /// </summary>
-        public async Task<AlarmStateEnum> GetBatteryAlert(SecureSession session) {
-            return (AlarmStateEnum)await GetEnumAttribute(session, 3);
+        public async Task<AlarmState> GetBatteryAlert(SecureSession session) {
+            return (AlarmState)await GetEnumAttribute(session, 3);
         }
 
         /// <summary>
         /// Get the Device Muted attribute
         /// </summary>
-        public async Task<MuteStateEnum> GetDeviceMuted(SecureSession session) {
-            return (MuteStateEnum)await GetEnumAttribute(session, 4);
+        public async Task<MuteState> GetDeviceMuted(SecureSession session) {
+            return (MuteState)await GetEnumAttribute(session, 4);
         }
 
         /// <summary>
@@ -267,42 +267,42 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the End Of Service Alert attribute
         /// </summary>
-        public async Task<EndOfServiceEnum> GetEndOfServiceAlert(SecureSession session) {
-            return (EndOfServiceEnum)await GetEnumAttribute(session, 7);
+        public async Task<EndOfService> GetEndOfServiceAlert(SecureSession session) {
+            return (EndOfService)await GetEnumAttribute(session, 7);
         }
 
         /// <summary>
         /// Get the Interconnect Smoke Alarm attribute
         /// </summary>
-        public async Task<AlarmStateEnum> GetInterconnectSmokeAlarm(SecureSession session) {
-            return (AlarmStateEnum)await GetEnumAttribute(session, 8);
+        public async Task<AlarmState> GetInterconnectSmokeAlarm(SecureSession session) {
+            return (AlarmState)await GetEnumAttribute(session, 8);
         }
 
         /// <summary>
         /// Get the Interconnect CO Alarm attribute
         /// </summary>
-        public async Task<AlarmStateEnum> GetInterconnectCOAlarm(SecureSession session) {
-            return (AlarmStateEnum)await GetEnumAttribute(session, 9);
+        public async Task<AlarmState> GetInterconnectCOAlarm(SecureSession session) {
+            return (AlarmState)await GetEnumAttribute(session, 9);
         }
 
         /// <summary>
         /// Get the Contamination State attribute
         /// </summary>
-        public async Task<ContaminationStateEnum> GetContaminationState(SecureSession session) {
-            return (ContaminationStateEnum)await GetEnumAttribute(session, 10);
+        public async Task<ContaminationState> GetContaminationState(SecureSession session) {
+            return (ContaminationState)await GetEnumAttribute(session, 10);
         }
 
         /// <summary>
         /// Get the Smoke Sensitivity Level attribute
         /// </summary>
-        public async Task<SensitivityEnum> GetSmokeSensitivityLevel(SecureSession session) {
-            return (SensitivityEnum)await GetEnumAttribute(session, 11);
+        public async Task<Sensitivity> GetSmokeSensitivityLevel(SecureSession session) {
+            return (Sensitivity)await GetEnumAttribute(session, 11);
         }
 
         /// <summary>
         /// Set the Smoke Sensitivity Level attribute
         /// </summary>
-        public async Task SetSmokeSensitivityLevel (SecureSession session, SensitivityEnum value) {
+        public async Task SetSmokeSensitivityLevel (SecureSession session, Sensitivity value) {
             await SetAttribute(session, 11, value);
         }
 
@@ -310,13 +310,13 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Expiry Date attribute
         /// </summary>
         public async Task<DateTime> GetExpiryDate(SecureSession session) {
-            return (DateTime)(dynamic?)(await GetAttribute(session, 12))!;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)(await GetAttribute(session, 12)))!.Value;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Smoke CO Alarm Cluster";
+            return "Smoke CO Alarm";
         }
     }
 }

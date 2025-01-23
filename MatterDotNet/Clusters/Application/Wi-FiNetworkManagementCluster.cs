@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.NetworkInfrastructure
 {
     /// <summary>
-    /// Wi-Fi Network Management Cluster
+    /// Functionality to retrieve operational information about a managed Wi-Fi network.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class WiFiNetworkManagementCluster : ClusterBase
+    public class WiFiNetworkManagement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0451;
 
         /// <summary>
-        /// Wi-Fi Network Management Cluster
+        /// Functionality to retrieve operational information about a managed Wi-Fi network.
         /// </summary>
-        public WiFiNetworkManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public WiFiNetworkManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WiFiNetworkManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected WiFiNetworkManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Payloads
         /// <summary>
@@ -63,20 +63,20 @@ namespace MatterDotNet.Clusters.Application
         /// Get the SSID attribute
         /// </summary>
         public async Task<byte[]?> GetSSID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Passphrase Surrogate attribute
         /// </summary>
         public async Task<ulong?> GetPassphraseSurrogate(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 1, true) ?? null;
+            return (ulong?)(dynamic?)await GetAttribute(session, 1, true);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Wi-Fi Network Management Cluster";
+            return "Wi-Fi Network Management";
         }
     }
 }

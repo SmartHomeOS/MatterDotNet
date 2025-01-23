@@ -18,48 +18,48 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Media
 {
     /// <summary>
-    /// Content App Observer Cluster
+    /// This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ContentAppObserverCluster : ClusterBase
+    public class ContentAppObserver : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0510;
 
         /// <summary>
-        /// Content App Observer Cluster
+        /// This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse.
         /// </summary>
-        public ContentAppObserverCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ContentAppObserver(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ContentAppObserverCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ContentAppObserver(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Status
         /// </summary>
-        public enum StatusEnum {
+        public enum Status : byte {
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0,
+            Success = 0x00,
             /// <summary>
             /// Data field in command was not understood by the Observer
             /// </summary>
-            UnexpectedData = 1,
+            UnexpectedData = 0x01,
         }
         #endregion Enums
 
         #region Payloads
         private record ContentAppMessagePayload : TLVPayload {
-            public required string Data { get; set; }
-            public string? EncodingHint { get; set; }
+            public string? Data { get; set; }
+            public required string EncodingHint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteString(0, Data, 500);
-                if (EncodingHint != null)
-                    writer.WriteString(1, EncodingHint, 100);
+                if (Data != null)
+                    writer.WriteString(0, Data);
+                writer.WriteString(1, EncodingHint);
                 writer.EndContainer();
             }
         }
@@ -68,7 +68,7 @@ namespace MatterDotNet.Clusters.Application
         /// Content App Message Response - Reply from server
         /// </summary>
         public struct ContentAppMessageResponse() {
-            public required StatusEnum Status { get; set; }
+            public required Status Status { get; set; }
             public string? Data { get; set; }
             public string? EncodingHint { get; set; }
         }
@@ -78,16 +78,16 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Content App Message
         /// </summary>
-        public async Task<ContentAppMessageResponse?> ContentAppMessage(SecureSession session, string Data, string? EncodingHint) {
+        public async Task<ContentAppMessageResponse?> ContentAppMessage(SecureSession session, string? data, string encodingHint) {
             ContentAppMessagePayload requestFields = new ContentAppMessagePayload() {
-                Data = Data,
-                EncodingHint = EncodingHint,
+                Data = data,
+                EncodingHint = encodingHint,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ContentAppMessageResponse() {
-                Status = (StatusEnum)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 Data = (string?)GetOptionalField(resp, 1),
                 EncodingHint = (string?)GetOptionalField(resp, 2),
             };
@@ -97,7 +97,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Content App Observer Cluster";
+            return "Content App Observer";
         }
     }
 }

@@ -20,22 +20,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Scenes Management Cluster
+    /// Attributes and commands for scene configuration and manipulation.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class ScenesManagementCluster : ClusterBase
+    public class ScenesManagement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0062;
 
         /// <summary>
-        /// Scenes Management Cluster
+        /// Attributes and commands for scene configuration and manipulation.
         /// </summary>
-        public ScenesManagementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public ScenesManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ScenesManagementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected ScenesManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -50,10 +50,10 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Copy Mode Bitmap
+        /// Copy Mode
         /// </summary>
         [Flags]
-        public enum CopyModeBitmap {
+        public enum CopyMode : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -61,11 +61,48 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Copy all scenes in the scene table
             /// </summary>
-            CopyAllScenes = 1,
+            CopyAllScenes = 0x01,
         }
         #endregion Enums
 
         #region Records
+        /// <summary>
+        /// Scene Info
+        /// </summary>
+        public record SceneInfo : TLVPayload {
+            /// <summary>
+            /// Scene Info
+            /// </summary>
+            public SceneInfo() { }
+
+            /// <summary>
+            /// Scene Info
+            /// </summary>
+            [SetsRequiredMembers]
+            public SceneInfo(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                SceneCount = reader.GetByte(0)!.Value;
+                CurrentScene = reader.GetByte(1)!.Value;
+                CurrentGroup = reader.GetUShort(2)!.Value;
+                SceneValid = reader.GetBool(3)!.Value;
+                RemainingCapacity = reader.GetByte(4)!.Value;
+            }
+            public required byte SceneCount { get; set; }
+            public required byte CurrentScene { get; set; }
+            public required ushort CurrentGroup { get; set; }
+            public required bool SceneValid { get; set; }
+            public required byte RemainingCapacity { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteByte(0, SceneCount);
+                writer.WriteByte(1, CurrentScene);
+                writer.WriteUShort(2, CurrentGroup);
+                writer.WriteBool(3, SceneValid);
+                writer.WriteByte(4, RemainingCapacity);
+                writer.EndContainer();
+            }
+        }
+
         /// <summary>
         /// Attribute Value Pair
         /// </summary>
@@ -140,9 +177,9 @@ namespace MatterDotNet.Clusters.Application
                 FieldReader reader = new FieldReader(fields);
                 ClusterID = reader.GetUInt(0)!.Value;
                 {
-                    AttributeValueList = new AttributeValuePair[((object[])fields[1]).Length];
-                    for (int i = 0; i < AttributeValueList.Length; i++) {
-                        AttributeValueList[i] = new AttributeValuePair((object[])fields[-1]);
+                    AttributeValueList = new AttributeValuePair[reader.GetStruct(1)!.Length];
+                    for (int n = 0; n < AttributeValueList.Length; n++) {
+                        AttributeValueList[n] = new AttributeValuePair((object[])((object[])fields[1])[n]);
                     }
                 }
             }
@@ -161,92 +198,6 @@ namespace MatterDotNet.Clusters.Application
                 writer.EndContainer();
             }
         }
-
-        /// <summary>
-        /// Logical  Scene  Table
-        /// </summary>
-        public record LogicalSceneTable : TLVPayload {
-            /// <summary>
-            /// Logical  Scene  Table
-            /// </summary>
-            public LogicalSceneTable() { }
-
-            /// <summary>
-            /// Logical  Scene  Table
-            /// </summary>
-            [SetsRequiredMembers]
-            public LogicalSceneTable(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                SceneGroupID = reader.GetUShort(0)!.Value;
-                SceneID = reader.GetByte(1)!.Value;
-                SceneName = reader.GetString(2, true);
-                SceneTransitionTime = reader.GetUInt(3)!.Value;
-                {
-                    ExtensionFields = new ExtensionFieldSet[((object[])fields[4]).Length];
-                    for (int i = 0; i < ExtensionFields.Length; i++) {
-                        ExtensionFields[i] = new ExtensionFieldSet((object[])fields[-1]);
-                    }
-                }
-            }
-            public required ushort SceneGroupID { get; set; }
-            public required byte SceneID { get; set; }
-            public required string? SceneName { get; set; }
-            public required uint SceneTransitionTime { get; set; } = 0;
-            public required ExtensionFieldSet[] ExtensionFields { get; set; } = Array.Empty<ExtensionFieldSet>();
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, SceneGroupID);
-                writer.WriteByte(1, SceneID, 254);
-                if (SceneName != null)
-                    writer.WriteString(2, SceneName, 16);
-                writer.WriteUInt(3, SceneTransitionTime, 60000000);
-                {
-                    writer.StartArray(4);
-                    foreach (var item in ExtensionFields) {
-                        item.Serialize(writer, -1);
-                    }
-                    writer.EndContainer();
-                }
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Scene Info
-        /// </summary>
-        public record SceneInfo : TLVPayload {
-            /// <summary>
-            /// Scene Info
-            /// </summary>
-            public SceneInfo() { }
-
-            /// <summary>
-            /// Scene Info
-            /// </summary>
-            [SetsRequiredMembers]
-            public SceneInfo(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                SceneCount = reader.GetByte(0)!.Value;
-                CurrentScene = reader.GetByte(1)!.Value;
-                CurrentGroup = reader.GetUShort(2)!.Value;
-                SceneValid = reader.GetBool(3)!.Value;
-                RemainingCapacity = reader.GetByte(4)!.Value;
-            }
-            public required byte SceneCount { get; set; } = 0;
-            public required byte CurrentScene { get; set; } = 0xFF;
-            public required ushort CurrentGroup { get; set; } = 0;
-            public required bool SceneValid { get; set; } = false;
-            public required byte RemainingCapacity { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteByte(0, SceneCount);
-                writer.WriteByte(1, CurrentScene);
-                writer.WriteUShort(2, CurrentGroup);
-                writer.WriteBool(3, SceneValid);
-                writer.WriteByte(4, RemainingCapacity, 253);
-                writer.EndContainer();
-            }
-        }
         #endregion Records
 
         #region Payloads
@@ -255,16 +206,16 @@ namespace MatterDotNet.Clusters.Application
             public required byte SceneID { get; set; }
             public required uint TransitionTime { get; set; }
             public required string SceneName { get; set; }
-            public required ExtensionFieldSet[] ExtensionFieldSetStructs { get; set; }
+            public required ExtensionFieldSet[] ExtensionFieldSets { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
-                writer.WriteByte(1, SceneID, 254);
-                writer.WriteUInt(2, TransitionTime, 60000000);
-                writer.WriteString(3, SceneName, 16);
+                writer.WriteByte(1, SceneID);
+                writer.WriteUInt(2, TransitionTime);
+                writer.WriteString(3, SceneName);
                 {
                     writer.StartArray(4);
-                    foreach (var item in ExtensionFieldSetStructs) {
+                    foreach (var item in ExtensionFieldSets) {
                         item.Serialize(writer, -1);
                     }
                     writer.EndContainer();
@@ -273,36 +224,15 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
-        /// <summary>
-        /// Add Scene Response - Reply from server
-        /// </summary>
-        public struct AddSceneResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-            public required byte SceneID { get; set; }
-        }
-
         private record ViewScenePayload : TLVPayload {
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
-                writer.WriteByte(1, SceneID, 254);
+                writer.WriteByte(1, SceneID);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// View Scene Response - Reply from server
-        /// </summary>
-        public struct ViewSceneResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-            public required byte SceneID { get; set; }
-            public uint? TransitionTime { get; set; }
-            public string? SceneName { get; set; }
-            public ExtensionFieldSet[]? ExtensionFieldSetStructs { get; set; }
         }
 
         private record RemoveScenePayload : TLVPayload {
@@ -311,18 +241,9 @@ namespace MatterDotNet.Clusters.Application
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
-                writer.WriteByte(1, SceneID, 254);
+                writer.WriteByte(1, SceneID);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// Remove Scene Response - Reply from server
-        /// </summary>
-        public struct RemoveSceneResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-            public required byte SceneID { get; set; }
         }
 
         private record RemoveAllScenesPayload : TLVPayload {
@@ -334,32 +255,15 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
-        /// <summary>
-        /// Remove All Scenes Response - Reply from server
-        /// </summary>
-        public struct RemoveAllScenesResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-        }
-
         private record StoreScenePayload : TLVPayload {
             public required ushort GroupID { get; set; }
             public required byte SceneID { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
-                writer.WriteByte(1, SceneID, 254);
+                writer.WriteByte(1, SceneID);
                 writer.EndContainer();
             }
-        }
-
-        /// <summary>
-        /// Store Scene Response - Reply from server
-        /// </summary>
-        public struct StoreSceneResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort GroupID { get; set; }
-            public required byte SceneID { get; set; }
         }
 
         private record RecallScenePayload : TLVPayload {
@@ -369,9 +273,9 @@ namespace MatterDotNet.Clusters.Application
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, GroupID);
-                writer.WriteByte(1, SceneID, 254);
+                writer.WriteByte(1, SceneID);
                 if (TransitionTime != null)
-                    writer.WriteUInt(2, TransitionTime, 60000000);
+                    writer.WriteUInt(2, TransitionTime);
                 writer.EndContainer();
             }
         }
@@ -385,6 +289,70 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
+        private record CopyScenePayload : TLVPayload {
+            public required CopyMode Mode { get; set; }
+            public required ushort GroupIdentifierFrom { get; set; }
+            public required byte SceneIdentifierFrom { get; set; }
+            public required ushort GroupIdentifierTo { get; set; }
+            public required byte SceneIdentifierTo { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteUInt(0, (uint)Mode);
+                writer.WriteUShort(1, GroupIdentifierFrom);
+                writer.WriteByte(2, SceneIdentifierFrom);
+                writer.WriteUShort(3, GroupIdentifierTo);
+                writer.WriteByte(4, SceneIdentifierTo);
+                writer.EndContainer();
+            }
+        }
+
+        /// <summary>
+        /// Add Scene Response - Reply from server
+        /// </summary>
+        public struct AddSceneResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+            public required byte SceneID { get; set; }
+        }
+
+        /// <summary>
+        /// View Scene Response - Reply from server
+        /// </summary>
+        public struct ViewSceneResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+            public required byte SceneID { get; set; }
+            public uint? TransitionTime { get; set; }
+            public string? SceneName { get; set; }
+            public ExtensionFieldSet[]? ExtensionFieldSets { get; set; }
+        }
+
+        /// <summary>
+        /// Remove Scene Response - Reply from server
+        /// </summary>
+        public struct RemoveSceneResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+            public required byte SceneID { get; set; }
+        }
+
+        /// <summary>
+        /// Remove All Scenes Response - Reply from server
+        /// </summary>
+        public struct RemoveAllScenesResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+        }
+
+        /// <summary>
+        /// Store Scene Response - Reply from server
+        /// </summary>
+        public struct StoreSceneResponse() {
+            public required IMStatusCode Status { get; set; }
+            public required ushort GroupID { get; set; }
+            public required byte SceneID { get; set; }
+        }
+
         /// <summary>
         /// Get Scene Membership Response - Reply from server
         /// </summary>
@@ -393,23 +361,6 @@ namespace MatterDotNet.Clusters.Application
             public required byte? Capacity { get; set; }
             public required ushort GroupID { get; set; }
             public byte[]? SceneList { get; set; }
-        }
-
-        private record CopyScenePayload : TLVPayload {
-            public required CopyModeBitmap Mode { get; set; }
-            public required ushort GroupIdentifierFrom { get; set; }
-            public required byte SceneIdentifierFrom { get; set; }
-            public required ushort GroupIdentifierTo { get; set; }
-            public required byte SceneIdentifierTo { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, (ushort)Mode);
-                writer.WriteUShort(1, GroupIdentifierFrom);
-                writer.WriteByte(2, SceneIdentifierFrom, 254);
-                writer.WriteUShort(3, GroupIdentifierTo);
-                writer.WriteByte(4, SceneIdentifierTo, 254);
-                writer.EndContainer();
-            }
         }
 
         /// <summary>
@@ -426,13 +377,13 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Add Scene
         /// </summary>
-        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort GroupID, byte SceneID, uint TransitionTime, string SceneName, ExtensionFieldSet[] ExtensionFieldSetStructs) {
+        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort groupID, byte sceneID, uint transitionTime, string sceneName, ExtensionFieldSet[] extensionFieldSets) {
             AddScenePayload requestFields = new AddScenePayload() {
-                GroupID = GroupID,
-                SceneID = SceneID,
-                TransitionTime = TransitionTime,
-                SceneName = SceneName,
-                ExtensionFieldSetStructs = ExtensionFieldSetStructs,
+                GroupID = groupID,
+                SceneID = sceneID,
+                TransitionTime = transitionTime,
+                SceneName = sceneName,
+                ExtensionFieldSets = extensionFieldSets,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
@@ -447,10 +398,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// View Scene
         /// </summary>
-        public async Task<ViewSceneResponse?> ViewScene(SecureSession session, ushort GroupID, byte SceneID) {
+        public async Task<ViewSceneResponse?> ViewScene(SecureSession session, ushort groupID, byte sceneID) {
             ViewScenePayload requestFields = new ViewScenePayload() {
-                GroupID = GroupID,
-                SceneID = SceneID,
+                GroupID = groupID,
+                SceneID = sceneID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
             if (!ValidateResponse(resp))
@@ -459,19 +410,19 @@ namespace MatterDotNet.Clusters.Application
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
                 GroupID = (ushort)GetField(resp, 1),
                 SceneID = (byte)GetField(resp, 2),
-                TransitionTime = (uint)GetField(resp, 3),
-                SceneName = (string)GetField(resp, 4),
-                ExtensionFieldSetStructs = GetArrayField<ExtensionFieldSet>(resp, 5),
+                TransitionTime = (uint?)GetOptionalField(resp, 3),
+                SceneName = (string?)GetOptionalField(resp, 4),
+                ExtensionFieldSets = GetOptionalArrayField<ExtensionFieldSet>(resp, 5),
             };
         }
 
         /// <summary>
         /// Remove Scene
         /// </summary>
-        public async Task<RemoveSceneResponse?> RemoveScene(SecureSession session, ushort GroupID, byte SceneID) {
+        public async Task<RemoveSceneResponse?> RemoveScene(SecureSession session, ushort groupID, byte sceneID) {
             RemoveScenePayload requestFields = new RemoveScenePayload() {
-                GroupID = GroupID,
-                SceneID = SceneID,
+                GroupID = groupID,
+                SceneID = sceneID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
@@ -486,9 +437,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Remove All Scenes
         /// </summary>
-        public async Task<RemoveAllScenesResponse?> RemoveAllScenes(SecureSession session, ushort GroupID) {
+        public async Task<RemoveAllScenesResponse?> RemoveAllScenes(SecureSession session, ushort groupID) {
             RemoveAllScenesPayload requestFields = new RemoveAllScenesPayload() {
-                GroupID = GroupID,
+                GroupID = groupID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
             if (!ValidateResponse(resp))
@@ -502,10 +453,10 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Store Scene
         /// </summary>
-        public async Task<StoreSceneResponse?> StoreScene(SecureSession session, ushort GroupID, byte SceneID) {
+        public async Task<StoreSceneResponse?> StoreScene(SecureSession session, ushort groupID, byte sceneID) {
             StoreScenePayload requestFields = new StoreScenePayload() {
-                GroupID = GroupID,
-                SceneID = SceneID,
+                GroupID = groupID,
+                SceneID = sceneID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
             if (!ValidateResponse(resp))
@@ -520,11 +471,11 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Recall Scene
         /// </summary>
-        public async Task<bool> RecallScene(SecureSession session, ushort GroupID, byte SceneID, uint? TransitionTime) {
+        public async Task<bool> RecallScene(SecureSession session, ushort groupID, byte sceneID, uint? transitionTime) {
             RecallScenePayload requestFields = new RecallScenePayload() {
-                GroupID = GroupID,
-                SceneID = SceneID,
-                TransitionTime = TransitionTime,
+                GroupID = groupID,
+                SceneID = sceneID,
+                TransitionTime = transitionTime,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
             return ValidateResponse(resp);
@@ -533,9 +484,9 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get Scene Membership
         /// </summary>
-        public async Task<GetSceneMembershipResponse?> GetSceneMembership(SecureSession session, ushort GroupID) {
+        public async Task<GetSceneMembershipResponse?> GetSceneMembership(SecureSession session, ushort groupID) {
             GetSceneMembershipPayload requestFields = new GetSceneMembershipPayload() {
-                GroupID = GroupID,
+                GroupID = groupID,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
@@ -544,20 +495,20 @@ namespace MatterDotNet.Clusters.Application
                 Status = (IMStatusCode)(byte)GetField(resp, 0),
                 Capacity = (byte?)GetField(resp, 1),
                 GroupID = (ushort)GetField(resp, 2),
-                SceneList = (byte[])GetField(resp, 3),
+                SceneList = (byte[]?)GetOptionalField(resp, 3),
             };
         }
 
         /// <summary>
         /// Copy Scene
         /// </summary>
-        public async Task<CopySceneResponse?> CopyScene(SecureSession session, CopyModeBitmap Mode, ushort GroupIdentifierFrom, byte SceneIdentifierFrom, ushort GroupIdentifierTo, byte SceneIdentifierTo) {
+        public async Task<CopySceneResponse?> CopyScene(SecureSession session, CopyMode mode, ushort groupIdentifierFrom, byte sceneIdentifierFrom, ushort groupIdentifierTo, byte sceneIdentifierTo) {
             CopyScenePayload requestFields = new CopyScenePayload() {
-                Mode = Mode,
-                GroupIdentifierFrom = GroupIdentifierFrom,
-                SceneIdentifierFrom = SceneIdentifierFrom,
-                GroupIdentifierTo = GroupIdentifierTo,
-                SceneIdentifierTo = SceneIdentifierTo,
+                Mode = mode,
+                GroupIdentifierFrom = groupIdentifierFrom,
+                SceneIdentifierFrom = sceneIdentifierFrom,
+                GroupIdentifierTo = groupIdentifierTo,
+                SceneIdentifierTo = sceneIdentifierTo,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
             if (!ValidateResponse(resp))
@@ -596,7 +547,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Last Configured By attribute
         /// </summary>
         public async Task<ulong?> GetLastConfiguredBy(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (ulong?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
@@ -620,7 +571,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Scenes Management Cluster";
+            return "Scenes Management";
         }
     }
 }

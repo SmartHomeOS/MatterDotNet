@@ -12,28 +12,28 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
-using MatterDotNet.Messages;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
+using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Ecosystem Information Cluster
+    /// Provides extended device information for all the logical devices represented by a Bridged Node.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class EcosystemInformationCluster : ClusterBase
+    public class EcosystemInformation : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0750;
 
         /// <summary>
-        /// Ecosystem Information Cluster
+        /// Provides extended device information for all the logical devices represented by a Bridged Node.
         /// </summary>
-        public EcosystemInformationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public EcosystemInformation(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EcosystemInformationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected EcosystemInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Records
         /// <summary>
@@ -51,29 +51,29 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public EcosystemDevice(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                DeviceName = reader.GetString(0, true);
+                DeviceName = reader.GetString(0, true, 64);
                 DeviceNameLastEdit = TimeUtil.FromEpochUS(reader.GetULong(1, true));
-                BridgedEndpoint = reader.GetUShort(2, true);
-                OriginalEndpoint = reader.GetUShort(3, true);
+                BridgedEndpoint = reader.GetUShort(2)!.Value;
+                OriginalEndpoint = reader.GetUShort(3)!.Value;
                 {
-                    DeviceTypes = new DescriptorCluster.DeviceType[((object[])fields[4]).Length];
-                    for (int i = 0; i < DeviceTypes.Length; i++) {
-                        DeviceTypes[i] = new DescriptorCluster.DeviceType((object[])fields[-1]);
+                    DeviceTypes = new Descriptor.DeviceType[reader.GetStruct(4)!.Length];
+                    for (int n = 0; n < DeviceTypes.Length; n++) {
+                        DeviceTypes[n] = new Descriptor.DeviceType((object[])((object[])fields[4])[n]);
                     }
                 }
                 {
-                    UniqueLocationIDs = new string[((object[])fields[5]).Length];
-                    for (int i = 0; i < UniqueLocationIDs.Length; i++) {
-                        UniqueLocationIDs[i] = reader.GetString(-1, false)!;
+                    UniqueLocationIDs = new string[reader.GetStruct(5)!.Length];
+                    for (int n = 0; n < UniqueLocationIDs.Length; n++) {
+                        UniqueLocationIDs[n] = reader.GetString(n, false)!;
                     }
                 }
                 UniqueLocationIDsLastEdit = TimeUtil.FromEpochUS(reader.GetULong(6))!.Value;
             }
-            public string? DeviceName { get; set; } = "";
+            public string? DeviceName { get; set; }
             public DateTime? DeviceNameLastEdit { get; set; } = TimeUtil.EPOCH;
-            public ushort? BridgedEndpoint { get; set; }
-            public ushort? OriginalEndpoint { get; set; }
-            public required DescriptorCluster.DeviceType[] DeviceTypes { get; set; }
+            public required ushort BridgedEndpoint { get; set; }
+            public required ushort OriginalEndpoint { get; set; }
+            public required Descriptor.DeviceType[] DeviceTypes { get; set; }
             public required string[] UniqueLocationIDs { get; set; }
             public required DateTime UniqueLocationIDsLastEdit { get; set; } = TimeUtil.EPOCH;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -82,10 +82,8 @@ namespace MatterDotNet.Clusters.Utility
                     writer.WriteString(0, DeviceName, 64);
                 if (DeviceNameLastEdit != null)
                     writer.WriteULong(1, TimeUtil.ToEpochUS(DeviceNameLastEdit!.Value));
-                if (BridgedEndpoint != null)
-                    writer.WriteUShort(2, BridgedEndpoint);
-                if (OriginalEndpoint != null)
-                    writer.WriteUShort(3, OriginalEndpoint);
+                writer.WriteUShort(2, BridgedEndpoint);
+                writer.WriteUShort(3, OriginalEndpoint);
                 {
                     writer.StartArray(4);
                     foreach (var item in DeviceTypes) {
@@ -121,7 +119,7 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public EcosystemLocation(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                UniqueLocationID = reader.GetString(0, false)!;
+                UniqueLocationID = reader.GetString(0, false, 64)!;
                 LocationDescriptor = new LocationDescriptor((object[])fields[1]);
                 LocationDescriptorLastEdit = TimeUtil.FromEpochUS(reader.GetULong(2))!.Value;
             }
@@ -138,10 +136,33 @@ namespace MatterDotNet.Clusters.Utility
         }
         #endregion Records
 
+        #region Attributes
+        /// <summary>
+        /// Get the Device Directory attribute
+        /// </summary>
+        public async Task<EcosystemDevice[]> GetDeviceDirectory(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
+            EcosystemDevice[] list = new EcosystemDevice[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new EcosystemDevice(reader.GetStruct(i)!);
+            return list;
+        }
+
+        /// <summary>
+        /// Get the Location Directory attribute
+        /// </summary>
+        public async Task<EcosystemLocation[]> GetLocationDirectory(SecureSession session) {
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
+            EcosystemLocation[] list = new EcosystemLocation[reader.Count];
+            for (int i = 0; i < reader.Count; i++)
+                list[i] = new EcosystemLocation(reader.GetStruct(i)!);
+            return list;
+        }
+        #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Ecosystem Information Cluster";
+            return "Ecosystem Information";
         }
     }
 }

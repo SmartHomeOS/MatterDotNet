@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// General Commissioning Cluster
+    /// This cluster is used to manage global aspects of the Commissioning flow.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 2)]
-    public class GeneralCommissioningCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class GeneralCommissioning : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0030;
 
         /// <summary>
-        /// General Commissioning Cluster
+        /// This cluster is used to manage global aspects of the Commissioning flow.
         /// </summary>
-        public GeneralCommissioningCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public GeneralCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GeneralCommissioningCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected GeneralCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -43,7 +43,7 @@ namespace MatterDotNet.Clusters.Utility
         [Flags]
         public enum Feature {
             /// <summary>
-            /// Supports Terms &amp; Conditions acknowledgement
+            /// Supports Terms and Conditions acknowledgement
             /// </summary>
             TermsAndConditions = 1,
         }
@@ -51,57 +51,57 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Commissioning Error
         /// </summary>
-        public enum CommissioningErrorEnum {
+        public enum CommissioningError : byte {
             /// <summary>
             /// No error
             /// </summary>
-            OK = 0,
+            OK = 0x0,
             /// <summary>
             /// <see cref="ValueOutsideRange"/> Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.
             /// </summary>
-            ValueOutsideRange = 1,
+            ValueOutsideRange = 0x1,
             /// <summary>
             /// <see cref="InvalidAuthentication"/> Executed CommissioningComplete outside CASE session.
             /// </summary>
-            InvalidAuthentication = 2,
+            InvalidAuthentication = 0x2,
             /// <summary>
             /// <see cref="NoFailSafe"/> Executed CommissioningComplete when there was no active ArmFailSafe Command.
             /// </summary>
-            NoFailSafe = 3,
+            NoFailSafe = 0x3,
             /// <summary>
             /// <see cref="BusyWithOtherAdmin"/> Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.
             /// </summary>
-            BusyWithOtherAdmin = 4,
+            BusyWithOtherAdmin = 0x4,
             /// <summary>
             /// <see cref="RequiredTCNotAccepted"/> One or more required TC features from the Enhanced Setup Flow were not accepted.
             /// </summary>
-            RequiredTCNotAccepted = 5,
+            RequiredTCNotAccepted = 0x5,
             /// <summary>
             /// <see cref="TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
             /// </summary>
-            TCAcknowledgementsNotReceived = 6,
+            TCAcknowledgementsNotReceived = 0x6,
             /// <summary>
             /// <see cref="TCMinVersionNotMet, TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
             /// </summary>
-            TCMinVersionNotMet = 7,
+            TCMinVersionNotMet = 0x7,
         }
 
         /// <summary>
         /// Regulatory Location Type
         /// </summary>
-        public enum RegulatoryLocationTypeEnum {
+        public enum RegulatoryLocationType : byte {
             /// <summary>
             /// Indoor only
             /// </summary>
-            Indoor = 0,
+            Indoor = 0x0,
             /// <summary>
             /// Outdoor only
             /// </summary>
-            Outdoor = 1,
+            Outdoor = 0x1,
             /// <summary>
             /// Indoor/Outdoor
             /// </summary>
-            IndoorOutdoor = 2,
+            IndoorOutdoor = 0x2,
         }
         #endregion Enums
 
@@ -137,7 +137,7 @@ namespace MatterDotNet.Clusters.Utility
 
         #region Payloads
         private record ArmFailSafePayload : TLVPayload {
-            public required ushort ExpiryLengthSeconds { get; set; } = 900;
+            public required ushort ExpiryLengthSeconds { get; set; }
             public required ulong Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -151,12 +151,12 @@ namespace MatterDotNet.Clusters.Utility
         /// Arm Fail Safe Response - Reply from server
         /// </summary>
         public struct ArmFailSafeResponse() {
-            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
-            public required string DebugText { get; set; } = "";
+            public required CommissioningError ErrorCode { get; set; }
+            public required string DebugText { get; set; }
         }
 
         private record SetRegulatoryConfigPayload : TLVPayload {
-            public required RegulatoryLocationTypeEnum NewRegulatoryConfig { get; set; }
+            public required RegulatoryLocationType NewRegulatoryConfig { get; set; }
             public required string CountryCode { get; set; }
             public required ulong Breadcrumb { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -172,16 +172,16 @@ namespace MatterDotNet.Clusters.Utility
         /// Set Regulatory Config Response - Reply from server
         /// </summary>
         public struct SetRegulatoryConfigResponse() {
-            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
-            public required string DebugText { get; set; } = "";
+            public required CommissioningError ErrorCode { get; set; }
+            public required string DebugText { get; set; }
         }
 
         /// <summary>
         /// Commissioning Complete Response - Reply from server
         /// </summary>
         public struct CommissioningCompleteResponse() {
-            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
-            public required string DebugText { get; set; } = "";
+            public required CommissioningError ErrorCode { get; set; }
+            public required string DebugText { get; set; }
         }
 
         private record SetTCAcknowledgementsPayload : TLVPayload {
@@ -199,7 +199,7 @@ namespace MatterDotNet.Clusters.Utility
         /// Set TC Acknowledgements Response - Reply from server
         /// </summary>
         public struct SetTCAcknowledgementsResponse() {
-            public required CommissioningErrorEnum ErrorCode { get; set; } = CommissioningErrorEnum.OK;
+            public required CommissioningError ErrorCode { get; set; }
         }
         #endregion Payloads
 
@@ -207,16 +207,16 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Arm Fail Safe
         /// </summary>
-        public async Task<ArmFailSafeResponse?> ArmFailSafe(SecureSession session, ushort ExpiryLengthSeconds, ulong Breadcrumb) {
+        public async Task<ArmFailSafeResponse?> ArmFailSafe(SecureSession session, ushort expiryLengthSeconds, ulong breadcrumb) {
             ArmFailSafePayload requestFields = new ArmFailSafePayload() {
-                ExpiryLengthSeconds = ExpiryLengthSeconds,
-                Breadcrumb = Breadcrumb,
+                ExpiryLengthSeconds = expiryLengthSeconds,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new ArmFailSafeResponse() {
-                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
+                ErrorCode = (CommissioningError)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
         }
@@ -224,17 +224,17 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set Regulatory Config
         /// </summary>
-        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig(SecureSession session, RegulatoryLocationTypeEnum NewRegulatoryConfig, string CountryCode, ulong Breadcrumb) {
+        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig(SecureSession session, RegulatoryLocationType newRegulatoryConfig, string countryCode, ulong breadcrumb) {
             SetRegulatoryConfigPayload requestFields = new SetRegulatoryConfigPayload() {
-                NewRegulatoryConfig = NewRegulatoryConfig,
-                CountryCode = CountryCode,
-                Breadcrumb = Breadcrumb,
+                NewRegulatoryConfig = newRegulatoryConfig,
+                CountryCode = countryCode,
+                Breadcrumb = breadcrumb,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetRegulatoryConfigResponse() {
-                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
+                ErrorCode = (CommissioningError)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
         }
@@ -247,7 +247,7 @@ namespace MatterDotNet.Clusters.Utility
             if (!ValidateResponse(resp))
                 return null;
             return new CommissioningCompleteResponse() {
-                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
+                ErrorCode = (CommissioningError)(byte)GetField(resp, 0),
                 DebugText = (string)GetField(resp, 1),
             };
         }
@@ -255,16 +255,16 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Set TC Acknowledgements
         /// </summary>
-        public async Task<SetTCAcknowledgementsResponse?> SetTCAcknowledgements(SecureSession session, ushort TCVersion, ushort TCUserResponse) {
+        public async Task<SetTCAcknowledgementsResponse?> SetTCAcknowledgements(SecureSession session, ushort tCVersion, ushort tCUserResponse) {
             SetTCAcknowledgementsPayload requestFields = new SetTCAcknowledgementsPayload() {
-                TCVersion = TCVersion,
-                TCUserResponse = TCUserResponse,
+                TCVersion = tCVersion,
+                TCUserResponse = tCUserResponse,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetTCAcknowledgementsResponse() {
-                ErrorCode = (CommissioningErrorEnum)(byte)GetField(resp, 0),
+                ErrorCode = (CommissioningError)(byte)GetField(resp, 0),
             };
         }
         #endregion Commands
@@ -295,13 +295,13 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Breadcrumb attribute
         /// </summary>
         public async Task<ulong> GetBreadcrumb(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 0) ?? 0;
+            return (ulong?)(dynamic?)await GetAttribute(session, 0) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Set the Breadcrumb attribute
         /// </summary>
-        public async Task SetBreadcrumb (SecureSession session, ulong? value = 0) {
+        public async Task SetBreadcrumb (SecureSession session, ulong? value = 0x0000000000000000) {
             await SetAttribute(session, 0, value);
         }
 
@@ -315,15 +315,15 @@ namespace MatterDotNet.Clusters.Utility
         /// <summary>
         /// Get the Regulatory Config attribute
         /// </summary>
-        public async Task<RegulatoryLocationTypeEnum> GetRegulatoryConfig(SecureSession session) {
-            return (RegulatoryLocationTypeEnum)await GetEnumAttribute(session, 2);
+        public async Task<RegulatoryLocationType> GetRegulatoryConfig(SecureSession session) {
+            return (RegulatoryLocationType)await GetEnumAttribute(session, 2);
         }
 
         /// <summary>
         /// Get the Location Capability attribute
         /// </summary>
-        public async Task<RegulatoryLocationTypeEnum> GetLocationCapability(SecureSession session) {
-            return (RegulatoryLocationTypeEnum?)await GetEnumAttribute(session, 3) ?? RegulatoryLocationTypeEnum.IndoorOutdoor;
+        public async Task<RegulatoryLocationType> GetLocationCapability(SecureSession session) {
+            return (RegulatoryLocationType)await GetEnumAttribute(session, 3);
         }
 
         /// <summary>
@@ -351,27 +351,20 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the TC Acknowledgements attribute
         /// </summary>
         public async Task<ushort> GetTCAcknowledgements(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 7))!;
+            return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0x0000;
         }
 
         /// <summary>
         /// Get the TC Acknowledgements Required attribute
         /// </summary>
         public async Task<bool> GetTCAcknowledgementsRequired(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 8) ?? true;
-        }
-
-        /// <summary>
-        /// Get the TC Update Deadline attribute
-        /// </summary>
-        public async Task<uint?> GetTCUpdateDeadline(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9, true);
+            return (bool)(dynamic?)(await GetAttribute(session, 8))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "General Commissioning Cluster";
+            return "General Commissioning";
         }
     }
 }

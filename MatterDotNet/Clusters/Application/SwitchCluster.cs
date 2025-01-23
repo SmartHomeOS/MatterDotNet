@@ -15,22 +15,22 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Switch Cluster
+    /// This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 2)]
-    public class SwitchCluster : ClusterBase
+    public class Switch : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x003B;
+        internal const uint CLUSTER_ID = 0x003b;
 
         /// <summary>
-        /// Switch Cluster
+        /// This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.
         /// </summary>
-        public SwitchCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public Switch(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected SwitchCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected Switch(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -98,7 +98,7 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Current Position attribute
         /// </summary>
         public async Task<byte> GetCurrentPosition(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0;
+            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Switch Cluster";
+            return "Switch";
         }
     }
 }

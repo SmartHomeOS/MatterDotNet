@@ -15,28 +15,27 @@
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
-using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.Closures
 {
     /// <summary>
-    /// Door Lock Cluster
+    /// An interface to a generic way to secure a door
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 8)]
-    public class DoorLockCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 7)]
+    public class DoorLock : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0101;
 
         /// <summary>
-        /// Door Lock Cluster
+        /// An interface to a generic way to secure a door
         /// </summary>
-        public DoorLockCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public DoorLock(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DoorLockCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected DoorLock(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -57,6 +56,10 @@ namespace MatterDotNet.Clusters.Application
             /// </summary>
             FingerCredentials = 4,
             /// <summary>
+            /// Lock supports local/on-lock logging when Events are not supported
+            /// </summary>
+            Logging = 8,
+            /// <summary>
             /// Lock supports week day user access schedules
             /// </summary>
             WeekDayAccessSchedules = 16,
@@ -71,11 +74,15 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// PIN codes over-the-air supported for lock/unlock operations
             /// </summary>
-            CredentialOverTheAirAccess = 128,
+            CredentialsOverTheAirAccess = 128,
             /// <summary>
             /// Lock supports the user commands and database
             /// </summary>
             User = 256,
+            /// <summary>
+            /// Operation and Programming Notifications
+            /// </summary>
+            Notification = 512,
             /// <summary>
             /// Lock supports year day user access schedules
             /// </summary>
@@ -87,13 +94,13 @@ namespace MatterDotNet.Clusters.Application
             /// <summary>
             /// Lock supports unbolting
             /// </summary>
-            Unbolting = 4096,
+            Unbolt = 4096,
             /// <summary>
-            /// Lock supports Aliro credential provisioning as defined in ref_Aliro
+            /// AliroProvisioning
             /// </summary>
             AliroProvisioning = 8192,
             /// <summary>
-            /// Lock supports the Bluetooth LE + UWB Access Control Flow as defined in ref_Aliro
+            /// AliroBLEUWB
             /// </summary>
             AliroBLEUWB = 16384,
         }
@@ -101,7 +108,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Alarm Code
         /// </summary>
-        public enum AlarmCodeEnum {
+        public enum AlarmCode : byte {
             /// <summary>
             /// Locking Mechanism Jammed
             /// </summary>
@@ -139,7 +146,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Credential Rule
         /// </summary>
-        public enum CredentialRuleEnum {
+        public enum CredentialRule : byte {
             /// <summary>
             /// Only one credential is required for lock operation
             /// </summary>
@@ -157,7 +164,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Credential Type
         /// </summary>
-        public enum CredentialTypeEnum {
+        public enum CredentialType : byte {
             /// <summary>
             /// Programming PIN code credential type
             /// </summary>
@@ -199,7 +206,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Data Operation Type
         /// </summary>
-        public enum DataOperationTypeEnum {
+        public enum DataOperationType : byte {
             /// <summary>
             /// Data is being added or was added
             /// </summary>
@@ -217,7 +224,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Door State
         /// </summary>
-        public enum DoorStateEnum {
+        public enum DoorState : byte {
             /// <summary>
             /// Door state is open
             /// </summary>
@@ -245,45 +252,9 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Event Type
-        /// </summary>
-        public enum EventTypeEnum {
-            /// <summary>
-            /// Event type is operation
-            /// </summary>
-            Operation = 0,
-            /// <summary>
-            /// Event type is programming
-            /// </summary>
-            Programming = 1,
-            /// <summary>
-            /// Event type is alarm
-            /// </summary>
-            Alarm = 2,
-        }
-
-        /// <summary>
-        /// LED Setting
-        /// </summary>
-        public enum LEDSettingEnum {
-            /// <summary>
-            /// Never use LED for signalization
-            /// </summary>
-            NoLEDSignal = 0,
-            /// <summary>
-            /// Use LED signalization except for access allowed events
-            /// </summary>
-            NoLEDSignalAccessAllowed = 1,
-            /// <summary>
-            /// Use LED signalization for all events
-            /// </summary>
-            LEDSignalAll = 2,
-        }
-
-        /// <summary>
         /// Lock Data Type
         /// </summary>
-        public enum LockDataTypeEnum {
+        public enum LockDataType : byte {
             /// <summary>
             /// Unspecified or manufacturer specific lock user data added, cleared, or modified.
             /// </summary>
@@ -345,7 +316,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Lock Operation Type
         /// </summary>
-        public enum LockOperationTypeEnum {
+        public enum LockOperationType : byte {
             /// <summary>
             /// Lock operation
             /// </summary>
@@ -369,96 +340,9 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Lock State
-        /// </summary>
-        public enum LockStateEnum {
-            /// <summary>
-            /// Lock state is not fully locked
-            /// </summary>
-            NotFullyLocked = 0,
-            /// <summary>
-            /// Lock state is fully locked
-            /// </summary>
-            Locked = 1,
-            /// <summary>
-            /// Lock state is fully unlocked
-            /// </summary>
-            Unlocked = 2,
-            /// <summary>
-            /// Lock state is fully unlocked and the latch is pulled
-            /// </summary>
-            Unlatched = 3,
-        }
-
-        /// <summary>
-        /// Lock Type
-        /// </summary>
-        public enum LockTypeEnum {
-            /// <summary>
-            /// Physical lock type is dead bolt
-            /// </summary>
-            DeadBolt = 0,
-            /// <summary>
-            /// Physical lock type is magnetic
-            /// </summary>
-            Magnetic = 1,
-            /// <summary>
-            /// Physical lock type is other
-            /// </summary>
-            Other = 2,
-            /// <summary>
-            /// Physical lock type is mortise
-            /// </summary>
-            Mortise = 3,
-            /// <summary>
-            /// Physical lock type is rim
-            /// </summary>
-            Rim = 4,
-            /// <summary>
-            /// Physical lock type is latch bolt
-            /// </summary>
-            LatchBolt = 5,
-            /// <summary>
-            /// Physical lock type is cylindrical lock
-            /// </summary>
-            CylindricalLock = 6,
-            /// <summary>
-            /// Physical lock type is tubular lock
-            /// </summary>
-            TubularLock = 7,
-            /// <summary>
-            /// Physical lock type is interconnected lock
-            /// </summary>
-            InterconnectedLock = 8,
-            /// <summary>
-            /// Physical lock type is dead latch
-            /// </summary>
-            DeadLatch = 9,
-            /// <summary>
-            /// Physical lock type is door furniture
-            /// </summary>
-            DoorFurniture = 10,
-            /// <summary>
-            /// Physical lock type is euro cylinder
-            /// </summary>
-            Eurocylinder = 11,
-        }
-
-        /// <summary>
-        /// Operating Mode
-        /// </summary>
-        public enum OperatingModeEnum {
-            Normal = 0,
-            Vacation = 1,
-            Privacy = 2,
-            NoRemoteLockUnlock = 3,
-            Passage = 4,
-        }
-
-        /// <summary>
         /// Operation Error
         /// </summary>
-        public enum OperationErrorEnum {
+        public enum OperationError : byte {
             /// <summary>
             /// Lock/unlock error caused by unknown or unspecified source
             /// </summary>
@@ -482,9 +366,35 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
+        /// Operating Mode
+        /// </summary>
+        public enum OperatingMode : byte {
+            /// <summary>
+            /// 
+            /// </summary>
+            Normal = 0,
+            /// <summary>
+            /// 
+            /// </summary>
+            Vacation = 1,
+            /// <summary>
+            /// 
+            /// </summary>
+            Privacy = 2,
+            /// <summary>
+            /// 
+            /// </summary>
+            NoRemoteLockUnlock = 3,
+            /// <summary>
+            /// 
+            /// </summary>
+            Passage = 4,
+        }
+
+        /// <summary>
         /// Operation Source
         /// </summary>
-        public enum OperationSourceEnum {
+        public enum OperationSource : byte {
             /// <summary>
             /// Lock/unlock operation came from unspecified source
             /// </summary>
@@ -532,31 +442,9 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Sound Volume
-        /// </summary>
-        public enum SoundVolumeEnum {
-            /// <summary>
-            /// Silent Mode
-            /// </summary>
-            Silent = 0,
-            /// <summary>
-            /// Low Volume
-            /// </summary>
-            Low = 1,
-            /// <summary>
-            /// High Volume
-            /// </summary>
-            High = 2,
-            /// <summary>
-            /// Medium Volume
-            /// </summary>
-            Medium = 3,
-        }
-
-        /// <summary>
         /// User Status
         /// </summary>
-        public enum UserStatusEnum {
+        public enum UserStatus : byte {
             /// <summary>
             /// The user ID is available
             /// </summary>
@@ -574,7 +462,7 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// User Type
         /// </summary>
-        public enum UserTypeEnum {
+        public enum UserType : byte {
             /// <summary>
             /// The user ID type is unrestricted
             /// </summary>
@@ -618,193 +506,347 @@ namespace MatterDotNet.Clusters.Application
         }
 
         /// <summary>
-        /// Alarm Mask Bitmap
+        /// Dl Lock State
         /// </summary>
-        [Flags]
-        public enum AlarmMaskBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Locking Mechanism Jammed
-            /// </summary>
-            LockJammed = 1,
-            /// <summary>
-            /// Lock Reset to Factory Defaults
-            /// </summary>
-            LockFactoryReset = 2,
-            /// <summary>
-            /// RF Module Power Cycled
-            /// </summary>
-            LockRadioPowerCycled = 8,
-            /// <summary>
-            /// Tamper Alarm - wrong code entry limit
-            /// </summary>
-            WrongCodeEntryLimit = 16,
-            /// <summary>
-            /// Tamper Alarm - front escutcheon removed from main
-            /// </summary>
-            FrontEscutcheonRemoved = 32,
-            /// <summary>
-            /// Forced Door Open under Door Locked Condition
-            /// </summary>
-            DoorForcedOpen = 64,
+        public enum DlLockState : byte {
+            NotFullyLocked = 0,
+            Locked = 1,
+            Unlocked = 2,
+            Unlatched = 3,
         }
 
         /// <summary>
-        /// Configuration Register Bitmap
+        /// Dl Lock Type
         /// </summary>
-        [Flags]
-        public enum ConfigurationRegisterBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// The state of local programming functionality
-            /// </summary>
-            LocalProgramming = 1,
-            /// <summary>
-            /// The state of the keypad interface
-            /// </summary>
-            KeypadInterface = 2,
-            /// <summary>
-            /// The state of the remote interface
-            /// </summary>
-            RemoteInterface = 4,
-            /// <summary>
-            /// Sound volume is set to Silent value
-            /// </summary>
-            SoundVolume = 32,
-            /// <summary>
-            /// Auto relock time it set to 0
-            /// </summary>
-            AutoRelockTime = 64,
-            /// <summary>
-            /// LEDs is disabled
-            /// </summary>
-            LEDSettings = 128,
+        public enum DlLockType : byte {
+            DeadBolt = 0,
+            Magnetic = 1,
+            Other = 2,
+            Mortise = 3,
+            Rim = 4,
+            LatchBolt = 5,
+            CylindricalLock = 6,
+            TubularLock = 7,
+            InterconnectedLock = 8,
+            DeadLatch = 9,
+            DoorFurniture = 10,
+            Eurocylinder = 11,
         }
 
         /// <summary>
-        /// Credential Rules Bitmap
+        /// Dl Status
         /// </summary>
-        [Flags]
-        public enum CredentialRulesBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Only one credential is required for lock operation
-            /// </summary>
-            Single = 1,
-            /// <summary>
-            /// Any two credentials are required for lock operation
-            /// </summary>
-            Dual = 2,
-            /// <summary>
-            /// Any three credentials are required for lock operation
-            /// </summary>
-            Tri = 4,
+        public enum DlStatus : byte {
+            Success = 0x00,
+            Failure = 0x01,
+            Duplicate = 0x02,
+            Occupied = 0x03,
+            InvalidField = 0x85,
+            ResourceExhausted = 0x89,
+            NotFound = 0x8B,
         }
 
         /// <summary>
-        /// Days Mask Bitmap
+        /// Door Lock Set Pin Or Id Status
         /// </summary>
-        [Flags]
-        public enum DaysMaskBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Schedule is applied on Sunday
-            /// </summary>
-            Sunday = 1,
-            /// <summary>
-            /// Schedule is applied on Monday
-            /// </summary>
-            Monday = 2,
-            /// <summary>
-            /// Schedule is applied on Tuesday
-            /// </summary>
-            Tuesday = 4,
-            /// <summary>
-            /// Schedule is applied on Wednesday
-            /// </summary>
-            Wednesday = 8,
-            /// <summary>
-            /// Schedule is applied on Thursday
-            /// </summary>
-            Thursday = 16,
-            /// <summary>
-            /// Schedule is applied on Friday
-            /// </summary>
-            Friday = 32,
-            /// <summary>
-            /// Schedule is applied on Saturday
-            /// </summary>
-            Saturday = 64,
+        public enum DoorLockSetPinOrIdStatus : byte {
+            Success = 0x00,
+            GeneralFailure = 0x01,
+            MemoryFull = 0x02,
+            DuplicateCodeError = 0x03,
         }
 
         /// <summary>
-        /// Local Programming Features Bitmap
+        /// Door Lock Operation Event Code
         /// </summary>
-        [Flags]
-        public enum LocalProgrammingFeaturesBitmap {
-            /// <summary>
-            /// Nothing Set
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// The state of the ability to add users, credentials or schedules on the device
-            /// </summary>
-            AddUsersCredentialsSchedules = 1,
-            /// <summary>
-            /// The state of the ability to modify users, credentials or schedules on the device
-            /// </summary>
-            ModifyUsersCredentialsSchedules = 2,
-            /// <summary>
-            /// The state of the ability to clear users, credentials or schedules on the device
-            /// </summary>
-            ClearUsersCredentialsSchedules = 4,
-            /// <summary>
-            /// The state of the ability to adjust settings on the device
-            /// </summary>
-            AdjustSettings = 8,
+        public enum DoorLockOperationEventCode : byte {
+            UnknownOrMfgSpecific = 0x00,
+            Lock = 0x01,
+            Unlock = 0x02,
+            LockInvalidPinOrId = 0x03,
+            LockInvalidSchedule = 0x04,
+            UnlockInvalidPinOrId = 0x05,
+            UnlockInvalidSchedule = 0x06,
+            OneTouchLock = 0x07,
+            KeyLock = 0x08,
+            KeyUnlock = 0x09,
+            AutoLock = 0x0A,
+            ScheduleLock = 0x0B,
+            ScheduleUnlock = 0x0C,
+            ManualLock = 0x0D,
+            ManualUnlock = 0x0E,
         }
 
         /// <summary>
-        /// Operating Modes Bitmap
+        /// Door Lock Programming Event Code
+        /// </summary>
+        public enum DoorLockProgrammingEventCode : byte {
+            UnknownOrMfgSpecific = 0x00,
+            MasterCodeChanged = 0x01,
+            PinAdded = 0x02,
+            PinDeleted = 0x03,
+            PinChanged = 0x04,
+            IdAdded = 0x05,
+            IdDeleted = 0x06,
+        }
+
+        /// <summary>
+        /// Door Lock User Status
+        /// </summary>
+        public enum DoorLockUserStatus : byte {
+            Available = 0x00,
+            OccupiedEnabled = 0x01,
+            OccupiedDisabled = 0x03,
+            NotSupported = 0xFF,
+        }
+
+        /// <summary>
+        /// Door Lock User Type
+        /// </summary>
+        public enum DoorLockUserType : byte {
+            Unrestricted = 0x00,
+            YearDayScheduleUser = 0x01,
+            WeekDayScheduleUser = 0x02,
+            MasterUser = 0x03,
+            NonAccessUser = 0x04,
+            NotSupported = 0xFF,
+        }
+
+        /// <summary>
+        /// Dl Credential Rule Mask
         /// </summary>
         [Flags]
-        public enum OperatingModesBitmap {
+        public enum DlCredentialRuleMask : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
             None = 0,
+            Single = 0x01,
+            Dual = 0x02,
+            Tri = 0x04,
+        }
+
+        /// <summary>
+        /// Days Mask Map
+        /// </summary>
+        [Flags]
+        public enum DaysMaskMap : byte {
             /// <summary>
-            /// Normal operation mode
+            /// Nothing Set
             /// </summary>
-            Normal = 1,
+            None = 0,
+            Sunday = 0x01,
+            Monday = 0x02,
+            Tuesday = 0x04,
+            Wednesday = 0x08,
+            Thursday = 0x10,
+            Friday = 0x20,
+            Saturday = 0x40,
+        }
+
+        /// <summary>
+        /// Dl Credential Rules Support
+        /// </summary>
+        [Flags]
+        public enum DlCredentialRulesSupport : byte {
             /// <summary>
-            /// Vacation operation mode
+            /// Nothing Set
             /// </summary>
-            Vacation = 2,
+            None = 0,
+            Single = 0x01,
+            Dual = 0x02,
+            Tri = 0x04,
+        }
+
+        /// <summary>
+        /// Dl Supported Operating Modes
+        /// </summary>
+        [Flags]
+        public enum DlSupportedOperatingModes : ushort {
             /// <summary>
-            /// Privacy operation mode
+            /// Nothing Set
             /// </summary>
-            Privacy = 4,
+            None = 0,
+            Normal = 0x01,
+            Vacation = 0x02,
+            Privacy = 0x04,
+            NoRemoteLockUnlock = 0x08,
+            Passage = 0x10,
+        }
+
+        /// <summary>
+        /// Dl Default Configuration Register
+        /// </summary>
+        [Flags]
+        public enum DlDefaultConfigurationRegister : ushort {
             /// <summary>
-            /// No remote lock and unlock operation mode
+            /// Nothing Set
             /// </summary>
-            NoRemoteLockUnlock = 8,
+            None = 0,
+            EnableLocalProgrammingEnabled = 0x01,
+            KeypadInterfaceDefaultAccessEnabled = 0x02,
+            RemoteInterfaceDefaultAccessIsEnabled = 0x04,
+            SoundEnabled = 0x20,
+            AutoRelockTimeSet = 0x40,
+            LEDSettingsSet = 0x80,
+        }
+
+        /// <summary>
+        /// Dl Local Programming Features
+        /// </summary>
+        [Flags]
+        public enum DlLocalProgrammingFeatures : byte {
             /// <summary>
-            /// Passage operation mode
+            /// Nothing Set
             /// </summary>
-            Passage = 16,
+            None = 0,
+            AddUsersCredentialsSchedulesLocally = 0x01,
+            ModifyUsersCredentialsSchedulesLocally = 0x02,
+            ClearUsersCredentialsSchedulesLocally = 0x04,
+            AdjustLockSettingsLocally = 0x08,
+        }
+
+        /// <summary>
+        /// Dl Keypad Operation Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlKeypadOperationEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            Lock = 0x02,
+            Unlock = 0x04,
+            LockInvalidPIN = 0x08,
+            LockInvalidSchedule = 0x10,
+            UnlockInvalidCode = 0x20,
+            UnlockInvalidSchedule = 0x40,
+            NonAccessUserOpEvent = 0x80,
+        }
+
+        /// <summary>
+        /// Dl Remote Operation Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlRemoteOperationEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            Lock = 0x02,
+            Unlock = 0x04,
+            LockInvalidCode = 0x08,
+            LockInvalidSchedule = 0x10,
+            UnlockInvalidCode = 0x20,
+            UnlockInvalidSchedule = 0x40,
+        }
+
+        /// <summary>
+        /// Dl Manual Operation Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlManualOperationEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x001,
+            ThumbturnLock = 0x002,
+            ThumbturnUnlock = 0x004,
+            OneTouchLock = 0x008,
+            KeyLock = 0x010,
+            KeyUnlock = 0x020,
+            AutoLock = 0x040,
+            ScheduleLock = 0x080,
+            ScheduleUnlock = 0x100,
+            ManualLock = 0x200,
+            ManualUnlock = 0x400,
+        }
+
+        /// <summary>
+        /// Dl RFID Operation Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlRFIDOperationEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            Lock = 0x02,
+            Unlock = 0x04,
+            LockInvalidRFID = 0x08,
+            LockInvalidSchedule = 0x10,
+            UnlockInvalidRFID = 0x20,
+            UnlockInvalidSchedule = 0x40,
+        }
+
+        /// <summary>
+        /// Dl Keypad Programming Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlKeypadProgrammingEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            ProgrammingPINChanged = 0x02,
+            PINAdded = 0x04,
+            PINCleared = 0x08,
+            PINChanged = 0x10,
+        }
+
+        /// <summary>
+        /// Dl Remote Programming Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlRemoteProgrammingEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            ProgrammingPINChanged = 0x02,
+            PINAdded = 0x04,
+            PINCleared = 0x08,
+            PINChanged = 0x10,
+            RFIDCodeAdded = 0x20,
+            RFIDCodeCleared = 0x40,
+        }
+
+        /// <summary>
+        /// Dl RFID Programming Event Mask
+        /// </summary>
+        [Flags]
+        public enum DlRFIDProgrammingEventMask : ushort {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Unknown = 0x01,
+            RFIDCodeAdded = 0x20,
+            RFIDCodeCleared = 0x40,
+        }
+
+        /// <summary>
+        /// Door Lock Day Of Week
+        /// </summary>
+        [Flags]
+        public enum DoorLockDayOfWeek : byte {
+            /// <summary>
+            /// Nothing Set
+            /// </summary>
+            None = 0,
+            Sunday = 0x01,
+            Monday = 0x02,
+            Tuesday = 0x04,
+            Wednesday = 0x08,
+            Thursday = 0x10,
+            Friday = 0x20,
+            Saturday = 0x40,
         }
         #endregion Enums
 
@@ -824,11 +866,11 @@ namespace MatterDotNet.Clusters.Application
             [SetsRequiredMembers]
             public Credential(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                CredentialType = (CredentialTypeEnum)reader.GetUShort(0)!.Value;
+                CredentialType = (CredentialType)reader.GetUShort(0)!.Value;
                 CredentialIndex = reader.GetUShort(1)!.Value;
             }
-            public required CredentialTypeEnum CredentialType { get; set; }
-            public required ushort CredentialIndex { get; set; } = 0;
+            public required CredentialType CredentialType { get; set; }
+            public required ushort CredentialIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)CredentialType);
@@ -871,94 +913,23 @@ namespace MatterDotNet.Clusters.Application
             }
         }
 
-        private record SetPINCodePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.OccupiedEnabled;
-            public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
-            public required byte[] PIN { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.WriteUShort(1, (ushort?)UserStatus);
-                writer.WriteUShort(2, (ushort?)UserType);
-                writer.WriteBytes(3, PIN);
-                writer.EndContainer();
-            }
-        }
-
-        private record GetPINCodePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Get PIN Code Response - Reply from server
-        /// </summary>
-        public struct GetPINCodeResponse() {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.Available;
-            public required UserTypeEnum? UserType { get; set; }
-            public required byte[]? PINCode { get; set; } = [];
-        }
-
-        private record ClearPINCodePayload : TLVPayload {
-            public required ushort PINSlotIndex { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, PINSlotIndex, ushort.MaxValue, 1);
-                writer.EndContainer();
-            }
-        }
-
-        private record SetUserStatusPayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum UserStatus { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.WriteUShort(1, (ushort)UserStatus);
-                writer.EndContainer();
-            }
-        }
-
-        private record GetUserStatusPayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Get User Status Response - Reply from server
-        /// </summary>
-        public struct GetUserStatusResponse() {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum UserStatus { get; set; }
-        }
-
         private record SetWeekDaySchedulePayload : TLVPayload {
             public required byte WeekDayIndex { get; set; }
             public required ushort UserIndex { get; set; }
-            public required DaysMaskBitmap DaysMask { get; set; }
+            public required DaysMaskMap DaysMask { get; set; }
             public required byte StartHour { get; set; }
             public required byte StartMinute { get; set; }
             public required byte EndHour { get; set; }
             public required byte EndMinute { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, WeekDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
-                writer.WriteUShort(2, (ushort)DaysMask);
-                writer.WriteByte(3, StartHour, 23);
-                writer.WriteByte(4, StartMinute, 59);
-                writer.WriteByte(5, EndHour, 23);
-                writer.WriteByte(6, EndMinute, 59);
+                writer.WriteByte(0, WeekDayIndex);
+                writer.WriteUShort(1, UserIndex);
+                writer.WriteUInt(2, (uint)DaysMask);
+                writer.WriteByte(3, StartHour);
+                writer.WriteByte(4, StartMinute);
+                writer.WriteByte(5, EndHour);
+                writer.WriteByte(6, EndMinute);
                 writer.EndContainer();
             }
         }
@@ -968,8 +939,8 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, WeekDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, WeekDayIndex);
+                writer.WriteUShort(1, UserIndex);
                 writer.EndContainer();
             }
         }
@@ -980,8 +951,8 @@ namespace MatterDotNet.Clusters.Application
         public struct GetWeekDayScheduleResponse() {
             public required byte WeekDayIndex { get; set; }
             public required ushort UserIndex { get; set; }
-            public required IMStatusCode Status { get; set; } = IMStatusCode.SUCCESS;
-            public DaysMaskBitmap? DaysMask { get; set; }
+            public required DlStatus Status { get; set; }
+            public DaysMaskMap? DaysMask { get; set; }
             public byte? StartHour { get; set; }
             public byte? StartMinute { get; set; }
             public byte? EndHour { get; set; }
@@ -993,8 +964,8 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, WeekDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, WeekDayIndex);
+                writer.WriteUShort(1, UserIndex);
                 writer.EndContainer();
             }
         }
@@ -1006,8 +977,8 @@ namespace MatterDotNet.Clusters.Application
             public required DateTime LocalEndTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, YearDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, YearDayIndex);
+                writer.WriteUShort(1, UserIndex);
                 writer.WriteUInt(2, TimeUtil.ToEpochSeconds(LocalStartTime));
                 writer.WriteUInt(3, TimeUtil.ToEpochSeconds(LocalEndTime));
                 writer.EndContainer();
@@ -1019,8 +990,8 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, YearDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, YearDayIndex);
+                writer.WriteUShort(1, UserIndex);
                 writer.EndContainer();
             }
         }
@@ -1031,7 +1002,7 @@ namespace MatterDotNet.Clusters.Application
         public struct GetYearDayScheduleResponse() {
             public required byte YearDayIndex { get; set; }
             public required ushort UserIndex { get; set; }
-            public required IMStatusCode Status { get; set; } = IMStatusCode.SUCCESS;
+            public required DlStatus Status { get; set; }
             public DateTime? LocalStartTime { get; set; }
             public DateTime? LocalEndTime { get; set; }
         }
@@ -1041,8 +1012,8 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, YearDayIndex, byte.MaxValue, 1);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, YearDayIndex);
+                writer.WriteUShort(1, UserIndex);
                 writer.EndContainer();
             }
         }
@@ -1051,10 +1022,10 @@ namespace MatterDotNet.Clusters.Application
             public required byte HolidayIndex { get; set; }
             public required DateTime LocalStartTime { get; set; }
             public required DateTime LocalEndTime { get; set; }
-            public required OperatingModeEnum OperatingMode { get; set; }
+            public required OperatingMode OperatingMode { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, HolidayIndex, byte.MaxValue, 1);
+                writer.WriteByte(0, HolidayIndex);
                 writer.WriteUInt(1, TimeUtil.ToEpochSeconds(LocalStartTime));
                 writer.WriteUInt(2, TimeUtil.ToEpochSeconds(LocalEndTime));
                 writer.WriteUShort(3, (ushort)OperatingMode);
@@ -1066,7 +1037,7 @@ namespace MatterDotNet.Clusters.Application
             public required byte HolidayIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, HolidayIndex, byte.MaxValue, 1);
+                writer.WriteByte(0, HolidayIndex);
                 writer.EndContainer();
             }
         }
@@ -1076,105 +1047,34 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public struct GetHolidayScheduleResponse() {
             public required byte HolidayIndex { get; set; }
-            public required IMStatusCode Status { get; set; } = IMStatusCode.SUCCESS;
+            public required DlStatus Status { get; set; }
             public DateTime? LocalStartTime { get; set; }
             public DateTime? LocalEndTime { get; set; }
-            public OperatingModeEnum? OperatingMode { get; set; }
+            public OperatingMode? OperatingMode { get; set; }
         }
 
         private record ClearHolidaySchedulePayload : TLVPayload {
             public required byte HolidayIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteByte(0, HolidayIndex, byte.MaxValue, 1);
-                writer.EndContainer();
-            }
-        }
-
-        private record SetUserTypePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            public required UserTypeEnum UserType { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.WriteUShort(1, (ushort)UserType);
-                writer.EndContainer();
-            }
-        }
-
-        private record GetUserTypePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Get User Type Response - Reply from server
-        /// </summary>
-        public struct GetUserTypeResponse() {
-            public required ushort UserID { get; set; }
-            public required UserTypeEnum UserType { get; set; }
-        }
-
-        private record SetRFIDCodePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.OccupiedEnabled;
-            public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
-            public required byte[] RFIDCode { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.WriteUShort(1, (ushort?)UserStatus);
-                writer.WriteUShort(2, (ushort?)UserType);
-                writer.WriteBytes(3, RFIDCode);
-                writer.EndContainer();
-            }
-        }
-
-        private record GetRFIDCodePayload : TLVPayload {
-            public required ushort UserID { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserID);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Get RFID Code Response - Reply from server
-        /// </summary>
-        public struct GetRFIDCodeResponse() {
-            public required ushort UserID { get; set; }
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.Available;
-            public required UserTypeEnum? UserType { get; set; }
-            public required byte[]? RFIDCode { get; set; } = [];
-        }
-
-        private record ClearRFIDCodePayload : TLVPayload {
-            public required ushort RFIDSlotIndex { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteUShort(0, RFIDSlotIndex, ushort.MaxValue, 1);
+                writer.WriteByte(0, HolidayIndex);
                 writer.EndContainer();
             }
         }
 
         private record SetUserPayload : TLVPayload {
-            public required DataOperationTypeEnum OperationType { get; set; }
+            public required DataOperationType OperationType { get; set; }
             public required ushort UserIndex { get; set; }
-            public required string? UserName { get; set; } = "";
-            public required uint? UserUniqueID { get; set; } = 0xFFFFFFFF;
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.OccupiedEnabled;
-            public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
-            public required CredentialRuleEnum? CredentialRule { get; set; } = CredentialRuleEnum.Single;
+            public required string? UserName { get; set; }
+            public required uint? UserUniqueID { get; set; }
+            public required UserStatus? UserStatus { get; set; }
+            public required UserType? UserType { get; set; }
+            public required CredentialRule? CredentialRule { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)OperationType);
-                writer.WriteUShort(1, UserIndex, ushort.MaxValue, 1);
-                writer.WriteString(2, UserName, 10);
+                writer.WriteUShort(1, UserIndex);
+                writer.WriteString(2, UserName);
                 writer.WriteUInt(3, UserUniqueID);
                 writer.WriteUShort(4, (ushort?)UserStatus);
                 writer.WriteUShort(5, (ushort?)UserType);
@@ -1187,7 +1087,7 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserIndex, ushort.MaxValue, 1);
+                writer.WriteUShort(0, UserIndex);
                 writer.EndContainer();
             }
         }
@@ -1197,11 +1097,11 @@ namespace MatterDotNet.Clusters.Application
         /// </summary>
         public struct GetUserResponse() {
             public required ushort UserIndex { get; set; }
-            public required string? UserName { get; set; } = "";
-            public required uint? UserUniqueID { get; set; } = 0;
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.Available;
-            public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
-            public required CredentialRuleEnum? CredentialRule { get; set; } = CredentialRuleEnum.Single;
+            public required string? UserName { get; set; }
+            public required uint? UserUniqueID { get; set; }
+            public required UserStatus? UserStatus { get; set; }
+            public required UserType? UserType { get; set; }
+            public required CredentialRule? CredentialRule { get; set; }
             public required Credential[]? Credentials { get; set; }
             public required byte? CreatorFabricIndex { get; set; }
             public required byte? LastModifiedFabricIndex { get; set; }
@@ -1212,24 +1112,24 @@ namespace MatterDotNet.Clusters.Application
             public required ushort UserIndex { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, UserIndex, ushort.MaxValue, 1);
+                writer.WriteUShort(0, UserIndex);
                 writer.EndContainer();
             }
         }
 
         private record SetCredentialPayload : TLVPayload {
-            public required DataOperationTypeEnum OperationType { get; set; }
+            public required DataOperationType OperationType { get; set; }
             public required Credential Credential { get; set; }
             public required byte[] CredentialData { get; set; }
             public required ushort? UserIndex { get; set; }
-            public required UserStatusEnum? UserStatus { get; set; } = UserStatusEnum.OccupiedEnabled;
-            public required UserTypeEnum? UserType { get; set; } = UserTypeEnum.UnrestrictedUser;
+            public required UserStatus? UserStatus { get; set; }
+            public required UserType? UserType { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)OperationType);
                 Credential.Serialize(writer, 1);
                 writer.WriteBytes(2, CredentialData);
-                writer.WriteUShort(3, UserIndex, ushort.MaxValue, 1);
+                writer.WriteUShort(3, UserIndex);
                 writer.WriteUShort(4, (ushort?)UserStatus);
                 writer.WriteUShort(5, (ushort?)UserType);
                 writer.EndContainer();
@@ -1240,9 +1140,9 @@ namespace MatterDotNet.Clusters.Application
         /// Set Credential Response - Reply from server
         /// </summary>
         public struct SetCredentialResponse() {
-            public required IMStatusCode Status { get; set; }
-            public required ushort? UserIndex { get; set; } = 0;
-            public ushort? NextCredentialIndex { get; set; }
+            public required DlStatus Status { get; set; }
+            public required ushort? UserIndex { get; set; }
+            public required ushort? NextCredentialIndex { get; set; }
         }
 
         private record GetCredentialStatusPayload : TLVPayload {
@@ -1262,7 +1162,7 @@ namespace MatterDotNet.Clusters.Application
             public required ushort? UserIndex { get; set; }
             public required byte? CreatorFabricIndex { get; set; }
             public required byte? LastModifiedFabricIndex { get; set; }
-            public ushort? NextCredentialIndex { get; set; }
+            public required ushort? NextCredentialIndex { get; set; }
             public byte[]? CredentialData { get; set; }
         }
 
@@ -1309,157 +1209,70 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Lock Door
         /// </summary>
-        public async Task<bool> LockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? PINCode) {
+        public async Task<bool> LockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
             LockDoorPayload requestFields = new LockDoorPayload() {
-                PINCode = PINCode,
+                PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unlock Door
         /// </summary>
-        public async Task<bool> UnlockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? PINCode) {
+        public async Task<bool> UnlockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
             UnlockDoorPayload requestFields = new UnlockDoorPayload() {
-                PINCode = PINCode,
+                PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Toggle
-        /// </summary>
-        public async Task<bool> Toggle(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 1, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unlock With Timeout
         /// </summary>
-        public async Task<bool> UnlockWithTimeout(SecureSession session, ushort commandTimeoutMS, ushort Timeout, byte[]? PINCode) {
+        public async Task<bool> UnlockWithTimeout(SecureSession session, ushort commandTimeoutMS, ushort timeout, byte[]? pINCode) {
             UnlockWithTimeoutPayload requestFields = new UnlockWithTimeoutPayload() {
-                Timeout = Timeout,
-                PINCode = PINCode,
+                Timeout = timeout,
+                PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 3, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Set PIN Code
-        /// </summary>
-        public async Task<bool> SetPINCode(SecureSession session, ushort commandTimeoutMS, ushort UserID, UserStatusEnum UserStatus, UserTypeEnum UserType, byte[] PIN) {
-            SetPINCodePayload requestFields = new SetPINCodePayload() {
-                UserID = UserID,
-                UserStatus = UserStatus,
-                UserType = UserType,
-                PIN = PIN,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Get PIN Code
-        /// </summary>
-        public async Task<GetPINCodeResponse?> GetPINCode(SecureSession session, ushort UserID) {
-            GetPINCodePayload requestFields = new GetPINCodePayload() {
-                UserID = UserID,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
-            if (!ValidateResponse(resp))
-                return null;
-            return new GetPINCodeResponse() {
-                UserID = (ushort)GetField(resp, 0),
-                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 1),
-                UserType = (UserTypeEnum?)(byte)GetField(resp, 2),
-                PINCode = (byte[]?)GetField(resp, 3),
-            };
-        }
-
-        /// <summary>
-        /// Clear PIN Code
-        /// </summary>
-        public async Task<bool> ClearPINCode(SecureSession session, ushort commandTimeoutMS, ushort PINSlotIndex) {
-            ClearPINCodePayload requestFields = new ClearPINCodePayload() {
-                PINSlotIndex = PINSlotIndex,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x07, commandTimeoutMS, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Clear All PIN Codes
-        /// </summary>
-        public async Task<bool> ClearAllPINCodes(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x08, commandTimeoutMS);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Set User Status
-        /// </summary>
-        public async Task<bool> SetUserStatus(SecureSession session, ushort UserID, UserStatusEnum UserStatus) {
-            SetUserStatusPayload requestFields = new SetUserStatusPayload() {
-                UserID = UserID,
-                UserStatus = UserStatus,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Get User Status
-        /// </summary>
-        public async Task<GetUserStatusResponse?> GetUserStatus(SecureSession session, ushort UserID) {
-            GetUserStatusPayload requestFields = new GetUserStatusPayload() {
-                UserID = UserID,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
-            if (!ValidateResponse(resp))
-                return null;
-            return new GetUserStatusResponse() {
-                UserID = (ushort)GetField(resp, 0),
-                UserStatus = (UserStatusEnum)(byte)GetField(resp, 1),
-            };
         }
 
         /// <summary>
         /// Set Week Day Schedule
         /// </summary>
-        public async Task<bool> SetWeekDaySchedule(SecureSession session, byte WeekDayIndex, ushort UserIndex, DaysMaskBitmap DaysMask, byte StartHour, byte StartMinute, byte EndHour, byte EndMinute) {
+        public async Task<bool> SetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex, DaysMaskMap daysMask, byte startHour, byte startMinute, byte endHour, byte endMinute) {
             SetWeekDaySchedulePayload requestFields = new SetWeekDaySchedulePayload() {
-                WeekDayIndex = WeekDayIndex,
-                UserIndex = UserIndex,
-                DaysMask = DaysMask,
-                StartHour = StartHour,
-                StartMinute = StartMinute,
-                EndHour = EndHour,
-                EndMinute = EndMinute,
+                WeekDayIndex = weekDayIndex,
+                UserIndex = userIndex,
+                DaysMask = daysMask,
+                StartHour = startHour,
+                StartMinute = startMinute,
+                EndHour = endHour,
+                EndMinute = endMinute,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 11, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Week Day Schedule
         /// </summary>
-        public async Task<GetWeekDayScheduleResponse?> GetWeekDaySchedule(SecureSession session, byte WeekDayIndex, ushort UserIndex) {
+        public async Task<GetWeekDayScheduleResponse?> GetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex) {
             GetWeekDaySchedulePayload requestFields = new GetWeekDaySchedulePayload() {
-                WeekDayIndex = WeekDayIndex,
-                UserIndex = UserIndex,
+                WeekDayIndex = weekDayIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0C, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 12, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetWeekDayScheduleResponse() {
                 WeekDayIndex = (byte)GetField(resp, 0),
                 UserIndex = (ushort)GetField(resp, 1),
-                Status = (IMStatusCode)(byte)GetField(resp, 2),
-                DaysMask = (DaysMaskBitmap?)(byte?)GetOptionalField(resp, 3),
+                Status = (DlStatus)(byte)GetField(resp, 2),
+                DaysMask = (DaysMaskMap?)(byte?)GetOptionalField(resp, 3),
                 StartHour = (byte?)GetOptionalField(resp, 4),
                 StartMinute = (byte?)GetOptionalField(resp, 5),
                 EndHour = (byte?)GetOptionalField(resp, 6),
@@ -1470,219 +1283,140 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Clear Week Day Schedule
         /// </summary>
-        public async Task<bool> ClearWeekDaySchedule(SecureSession session, byte WeekDayIndex, ushort UserIndex) {
+        public async Task<bool> ClearWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex) {
             ClearWeekDaySchedulePayload requestFields = new ClearWeekDaySchedulePayload() {
-                WeekDayIndex = WeekDayIndex,
-                UserIndex = UserIndex,
+                WeekDayIndex = weekDayIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0D, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 13, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Year Day Schedule
         /// </summary>
-        public async Task<bool> SetYearDaySchedule(SecureSession session, byte YearDayIndex, ushort UserIndex, DateTime LocalStartTime, DateTime LocalEndTime) {
+        public async Task<bool> SetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex, DateTime localStartTime, DateTime localEndTime) {
             SetYearDaySchedulePayload requestFields = new SetYearDaySchedulePayload() {
-                YearDayIndex = YearDayIndex,
-                UserIndex = UserIndex,
-                LocalStartTime = LocalStartTime,
-                LocalEndTime = LocalEndTime,
+                YearDayIndex = yearDayIndex,
+                UserIndex = userIndex,
+                LocalStartTime = localStartTime,
+                LocalEndTime = localEndTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0E, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 14, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Year Day Schedule
         /// </summary>
-        public async Task<GetYearDayScheduleResponse?> GetYearDaySchedule(SecureSession session, byte YearDayIndex, ushort UserIndex) {
+        public async Task<GetYearDayScheduleResponse?> GetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex) {
             GetYearDaySchedulePayload requestFields = new GetYearDaySchedulePayload() {
-                YearDayIndex = YearDayIndex,
-                UserIndex = UserIndex,
+                YearDayIndex = yearDayIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0F, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 15, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetYearDayScheduleResponse() {
                 YearDayIndex = (byte)GetField(resp, 0),
                 UserIndex = (ushort)GetField(resp, 1),
-                Status = (IMStatusCode)(byte)GetField(resp, 2),
-                LocalStartTime = (DateTime?)GetOptionalField(resp, 2),
-                LocalEndTime = (DateTime?)GetOptionalField(resp, 3),
+                Status = (DlStatus)(byte)GetField(resp, 2),
+                LocalStartTime = (DateTime?)GetOptionalField(resp, 3),
+                LocalEndTime = (DateTime?)GetOptionalField(resp, 4),
             };
         }
 
         /// <summary>
         /// Clear Year Day Schedule
         /// </summary>
-        public async Task<bool> ClearYearDaySchedule(SecureSession session, byte YearDayIndex, ushort UserIndex) {
+        public async Task<bool> ClearYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex) {
             ClearYearDaySchedulePayload requestFields = new ClearYearDaySchedulePayload() {
-                YearDayIndex = YearDayIndex,
-                UserIndex = UserIndex,
+                YearDayIndex = yearDayIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x10, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 16, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Holiday Schedule
         /// </summary>
-        public async Task<bool> SetHolidaySchedule(SecureSession session, byte HolidayIndex, DateTime LocalStartTime, DateTime LocalEndTime, OperatingModeEnum OperatingMode) {
+        public async Task<bool> SetHolidaySchedule(SecureSession session, byte holidayIndex, DateTime localStartTime, DateTime localEndTime, OperatingMode operatingMode) {
             SetHolidaySchedulePayload requestFields = new SetHolidaySchedulePayload() {
-                HolidayIndex = HolidayIndex,
-                LocalStartTime = LocalStartTime,
-                LocalEndTime = LocalEndTime,
-                OperatingMode = OperatingMode,
+                HolidayIndex = holidayIndex,
+                LocalStartTime = localStartTime,
+                LocalEndTime = localEndTime,
+                OperatingMode = operatingMode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x11, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 17, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Holiday Schedule
         /// </summary>
-        public async Task<GetHolidayScheduleResponse?> GetHolidaySchedule(SecureSession session, byte HolidayIndex) {
+        public async Task<GetHolidayScheduleResponse?> GetHolidaySchedule(SecureSession session, byte holidayIndex) {
             GetHolidaySchedulePayload requestFields = new GetHolidaySchedulePayload() {
-                HolidayIndex = HolidayIndex,
+                HolidayIndex = holidayIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x12, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 18, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetHolidayScheduleResponse() {
                 HolidayIndex = (byte)GetField(resp, 0),
-                Status = (IMStatusCode)(byte)GetField(resp, 1),
+                Status = (DlStatus)(byte)GetField(resp, 1),
                 LocalStartTime = (DateTime?)GetOptionalField(resp, 2),
                 LocalEndTime = (DateTime?)GetOptionalField(resp, 3),
-                OperatingMode = (OperatingModeEnum?)(byte?)GetOptionalField(resp, 4),
+                OperatingMode = (OperatingMode?)(byte?)GetOptionalField(resp, 4),
             };
         }
 
         /// <summary>
         /// Clear Holiday Schedule
         /// </summary>
-        public async Task<bool> ClearHolidaySchedule(SecureSession session, byte HolidayIndex) {
+        public async Task<bool> ClearHolidaySchedule(SecureSession session, byte holidayIndex) {
             ClearHolidaySchedulePayload requestFields = new ClearHolidaySchedulePayload() {
-                HolidayIndex = HolidayIndex,
+                HolidayIndex = holidayIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x13, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Set User Type
-        /// </summary>
-        public async Task<bool> SetUserType(SecureSession session, ushort UserID, UserTypeEnum UserType) {
-            SetUserTypePayload requestFields = new SetUserTypePayload() {
-                UserID = UserID,
-                UserType = UserType,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x14, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Get User Type
-        /// </summary>
-        public async Task<GetUserTypeResponse?> GetUserType(SecureSession session, ushort UserID) {
-            GetUserTypePayload requestFields = new GetUserTypePayload() {
-                UserID = UserID,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x15, requestFields);
-            if (!ValidateResponse(resp))
-                return null;
-            return new GetUserTypeResponse() {
-                UserID = (ushort)GetField(resp, 0),
-                UserType = (UserTypeEnum)(byte)GetField(resp, 1),
-            };
-        }
-
-        /// <summary>
-        /// Set RFID Code
-        /// </summary>
-        public async Task<bool> SetRFIDCode(SecureSession session, ushort commandTimeoutMS, ushort UserID, UserStatusEnum UserStatus, UserTypeEnum UserType, byte[] RFIDCode) {
-            SetRFIDCodePayload requestFields = new SetRFIDCodePayload() {
-                UserID = UserID,
-                UserStatus = UserStatus,
-                UserType = UserType,
-                RFIDCode = RFIDCode,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x16, commandTimeoutMS, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Get RFID Code
-        /// </summary>
-        public async Task<GetRFIDCodeResponse?> GetRFIDCode(SecureSession session, ushort UserID) {
-            GetRFIDCodePayload requestFields = new GetRFIDCodePayload() {
-                UserID = UserID,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x17, requestFields);
-            if (!ValidateResponse(resp))
-                return null;
-            return new GetRFIDCodeResponse() {
-                UserID = (ushort)GetField(resp, 0),
-                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 1),
-                UserType = (UserTypeEnum?)(byte)GetField(resp, 2),
-                RFIDCode = (byte[]?)GetField(resp, 3),
-            };
-        }
-
-        /// <summary>
-        /// Clear RFID Code
-        /// </summary>
-        public async Task<bool> ClearRFIDCode(SecureSession session, ushort commandTimeoutMS, ushort RFIDSlotIndex) {
-            ClearRFIDCodePayload requestFields = new ClearRFIDCodePayload() {
-                RFIDSlotIndex = RFIDSlotIndex,
-            };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x18, commandTimeoutMS, requestFields);
-            return ValidateResponse(resp);
-        }
-
-        /// <summary>
-        /// Clear All RFID Codes
-        /// </summary>
-        public async Task<bool> ClearAllRFIDCodes(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x19, commandTimeoutMS);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 19, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set User
         /// </summary>
-        public async Task<bool> SetUser(SecureSession session, ushort commandTimeoutMS, DataOperationTypeEnum OperationType, ushort UserIndex, string UserName, uint UserUniqueID, UserStatusEnum UserStatus, UserTypeEnum UserType, CredentialRuleEnum CredentialRule) {
+        public async Task<bool> SetUser(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, ushort userIndex, string? userName, uint? userUniqueID, UserStatus? userStatus, UserType? userType, CredentialRule? credentialRule) {
             SetUserPayload requestFields = new SetUserPayload() {
-                OperationType = OperationType,
-                UserIndex = UserIndex,
-                UserName = UserName,
-                UserUniqueID = UserUniqueID,
-                UserStatus = UserStatus,
-                UserType = UserType,
-                CredentialRule = CredentialRule,
+                OperationType = operationType,
+                UserIndex = userIndex,
+                UserName = userName,
+                UserUniqueID = userUniqueID,
+                UserStatus = userStatus,
+                UserType = userType,
+                CredentialRule = credentialRule,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x1A, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 26, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get User
         /// </summary>
-        public async Task<GetUserResponse?> GetUser(SecureSession session, ushort UserIndex) {
+        public async Task<GetUserResponse?> GetUser(SecureSession session, ushort userIndex) {
             GetUserPayload requestFields = new GetUserPayload() {
-                UserIndex = UserIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x1B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 27, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetUserResponse() {
                 UserIndex = (ushort)GetField(resp, 0),
                 UserName = (string?)GetField(resp, 1),
                 UserUniqueID = (uint?)GetField(resp, 2),
-                UserStatus = (UserStatusEnum?)(byte)GetField(resp, 3),
-                UserType = (UserTypeEnum?)(byte)GetField(resp, 4),
-                CredentialRule = (CredentialRuleEnum?)(byte)GetField(resp, 5),
-                Credentials = GetArrayField<Credential>(resp, 6),
+                UserStatus = (UserStatus?)(byte)GetField(resp, 3),
+                UserType = (UserType?)(byte)GetField(resp, 4),
+                CredentialRule = (CredentialRule?)(byte)GetField(resp, 5),
+                Credentials = GetOptionalArrayField<Credential>(resp, 6),
                 CreatorFabricIndex = (byte?)GetField(resp, 7),
                 LastModifiedFabricIndex = (byte?)GetField(resp, 8),
                 NextUserIndex = (ushort?)GetField(resp, 9),
@@ -1692,44 +1426,44 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Clear User
         /// </summary>
-        public async Task<bool> ClearUser(SecureSession session, ushort commandTimeoutMS, ushort UserIndex) {
+        public async Task<bool> ClearUser(SecureSession session, ushort commandTimeoutMS, ushort userIndex) {
             ClearUserPayload requestFields = new ClearUserPayload() {
-                UserIndex = UserIndex,
+                UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x1D, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 29, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Credential
         /// </summary>
-        public async Task<SetCredentialResponse?> SetCredential(SecureSession session, ushort commandTimeoutMS, DataOperationTypeEnum OperationType, Credential Credential, byte[] CredentialData, ushort UserIndex, UserStatusEnum UserStatus, UserTypeEnum UserType) {
+        public async Task<SetCredentialResponse?> SetCredential(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, Credential credential, byte[] credentialData, ushort? userIndex, UserStatus? userStatus, UserType? userType) {
             SetCredentialPayload requestFields = new SetCredentialPayload() {
-                OperationType = OperationType,
-                Credential = Credential,
-                CredentialData = CredentialData,
-                UserIndex = UserIndex,
-                UserStatus = UserStatus,
-                UserType = UserType,
+                OperationType = operationType,
+                Credential = credential,
+                CredentialData = credentialData,
+                UserIndex = userIndex,
+                UserStatus = userStatus,
+                UserType = userType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x22, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 34, commandTimeoutMS, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new SetCredentialResponse() {
-                Status = (IMStatusCode)(byte)GetField(resp, 0),
+                Status = (DlStatus)(byte)GetField(resp, 0),
                 UserIndex = (ushort?)GetField(resp, 1),
-                NextCredentialIndex = (ushort?)GetOptionalField(resp, 2),
+                NextCredentialIndex = (ushort?)GetField(resp, 2),
             };
         }
 
         /// <summary>
         /// Get Credential Status
         /// </summary>
-        public async Task<GetCredentialStatusResponse?> GetCredentialStatus(SecureSession session, Credential Credential) {
+        public async Task<GetCredentialStatusResponse?> GetCredentialStatus(SecureSession session, Credential credential) {
             GetCredentialStatusPayload requestFields = new GetCredentialStatusPayload() {
-                Credential = Credential,
+                Credential = credential,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x24, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 36, requestFields);
             if (!ValidateResponse(resp))
                 return null;
             return new GetCredentialStatusResponse() {
@@ -1737,7 +1471,7 @@ namespace MatterDotNet.Clusters.Application
                 UserIndex = (ushort?)GetField(resp, 1),
                 CreatorFabricIndex = (byte?)GetField(resp, 2),
                 LastModifiedFabricIndex = (byte?)GetField(resp, 3),
-                NextCredentialIndex = (ushort?)GetOptionalField(resp, 4),
+                NextCredentialIndex = (ushort?)GetField(resp, 4),
                 CredentialData = (byte[]?)GetOptionalField(resp, 5),
             };
         }
@@ -1745,36 +1479,36 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Clear Credential
         /// </summary>
-        public async Task<bool> ClearCredential(SecureSession session, ushort commandTimeoutMS, Credential Credential) {
+        public async Task<bool> ClearCredential(SecureSession session, ushort commandTimeoutMS, Credential? credential) {
             ClearCredentialPayload requestFields = new ClearCredentialPayload() {
-                Credential = Credential,
+                Credential = credential,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x26, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 38, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unbolt Door
         /// </summary>
-        public async Task<bool> UnboltDoor(SecureSession session, ushort commandTimeoutMS, byte[]? PINCode) {
+        public async Task<bool> UnboltDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
             UnboltDoorPayload requestFields = new UnboltDoorPayload() {
-                PINCode = PINCode,
+                PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x27, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 39, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Aliro Reader Config
         /// </summary>
-        public async Task<bool> SetAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, byte[] SigningKey, byte[] VerificationKey, byte[] GroupIdentifier, byte[]? GroupResolvingKey) {
+        public async Task<bool> SetAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, byte[] signingKey, byte[] verificationKey, byte[] groupIdentifier, byte[]? groupResolvingKey) {
             SetAliroReaderConfigPayload requestFields = new SetAliroReaderConfigPayload() {
-                SigningKey = SigningKey,
-                VerificationKey = VerificationKey,
-                GroupIdentifier = GroupIdentifier,
-                GroupResolvingKey = GroupResolvingKey,
+                SigningKey = signingKey,
+                VerificationKey = verificationKey,
+                GroupIdentifier = groupIdentifier,
+                GroupResolvingKey = groupResolvingKey,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x28, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 40, commandTimeoutMS, requestFields);
             return ValidateResponse(resp);
         }
 
@@ -1782,7 +1516,7 @@ namespace MatterDotNet.Clusters.Application
         /// Clear Aliro Reader Config
         /// </summary>
         public async Task<bool> ClearAliroReaderConfig(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x29, commandTimeoutMS);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 41, commandTimeoutMS);
             return ValidateResponse(resp);
         }
         #endregion Commands
@@ -1812,15 +1546,15 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Lock State attribute
         /// </summary>
-        public async Task<LockStateEnum?> GetLockState(SecureSession session) {
-            return (LockStateEnum?)await GetEnumAttribute(session, 0, true);
+        public async Task<DlLockState?> GetLockState(SecureSession session) {
+            return (DlLockState?)await GetEnumAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Lock Type attribute
         /// </summary>
-        public async Task<LockTypeEnum> GetLockType(SecureSession session) {
-            return (LockTypeEnum)await GetEnumAttribute(session, 1);
+        public async Task<DlLockType> GetLockType(SecureSession session) {
+            return (DlLockType)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
@@ -1833,8 +1567,8 @@ namespace MatterDotNet.Clusters.Application
         /// <summary>
         /// Get the Door State attribute
         /// </summary>
-        public async Task<DoorStateEnum?> GetDoorState(SecureSession session) {
-            return (DoorStateEnum?)await GetEnumAttribute(session, 3, true);
+        public async Task<DoorState?> GetDoorState(SecureSession session) {
+            return (DoorState?)await GetEnumAttribute(session, 3, true);
         }
 
         /// <summary>
@@ -1883,353 +1617,339 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Number Of Total Users Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfTotalUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 23) ?? 0;
         }
 
         /// <summary>
         /// Get the Number Of PIN Users Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfPINUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 18) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 24) ?? 0;
         }
 
         /// <summary>
         /// Get the Number Of RFID Users Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfRFIDUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 25) ?? 0;
         }
 
         /// <summary>
         /// Get the Number Of Week Day Schedules Supported Per User attribute
         /// </summary>
         public async Task<byte> GetNumberOfWeekDaySchedulesSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 20) ?? 0;
+            return (byte?)(dynamic?)await GetAttribute(session, 32) ?? 0;
         }
 
         /// <summary>
         /// Get the Number Of Year Day Schedules Supported Per User attribute
         /// </summary>
         public async Task<byte> GetNumberOfYearDaySchedulesSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 21) ?? 0;
+            return (byte?)(dynamic?)await GetAttribute(session, 33) ?? 0;
         }
 
         /// <summary>
         /// Get the Number Of Holiday Schedules Supported attribute
         /// </summary>
         public async Task<byte> GetNumberOfHolidaySchedulesSupported(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 22) ?? 0;
+            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 0;
         }
 
         /// <summary>
         /// Get the Max PIN Code Length attribute
         /// </summary>
         public async Task<byte> GetMaxPINCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 23))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 35))!;
         }
 
         /// <summary>
         /// Get the Min PIN Code Length attribute
         /// </summary>
         public async Task<byte> GetMinPINCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 24))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 36))!;
         }
 
         /// <summary>
         /// Get the Max RFID Code Length attribute
         /// </summary>
         public async Task<byte> GetMaxRFIDCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 25))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 37))!;
         }
 
         /// <summary>
         /// Get the Min RFID Code Length attribute
         /// </summary>
         public async Task<byte> GetMinRFIDCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 26))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 38))!;
         }
 
         /// <summary>
         /// Get the Credential Rules Support attribute
         /// </summary>
-        public async Task<CredentialRulesBitmap> GetCredentialRulesSupport(SecureSession session) {
-            return (CredentialRulesBitmap)await GetEnumAttribute(session, 27);
+        public async Task<DlCredentialRuleMask> GetCredentialRulesSupport(SecureSession session) {
+            return (DlCredentialRuleMask)await GetEnumAttribute(session, 39);
         }
 
         /// <summary>
         /// Get the Number Of Credentials Supported Per User attribute
         /// </summary>
         public async Task<byte> GetNumberOfCredentialsSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 28) ?? 0;
+            return (byte?)(dynamic?)await GetAttribute(session, 40) ?? 0;
         }
 
         /// <summary>
         /// Get the Language attribute
         /// </summary>
         public async Task<string> GetLanguage(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 33))!;
+            return (string)(dynamic?)(await GetAttribute(session, 51))!;
         }
 
         /// <summary>
         /// Set the Language attribute
         /// </summary>
         public async Task SetLanguage (SecureSession session, string value) {
-            await SetAttribute(session, 33, value);
+            await SetAttribute(session, 51, value);
         }
 
         /// <summary>
         /// Get the LED Settings attribute
         /// </summary>
-        public async Task<LEDSettingEnum> GetLEDSettings(SecureSession session) {
-            return (LEDSettingEnum)await GetEnumAttribute(session, 34);
+        public async Task<byte> GetLEDSettings(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 52) ?? 0;
         }
 
         /// <summary>
         /// Set the LED Settings attribute
         /// </summary>
-        public async Task SetLEDSettings (SecureSession session, LEDSettingEnum value) {
-            await SetAttribute(session, 34, value);
+        public async Task SetLEDSettings (SecureSession session, byte? value = 0) {
+            await SetAttribute(session, 52, value);
         }
 
         /// <summary>
         /// Get the Auto Relock Time attribute
         /// </summary>
         public async Task<uint> GetAutoRelockTime(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 35))!;
+            return (uint)(dynamic?)(await GetAttribute(session, 53))!;
         }
 
         /// <summary>
         /// Set the Auto Relock Time attribute
         /// </summary>
         public async Task SetAutoRelockTime (SecureSession session, uint value) {
-            await SetAttribute(session, 35, value);
+            await SetAttribute(session, 53, value);
         }
 
         /// <summary>
         /// Get the Sound Volume attribute
         /// </summary>
-        public async Task<SoundVolumeEnum> GetSoundVolume(SecureSession session) {
-            return (SoundVolumeEnum)await GetEnumAttribute(session, 36);
+        public async Task<byte> GetSoundVolume(SecureSession session) {
+            return (byte?)(dynamic?)await GetAttribute(session, 54) ?? 0;
         }
 
         /// <summary>
         /// Set the Sound Volume attribute
         /// </summary>
-        public async Task SetSoundVolume (SecureSession session, SoundVolumeEnum value) {
-            await SetAttribute(session, 36, value);
+        public async Task SetSoundVolume (SecureSession session, byte? value = 0) {
+            await SetAttribute(session, 54, value);
         }
 
         /// <summary>
         /// Get the Operating Mode attribute
         /// </summary>
-        public async Task<OperatingModeEnum> GetOperatingMode(SecureSession session) {
-            return (OperatingModeEnum)await GetEnumAttribute(session, 37);
+        public async Task<OperatingMode> GetOperatingMode(SecureSession session) {
+            return (OperatingMode)await GetEnumAttribute(session, 55);
         }
 
         /// <summary>
         /// Set the Operating Mode attribute
         /// </summary>
-        public async Task SetOperatingMode (SecureSession session, OperatingModeEnum value) {
-            await SetAttribute(session, 37, value);
+        public async Task SetOperatingMode (SecureSession session, OperatingMode value) {
+            await SetAttribute(session, 55, value);
         }
 
         /// <summary>
         /// Get the Supported Operating Modes attribute
         /// </summary>
-        public async Task<OperatingModesBitmap> GetSupportedOperatingModes(SecureSession session) {
-            return (OperatingModesBitmap)await GetEnumAttribute(session, 38);
+        public async Task<DlSupportedOperatingModes> GetSupportedOperatingModes(SecureSession session) {
+            return (DlSupportedOperatingModes)await GetEnumAttribute(session, 56);
         }
 
         /// <summary>
         /// Get the Default Configuration Register attribute
         /// </summary>
-        public async Task<ConfigurationRegisterBitmap> GetDefaultConfigurationRegister(SecureSession session) {
-            return (ConfigurationRegisterBitmap)await GetEnumAttribute(session, 39);
+        public async Task<DlDefaultConfigurationRegister> GetDefaultConfigurationRegister(SecureSession session) {
+            return (DlDefaultConfigurationRegister)await GetEnumAttribute(session, 57);
         }
 
         /// <summary>
         /// Get the Enable Local Programming attribute
         /// </summary>
         public async Task<bool> GetEnableLocalProgramming(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 40) ?? true;
+            return (bool?)(dynamic?)await GetAttribute(session, 64) ?? true;
         }
 
         /// <summary>
         /// Set the Enable Local Programming attribute
         /// </summary>
         public async Task SetEnableLocalProgramming (SecureSession session, bool? value = true) {
-            await SetAttribute(session, 40, value);
+            await SetAttribute(session, 64, value);
         }
 
         /// <summary>
         /// Get the Enable One Touch Locking attribute
         /// </summary>
         public async Task<bool> GetEnableOneTouchLocking(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 41) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 65) ?? false;
         }
 
         /// <summary>
         /// Set the Enable One Touch Locking attribute
         /// </summary>
         public async Task SetEnableOneTouchLocking (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 41, value);
+            await SetAttribute(session, 65, value);
         }
 
         /// <summary>
         /// Get the Enable Inside Status LED attribute
         /// </summary>
         public async Task<bool> GetEnableInsideStatusLED(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 42) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 66) ?? false;
         }
 
         /// <summary>
         /// Set the Enable Inside Status LED attribute
         /// </summary>
         public async Task SetEnableInsideStatusLED (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 42, value);
+            await SetAttribute(session, 66, value);
         }
 
         /// <summary>
         /// Get the Enable Privacy Mode Button attribute
         /// </summary>
         public async Task<bool> GetEnablePrivacyModeButton(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 43) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 67) ?? false;
         }
 
         /// <summary>
         /// Set the Enable Privacy Mode Button attribute
         /// </summary>
         public async Task SetEnablePrivacyModeButton (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 43, value);
+            await SetAttribute(session, 67, value);
         }
 
         /// <summary>
         /// Get the Local Programming Features attribute
         /// </summary>
-        public async Task<LocalProgrammingFeaturesBitmap> GetLocalProgrammingFeatures(SecureSession session) {
-            return (LocalProgrammingFeaturesBitmap)await GetEnumAttribute(session, 44);
+        public async Task<DlLocalProgrammingFeatures> GetLocalProgrammingFeatures(SecureSession session) {
+            return (DlLocalProgrammingFeatures)await GetEnumAttribute(session, 68);
         }
 
         /// <summary>
         /// Set the Local Programming Features attribute
         /// </summary>
-        public async Task SetLocalProgrammingFeatures (SecureSession session, LocalProgrammingFeaturesBitmap value) {
-            await SetAttribute(session, 44, value);
+        public async Task SetLocalProgrammingFeatures (SecureSession session, DlLocalProgrammingFeatures value) {
+            await SetAttribute(session, 68, value);
         }
 
         /// <summary>
         /// Get the Wrong Code Entry Limit attribute
         /// </summary>
         public async Task<byte> GetWrongCodeEntryLimit(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 48))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 72))!;
         }
 
         /// <summary>
         /// Set the Wrong Code Entry Limit attribute
         /// </summary>
         public async Task SetWrongCodeEntryLimit (SecureSession session, byte value) {
-            await SetAttribute(session, 48, value);
+            await SetAttribute(session, 72, value);
         }
 
         /// <summary>
         /// Get the User Code Temporary Disable Time attribute
         /// </summary>
         public async Task<byte> GetUserCodeTemporaryDisableTime(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 49))!;
+            return (byte)(dynamic?)(await GetAttribute(session, 73))!;
         }
 
         /// <summary>
         /// Set the User Code Temporary Disable Time attribute
         /// </summary>
         public async Task SetUserCodeTemporaryDisableTime (SecureSession session, byte value) {
-            await SetAttribute(session, 49, value);
+            await SetAttribute(session, 73, value);
         }
 
         /// <summary>
         /// Get the Send PIN Over The Air attribute
         /// </summary>
         public async Task<bool> GetSendPINOverTheAir(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 50) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 80) ?? false;
         }
 
         /// <summary>
         /// Set the Send PIN Over The Air attribute
         /// </summary>
         public async Task SetSendPINOverTheAir (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 50, value);
+            await SetAttribute(session, 80, value);
         }
 
         /// <summary>
         /// Get the Require PI Nfor Remote Operation attribute
         /// </summary>
         public async Task<bool> GetRequirePINforRemoteOperation(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 51) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 81) ?? false;
         }
 
         /// <summary>
         /// Set the Require PI Nfor Remote Operation attribute
         /// </summary>
         public async Task SetRequirePINforRemoteOperation (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 51, value);
+            await SetAttribute(session, 81, value);
         }
 
         /// <summary>
         /// Get the Expiring User Timeout attribute
         /// </summary>
         public async Task<ushort> GetExpiringUserTimeout(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 53))!;
+            return (ushort)(dynamic?)(await GetAttribute(session, 83))!;
         }
 
         /// <summary>
         /// Set the Expiring User Timeout attribute
         /// </summary>
         public async Task SetExpiringUserTimeout (SecureSession session, ushort value) {
-            await SetAttribute(session, 53, value);
-        }
-
-        /// <summary>
-        /// Get the Alarm Mask attribute
-        /// </summary>
-        public async Task<AlarmMaskBitmap> GetAlarmMask(SecureSession session) {
-            return (AlarmMaskBitmap)await GetEnumAttribute(session, 64);
-        }
-
-        /// <summary>
-        /// Set the Alarm Mask attribute
-        /// </summary>
-        public async Task SetAlarmMask (SecureSession session, AlarmMaskBitmap value) {
-            await SetAttribute(session, 64, value);
+            await SetAttribute(session, 83, value);
         }
 
         /// <summary>
         /// Get the Aliro Reader Verification Key attribute
         /// </summary>
         public async Task<byte[]?> GetAliroReaderVerificationKey(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 128, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 296, true);
         }
 
         /// <summary>
         /// Get the Aliro Reader Group Identifier attribute
         /// </summary>
         public async Task<byte[]?> GetAliroReaderGroupIdentifier(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 129, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 297, true);
         }
 
         /// <summary>
         /// Get the Aliro Reader Group Sub Identifier attribute
         /// </summary>
         public async Task<byte[]> GetAliroReaderGroupSubIdentifier(SecureSession session) {
-            return (byte[])(dynamic?)(await GetAttribute(session, 130))!;
+            return (byte[])(dynamic?)(await GetAttribute(session, 304))!;
         }
 
         /// <summary>
         /// Get the Aliro Expedited Transaction Supported Protocol Versions attribute
         /// </summary>
         public async Task<byte[][]> GetAliroExpeditedTransactionSupportedProtocolVersions(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 131))!);
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 305))!);
             byte[][] list = new byte[reader.Count][];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false)!;
+                list[i] = reader.GetBytes(i, false, 16)!;
             return list;
         }
 
@@ -2237,17 +1957,17 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Aliro Group Resolving Key attribute
         /// </summary>
         public async Task<byte[]?> GetAliroGroupResolvingKey(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 132, true) ?? null;
+            return (byte[]?)(dynamic?)await GetAttribute(session, 306, true);
         }
 
         /// <summary>
         /// Get the Aliro Supported BLEUWB Protocol Versions attribute
         /// </summary>
         public async Task<byte[][]> GetAliroSupportedBLEUWBProtocolVersions(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 133))!);
+            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 307))!);
             byte[][] list = new byte[reader.Count][];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false)!;
+                list[i] = reader.GetBytes(i, false, 16)!;
             return list;
         }
 
@@ -2255,27 +1975,27 @@ namespace MatterDotNet.Clusters.Application
         /// Get the Aliro BLE Advertising Version attribute
         /// </summary>
         public async Task<byte> GetAliroBLEAdvertisingVersion(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 134) ?? 0;
+            return (byte)(dynamic?)(await GetAttribute(session, 308))!;
         }
 
         /// <summary>
         /// Get the Number Of Aliro Credential Issuer Keys Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfAliroCredentialIssuerKeysSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 135) ?? 0;
+            return (ushort)(dynamic?)(await GetAttribute(session, 309))!;
         }
 
         /// <summary>
         /// Get the Number Of Aliro Endpoint Keys Supported attribute
         /// </summary>
         public async Task<ushort> GetNumberOfAliroEndpointKeysSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 136) ?? 0;
+            return (ushort)(dynamic?)(await GetAttribute(session, 310))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Door Lock Cluster";
+            return "Door Lock";
         }
     }
 }

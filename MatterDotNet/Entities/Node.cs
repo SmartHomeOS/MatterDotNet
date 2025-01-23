@@ -10,7 +10,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Clusters.Utility;
+using MatterDotNet.Clusters.General;
 using MatterDotNet.OperationalDiscovery;
 using MatterDotNet.PKI;
 using MatterDotNet.Protocol.Connection;
@@ -85,13 +85,13 @@ namespace MatterDotNet.Entities
         /// <exception cref="PlatformNotSupportedException"></exception>
         public async Task<string?> OpenEnhancedCommissioning(SecureSession session, ushort timeoutSec = 300)
         {
-            if (!root.HasCluster<AdministratorCommissioningCluster>())
+            if (!root.HasCluster<AdministratorCommissioning>())
                 throw new PlatformNotSupportedException("Admin commissioning cluster not found");
             uint passcode = Crypto.GeneratePasscode();
             ushort discriminator = (ushort)(Random.Shared.Next() & 0xFFF);
             string pin = CommissioningPayload.GeneratePIN(discriminator, passcode);
             SPAKE2Plus spake = new SPAKE2Plus();
-            AdministratorCommissioningCluster com = root.GetCluster<AdministratorCommissioningCluster>();
+            AdministratorCommissioning com = root.GetCluster<AdministratorCommissioning>();
             byte[] salt = RandomNumberGenerator.GetBytes(32);
             if (!await com.OpenCommissioningWindow(session, 10000, timeoutSec, spake.CommissioneePakeInput(passcode, 10000, salt), discriminator, 10000, salt))
                 return null;
@@ -140,12 +140,12 @@ namespace MatterDotNet.Entities
 
         internal static async Task Populate(SecureSession session, Node node)
         {
-            ushort[] eps = await node.Root.GetCluster<DescriptorCluster>().GetPartsList(session);
+            ushort[] eps = await node.Root.GetCluster<Descriptor>().GetPartsList(session);
             foreach (ushort index in eps)
                 node.Root.AddChild(new EndPoint(index, node));
             foreach (EndPoint child in node.Root.Children)
             {
-                ushort[] childEps = await child.GetCluster<DescriptorCluster>().GetPartsList(session);
+                ushort[] childEps = await child.GetCluster<Descriptor>().GetPartsList(session);
                 foreach (ushort childEp in childEps)
                 {
                     child.AddChild(node.Root.RemoveChild(childEp)!);

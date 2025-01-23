@@ -19,22 +19,22 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// Software Diagnostics Cluster
+    /// The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class SoftwareDiagnosticsCluster : ClusterBase
+    public class SoftwareDiagnostics : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0034;
 
         /// <summary>
-        /// Software Diagnostics Cluster
+        /// The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public SoftwareDiagnosticsCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public SoftwareDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected SoftwareDiagnosticsCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected SoftwareDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -66,13 +66,13 @@ namespace MatterDotNet.Clusters.Utility
             public ThreadMetrics(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ID = reader.GetULong(0)!.Value;
-                Name = reader.GetString(1, true);
+                Name = reader.GetString(1, true, 8);
                 StackFreeCurrent = reader.GetUInt(2, true);
                 StackFreeMinimum = reader.GetUInt(3, true);
                 StackSize = reader.GetUInt(4, true);
             }
             public required ulong ID { get; set; }
-            public string? Name { get; set; } = "";
+            public string? Name { get; set; }
             public uint? StackFreeCurrent { get; set; }
             public uint? StackFreeMinimum { get; set; }
             public uint? StackSize { get; set; }
@@ -142,27 +142,27 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Current Heap Free attribute
         /// </summary>
         public async Task<ulong> GetCurrentHeapFree(SecureSession session) {
-            return (ulong)(dynamic?)(await GetAttribute(session, 1))!;
+            return (ulong?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Current Heap Used attribute
         /// </summary>
         public async Task<ulong> GetCurrentHeapUsed(SecureSession session) {
-            return (ulong)(dynamic?)(await GetAttribute(session, 2))!;
+            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
         }
 
         /// <summary>
         /// Get the Current Heap High Watermark attribute
         /// </summary>
         public async Task<ulong> GetCurrentHeapHighWatermark(SecureSession session) {
-            return (ulong)(dynamic?)(await GetAttribute(session, 3))!;
+            return (ulong?)(dynamic?)await GetAttribute(session, 3) ?? 0x0000000000000000;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Software Diagnostics Cluster";
+            return "Software Diagnostics";
         }
     }
 }

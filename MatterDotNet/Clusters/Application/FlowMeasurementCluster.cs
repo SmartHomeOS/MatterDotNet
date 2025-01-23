@@ -15,29 +15,29 @@
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 
-namespace MatterDotNet.Clusters.Application
+namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
     /// <summary>
-    /// Flow Measurement Cluster
+    /// Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 3)]
-    public class FlowMeasurementCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 1)]
+    public class FlowMeasurement : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0404;
 
         /// <summary>
-        /// Flow Measurement Cluster
+        /// Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
         /// </summary>
-        public FlowMeasurementCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public FlowMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected FlowMeasurementCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected FlowMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Attributes
         /// <summary>
         /// Get the Measured Value attribute
         /// </summary>
         public async Task<ushort?> GetMeasuredValue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0, true) ?? null;
+            return (ushort?)(dynamic?)await GetAttribute(session, 0, true);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace MatterDotNet.Clusters.Application
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Flow Measurement Cluster";
+            return "Flow Measurement";
         }
     }
 }

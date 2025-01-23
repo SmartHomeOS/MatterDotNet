@@ -17,28 +17,58 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.Utility
+namespace MatterDotNet.Clusters.CHIP
 {
     /// <summary>
-    /// Basic Information Cluster
+    /// This cluster provides attributes and events for determining basic information about Nodes, which supports both Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number, which apply to the whole Node. Also allows setting user device information such as location.
     /// </summary>
-    [ClusterRevision(CLUSTER_ID, 4)]
-    public class BasicInformationCluster : ClusterBase
+    [ClusterRevision(CLUSTER_ID, 3)]
+    public class BasicInformation : ClusterBase
     {
         internal const uint CLUSTER_ID = 0x0028;
 
         /// <summary>
-        /// Basic Information Cluster
+        /// This cluster provides attributes and events for determining basic information about Nodes, which supports both Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number, which apply to the whole Node. Also allows setting user device information such as location.
         /// </summary>
-        public BasicInformationCluster(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public BasicInformation(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BasicInformationCluster(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected BasicInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
+        /// Product Finish
+        /// </summary>
+        public enum ProductFinish : byte {
+            /// <summary>
+            /// Product has some other finish not listed below.
+            /// </summary>
+            Other = 0,
+            /// <summary>
+            /// Product has a matte finish.
+            /// </summary>
+            Matte = 1,
+            /// <summary>
+            /// Product has a satin finish.
+            /// </summary>
+            Satin = 2,
+            /// <summary>
+            /// Product has a polished or shiny finish.
+            /// </summary>
+            Polished = 3,
+            /// <summary>
+            /// Product has a rugged finish.
+            /// </summary>
+            Rugged = 4,
+            /// <summary>
+            /// Product has a fabric finish.
+            /// </summary>
+            Fabric = 5,
+        }
+
+        /// <summary>
         /// Color
         /// </summary>
-        public enum ColorEnum {
+        public enum Color : byte {
             /// <summary>
             /// Approximately RGB #000000.
             /// </summary>
@@ -100,59 +130,29 @@ namespace MatterDotNet.Clusters.Utility
             /// </summary>
             White = 14,
             /// <summary>
-            /// Typical hardware &quot;Nickel&quot; color.
+            /// Typical hardware "Nickel" color.
             /// </summary>
             Nickel = 15,
             /// <summary>
-            /// Typical hardware &quot;Chrome&quot; color.
+            /// Typical hardware "Chrome" color.
             /// </summary>
             Chrome = 16,
             /// <summary>
-            /// Typical hardware &quot;Brass&quot; color.
+            /// Typical hardware "Brass" color.
             /// </summary>
             Brass = 17,
             /// <summary>
-            /// Typical hardware &quot;Copper&quot; color.
+            /// Typical hardware "Copper" color.
             /// </summary>
             Copper = 18,
             /// <summary>
-            /// Typical hardware &quot;Silver&quot; color.
+            /// Typical hardware "Silver" color.
             /// </summary>
             Silver = 19,
             /// <summary>
-            /// Typical hardware &quot;Gold&quot; color.
+            /// Typical hardware "Gold" color.
             /// </summary>
             Gold = 20,
-        }
-
-        /// <summary>
-        /// Product Finish
-        /// </summary>
-        public enum ProductFinishEnum {
-            /// <summary>
-            /// Product has some other finish not listed below.
-            /// </summary>
-            Other = 0,
-            /// <summary>
-            /// Product has a matte finish.
-            /// </summary>
-            Matte = 1,
-            /// <summary>
-            /// Product has a satin finish.
-            /// </summary>
-            Satin = 2,
-            /// <summary>
-            /// Product has a polished or shiny finish.
-            /// </summary>
-            Polished = 3,
-            /// <summary>
-            /// Product has a rugged finish.
-            /// </summary>
-            Rugged = 4,
-            /// <summary>
-            /// Product has a fabric finish.
-            /// </summary>
-            Fabric = 5,
         }
         #endregion Enums
 
@@ -175,12 +175,12 @@ namespace MatterDotNet.Clusters.Utility
                 CaseSessionsPerFabric = reader.GetUShort(0)!.Value;
                 SubscriptionsPerFabric = reader.GetUShort(1)!.Value;
             }
-            public required ushort CaseSessionsPerFabric { get; set; } = 3;
-            public required ushort SubscriptionsPerFabric { get; set; } = 3;
+            public required ushort CaseSessionsPerFabric { get; set; }
+            public required ushort SubscriptionsPerFabric { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteUShort(0, CaseSessionsPerFabric, ushort.MaxValue, 3);
-                writer.WriteUShort(1, SubscriptionsPerFabric, ushort.MaxValue, 3);
+                writer.WriteUShort(0, CaseSessionsPerFabric);
+                writer.WriteUShort(1, SubscriptionsPerFabric);
                 writer.EndContainer();
             }
         }
@@ -200,11 +200,11 @@ namespace MatterDotNet.Clusters.Utility
             [SetsRequiredMembers]
             public ProductAppearance(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Finish = (ProductFinishEnum)reader.GetUShort(0)!.Value;
-                PrimaryColor = (ColorEnum)reader.GetUShort(1)!.Value;
+                Finish = (ProductFinish)reader.GetUShort(0)!.Value;
+                PrimaryColor = (Color)reader.GetUShort(1)!.Value;
             }
-            public required ProductFinishEnum Finish { get; set; }
-            public required ColorEnum? PrimaryColor { get; set; }
+            public required ProductFinish Finish { get; set; }
+            public required Color? PrimaryColor { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)Finish);
@@ -254,13 +254,13 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Node Label attribute
         /// </summary>
         public async Task<string> GetNodeLabel(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 5) ?? "";
+            return (string)(dynamic?)(await GetAttribute(session, 5))!;
         }
 
         /// <summary>
         /// Set the Node Label attribute
         /// </summary>
-        public async Task SetNodeLabel (SecureSession session, string? value = "") {
+        public async Task SetNodeLabel (SecureSession session, string value) {
             await SetAttribute(session, 5, value);
         }
 
@@ -268,13 +268,13 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Location attribute
         /// </summary>
         public async Task<string> GetLocation(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 6) ?? "XX";
+            return (string?)(dynamic?)await GetAttribute(session, 6) ?? "xx";
         }
 
         /// <summary>
         /// Set the Location attribute
         /// </summary>
-        public async Task SetLocation (SecureSession session, string? value = "XX") {
+        public async Task SetLocation (SecureSession session, string? value = "xx") {
             await SetAttribute(session, 6, value);
         }
 
@@ -303,104 +303,104 @@ namespace MatterDotNet.Clusters.Utility
         /// Get the Software Version String attribute
         /// </summary>
         public async Task<string> GetSoftwareVersionString(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 10))!;
+            return (string)(dynamic?)(await GetAttribute(session, 16))!;
         }
 
         /// <summary>
         /// Get the Manufacturing Date attribute
         /// </summary>
         public async Task<string> GetManufacturingDate(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 11))!;
+            return (string)(dynamic?)(await GetAttribute(session, 17))!;
         }
 
         /// <summary>
         /// Get the Part Number attribute
         /// </summary>
         public async Task<string> GetPartNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 12))!;
+            return (string)(dynamic?)(await GetAttribute(session, 18))!;
         }
 
         /// <summary>
         /// Get the Product URL attribute
         /// </summary>
         public async Task<string> GetProductURL(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 13))!;
+            return (string)(dynamic?)(await GetAttribute(session, 19))!;
         }
 
         /// <summary>
         /// Get the Product Label attribute
         /// </summary>
         public async Task<string> GetProductLabel(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 14))!;
+            return (string)(dynamic?)(await GetAttribute(session, 20))!;
         }
 
         /// <summary>
         /// Get the Serial Number attribute
         /// </summary>
         public async Task<string> GetSerialNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 15))!;
+            return (string)(dynamic?)(await GetAttribute(session, 21))!;
         }
 
         /// <summary>
         /// Get the Local Config Disabled attribute
         /// </summary>
         public async Task<bool> GetLocalConfigDisabled(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 16) ?? false;
+            return (bool?)(dynamic?)await GetAttribute(session, 22) ?? false;
         }
 
         /// <summary>
         /// Set the Local Config Disabled attribute
         /// </summary>
         public async Task SetLocalConfigDisabled (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 16, value);
+            await SetAttribute(session, 22, value);
         }
 
         /// <summary>
         /// Get the Reachable attribute
         /// </summary>
         public async Task<bool> GetReachable(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 17) ?? true;
+            return (bool?)(dynamic?)await GetAttribute(session, 23) ?? true;
         }
 
         /// <summary>
         /// Get the Unique ID attribute
         /// </summary>
         public async Task<string> GetUniqueID(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 18))!;
+            return (string)(dynamic?)(await GetAttribute(session, 24))!;
         }
 
         /// <summary>
         /// Get the Capability Minima attribute
         /// </summary>
         public async Task<CapabilityMinima> GetCapabilityMinima(SecureSession session) {
-            return new CapabilityMinima((object[])(await GetAttribute(session, 19))!);
+            return new CapabilityMinima((object[])(await GetAttribute(session, 25))!);
         }
 
         /// <summary>
         /// Get the Product Appearance attribute
         /// </summary>
         public async Task<ProductAppearance> GetProductAppearance(SecureSession session) {
-            return new ProductAppearance((object[])(await GetAttribute(session, 20))!);
+            return new ProductAppearance((object[])(await GetAttribute(session, 32))!);
         }
 
         /// <summary>
         /// Get the Specification Version attribute
         /// </summary>
         public async Task<uint> GetSpecificationVersion(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 21) ?? 0;
+            return (uint)(dynamic?)(await GetAttribute(session, 33))!;
         }
 
         /// <summary>
         /// Get the Max Paths Per Invoke attribute
         /// </summary>
         public async Task<ushort> GetMaxPathsPerInvoke(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 22) ?? 1;
+            return (ushort)(dynamic?)(await GetAttribute(session, 34))!;
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Basic Information Cluster";
+            return "Basic Information";
         }
     }
 }

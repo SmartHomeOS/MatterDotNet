@@ -77,11 +77,11 @@ namespace MatterDotNet.Clusters.General
             /// </summary>
             RequiredTCNotAccepted = 0x5,
             /// <summary>
-            /// <see cref="TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
+            /// <see cref="TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
             /// </summary>
             TCAcknowledgementsNotReceived = 0x6,
             /// <summary>
-            /// <see cref="TCMinVersionNotMet, TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
+            /// <see cref="TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
             /// </summary>
             TCMinVersionNotMet = 0x7,
         }

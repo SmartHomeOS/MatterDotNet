@@ -54,7 +54,7 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Parameter
         /// </summary>
-        public enum ParameterEnum : byte {
+        public enum ParameterType : byte {
             /// <summary>
             /// Actor represents an actor credited in video media content; for example, “Gaby Hoffman”
             /// </summary>
@@ -99,7 +99,10 @@ namespace MatterDotNet.Clusters.Media
             /// Sport represents the categorical information of a sport; for example, football
             /// </summary>
             Sport = 0x0A,
-            SportsTeam = 0x00B,
+            /// <summary>
+            /// SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;
+            /// </summary>
+            SportsTeam = 0x0B,
             /// <summary>
             /// The type of content requested. Supported types are "Movie", "MovieSeries", "TVSeries", "TVSeason", "TVEpisode", "Trailer", "SportsEvent", "LiveEvent", and "Video"
             /// </summary>
@@ -398,7 +401,7 @@ namespace MatterDotNet.Clusters.Media
             [SetsRequiredMembers]
             public Parameter(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Type = (ParameterEnum)reader.GetUShort(0)!.Value;
+                Type = (ParameterType)reader.GetUShort(0)!.Value;
                 Value = reader.GetString(1, false, 1024)!;
                 {
                     ExternalIDList = new AdditionalInfo[reader.GetStruct(2)!.Length];
@@ -407,7 +410,7 @@ namespace MatterDotNet.Clusters.Media
                     }
                 }
             }
-            public required ParameterEnum Type { get; set; }
+            public required ParameterType Type { get; set; }
             public required string Value { get; set; }
             public AdditionalInfo[]? ExternalIDList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {

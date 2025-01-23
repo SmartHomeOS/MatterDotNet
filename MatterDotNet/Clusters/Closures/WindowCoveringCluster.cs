@@ -100,7 +100,7 @@ namespace MatterDotNet.Clusters.Closures
             /// </summary>
             TiltBlindTiltOnly = 7,
             /// <summary>
-            /// Tilt Blind - Lift & Tilt
+            /// Tilt Blind - Lift &amp; Tilt
             /// </summary>
             TiltBlindLiftAndTilt = 8,
             /// <summary>

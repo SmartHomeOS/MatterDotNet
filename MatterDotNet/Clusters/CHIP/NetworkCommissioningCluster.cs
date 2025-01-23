@@ -106,11 +106,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// </summary>
             OtherConnectionFailure = 0x9,
             /// <summary>
-            /// <see cref="Ipv6Failed"/> Failure to generate an IPv6 address
+            /// <see cref="IPV6Failed"/> Failure to generate an IPv6 address
             /// </summary>
             IPV6Failed = 0xa,
             /// <summary>
-            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +<->+ IP interfaces
+            /// <see cref="IPBindFailed"/> Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces
             /// </summary>
             IPBindFailed = 0xb,
             /// <summary>
@@ -190,10 +190,25 @@ namespace MatterDotNet.Clusters.CHIP
             /// Nothing Set
             /// </summary>
             None = 0,
+            /// <summary>
+            /// Thread Border Router functionality is present
+            /// </summary>
             IsBorderRouterCapable = 0x1,
+            /// <summary>
+            /// Router mode is supported (interface could be in router or REED mode)
+            /// </summary>
             IsRouterCapable = 0x2,
+            /// <summary>
+            /// Sleepy end-device mode is supported
+            /// </summary>
             IsSleepyEndDeviceCapable = 0x4,
+            /// <summary>
+            /// Device is a full Thread device (opposite of Minimal Thread Device)
+            /// </summary>
             IsFullThreadDevice = 0x8,
+            /// <summary>
+            /// Synchronized sleepy end-device mode is supported
+            /// </summary>
             IsSynchronizedSleepyEndDeviceCapable = 0x10,
         }
         #endregion Enums

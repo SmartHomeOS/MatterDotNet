@@ -89,7 +89,7 @@ namespace MatterDotNet.Clusters.Media
         /// Get the Application attribute
         /// </summary>
         public async Task<ApplicationLauncher.Application> GetApplication(SecureSession session) {
-            return (ApplicationLauncher.Application)(dynamic?)(await GetAttribute(session, 4))!;
+            return new ApplicationLauncher.Application((object[])(await GetAttribute(session, 4))!);
         }
 
         /// <summary>

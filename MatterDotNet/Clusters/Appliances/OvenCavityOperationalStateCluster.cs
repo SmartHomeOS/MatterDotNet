@@ -18,22 +18,22 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 
-namespace MatterDotNet.Clusters.Robots
+namespace MatterDotNet.Clusters.Appliances
 {
     /// <summary>
-    /// This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.
+    /// This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class RVCOperationalState : ClusterBase
+    public class OvenCavityOperationalState : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x0061;
+        internal const uint CLUSTER_ID = 0x0048;
 
         /// <summary>
-        /// This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.
+        /// This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven.
         /// </summary>
-        public RVCOperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public OvenCavityOperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected RVCOperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected OvenCavityOperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
@@ -44,18 +44,6 @@ namespace MatterDotNet.Clusters.Robots
             Running = 0x01,
             Paused = 0x02,
             Error = 0x03,
-            /// <summary>
-            /// The device is en route to the charging dock
-            /// </summary>
-            SeekingCharger = 0x40,
-            /// <summary>
-            /// The device is charging
-            /// </summary>
-            Charging = 0x41,
-            /// <summary>
-            /// The device is on the dock, not charging
-            /// </summary>
-            Docked = 0x42,
         }
 
         /// <summary>
@@ -66,38 +54,6 @@ namespace MatterDotNet.Clusters.Robots
             UnableToStartOrResume = 0x01,
             UnableToCompleteOperation = 0x02,
             CommandInvalidInState = 0x03,
-            /// <summary>
-            /// The device has failed to find or reach the charging dock
-            /// </summary>
-            FailedToFindChargingDock = 0x40,
-            /// <summary>
-            /// The device is stuck and requires manual intervention
-            /// </summary>
-            Stuck = 0x41,
-            /// <summary>
-            /// The device has detected that its dust bin is missing
-            /// </summary>
-            DustBinMissing = 0x42,
-            /// <summary>
-            /// The device has detected that its dust bin is full
-            /// </summary>
-            DustBinFull = 0x43,
-            /// <summary>
-            /// The device has detected that its water tank is empty
-            /// </summary>
-            WaterTankEmpty = 0x44,
-            /// <summary>
-            /// The device has detected that its water tank is missing
-            /// </summary>
-            WaterTankMissing = 0x45,
-            /// <summary>
-            /// The device has detected that its water tank lid is open
-            /// </summary>
-            WaterTankLidOpen = 0x46,
-            /// <summary>
-            /// The device has detected that its cleaning pad is missing
-            /// </summary>
-            MopCleaningPadMissing = 0x47,
         }
         #endregion Enums
 
@@ -124,10 +80,10 @@ namespace MatterDotNet.Clusters.Robots
         }
 
         /// <summary>
-        /// Resume
+        /// Stop
         /// </summary>
-        public async Task<OperationalCommandResponse?> Resume(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+        public async Task<OperationalCommandResponse?> Stop(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {
@@ -136,10 +92,22 @@ namespace MatterDotNet.Clusters.Robots
         }
 
         /// <summary>
-        /// Go Home
+        /// Start
         /// </summary>
-        public async Task<OperationalCommandResponse?> GoHome(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80);
+        public async Task<OperationalCommandResponse?> Start(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
+            if (!ValidateResponse(resp))
+                return null;
+            return new OperationalCommandResponse() {
+                CommandResponseState = (ErrorState)GetField(resp, 0),
+            };
+        }
+
+        /// <summary>
+        /// Resume
+        /// </summary>
+        public async Task<OperationalCommandResponse?> Resume(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {
@@ -189,20 +157,20 @@ namespace MatterDotNet.Clusters.Robots
         /// Get the Operational State attribute
         /// </summary>
         public async Task<OperationalState> GetOperationalState(SecureSession session) {
-            return (OperationalState)(dynamic?)(await GetAttribute(session, 4))!;
+            return (OperationalState)await GetEnumAttribute(session, 4);
         }
 
         /// <summary>
         /// Get the Operational Error attribute
         /// </summary>
-        public async Task<General.OperationalState.ErrorState> GetOperationalError(SecureSession session) {
-            return new General.OperationalState.ErrorState((object[])(await GetAttribute(session, 5))!);
+        public async Task<General.OperationalState.ErrorStatePayload> GetOperationalError(SecureSession session) {
+            return new General.OperationalState.ErrorStatePayload((object[])(await GetAttribute(session, 5))!);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "RVC Operational State";
+            return "Oven Cavity Operational State";
         }
     }
 }

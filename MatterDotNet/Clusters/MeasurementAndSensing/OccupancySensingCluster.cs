@@ -236,13 +236,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the PIR Occupied To Unoccupied Delay attribute
         /// </summary>
         public async Task<ushort> GetPIROccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the PIR Occupied To Unoccupied Delay attribute
         /// </summary>
-        public async Task SetPIROccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetPIROccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 16, value);
         }
 
@@ -250,13 +250,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the PIR Unoccupied To Occupied Delay attribute
         /// </summary>
         public async Task<ushort> GetPIRUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the PIR Unoccupied To Occupied Delay attribute
         /// </summary>
-        public async Task SetPIRUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetPIRUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 17, value);
         }
 
@@ -270,7 +270,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Set the PIR Unoccupied To Occupied Threshold attribute
         /// </summary>
-        public async Task SetPIRUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 1) {
+        public async Task SetPIRUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
             await SetAttribute(session, 18, value);
         }
 
@@ -278,13 +278,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Ultrasonic Occupied To Unoccupied Delay attribute
         /// </summary>
         public async Task<ushort> GetUltrasonicOccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 32) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 32) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the Ultrasonic Occupied To Unoccupied Delay attribute
         /// </summary>
-        public async Task SetUltrasonicOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetUltrasonicOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 32, value);
         }
 
@@ -292,13 +292,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Ultrasonic Unoccupied To Occupied Delay attribute
         /// </summary>
         public async Task<ushort> GetUltrasonicUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 33) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 33) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the Ultrasonic Unoccupied To Occupied Delay attribute
         /// </summary>
-        public async Task SetUltrasonicUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetUltrasonicUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 33, value);
         }
 
@@ -306,13 +306,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Ultrasonic Unoccupied To Occupied Threshold attribute
         /// </summary>
         public async Task<byte> GetUltrasonicUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 1;
+            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 0x01;
         }
 
         /// <summary>
         /// Set the Ultrasonic Unoccupied To Occupied Threshold attribute
         /// </summary>
-        public async Task SetUltrasonicUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 1) {
+        public async Task SetUltrasonicUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
             await SetAttribute(session, 34, value);
         }
 
@@ -320,13 +320,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Physical Contact Occupied To Unoccupied Delay attribute
         /// </summary>
         public async Task<ushort> GetPhysicalContactOccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 48) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 48) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the Physical Contact Occupied To Unoccupied Delay attribute
         /// </summary>
-        public async Task SetPhysicalContactOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetPhysicalContactOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 48, value);
         }
 
@@ -334,13 +334,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Physical Contact Unoccupied To Occupied Delay attribute
         /// </summary>
         public async Task<ushort> GetPhysicalContactUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 49) ?? 0;
+            return (ushort?)(dynamic?)await GetAttribute(session, 49) ?? 0x0000;
         }
 
         /// <summary>
         /// Set the Physical Contact Unoccupied To Occupied Delay attribute
         /// </summary>
-        public async Task SetPhysicalContactUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0) {
+        public async Task SetPhysicalContactUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
             await SetAttribute(session, 49, value);
         }
 
@@ -348,13 +348,13 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Physical Contact Unoccupied To Occupied Threshold attribute
         /// </summary>
         public async Task<byte> GetPhysicalContactUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 50) ?? 1;
+            return (byte?)(dynamic?)await GetAttribute(session, 50) ?? 0x01;
         }
 
         /// <summary>
         /// Set the Physical Contact Unoccupied To Occupied Threshold attribute
         /// </summary>
-        public async Task SetPhysicalContactUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 1) {
+        public async Task SetPhysicalContactUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
             await SetAttribute(session, 50, value);
         }
         #endregion Attributes

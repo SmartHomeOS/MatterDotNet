@@ -17,110 +17,89 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
-using System.Diagnostics.CodeAnalysis;
 
-namespace MatterDotNet.Clusters.General
+namespace MatterDotNet.Clusters.Robots
 {
     /// <summary>
-    /// This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.
+    /// This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
-    public class OperationalState : ClusterBase
+    public class RVCOperationalState : ClusterBase
     {
-        internal const uint CLUSTER_ID = 0x0060;
+        internal const uint CLUSTER_ID = 0x0061;
 
         /// <summary>
-        /// This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.
+        /// This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.
         /// </summary>
-        public OperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        public RVCOperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        protected RVCOperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
 
         #region Enums
         /// <summary>
         /// Operational State
         /// </summary>
-        public enum OperationalStateEnum : byte {
+        public enum OperationalState : byte {
             Stopped = 0x00,
             Running = 0x01,
             Paused = 0x02,
             Error = 0x03,
+            /// <summary>
+            /// The device is en route to the charging dock
+            /// </summary>
+            SeekingCharger = 0x40,
+            /// <summary>
+            /// The device is charging
+            /// </summary>
+            Charging = 0x41,
+            /// <summary>
+            /// The device is on the dock, not charging
+            /// </summary>
+            Docked = 0x42,
         }
 
         /// <summary>
         /// Error State
         /// </summary>
-        public enum ErrorStateEnum : byte {
+        public enum ErrorState : byte {
             NoError = 0x00,
             UnableToStartOrResume = 0x01,
             UnableToCompleteOperation = 0x02,
             CommandInvalidInState = 0x03,
+            /// <summary>
+            /// The device has failed to find or reach the charging dock
+            /// </summary>
+            FailedToFindChargingDock = 0x40,
+            /// <summary>
+            /// The device is stuck and requires manual intervention
+            /// </summary>
+            Stuck = 0x41,
+            /// <summary>
+            /// The device has detected that its dust bin is missing
+            /// </summary>
+            DustBinMissing = 0x42,
+            /// <summary>
+            /// The device has detected that its dust bin is full
+            /// </summary>
+            DustBinFull = 0x43,
+            /// <summary>
+            /// The device has detected that its water tank is empty
+            /// </summary>
+            WaterTankEmpty = 0x44,
+            /// <summary>
+            /// The device has detected that its water tank is missing
+            /// </summary>
+            WaterTankMissing = 0x45,
+            /// <summary>
+            /// The device has detected that its water tank lid is open
+            /// </summary>
+            WaterTankLidOpen = 0x46,
+            /// <summary>
+            /// The device has detected that its cleaning pad is missing
+            /// </summary>
+            MopCleaningPadMissing = 0x47,
         }
         #endregion Enums
-
-        #region Records
-        /// <summary>
-        /// Operational State
-        /// </summary>
-        public record OperationalStatePayload : TLVPayload {
-            /// <summary>
-            /// Operational State
-            /// </summary>
-            public OperationalStatePayload() { }
-
-            /// <summary>
-            /// Operational State
-            /// </summary>
-            [SetsRequiredMembers]
-            public OperationalStatePayload(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                OperationalStateID = reader.GetByte(0)!.Value;
-                OperationalStateLabel = reader.GetString(1, true, 64);
-            }
-            public required byte OperationalStateID { get; set; }
-            public string? OperationalStateLabel { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteByte(0, OperationalStateID);
-                if (OperationalStateLabel != null)
-                    writer.WriteString(1, OperationalStateLabel, 64);
-                writer.EndContainer();
-            }
-        }
-
-        /// <summary>
-        /// Error State
-        /// </summary>
-        public record ErrorState : TLVPayload {
-            /// <summary>
-            /// Error State
-            /// </summary>
-            public ErrorState() { }
-
-            /// <summary>
-            /// Error State
-            /// </summary>
-            [SetsRequiredMembers]
-            public ErrorState(object[] fields) {
-                FieldReader reader = new FieldReader(fields);
-                ErrorStateID = reader.GetByte(0)!.Value;
-                ErrorStateLabel = reader.GetString(1, true, 64);
-                ErrorStateDetails = reader.GetString(2, true, 64);
-            }
-            public required byte ErrorStateID { get; set; }
-            public string? ErrorStateLabel { get; set; }
-            public string? ErrorStateDetails { get; set; }
-            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-                writer.StartStructure(structNumber);
-                writer.WriteByte(0, ErrorStateID);
-                if (ErrorStateLabel != null)
-                    writer.WriteString(1, ErrorStateLabel, 64);
-                if (ErrorStateDetails != null)
-                    writer.WriteString(2, ErrorStateDetails, 64);
-                writer.EndContainer();
-            }
-        }
-        #endregion Records
 
         #region Payloads
         /// <summary>
@@ -145,34 +124,22 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Stop
-        /// </summary>
-        public async Task<OperationalCommandResponse?> Stop(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
-            if (!ValidateResponse(resp))
-                return null;
-            return new OperationalCommandResponse() {
-                CommandResponseState = (ErrorState)GetField(resp, 0),
-            };
-        }
-
-        /// <summary>
-        /// Start
-        /// </summary>
-        public async Task<OperationalCommandResponse?> Start(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
-            if (!ValidateResponse(resp))
-                return null;
-            return new OperationalCommandResponse() {
-                CommandResponseState = (ErrorState)GetField(resp, 0),
-            };
-        }
-
-        /// <summary>
         /// Resume
         /// </summary>
         public async Task<OperationalCommandResponse?> Resume(SecureSession session) {
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+            if (!ValidateResponse(resp))
+                return null;
+            return new OperationalCommandResponse() {
+                CommandResponseState = (ErrorState)GetField(resp, 0),
+            };
+        }
+
+        /// <summary>
+        /// Go Home
+        /// </summary>
+        public async Task<OperationalCommandResponse?> GoHome(SecureSession session) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {
@@ -210,32 +177,32 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Get the Operational State List attribute
         /// </summary>
-        public async Task<OperationalStatePayload[]> GetOperationalStateList(SecureSession session) {
+        public async Task<General.OperationalState.OperationalStatePayload[]> GetOperationalStateList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            OperationalStatePayload[] list = new OperationalStatePayload[reader.Count];
+            General.OperationalState.OperationalStatePayload[] list = new General.OperationalState.OperationalStatePayload[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new OperationalStatePayload(reader.GetStruct(i)!);
+                list[i] = new General.OperationalState.OperationalStatePayload(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Operational State attribute
         /// </summary>
-        public async Task<OperationalStateEnum> GetOperationalState(SecureSession session) {
-            return (OperationalStateEnum)await GetEnumAttribute(session, 4);
+        public async Task<byte> GetOperationalState(SecureSession session) {
+            return (byte)(dynamic?)(await GetAttribute(session, 4))!;
         }
 
         /// <summary>
         /// Get the Operational Error attribute
         /// </summary>
-        public async Task<ErrorState> GetOperationalError(SecureSession session) {
-            return new ErrorState((object[])(await GetAttribute(session, 5))!);
+        public async Task<General.OperationalState.ErrorStatePayload> GetOperationalError(SecureSession session) {
+            return new General.OperationalState.ErrorStatePayload((object[])(await GetAttribute(session, 5))!);
         }
         #endregion Attributes
 
         /// <inheritdoc />
         public override string ToString() {
-            return "Operational State";
+            return "RVC Operational State";
         }
     }
 }

@@ -737,6 +737,10 @@ namespace Generator.Schema
 
         private int bitField;
 
+        private string toField;
+
+        private string fromField;
+
         private string nameField;
 
         private string summaryField;
@@ -765,6 +769,34 @@ namespace Generator.Schema
             set
             {
                 this.bitField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string to
+        {
+            get
+            {
+                return this.toField;
+            }
+            set
+            {
+                this.toField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string from
+        {
+            get
+            {
+                return this.fromField;
+            }
+            set
+            {
+                this.fromField = value;
             }
         }
 

@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Measurement &amp; Sensing"/>
+
+  <bitmap name="OccupancyBitmap" type="bitmap8">
+    <cluster code="0x0406"/>
+    <field name="Occupied" mask="0x1"/>
+  </bitmap>
+
+  <enum name="OccupancySensorTypeEnum" type="enum8">
+    <cluster code="0x0406"/>
+    <item name="PIR" value="0x0"/>
+    <item name="Ultrasonic" value="0x1"/>
+    <item name="PIRAndUltrasonic" value="0x2"/>
+    <item name="PhysicalContact" value="0x3"/>
+  </enum>
+
+  <bitmap name="OccupancySensorTypeBitmap" type="bitmap8">
+    <cluster code="0x0406"/>
+    <field name="PIR" mask="0x01"/>
+    <field name="Ultrasonic" mask="0x02"/>
+    <field name="PhysicalContact" mask="0x04"/>
+  </bitmap>
+
+  <struct apiMaturity="provisional" name="HoldTimeLimitsStruct">
+    <cluster code="0x0406"/> <!-- Occupancy Sensing Cluster -->
+    <item name="HoldTimeMin"     fieldId="0" type="int16u" optional="false"/>
+    <item name="HoldTimeMax"     fieldId="1" type="int16u" optional="false"/>
+    <item name="HoldTimeDefault" fieldId="2" type="int16u" optional="false"/>
+  </struct>
+
+  <cluster>
+    <name>Occupancy Sensing</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.</description>
+    <code>0x0406</code>
+    <define>OCCUPANCY_SENSING_CLUSTER</define>
+
+    <features>
+        <feature apiMaturity="provisional" bit="0" code="OTHER" name="Other"           summary="Supports sensing using a modality not listed in the other bits">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="1" code="PIR"   name="PassiveInfrared" summary="Supports sensing using PIR (Passive InfraRed)">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="2" code="US"    name="Ultrasonic"      summary="Supports sensing using UltraSound">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="3" code="PHY"   name="PhysicalContact" summary="Supports sensing using a physical contact">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="4" code="AIR"   name="ActiveInfrared"  summary="Supports sensing using Active InfraRed measurement (e.g. time-of-flight or transflective/reflective IR sensing)">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="5" code="RAD"   name="Radar"           summary="Supports sensing using radar waves (microwave)">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="6" code="RFS"   name="RFSensing"       summary="Supports sensing based on RF signal analysis">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+        <feature apiMaturity="provisional" bit="7" code="VIS"   name="Vision"          summary="Supports sensing based on analyzing images">
+            <optionalConform choice="a" more="true"/>
+        </feature>
+    </features>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" tickFrequency="half" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
+
+    <attribute side="server" code="0x0000" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
+    <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
+    <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
+
+    <attribute side="server" code="0x0003" define="HOLD_TIME" type="int16u" writable="true" optional="true">
+        <description>HoldTime</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0004" define="HOLD_TIME_LIMITS" type="HoldTimeLimitsStruct" writable="false" optional="true">HoldTimeLimits</attribute>
+
+    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>PIROccupiedToUnoccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>PIRUnoccupiedToOccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0012" define="PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>PIRUnoccupiedToOccupiedThreshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>UltrasonicOccupiedToUnoccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>UltrasonicUnoccupiedToOccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0022" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>UltrasonicUnoccupiedToOccupiedThreshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="int16u" writable="true" default="0x0000" optional="true">
+      <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <attribute side="server" code="0x0032" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD" type="int8u" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">
+      <description>PhysicalContactUnoccupiedToOccupiedThreshold</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <event side="server" code="0x00" priority="info" name="OccupancyChanged" optional="true">
+      <description>If this event is supported, it SHALL be generated when the Occupancy attribute changes.</description>
+      <field id="0" name="Occupancy" type="OccupancyBitmap"/>
+    </event>
+  </cluster>
+</configurator>

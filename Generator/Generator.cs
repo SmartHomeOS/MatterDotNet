@@ -17,6 +17,7 @@ namespace Generator
         static void Main(string[] args)
         {
             Directory.CreateDirectory("outputs");
+            CommentGenerator.Generate();
             ClusterGenerator.Generate();
             DeviceTypeGenerator.Generate();
             foreach (string file in Directory.EnumerateFiles("..\\..\\..\\Structures"))

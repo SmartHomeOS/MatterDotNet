@@ -12,123 +12,30 @@
 
 namespace Generator.Schema
 {
-    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", ElementName = "deviceType", IsNullable = false)]
-    public partial class DeviceType
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", ElementName = "configurator", IsNullable = false)]
+    public partial class deviceTypeRoot
     {
 
-        private deviceTypeRevision[] revisionHistoryField;
-
-        private deviceTypeClassification classificationField;
-
-        private object conditionsField;
-
-        private deviceTypeCluster[] clustersField;
-
-        private string idField;
-
-        private string nameField;
-
-        private byte revisionField;
+        private deviceTypeRootDeviceType[] deviceTypeField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("revision", IsNullable = false)]
-        public deviceTypeRevision[] revisionHistory
+        [System.Xml.Serialization.XmlElementAttribute("deviceType")]
+        public deviceTypeRootDeviceType[] deviceType
         {
             get
             {
-                return this.revisionHistoryField;
+                return this.deviceTypeField;
             }
             set
             {
-                this.revisionHistoryField = value;
-            }
-        }
-
-        /// <remarks/>
-        public deviceTypeClassification classification
-        {
-            get
-            {
-                return this.classificationField;
-            }
-            set
-            {
-                this.classificationField = value;
-            }
-        }
-
-        /// <remarks/>
-        public object conditions
-        {
-            get
-            {
-                return this.conditionsField;
-            }
-            set
-            {
-                this.conditionsField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("cluster", IsNullable = false)]
-        public deviceTypeCluster[] clusters
-        {
-            get
-            {
-                return this.clustersField;
-            }
-            set
-            {
-                this.clustersField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string id
-        {
-            get
-            {
-                return this.idField;
-            }
-            set
-            {
-                this.idField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string name
-        {
-            get
-            {
-                return this.nameField;
-            }
-            set
-            {
-                this.nameField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte revision
-        {
-            get
-            {
-                return this.revisionField;
-            }
-            set
-            {
-                this.revisionField = value;
+                this.deviceTypeField = value;
             }
         }
     }
@@ -137,78 +44,66 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class deviceTypeRevision
+    public partial class deviceTypeRootDeviceType
     {
-
-        private byte revisionField;
-
-        private string summaryField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte revision
-        {
-            get
-            {
-                return this.revisionField;
-            }
-            set
-            {
-                this.revisionField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string summary
-        {
-            get
-            {
-                return this.summaryField;
-            }
-            set
-            {
-                this.summaryField = value;
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class deviceTypeClassification
-    {
-
+        private string typeNameField;
         private string classField;
+        private deviceTypeRootDeviceTypeDeviceId deviceIdField;
+        private object[] itemsField;
 
-        private string scopeField;
+        private ItemsChoiceType1[] itemsElementNameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlElementAttribute("clusters", typeof(deviceTypeRootDeviceTypeClusters))]
+        [System.Xml.Serialization.XmlElementAttribute("domain", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("endpointComposition", typeof(deviceTypeRootDeviceTypeEndpointComposition))]
+        [System.Xml.Serialization.XmlElementAttribute("name", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("profileId", typeof(deviceTypeRootDeviceTypeProfileId))]
+        [System.Xml.Serialization.XmlElementAttribute("scope", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("superset", typeof(string))]
+        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        public object[] Items
+        {
+            get
+            {
+                return this.itemsField;
+            }
+            set
+            {
+                this.itemsField = value;
+            }
+        }
+
+        public deviceTypeRootDeviceTypeDeviceId deviceId
+        {
+            get { return deviceIdField; }
+            set { deviceIdField = value; }
+        }
+
+        public string typeName
+        {
+            get { return typeNameField; }
+            set { typeNameField = value; }
+        }
+
         public string @class
         {
-            get
-            {
-                return this.classField;
-            }
-            set
-            {
-                this.classField = value;
-            }
+            get { return classField; }
+            set { classField = value; }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string scope
+        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public ItemsChoiceType1[] ItemsElementName
         {
             get
             {
-                return this.scopeField;
+                return this.itemsElementNameField;
             }
             set
             {
-                this.scopeField = value;
+                this.itemsElementNameField = value;
             }
         }
     }
@@ -217,31 +112,219 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class deviceTypeCluster
+    public partial class deviceTypeRootDeviceTypeClusters
     {
 
-        private deviceTypeClusterOtherwiseConform otherwiseConformField;
+        private deviceTypeRootDeviceTypeClustersInclude[] includeField;
+
+        private bool lockOthersField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("include")]
+        public deviceTypeRootDeviceTypeClustersInclude[] include
+        {
+            get
+            {
+                return this.includeField;
+            }
+            set
+            {
+                this.includeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool lockOthers
+        {
+            get
+            {
+                return this.lockOthersField;
+            }
+            set
+            {
+                this.lockOthersField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersInclude
+    {
+
+        private object[] itemsField;
+
+        private ItemsChoiceType[] itemsElementNameField;
+
+        private string clusterField;
+
+        private bool clientField;
+
+        private bool serverField;
+
+        private bool clientLockedField;
+
+        private bool serverLockedField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("features", typeof(deviceTypeRootDeviceTypeClustersIncludeFeatures))]
+        [System.Xml.Serialization.XmlElementAttribute("requireAttribute", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("requireCommand", typeof(string))]
+        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
+        public object[] Items
+        {
+            get
+            {
+                return this.itemsField;
+            }
+            set
+            {
+                this.itemsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ItemsElementName")]
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public ItemsChoiceType[] ItemsElementName
+        {
+            get
+            {
+                return this.itemsElementNameField;
+            }
+            set
+            {
+                this.itemsElementNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string cluster
+        {
+            get
+            {
+                return this.clusterField;
+            }
+            set
+            {
+                this.clusterField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool client
+        {
+            get
+            {
+                return this.clientField;
+            }
+            set
+            {
+                this.clientField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool server
+        {
+            get
+            {
+                return this.serverField;
+            }
+            set
+            {
+                this.serverField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool clientLocked
+        {
+            get
+            {
+                return this.clientLockedField;
+            }
+            set
+            {
+                this.clientLockedField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool serverLocked
+        {
+            get
+            {
+                return this.serverLockedField;
+            }
+            set
+            {
+                this.serverLockedField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeatures
+    {
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeature[] featureField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("feature")]
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeature[] feature
+        {
+            get
+            {
+                return this.featureField;
+            }
+            set
+            {
+                this.featureField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeature
+    {
+
+        private object disallowConformField;
 
         private object optionalConformField;
 
-        private object mandatoryConformField;
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConform mandatoryConformField;
 
-        private string idField;
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConform otherwiseConformField;
+
+        private string codeField;
 
         private string nameField;
 
-        private string sideField;
-
         /// <remarks/>
-        public deviceTypeClusterOtherwiseConform otherwiseConform
+        public object disallowConform
         {
             get
             {
-                return this.otherwiseConformField;
+                return this.disallowConformField;
             }
             set
             {
-                this.otherwiseConformField = value;
+                this.disallowConformField = value;
             }
         }
 
@@ -259,7 +342,7 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        public object mandatoryConform
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConform mandatoryConform
         {
             get
             {
@@ -272,16 +355,29 @@ namespace Generator.Schema
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string id
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConform otherwiseConform
         {
             get
             {
-                return this.idField;
+                return this.otherwiseConformField;
             }
             set
             {
-                this.idField = value;
+                this.otherwiseConformField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string code
+        {
+            get
+            {
+                return this.codeField;
+            }
+            set
+            {
+                this.codeField = value;
             }
         }
 
@@ -298,18 +394,42 @@ namespace Generator.Schema
                 this.nameField = value;
             }
         }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConform
+    {
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformCondition conditionField;
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTerm andTermField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string side
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformCondition condition
         {
             get
             {
-                return this.sideField;
+                return this.conditionField;
             }
             set
             {
-                this.sideField = value;
+                this.conditionField = value;
+            }
+        }
+
+        /// <remarks/>
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTerm andTerm
+        {
+            get
+            {
+                return this.andTermField;
+            }
+            set
+            {
+                this.andTermField = value;
             }
         }
     }
@@ -318,12 +438,125 @@ namespace Generator.Schema
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class deviceTypeClusterOtherwiseConform
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformCondition
+    {
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTerm
+    {
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermCondition conditionField;
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermFeature[] orTermField;
+
+        /// <remarks/>
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermCondition condition
+        {
+            get
+            {
+                return this.conditionField;
+            }
+            set
+            {
+                this.conditionField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("feature", IsNullable = false)]
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermFeature[] orTerm
+        {
+            get
+            {
+                return this.orTermField;
+            }
+            set
+            {
+                this.orTermField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermCondition
+    {
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureMandatoryConformAndTermFeature
+    {
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConform
     {
 
         private object provisionalConformField;
 
         private object optionalConformField;
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConform mandatoryConformField;
 
         /// <remarks/>
         public object provisionalConform
@@ -350,6 +583,276 @@ namespace Generator.Schema
                 this.optionalConformField = value;
             }
         }
+
+        /// <remarks/>
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConform mandatoryConform
+        {
+            get
+            {
+                return this.mandatoryConformField;
+            }
+            set
+            {
+                this.mandatoryConformField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConform
+    {
+
+        private deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConformFeature featureField;
+
+        /// <remarks/>
+        public deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConformFeature feature
+        {
+            get
+            {
+                return this.featureField;
+            }
+            set
+            {
+                this.featureField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeClustersIncludeFeaturesFeatureOtherwiseConformMandatoryConformFeature
+    {
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeDeviceId
+    {
+
+        private bool editableField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool editable
+        {
+            get
+            {
+                return this.editableField;
+            }
+            set
+            {
+                this.editableField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeEndpointComposition
+    {
+
+        private string compositionTypeField;
+
+        private deviceTypeRootDeviceTypeEndpointCompositionEndpoint endpointField;
+
+        /// <remarks/>
+        public string compositionType
+        {
+            get
+            {
+                return this.compositionTypeField;
+            }
+            set
+            {
+                this.compositionTypeField = value;
+            }
+        }
+
+        /// <remarks/>
+        public deviceTypeRootDeviceTypeEndpointCompositionEndpoint endpoint
+        {
+            get
+            {
+                return this.endpointField;
+            }
+            set
+            {
+                this.endpointField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeEndpointCompositionEndpoint
+    {
+
+        private string deviceTypeField;
+
+        private string conformanceField;
+
+        private string constraintField;
+
+        /// <remarks/>
+        public string deviceType
+        {
+            get
+            {
+                return this.deviceTypeField;
+            }
+            set
+            {
+                this.deviceTypeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string conformance
+        {
+            get
+            {
+                return this.conformanceField;
+            }
+            set
+            {
+                this.conformanceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string constraint
+        {
+            get
+            {
+                return this.constraintField;
+            }
+            set
+            {
+                this.constraintField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    public partial class deviceTypeRootDeviceTypeProfileId
+    {
+
+        private bool editableField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool editable
+        {
+            get
+            {
+                return this.editableField;
+            }
+            set
+            {
+                this.editableField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(IncludeInSchema = false)]
+    public enum ItemsChoiceType1
+    {
+
+        /// <remarks/>
+        @class,
+
+        /// <remarks/>
+        clusters,
+
+        /// <remarks/>
+        deviceId,
+
+        /// <remarks/>
+        domain,
+
+        /// <remarks/>
+        endpointComposition,
+
+        /// <remarks/>
+        name,
+
+        /// <remarks/>
+        profileId,
+
+        /// <remarks/>
+        scope,
+
+        /// <remarks/>
+        superset,
+
+        /// <remarks/>
+        typeName,
     }
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }

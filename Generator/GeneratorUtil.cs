@@ -16,11 +16,15 @@ namespace Generator
 {
     public class GeneratorUtil
     {
-        public static string SanitizeName(string name)
+        public static string SanitizeName(string name, bool paramName = false)
         {
             if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
                 name = name.Substring(0, name.Length - 6);
-            bool cap = true;
+            if (name.EndsWith("enum", StringComparison.InvariantCultureIgnoreCase))
+                name = name.Substring(0, name.Length - 4);
+            if (name.EndsWith("bitmap", StringComparison.InvariantCultureIgnoreCase))
+                name = name.Substring(0, name.Length - 6);
+            bool cap = !paramName;
             StringBuilder ret = new StringBuilder(name.Length);
             if (name.Length > 0 && Char.IsNumber(name[0]))
                 ret.Append('_');
@@ -33,6 +37,16 @@ namespace Generator
                     cap = true;
                     ret.Append('_');
                 }
+                else if (c == '.')
+                {
+                    cap = true;
+                    ret.Append('_');
+                }
+                else if (paramName)
+                {
+                    ret.Append(char.ToLower(c));
+                    paramName = false;
+                }
                 else if (cap)
                 {
                     ret.Append(char.ToUpper(c));
@@ -41,20 +55,22 @@ namespace Generator
                 else
                     ret.Append(c);
             }
-            return ret.ToString();
+            return ret.ToString().Replace("Percent100ths", "Percent");
         }
 
         public static string SanitizeClassName(string name)
         {
-            return name.Replace(" ", "").Replace('/', '_').Replace("-", "");
+            return name.Replace(" ", "").Replace('/', '_').Replace("-", "").Replace("&", "And");
         }
 
-        public static string FieldNameToComment(string name)
+        public static string FieldNameToComment(string name, string? type = null)
         {
             if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
                 name = name.Substring(0, name.Length - 6);
             if (name.EndsWith("enum", StringComparison.InvariantCultureIgnoreCase))
                 name = name.Substring(0, name.Length - 4);
+            if (name.EndsWith("bitmap", StringComparison.InvariantCultureIgnoreCase))
+                name = name.Substring(0, name.Length - 6);
             StringBuilder ret = new StringBuilder(name.Length);
             for (int i = 0; i < name.Length; i++)
             {
@@ -72,11 +88,37 @@ namespace Generator
                 else
                     ret.Append(name[i]);
             }
+            if (type != null)
+            {
+                switch (type)
+                {
+                    case "power_mw":
+                        ret.Append(" [mW]");
+                        break;
+                    case "amperage_ma":
+                        ret.Append(" [mA]");
+                        break;
+                    case "voltage_mv":
+                        ret.Append(" [mV]");
+                        break;
+                    case "energy_mwh":
+                        ret.Append(" [mWh]");
+                        break;
+                    case "percent":
+                        ret.Append(" [%]");
+                        break;
+                    case "percent100ths":
+                        ret.Append(" [%]");
+                        break;
+                }
+            }
             return ret.ToString().Replace("Wi Fi", "WiFi");
         }
 
-        internal static string SanitizeComment(string summary)
+        internal static string? SanitizeComment(string? summary)
         {
+            if (summary == null)
+                return null;
             summary = summary.Replace("Wi Fi", "WiFi");
             StringBuilder ret = new StringBuilder(summary.Length);
             bool space = false;
@@ -103,6 +145,33 @@ namespace Generator
                     ret.Append(c);
             }
             return ret.ToString().Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>");
+        }
+
+        internal static string EnsureHex(string? value, int hexLength = 2)
+        {
+            if (value == null)
+                return string.Empty;
+            if (value.StartsWith("0x"))
+            {
+                if (hexLength == 2)
+                {
+                    if (value.Length > 3)
+                        return value.ToUpperInvariant().Replace("0X", "0x");
+                    else
+                        return value.ToUpperInvariant().Replace("0X", "0x0");
+                }
+                else
+                {
+                    if (value.Length > 5)
+                        return value.ToUpperInvariant().Replace("0X", "0x");
+                    else if(value.Length > 3)
+                        return value.ToUpperInvariant().Replace("0X", "0x00");
+                    else
+                        return value.ToUpperInvariant().Replace("0X", "0x000");
+                }
+            }
+            long raw = long.Parse(value);
+            return "0x" + raw.ToString(hexLength == 2 ? "X2" : "X4");
         }
     }
 }

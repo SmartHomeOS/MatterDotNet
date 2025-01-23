@@ -1,0 +1,1762 @@
+<?xml version="1.0"?>
+<comments>
+  <enum name="0x001F.AccessControlEntryAuthMode">
+    <item value="1" comment="Passcode authenticated session" />
+    <item value="2" comment="Certificate authenticated session" />
+    <item value="3" comment="Group authenticated session" />
+  </enum>
+  <enum name="0x001F.AccessControlEntryPrivilege">
+    <item value="1" comment="Can read and observe all (except Access Control Cluster and as seen by a non-Proxy)" />
+    <item value="2" comment="Can read and observe all (as seen by a Proxy)" />
+    <item value="3" comment="View privileges, and can perform the primary function of this Node (except Access Control Cluster)" />
+    <item value="4" comment="Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)" />
+    <item value="5" comment="Manage privileges, and can observe and modify the Access Control Cluster" />
+  </enum>
+  <enum name="0x001F.AccessRestrictionType">
+    <item value="0" comment="Clients on this fabric are currently forbidden from reading and writing an attribute" />
+    <item value="1" comment="Clients on this fabric are currently forbidden from writing an attribute" />
+    <item value="2" comment="Clients on this fabric are currently forbidden from invoking a command" />
+    <item value="3" comment="Clients on this fabric are currently forbidden from reading an event" />
+  </enum>
+  <enum name="0x001F.ChangeType">
+    <item value="0" comment="Entry or extension was changed" />
+    <item value="1" comment="Entry or extension was added" />
+    <item value="2" comment="Entry or extension was removed" />
+  </enum>
+  <enum name="0x003C.CommissioningWindowStatus">
+    <item value="0" comment="Commissioning window not open" />
+    <item value="1" comment="An Enhanced Commissioning Method window is open" />
+    <item value="2" comment="A Basic Commissioning Method window is open" />
+  </enum>
+  <enum name="0x005B.AirQuality">
+    <item value="0" comment="The air quality is unknown." />
+    <item value="1" comment="The air quality is good." />
+    <item value="2" comment="The air quality is fair." />
+    <item value="3" comment="The air quality is moderate." />
+    <item value="4" comment="The air quality is poor." />
+    <item value="5" comment="The air quality is very poor." />
+    <item value="6" comment="The air quality is extremely poor." />
+  </enum>
+  <enum name="0x050D.ApplicationStatus">
+    <item value="0" comment="Application is not running." />
+    <item value="1" comment="Application is running, is visible to the user, and is the active target for input." />
+    <item value="2" comment="Application is running but not visible to the user." />
+    <item value="3" comment="Application is running and visible, but is not the active target for input." />
+  </enum>
+  <enum name="0x050C.Status">
+    <item value="0" comment="Command succeeded" />
+    <item value="1" comment="Requested app is not available" />
+    <item value="2" comment="Video platform unable to honor command" />
+    <item value="3" comment="User approval for app download is pending" />
+    <item value="4" comment="Downloading the requested app" />
+    <item value="5" comment="Installing the requested app" />
+  </enum>
+  <enum name="0x050B.OutputType">
+    <item value="0" comment="HDMI" />
+    <item value="1" comment="" />
+    <item value="2" comment="" />
+    <item value="3" comment="" />
+    <item value="4" comment="" />
+    <item value="5" comment="" />
+  </enum>
+  <bitmap name="0x0301.BallastStatus">
+    <item value="0x01" comment="Operational state of the ballast." />
+    <item value="0x02" comment="Operational state of the lamps." />
+  </bitmap>
+  <bitmap name="0x0301.LampAlarmMode">
+    <item value="0x01" comment="State of LampBurnHours alarm generation" />
+  </bitmap>
+  <enum name="0x0028.Color">
+    <item value="0" comment="Approximately RGB #000000." />
+    <item value="1" comment="Approximately RGB #000080." />
+    <item value="2" comment="Approximately RGB #008000." />
+    <item value="3" comment="Approximately RGB #008080." />
+    <item value="4" comment="Approximately RGB #800080." />
+    <item value="5" comment="Approximately RGB #800080." />
+    <item value="6" comment="Approximately RGB #808000." />
+    <item value="7" comment="Approximately RGB #808080." />
+    <item value="8" comment="Approximately RGB #0000FF." />
+    <item value="9" comment="Approximately RGB #00FF00." />
+    <item value="10" comment="Approximately RGB #00FFFF." />
+    <item value="11" comment="Approximately RGB #FF0000." />
+    <item value="12" comment="Approximately RGB #FF00FF." />
+    <item value="13" comment="Approximately RGB #FFFF00." />
+    <item value="14" comment="Approximately RGB #FFFFFF." />
+    <item value="15" comment="Typical hardware &quot;Nickel&quot; color." />
+    <item value="16" comment="Typical hardware &quot;Chrome&quot; color." />
+    <item value="17" comment="Typical hardware &quot;Brass&quot; color." />
+    <item value="18" comment="Typical hardware &quot;Copper&quot; color." />
+    <item value="19" comment="Typical hardware &quot;Silver&quot; color." />
+    <item value="20" comment="Typical hardware &quot;Gold&quot; color." />
+  </enum>
+  <enum name="0x0028.ProductFinish">
+    <item value="0" comment="Product has some other finish not listed below." />
+    <item value="1" comment="Product has a matte finish." />
+    <item value="2" comment="Product has a satin finish." />
+    <item value="3" comment="Product has a polished or shiny finish." />
+    <item value="4" comment="Product has a rugged finish." />
+    <item value="5" comment="Product has a fabric finish." />
+  </enum>
+  <bitmap name="0x0080.AlarmMode">
+    <item value="0x01" comment="Visual alarming" />
+    <item value="0x02" comment="Audible alarming" />
+  </bitmap>
+  <bitmap name="0x0080.SensorFault">
+    <item value="0x01" comment="Unspecified fault detected" />
+  </bitmap>
+  <bitmap name="0x0025.CommandBits">
+    <item value="0x0001" comment="Indicate support for InstantAction command" />
+    <item value="0x0002" comment="Indicate support for InstantActionWithTransition command" />
+    <item value="0x0004" comment="Indicate support for StartAction command" />
+    <item value="0x0008" comment="Indicate support for StartActionWithDuration command" />
+    <item value="0x0010" comment="Indicate support for StopAction command" />
+    <item value="0x0020" comment="Indicate support for PauseAction command" />
+    <item value="0x0040" comment="Indicate support for PauseActionWithDuration command" />
+    <item value="0x0080" comment="Indicate support for ResumeAction command" />
+    <item value="0x0100" comment="Indicate support for EnableAction command" />
+    <item value="0x0200" comment="Indicate support for EnableActionWithDuration command" />
+    <item value="0x0400" comment="Indicate support for DisableAction command" />
+    <item value="0x0800" comment="Indicate support for DisableActionWithDuration command" />
+  </bitmap>
+  <enum name="0x0025.ActionError">
+    <item value="0" comment="Other reason not listed in the row(s) below" />
+    <item value="1" comment="The action was interrupted by another command or interaction" />
+  </enum>
+  <enum name="0x0025.ActionState">
+    <item value="0" comment="The action is not active" />
+    <item value="1" comment="The action is active" />
+    <item value="2" comment="The action has been paused" />
+    <item value="3" comment="The action has been disabled" />
+  </enum>
+  <enum name="0x0025.ActionType">
+    <item value="0" comment="Use this only when none of the other values applies" />
+    <item value="1" comment="Bring the endpoints into a certain state" />
+    <item value="2" comment="A sequence of states with a certain time pattern" />
+    <item value="3" comment="Control an automation (e.g. motion sensor controlling lights)" />
+    <item value="4" comment="Sequence that will run when something doesn't happen" />
+    <item value="5" comment="Use the endpoints to send a message to user" />
+    <item value="6" comment="Higher priority notification" />
+  </enum>
+  <enum name="0x0025.EndpointListType">
+    <item value="0" comment="Another group of endpoints" />
+    <item value="1" comment="User-configured group of endpoints where an endpoint can be in only one room" />
+    <item value="2" comment="User-configured group of endpoints where an endpoint can be in any number of zones" />
+  </enum>
+  <bitmap name="0x0504.RecordingFlag">
+    <item value="0x01" comment="The program is scheduled for recording." />
+    <item value="0x02" comment="The program series is scheduled for recording." />
+    <item value="0x04" comment="The program is recorded and available to be played." />
+  </bitmap>
+  <enum name="0x0504.ChannelType">
+    <item value="0" comment="The channel is sourced from a satellite provider." />
+    <item value="1" comment="The channel is sourced from a cable provider." />
+    <item value="2" comment="The channel is sourced from a terrestrial provider." />
+    <item value="3" comment="The channel is sourced from an OTT provider." />
+  </enum>
+  <enum name="0x0504.LineupInfoType">
+    <item value="0" comment="Multi System Operator" />
+  </enum>
+  <enum name="0x0504.Status">
+    <item value="0" comment="Command succeeded" />
+    <item value="1" comment="More than one equal match for the ChannelInfoStruct passed in." />
+    <item value="2" comment="No matches for the ChannelInfoStruct passed in." />
+  </enum>
+  <bitmap name="0x0300.ColorCapabilities">
+    <item value="0x01" comment="Supports color specification via hue/saturation." />
+    <item value="0x02" comment="Enhanced hue is supported." />
+    <item value="0x04" comment="Color loop is supported." />
+    <item value="0x08" comment="Supports color specification via XY." />
+    <item value="0x10" comment="Supports color specification via color temperature." />
+  </bitmap>
+  <bitmap name="0x0300.Options">
+    <item value="0x01" comment="Dependency on On/Off cluster" />
+  </bitmap>
+  <bitmap name="0x0300.UpdateFlags">
+    <item value="0x01" comment="Device adheres to the associated action field." />
+    <item value="0x02" comment="Device updates the associated direction attribute." />
+    <item value="0x04" comment="Device updates the associated time attribute." />
+    <item value="0x08" comment="Device updates the associated start hue attribute." />
+  </bitmap>
+  <enum name="0x0300.ColorLoopAction">
+    <item value="0" comment="De-activate the color loop." />
+    <item value="1" comment="Activate the color loop from the value in the ColorLoopStartEnhancedHue field." />
+    <item value="2" comment="Activate the color loop from the value of the EnhancedCurrentHue attribute." />
+  </enum>
+  <enum name="0x0300.ColorLoopDirection">
+    <item value="0" comment="Decrement the hue in the color loop." />
+    <item value="1" comment="Increment the hue in the color loop." />
+  </enum>
+  <enum name="0x0300.ColorMode">
+    <item value="0" comment="The current hue and saturation attributes determine the color." />
+    <item value="1" comment="The current X and Y attributes determine the color." />
+    <item value="2" comment="The color temperature attribute determines the color." />
+  </enum>
+  <enum name="0x0300.Direction">
+    <item value="0" comment="Shortest distance" />
+    <item value="1" comment="Longest distance" />
+    <item value="2" comment="Up" />
+    <item value="3" comment="Down" />
+  </enum>
+  <enum name="0x0300.DriftCompensation">
+    <item value="0" comment="There is no compensation." />
+    <item value="1" comment="The compensation is based on other or unknown mechanism." />
+    <item value="2" comment="The compensation is based on temperature monitoring." />
+    <item value="3" comment="The compensation is based on optical luminance monitoring and feedback." />
+    <item value="4" comment="The compensation is based on optical color monitoring and feedback." />
+  </enum>
+  <enum name="0x0300.EnhancedColorMode">
+    <item value="0" comment="The current hue and saturation attributes determine the color." />
+    <item value="1" comment="The current X and Y attributes determine the color." />
+    <item value="2" comment="The color temperature attribute determines the color." />
+    <item value="3" comment="The enhanced current hue and saturation attributes determine the color." />
+  </enum>
+  <enum name="0x0300.MoveMode">
+    <item value="0" comment="Stop the movement" />
+    <item value="1" comment="Move in an upwards direction" />
+    <item value="3" comment="Move in a downwards direction" />
+  </enum>
+  <enum name="0x0300.StepMode">
+    <item value="1" comment="Step in an upwards direction" />
+    <item value="3" comment="Step in a downwards direction" />
+  </enum>
+  <bitmap name="0x0751.SupportedDeviceCategory">
+    <item value="0x01" comment="Aggregators which support Fabric Synchronization may be commissioned." />
+  </bitmap>
+  <enum name="0x040C.LevelValue">
+    <item value="0" comment="The level is Unknown" />
+    <item value="1" comment="The level is considered Low" />
+    <item value="2" comment="The level is considered Medium" />
+    <item value="3" comment="The level is considered High" />
+    <item value="4" comment="The level is considered Critical" />
+  </enum>
+  <enum name="0x040C.MeasurementMedium">
+    <item value="0" comment="The measurement is being made in Air" />
+    <item value="1" comment="The measurement is being made in Water" />
+    <item value="2" comment="The measurement is being made in Soil" />
+  </enum>
+  <enum name="0x040C.MeasurementUnit">
+    <item value="0" comment="Parts per Million (10)" />
+    <item value="1" comment="Parts per Billion (10)" />
+    <item value="2" comment="Parts per Trillion (10)" />
+    <item value="3" comment="Milligram per m" />
+    <item value="4" comment="Microgram per m" />
+    <item value="5" comment="Nanogram per m" />
+    <item value="6" comment="Particles per m" />
+    <item value="7" comment="Becquerel per m" />
+  </enum>
+  <enum name="0x0510.Status">
+    <item value="0" comment="Command succeeded" />
+    <item value="1" comment="Data field in command was not understood by the Observer" />
+  </enum>
+  <bitmap name="0x050F.DayOfWeek type">
+    <item value="0x01" comment="Sunday" />
+    <item value="0x02" comment="Monday" />
+    <item value="0x04" comment="Tuesday" />
+    <item value="0x08" comment="Wednesday" />
+    <item value="0x10" comment="Thursday" />
+    <item value="0x20" comment="Friday" />
+    <item value="0x40" comment="Saturday" />
+  </bitmap>
+  <bitmap name="0x050A.SupportedProtocols">
+    <item value="0x01" comment="Device supports Dynamic Adaptive Streaming over HTTP (DASH)" />
+    <item value="0x02" comment="Device supports HTTP Live Streaming (HLS)" />
+  </bitmap>
+  <enum name="0x050A.MetricType">
+    <item value="0" comment="Dimensions defined in a number of Pixels" />
+    <item value="1" comment="Dimensions defined as a percentage" />
+  </enum>
+  <enum name="0x050A.Parameter">
+    <item value="0" comment="Actor represents an actor credited in video media content; for example, “Gaby Hoffman”" />
+    <item value="1" comment="Channel represents the identifying data for a television channel; for example, &quot;PBS&quot;" />
+    <item value="2" comment="A character represented in video media content; for example, “Snow White”" />
+    <item value="3" comment="A director of the video media content; for example, “Spike Lee”" />
+    <item value="4" comment="An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for &quot;Football games&quot; would search for a 'game' event entity and a 'football' sport entity." />
+    <item value="5" comment="A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise &quot;Intergalactic Wars&quot; which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as &quot;Find Intergalactic Wars movies&quot;, which would search for all 'Intergalactic Wars' programs of the MOVIE MediaType, rather than attempting to match to a single title." />
+    <item value="6" comment="Genre represents the genre of video media content such as action, drama or comedy." />
+    <item value="7" comment="League represents the categorical information for a sporting league; for example, &quot;NCAA&quot;" />
+    <item value="8" comment="Popularity indicates whether the user asks for popular content." />
+    <item value="9" comment="The provider (MSP) the user wants this media to be played on; for example, &quot;Netflix&quot;." />
+    <item value="10" comment="Sport represents the categorical information of a sport; for example, football" />
+    <item value="11" comment="SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;" />
+    <item value="12" comment="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;Trailer&quot;, &quot;SportsEvent&quot;, &quot;LiveEvent&quot;, and &quot;Video&quot;" />
+    <item value="13" comment="Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;." />
+    <item value="14" comment="Season represents the specific season number within a TV series." />
+    <item value="15" comment="Episode represents a specific episode number within a Season in a TV series." />
+    <item value="16" comment="Represents a search text input across many parameter types or even outside of the defined param types." />
+  </enum>
+  <enum name="0x050A.Status">
+    <item value="0" comment="Command succeeded" />
+    <item value="1" comment="Requested URL could not be reached by device." />
+    <item value="2" comment="Requested URL returned 401 error code." />
+    <item value="3" comment="Requested Text Track (in PlaybackPreferences) not available" />
+    <item value="4" comment="Requested Audio Track (in PlaybackPreferences) not available" />
+  </enum>
+  <enum name="0x0098.AdjustmentCause">
+    <item value="0" comment="The adjustment is to optimize the local energy usage" />
+    <item value="1" comment="The adjustment is to optimize the grid energy usage" />
+  </enum>
+  <enum name="0x0098.Cause">
+    <item value="0" comment="The ESA completed the power adjustment as requested" />
+    <item value="1" comment="The ESA was set to offline" />
+    <item value="2" comment="The ESA has developed a fault could not complete the adjustment" />
+    <item value="3" comment="The user has disabled the ESA's flexibility capability" />
+    <item value="4" comment="The adjustment was cancelled by a client" />
+  </enum>
+  <enum name="0x0098.CostType">
+    <item value="0" comment="Financial cost" />
+    <item value="1" comment="Grid CO2e grams cost" />
+    <item value="2" comment="Consumer comfort impact cost" />
+    <item value="3" comment="Temperature impact cost" />
+  </enum>
+  <enum name="0x0098.ESAState">
+    <item value="0" comment="The ESA is not available to the EMS (e.g. start-up, maintenance mode)" />
+    <item value="1" comment="The ESA is working normally and can be controlled by the EMS" />
+    <item value="2" comment="The ESA has developed a fault and cannot provide service" />
+    <item value="3" comment="The ESA is in the middle of a power adjustment event" />
+    <item value="4" comment="The ESA is currently paused by a client using the PauseRequest command" />
+  </enum>
+  <enum name="0x0098.ESAType">
+    <item value="0" comment="EV Supply Equipment" />
+    <item value="1" comment="Space heating appliance" />
+    <item value="2" comment="Water heating appliance" />
+    <item value="3" comment="Space cooling appliance" />
+    <item value="4" comment="Space heating and cooling appliance" />
+    <item value="5" comment="Battery Electric Storage System" />
+    <item value="6" comment="Solar PV inverter" />
+    <item value="7" comment="Fridge / Freezer" />
+    <item value="8" comment="Washing Machine" />
+    <item value="9" comment="Dishwasher" />
+    <item value="10" comment="Cooking appliance" />
+    <item value="11" comment="Home water pump (e.g. drinking well)" />
+    <item value="12" comment="Irrigation water pump" />
+    <item value="13" comment="Pool pump" />
+    <item value="255" comment="Other appliance type" />
+  </enum>
+  <enum name="0x0098.ForecastUpdateReason">
+    <item value="0" comment="The update was due to internal ESA device optimization" />
+    <item value="1" comment="The update was due to local EMS optimization" />
+    <item value="2" comment="The update was due to grid optimization" />
+  </enum>
+  <enum name="0x0098.OptOutState">
+    <item value="0" comment="The user has not opted out of either local or grid optimizations" />
+    <item value="1" comment="The user has opted out of local EMS optimizations only" />
+    <item value="2" comment="The user has opted out of grid EMS optimizations only" />
+    <item value="3" comment="The user has opted out of all external optimizations" />
+  </enum>
+  <enum name="0x0098.PowerAdjustReason">
+    <item value="0" comment="There is no Power Adjustment active" />
+    <item value="1" comment="There is PowerAdjustment active due to local EMS optimization" />
+    <item value="2" comment="There is PowerAdjustment active due to local EMS optimization" />
+  </enum>
+  <enum name="0x0032.Intent">
+    <item value="0" comment="Logs to be used for end-user support" />
+    <item value="1" comment="Logs to be used for network diagnostics" />
+    <item value="2" comment="Obtain crash logs from the Node" />
+  </enum>
+  <enum name="0x0032.Status">
+    <item value="0" comment="Successful transfer of logs" />
+    <item value="1" comment="All logs has been transferred" />
+    <item value="2" comment="No logs of the requested type available" />
+    <item value="3" comment="Unable to handle request, retry later" />
+    <item value="4" comment="The request is denied, no logs being transferred" />
+  </enum>
+  <enum name="0x0032.TransferProtocol">
+    <item value="0" comment="Logs to be returned as a response" />
+    <item value="1" comment="Logs to be returned using BDX" />
+  </enum>
+  <enum name="0x0037.PHYRate">
+    <item value="0" comment="PHY rate is 10Mbps" />
+    <item value="1" comment="PHY rate is 100Mbps" />
+    <item value="2" comment="PHY rate is 1Gbps" />
+    <item value="3" comment="PHY rate is 2.5Gbps" />
+    <item value="4" comment="PHY rate is 5Gbps" />
+    <item value="5" comment="PHY rate is 10Gbps" />
+    <item value="6" comment="PHY rate is 40Gbps" />
+    <item value="7" comment="PHY rate is 100Gbps" />
+    <item value="8" comment="PHY rate is 200Gbps" />
+    <item value="9" comment="PHY rate is 400Gbps" />
+  </enum>
+  <enum name="0x0033.BootReason">
+    <item value="0" comment="The Node is unable to identify the Power-On reason as one of the other provided enumeration values." />
+    <item value="1" comment="The Node has booted as the result of physical interaction with the device resulting in a reboot." />
+    <item value="2" comment="The Node has rebooted as the result of a brown-out of the Node's power supply." />
+    <item value="3" comment="The Node has rebooted as the result of a software watchdog timer." />
+    <item value="4" comment="The Node has rebooted as the result of a hardware watchdog timer." />
+    <item value="5" comment="The Node has rebooted as the result of a completed software update." />
+    <item value="6" comment="The Node has rebooted as the result of a software initiated reboot." />
+  </enum>
+  <enum name="0x0033.HardwareFault">
+    <item value="0" comment="The Node has encountered an unspecified fault." />
+    <item value="1" comment="The Node has encountered a fault with at least one of its radios." />
+    <item value="2" comment="The Node has encountered a fault with at least one of its sensors." />
+    <item value="3" comment="The Node has encountered an over-temperature fault that is resettable." />
+    <item value="4" comment="The Node has encountered an over-temperature fault that is not resettable." />
+    <item value="5" comment="The Node has encountered a fault with at least one of its power sources." />
+    <item value="6" comment="The Node has encountered a fault with at least one of its visual displays." />
+    <item value="7" comment="The Node has encountered a fault with at least one of its audio outputs." />
+    <item value="8" comment="The Node has encountered a fault with at least one of its user interfaces." />
+    <item value="9" comment="The Node has encountered a fault with its non-volatile memory." />
+    <item value="10" comment="The Node has encountered disallowed physical tampering." />
+  </enum>
+  <enum name="0x0033.InterfaceType">
+    <item value="0" comment="Indicates an interface of an unspecified type." />
+    <item value="1" comment="Indicates a Wi-Fi interface." />
+    <item value="2" comment="Indicates a Ethernet interface." />
+    <item value="3" comment="Indicates a Cellular interface." />
+    <item value="4" comment="Indicates a Thread interface." />
+  </enum>
+  <enum name="0x0033.NetworkFault">
+    <item value="0" comment="The Node has encountered an unspecified fault." />
+    <item value="1" comment="The Node has encountered a network fault as a result of a hardware failure." />
+    <item value="2" comment="The Node has encountered a network fault as a result of a jammed network." />
+    <item value="3" comment="The Node has encountered a network fault as a result of a failure to establish a connection." />
+  </enum>
+  <enum name="0x0033.RadioFault">
+    <item value="0" comment="The Node has encountered an unspecified radio fault." />
+    <item value="1" comment="The Node has encountered a fault with its Wi-Fi radio." />
+    <item value="2" comment="The Node has encountered a fault with its cellular radio." />
+    <item value="3" comment="The Node has encountered a fault with its 802.15.4 radio." />
+    <item value="4" comment="The Node has encountered a fault with its NFC radio." />
+    <item value="5" comment="The Node has encountered a fault with its BLE radio." />
+    <item value="6" comment="The Node has encountered a fault with its Ethernet controller." />
+  </enum>
+  <enum name="0x0035.ConnectionStatus">
+    <item value="0" comment="Node is connected" />
+    <item value="1" comment="Node is not connected" />
+  </enum>
+  <enum name="0x0035.NetworkFault">
+    <item value="0" comment="Indicates an unspecified fault." />
+    <item value="1" comment="Indicates the Thread link is down." />
+    <item value="2" comment="Indicates there has been Thread hardware failure." />
+    <item value="3" comment="Indicates the Thread network is jammed." />
+  </enum>
+  <enum name="0x0035.RoutingRole">
+    <item value="0" comment="Unspecified routing role." />
+    <item value="1" comment="The Node does not currently have a role as a result of the Thread interface not currently being configured or operational." />
+    <item value="2" comment="The Node acts as a Sleepy End Device with RX-off-when-idle sleepy radio behavior." />
+    <item value="3" comment="The Node acts as an End Device without RX-off-when-idle sleepy radio behavior." />
+    <item value="4" comment="The Node acts as an Router Eligible End Device." />
+    <item value="5" comment="The Node acts as a Router Device." />
+    <item value="6" comment="The Node acts as a Leader Device." />
+  </enum>
+  <enum name="0x0036.AssociationFailureCause">
+    <item value="0" comment="The reason for the failure is unknown." />
+    <item value="1" comment="An error occurred during association." />
+    <item value="2" comment="An error occurred during authentication." />
+    <item value="3" comment="The specified SSID could not be found." />
+  </enum>
+  <enum name="0x0036.ConnectionStatus">
+    <item value="0" comment="Indicate the node is connected" />
+    <item value="1" comment="Indicate the node is not connected" />
+  </enum>
+  <enum name="0x0036.SecurityType">
+    <item value="0" comment="Indicate the usage of an unspecified Wi-Fi security type" />
+    <item value="1" comment="Indicate the usage of no Wi-Fi security" />
+    <item value="2" comment="Indicate the usage of WEP Wi-Fi security" />
+    <item value="3" comment="Indicate the usage of WPA Wi-Fi security" />
+    <item value="4" comment="Indicate the usage of WPA2 Wi-Fi security" />
+    <item value="5" comment="Indicate the usage of WPA3 Wi-Fi security" />
+  </enum>
+  <enum name="0x0036.WiFiVersion">
+    <item value="0" comment="Indicate the network interface is currently using 802.11a against the wireless access point." />
+    <item value="1" comment="Indicate the network interface is currently using 802.11b against the wireless access point." />
+    <item value="2" comment="Indicate the network interface is currently using 802.11g against the wireless access point." />
+    <item value="3" comment="Indicate the network interface is currently using 802.11n against the wireless access point." />
+    <item value="4" comment="Indicate the network interface is currently using 802.11ac against the wireless access point." />
+    <item value="5" comment="Indicate the network interface is currently using 802.11ax against the wireless access point." />
+    <item value="6" comment="Indicate the network interface is currently using 802.11ah against the wireless access point." />
+  </enum>
+  <bitmap name="0x005D.Alarm">
+    <item value="0x01" comment="Water inflow is abnormal" />
+    <item value="0x02" comment="Water draining is abnormal" />
+    <item value="0x04" comment="Door or door lock is abnormal" />
+    <item value="0x08" comment="Unable to reach normal temperature" />
+    <item value="0x10" comment="Temperature is too high" />
+    <item value="0x20" comment="Water level is abnormal" />
+  </bitmap>
+  <bitmap name="0x0101.AlarmMask">
+    <item value="0x01" comment="Locking Mechanism Jammed" />
+    <item value="0x02" comment="Lock Reset to Factory Defaults" />
+    <item value="0x08" comment="RF Module Power Cycled" />
+    <item value="0x10" comment="Tamper Alarm - wrong code entry limit" />
+    <item value="0x20" comment="Tamper Alarm - front escutcheon removed from main" />
+    <item value="0x40" comment="Forced Door Open under Door Locked Condition" />
+  </bitmap>
+  <bitmap name="0x0101.ConfigurationRegister">
+    <item value="0x01" comment="The state of local programming functionality" />
+    <item value="0x02" comment="The state of the keypad interface" />
+    <item value="0x04" comment="The state of the remote interface" />
+    <item value="0x20" comment="Sound volume is set to Silent value" />
+    <item value="0x40" comment="Auto relock time it set to 0" />
+    <item value="0x80" comment="LEDs is disabled" />
+  </bitmap>
+  <bitmap name="0x0101.CredentialRules">
+    <item value="0x01" comment="Only one credential is required for lock operation" />
+    <item value="0x02" comment="Any two credentials are required for lock operation" />
+    <item value="0x04" comment="Any three credentials are required for lock operation" />
+  </bitmap>
+  <bitmap name="0x0101.DaysMask">
+    <item value="0x01" comment="Schedule is applied on Sunday" />
+    <item value="0x02" comment="Schedule is applied on Monday" />
+    <item value="0x04" comment="Schedule is applied on Tuesday" />
+    <item value="0x08" comment="Schedule is applied on Wednesday" />
+    <item value="0x10" comment="Schedule is applied on Thursday" />
+    <item value="0x20" comment="Schedule is applied on Friday" />
+    <item value="0x40" comment="Schedule is applied on Saturday" />
+  </bitmap>
+  <bitmap name="0x0101.LocalProgrammingFeatures">
+    <item value="0x01" comment="The state of the ability to add users, credentials or schedules on the device" />
+    <item value="0x02" comment="The state of the ability to modify users, credentials or schedules on the device" />
+    <item value="0x04" comment="The state of the ability to clear users, credentials or schedules on the device" />
+    <item value="0x08" comment="The state of the ability to adjust settings on the device" />
+  </bitmap>
+  <bitmap name="0x0101.OperatingModes">
+    <item value="0x01" comment="Normal operation mode" />
+    <item value="0x02" comment="Vacation operation mode" />
+    <item value="0x04" comment="Privacy operation mode" />
+    <item value="0x08" comment="No remote lock and unlock operation mode" />
+    <item value="0x10" comment="Passage operation mode" />
+  </bitmap>
+  <enum name="0x0101.AlarmCode">
+    <item value="0" comment="Locking Mechanism Jammed" />
+    <item value="1" comment="Lock Reset to Factory Defaults" />
+    <item value="3" comment="Lock Radio Power Cycled" />
+    <item value="4" comment="Tamper Alarm - wrong code entry limit" />
+    <item value="5" comment="Tamper Alarm - front escutcheon removed from main" />
+    <item value="6" comment="Forced Door Open under Door Locked Condition" />
+    <item value="7" comment="Door ajar" />
+    <item value="8" comment="Force User SOS alarm" />
+  </enum>
+  <enum name="0x0101.CredentialRule">
+    <item value="0" comment="Only one credential is required for lock operation" />
+    <item value="1" comment="Any two credentials are required for lock operation" />
+    <item value="2" comment="Any three credentials are required for lock operation" />
+  </enum>
+  <enum name="0x0101.CredentialType">
+    <item value="0" comment="Programming PIN code credential type" />
+    <item value="1" comment="PIN code credential type" />
+    <item value="2" comment="RFID identifier credential type" />
+    <item value="3" comment="Fingerprint identifier credential type" />
+    <item value="4" comment="Finger vein identifier credential type" />
+    <item value="5" comment="Face identifier credential type" />
+    <item value="6" comment="A Credential Issuer public key as defined in ref_Aliro" />
+    <item value="7" comment="An Endpoint public key as defined in ref_Aliro which can be evicted if space is needed for another endpoint key" />
+    <item value="8" comment="An Endpoint public key as defined in ref_Aliro which cannot be evicted if space is needed for another endpoint key" />
+  </enum>
+  <enum name="0x0101.DataOperationType">
+    <item value="0" comment="Data is being added or was added" />
+    <item value="1" comment="Data is being cleared or was cleared" />
+    <item value="2" comment="Data is being modified or was modified" />
+  </enum>
+  <enum name="0x0101.DoorState">
+    <item value="0" comment="Door state is open" />
+    <item value="1" comment="Door state is closed" />
+    <item value="2" comment="Door state is jammed" />
+    <item value="3" comment="Door state is currently forced open" />
+    <item value="4" comment="Door state is invalid for unspecified reason" />
+    <item value="5" comment="Door state is ajar" />
+  </enum>
+  <enum name="0x0101.EventType">
+    <item value="0" comment="Event type is operation" />
+    <item value="1" comment="Event type is programming" />
+    <item value="2" comment="Event type is alarm" />
+  </enum>
+  <enum name="0x0101.LEDSetting">
+    <item value="0" comment="Never use LED for signalization" />
+    <item value="1" comment="Use LED signalization except for access allowed events" />
+    <item value="2" comment="Use LED signalization for all events" />
+  </enum>
+  <enum name="0x0101.LockDataType">
+    <item value="0" comment="Unspecified or manufacturer specific lock user data added, cleared, or modified." />
+    <item value="1" comment="Lock programming PIN code was added, cleared, or modified." />
+    <item value="2" comment="Lock user index was added, cleared, or modified." />
+    <item value="3" comment="Lock user week day schedule was added, cleared, or modified." />
+    <item value="4" comment="Lock user year day schedule was added, cleared, or modified." />
+    <item value="5" comment="Lock holiday schedule was added, cleared, or modified." />
+    <item value="6" comment="Lock user PIN code was added, cleared, or modified." />
+    <item value="7" comment="Lock user RFID code was added, cleared, or modified." />
+    <item value="8" comment="Lock user fingerprint was added, cleared, or modified." />
+    <item value="9" comment="Lock user finger-vein information was added, cleared, or modified." />
+    <item value="10" comment="Lock user face information was added, cleared, or modified." />
+    <item value="11" comment="An Aliro credential issuer key credential was added, cleared, or modified." />
+    <item value="12" comment="An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified." />
+    <item value="13" comment="An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified." />
+  </enum>
+  <enum name="0x0101.LockOperationType">
+    <item value="0" comment="Lock operation" />
+    <item value="1" comment="Unlock operation" />
+    <item value="2" comment="Triggered by keypad entry for user with User Type set to Non Access User" />
+    <item value="3" comment="Triggered by using a user with UserType set to Forced User" />
+    <item value="4" comment="Unlatch operation" />
+  </enum>
+  <enum name="0x0101.LockState">
+    <item value="0" comment="Lock state is not fully locked" />
+    <item value="1" comment="Lock state is fully locked" />
+    <item value="2" comment="Lock state is fully unlocked" />
+    <item value="3" comment="Lock state is fully unlocked and the latch is pulled" />
+  </enum>
+  <enum name="0x0101.LockType">
+    <item value="0" comment="Physical lock type is dead bolt" />
+    <item value="1" comment="Physical lock type is magnetic" />
+    <item value="2" comment="Physical lock type is other" />
+    <item value="3" comment="Physical lock type is mortise" />
+    <item value="4" comment="Physical lock type is rim" />
+    <item value="5" comment="Physical lock type is latch bolt" />
+    <item value="6" comment="Physical lock type is cylindrical lock" />
+    <item value="7" comment="Physical lock type is tubular lock" />
+    <item value="8" comment="Physical lock type is interconnected lock" />
+    <item value="9" comment="Physical lock type is dead latch" />
+    <item value="10" comment="Physical lock type is door furniture" />
+    <item value="11" comment="Physical lock type is euro cylinder" />
+  </enum>
+  <enum name="0x0101.OperatingMode">
+    <item value="0" comment="" />
+    <item value="1" comment="" />
+    <item value="2" comment="" />
+    <item value="3" comment="" />
+    <item value="4" comment="" />
+  </enum>
+  <enum name="0x0101.OperationError">
+    <item value="0" comment="Lock/unlock error caused by unknown or unspecified source" />
+    <item value="1" comment="Lock/unlock error caused by invalid PIN, RFID, fingerprint or other credential" />
+    <item value="2" comment="Lock/unlock error caused by disabled USER or credential" />
+    <item value="3" comment="Lock/unlock error caused by schedule restriction" />
+    <item value="4" comment="Lock/unlock error caused by insufficient battery power left to safely actuate the lock" />
+  </enum>
+  <enum name="0x0101.OperationSource">
+    <item value="0" comment="Lock/unlock operation came from unspecified source" />
+    <item value="1" comment="Lock/unlock operation came from manual operation (key, thumbturn, handle, etc)." />
+    <item value="2" comment="Lock/unlock operation came from proprietary remote source (e.g. vendor app/cloud)" />
+    <item value="3" comment="Lock/unlock operation came from keypad" />
+    <item value="4" comment="Lock/unlock operation came from lock automatically (e.g. relock timer)" />
+    <item value="5" comment="Lock/unlock operation came from lock button (e.g. one touch or button)" />
+    <item value="6" comment="Lock/unlock operation came from lock due to a schedule" />
+    <item value="7" comment="Lock/unlock operation came from remote node" />
+    <item value="8" comment="Lock/unlock operation came from RFID card" />
+    <item value="9" comment="Lock/unlock operation came from biometric source (e.g. face, fingerprint/fingervein)" />
+    <item value="10" comment="Lock/unlock operation came from an interaction defined in ref_Aliro, or user change operation was a step-up credential provisioning as defined in ref_Aliro" />
+  </enum>
+  <enum name="0x0101.SoundVolume">
+    <item value="0" comment="Silent Mode" />
+    <item value="1" comment="Low Volume" />
+    <item value="2" comment="High Volume" />
+    <item value="3" comment="Medium Volume" />
+  </enum>
+  <enum name="0x0101.UserStatus">
+    <item value="0" comment="The user ID is available" />
+    <item value="1" comment="The user ID is occupied and enabled" />
+    <item value="3" comment="The user ID is occupied and disabled" />
+  </enum>
+  <enum name="0x0101.UserType">
+    <item value="0" comment="The user ID type is unrestricted" />
+    <item value="1" comment="The user ID type is schedule" />
+    <item value="2" comment="The user ID type is schedule" />
+    <item value="3" comment="The user ID type is programming" />
+    <item value="4" comment="The user ID type is non access" />
+    <item value="5" comment="The user ID type is forced" />
+    <item value="6" comment="The user ID type is disposable" />
+    <item value="7" comment="The user ID type is expiring" />
+    <item value="8" comment="The user ID type is schedule restricted" />
+    <item value="9" comment="The user ID type is remote only" />
+  </enum>
+  <enum name="0x0090.PowerMode">
+    <item value="0" comment="" />
+    <item value="1" comment="Direct current" />
+    <item value="2" comment="Alternating current, either single-phase or polyphase" />
+  </enum>
+  <bitmap name="0x0099.TargetDayOfWeek">
+    <item value="0x01" comment="Sunday" />
+    <item value="0x02" comment="Monday" />
+    <item value="0x04" comment="Tuesday" />
+    <item value="0x08" comment="Wednesday" />
+    <item value="0x10" comment="Thursday" />
+    <item value="0x20" comment="Friday" />
+    <item value="0x40" comment="Saturday" />
+  </bitmap>
+  <enum name="0x0099.EnergyTransferStoppedReason">
+    <item value="0" comment="The EV decided to stop" />
+    <item value="1" comment="The EVSE decided to stop" />
+    <item value="2" comment="An other unknown reason" />
+  </enum>
+  <enum name="0x0099.FaultState">
+    <item value="0" comment="The EVSE is not in an error state." />
+    <item value="1" comment="The EVSE is unable to obtain electrical measurements." />
+    <item value="2" comment="The EVSE input voltage level is too high." />
+    <item value="3" comment="The EVSE input voltage level is too low." />
+    <item value="4" comment="The EVSE detected charging current higher than allowed by charger." />
+    <item value="5" comment="The EVSE detected voltage on charging pins when the contactor is open." />
+    <item value="6" comment="The EVSE detected absence of voltage after enabling contactor." />
+    <item value="7" comment="The EVSE has an unbalanced current supply." />
+    <item value="8" comment="The EVSE has detected a loss in power." />
+    <item value="9" comment="The EVSE has detected another power quality issue (e.g. phase imbalance)." />
+    <item value="10" comment="The EVSE pilot signal amplitude short circuited to ground." />
+    <item value="11" comment="The emergency stop button was pressed." />
+    <item value="12" comment="The EVSE detected that the cable has been disconnected." />
+    <item value="13" comment="The EVSE could not determine proper power supply level." />
+    <item value="14" comment="The EVSE detected Live and Neutral are swapped." />
+    <item value="15" comment="The EVSE internal temperature is too high." />
+    <item value="255" comment="Any other reason." />
+  </enum>
+  <enum name="0x0099.State">
+    <item value="0" comment="The EV is not plugged in." />
+    <item value="1" comment="The EV is plugged in, but not demanding current." />
+    <item value="2" comment="The EV is plugged in and is demanding current, but EVSE is not allowing current to flow." />
+    <item value="3" comment="The EV is plugged in, charging is in progress, and current is flowing" />
+    <item value="4" comment="The EV is plugged in, discharging is in progress, and current is flowing" />
+    <item value="5" comment="The EVSE is transitioning from any plugged-in state to NotPluggedIn" />
+    <item value="6" comment="There is a fault (see FaultState Attribute attribute)" />
+  </enum>
+  <enum name="0x0099.SupplyState">
+    <item value="0" comment="The EV is not currently allowed to charge or discharge" />
+    <item value="1" comment="The EV is currently allowed to charge" />
+    <item value="2" comment="The EV is currently allowed to discharge" />
+    <item value="3" comment="The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue." />
+    <item value="4" comment="The EV is not currently allowed to charge or discharge due to self-diagnostics mode." />
+    <item value="5" comment="The EV is currently allowed to charge and discharge" />
+  </enum>
+  <enum name="0x009B.EnergyPriority">
+    <item value="0" comment="User comfort" />
+    <item value="1" comment="Speed of operation" />
+    <item value="2" comment="Amount of Energy consumed by the device" />
+    <item value="3" comment="Amount of water consumed by the device" />
+  </enum>
+  <bitmap name="0x0202.Rock">
+    <item value="0x01" comment="Indicate rock left to right" />
+    <item value="0x02" comment="Indicate rock up and down" />
+    <item value="0x04" comment="Indicate rock around" />
+  </bitmap>
+  <bitmap name="0x0202.Wind">
+    <item value="0x01" comment="Indicate sleep wind" />
+    <item value="0x02" comment="Indicate natural wind" />
+  </bitmap>
+  <enum name="0x0202.AirflowDirection">
+    <item value="0" comment="Airflow is in the forward direction" />
+    <item value="1" comment="Airflow is in the reverse direction" />
+  </enum>
+  <enum name="0x0202.FanMode">
+    <item value="0" comment="Fan is off" />
+    <item value="1" comment="Fan using low speed" />
+    <item value="2" comment="Fan using medium speed" />
+    <item value="3" comment="Fan using high speed" />
+    <item value="4" comment="" />
+    <item value="5" comment="Fan is using auto mode" />
+    <item value="6" comment="Fan is using smart mode" />
+  </enum>
+  <enum name="0x0202.FanModeSequence">
+    <item value="0" comment="Fan is capable of off, low, medium and high modes" />
+    <item value="1" comment="Fan is capable of off, low and high modes" />
+    <item value="2" comment="Fan is capable of off, low, medium, high and auto modes" />
+    <item value="3" comment="Fan is capable of off, low, high and auto modes" />
+    <item value="4" comment="Fan is capable of off, high and auto modes" />
+    <item value="5" comment="Fan is capable of off and high modes" />
+  </enum>
+  <enum name="0x0202.StepDirection">
+    <item value="0" comment="Step moves in increasing direction" />
+    <item value="1" comment="Step moves in decreasing direction" />
+  </enum>
+  <enum name="0x0030.CommissioningError">
+    <item value="0" comment="No error" />
+    <item value="1" comment="&lt;see cref=&quot;ValueOutsideRange&quot;/&gt; Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration." />
+    <item value="2" comment="&lt;see cref=&quot;InvalidAuthentication&quot;/&gt; Executed CommissioningComplete outside CASE session." />
+    <item value="3" comment="&lt;see cref=&quot;NoFailSafe&quot;/&gt; Executed CommissioningComplete when there was no active ArmFailSafe Command." />
+    <item value="4" comment="&lt;see cref=&quot;BusyWithOtherAdmin&quot;/&gt; Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context." />
+    <item value="5" comment="&lt;see cref=&quot;RequiredTCNotAccepted&quot;/&gt; One or more required TC features from the Enhanced Setup Flow were not accepted." />
+    <item value="6" comment="&lt;see cref=&quot;TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived&quot;/&gt; No acknowledgements from the user for the TC features were received." />
+    <item value="7" comment="&lt;see cref=&quot;TCMinVersionNotMet, TCMinVersionNotMet&quot;/&gt; The version of the TC features acknowledged by the user did not meet the minimum required version." />
+  </enum>
+  <enum name="0x0030.RegulatoryLocationType">
+    <item value="0" comment="Indoor only" />
+    <item value="1" comment="Outdoor only" />
+    <item value="2" comment="Indoor/Outdoor" />
+  </enum>
+  <enum name="0x003F.GroupKeyMulticastPolicy">
+    <item value="0" comment="Indicates filtering of multicast messages for a specific Group ID" />
+    <item value="1" comment="Indicates not filtering of multicast messages" />
+  </enum>
+  <enum name="0x003F.GroupKeySecurityPolicy">
+    <item value="0" comment="Message counter synchronization using trust-first" />
+    <item value="1" comment="Message counter synchronization using cache-and-sync" />
+  </enum>
+  <bitmap name="0x0004.NameSupport">
+    <item value="0x80" comment="The ability to store a name for a group." />
+  </bitmap>
+  <bitmap name="0x0046.UserActiveModeTrigger">
+    <item value="0x0001" comment="Power Cycle to transition the device to ActiveMode" />
+    <item value="0x0002" comment="Settings menu on the device informs how to transition the device to ActiveMode" />
+    <item value="0x0004" comment="Custom Instruction on how to transition the device to ActiveMode" />
+    <item value="0x0008" comment="Device Manual informs how to transition the device to ActiveMode" />
+    <item value="0x0010" comment="Actuate Sensor to transition the device to ActiveMode" />
+    <item value="0x0020" comment="Actuate Sensor for N seconds to transition the device to ActiveMode" />
+    <item value="0x0040" comment="Actuate Sensor N times to transition the device to ActiveMode" />
+    <item value="0x0080" comment="Actuate Sensor until light blinks to transition the device to ActiveMode" />
+    <item value="0x0100" comment="Press Reset Button to transition the device to ActiveMode" />
+    <item value="0x0200" comment="Press Reset Button until light blinks to transition the device to ActiveMode" />
+    <item value="0x0400" comment="Press Reset Button for N seconds to transition the device to ActiveMode" />
+    <item value="0x0800" comment="Press Reset Button N times to transition the device to ActiveMode" />
+    <item value="0x1000" comment="Press Setup Button to transition the device to ActiveMode" />
+    <item value="0x2000" comment="Press Setup Button for N seconds to transition the device to ActiveMode" />
+    <item value="0x4000" comment="Press Setup Button until light blinks to transition the device to ActiveMode" />
+    <item value="0x8000" comment="Press Setup Button N times to transition the device to ActiveMode" />
+    <item value="0x10000" comment="Press the N Button to transition the device to ActiveMode" />
+  </bitmap>
+  <enum name="0x0046.OperatingMode">
+    <item value="0" comment="ICD is operating as a Short Idle Time ICD." />
+    <item value="1" comment="ICD is operating as a Long Idle Time ICD." />
+  </enum>
+  <enum name="0x0003.EffectIdentifier">
+    <item value="0x00" comment="e.g., Light is turned on/off once." />
+    <item value="0x0B" comment="e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s." />
+    <item value="0x01" comment="e.g., Light is turned on/off over 1 second and repeated 15 times." />
+    <item value="0x02" comment="e.g., Colored light turns green for 1 second; non-colored light flashes twice." />
+    <item value="0xFE" comment="Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect (as above), first complete the current 1s breathe effect and then terminate the effect." />
+    <item value="0xFF" comment="Terminate the effect as soon as possible." />
+  </enum>
+  <enum name="0x0003.EffectVariant">
+    <item value="0x00" comment="Indicates the default effect is used" />
+  </enum>
+  <enum name="0x0003.IdentifyType">
+    <item value="0x00" comment="No presentation." />
+    <item value="0x01" comment="Light output of a lighting product." />
+    <item value="0x02" comment="Typically a small LED." />
+    <item value="0x03" comment="" />
+    <item value="0x04" comment="Presentation will be visible on display screen." />
+    <item value="0x05" comment="Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay." />
+  </enum>
+  <enum name="0x0400.LightSensorType">
+    <item value="0" comment="Indicates photodiode sensor type" />
+    <item value="1" comment="Indicates CMOS sensor type" />
+  </enum>
+  <enum name="0x0752.DatastoreState">
+    <item value="0" comment="Target device operation is pending" />
+    <item value="1" comment="Target device operation has been committed" />
+    <item value="2" comment="Target device delete operation is pending" />
+  </enum>
+  <enum name="0x0753.ICAC Signing Request Status ">
+    <item value="0" comment="No error" />
+    <item value="1" comment="The ICACSR in the request is not compliant to &lt;&lt;ref_Rfc2986, PKCS #10&gt;&gt; rules" />
+    <item value="2" comment="The ICACSR in the request has an incorrect signature" />
+    <item value="3" comment="DCL Vendor ID validation failed" />
+    <item value="4" comment="DCL returned certificate is not an ICAC" />
+    <item value="5" comment="Error due to an in progress Anchor Transfer" />
+    <item value="6" comment="Signing the ICA CSR failed" />
+    <item value="7" comment="No user consent" />
+  </enum>
+  <enum name="0x0753.Transfer Anchor Response Status ">
+    <item value="0" comment="No error" />
+    <item value="1" comment="Anchor Transfer was not started due to on-going Datastore operations" />
+    <item value="2" comment="User has not consented for Anchor Transfer" />
+  </enum>
+  <enum name="0x0509.CecKeyCode">
+    <item value="0x00" comment="" />
+    <item value="0x0A" comment="" />
+    <item value="0x0B" comment="" />
+    <item value="0x0C" comment="" />
+    <item value="0x0D" comment="" />
+    <item value="0x01" comment="" />
+    <item value="0x1D" comment="" />
+    <item value="0x1E" comment="" />
+    <item value="0x1F" comment="" />
+    <item value="0x02" comment="" />
+    <item value="0x2A" comment="" />
+    <item value="0x2B" comment="" />
+    <item value="0x2C" comment="" />
+    <item value="0x2F" comment="" />
+    <item value="0x03" comment="" />
+    <item value="0x04" comment="" />
+    <item value="0x4A" comment="" />
+    <item value="0x4B" comment="" />
+    <item value="0x4C" comment="" />
+    <item value="0x4D" comment="" />
+    <item value="0x4E" comment="" />
+    <item value="0x4F" comment="" />
+    <item value="0x05" comment="" />
+    <item value="0x06" comment="" />
+    <item value="0x6A" comment="" />
+    <item value="0x6B" comment="" />
+    <item value="0x6C" comment="" />
+    <item value="0x6D" comment="" />
+    <item value="0x07" comment="" />
+    <item value="0x08" comment="" />
+    <item value="0x09" comment="" />
+    <item value="0x10" comment="" />
+    <item value="0x11" comment="" />
+    <item value="0x20" comment="" />
+    <item value="0x21" comment="" />
+    <item value="0x22" comment="" />
+    <item value="0x23" comment="" />
+    <item value="0x24" comment="" />
+    <item value="0x25" comment="" />
+    <item value="0x26" comment="" />
+    <item value="0x27" comment="" />
+    <item value="0x28" comment="" />
+    <item value="0x29" comment="" />
+    <item value="0x30" comment="" />
+    <item value="0x31" comment="" />
+    <item value="0x32" comment="" />
+    <item value="0x33" comment="" />
+    <item value="0x34" comment="" />
+    <item value="0x35" comment="" />
+    <item value="0x36" comment="" />
+    <item value="0x37" comment="" />
+    <item value="0x38" comment="" />
+    <item value="0x40" comment="" />
+    <item value="0x41" comment="" />
+    <item value="0x42" comment="" />
+    <item value="0x43" comment="" />
+    <item value="0x44" comment="" />
+    <item value="0x45" comment="" />
+    <item value="0x46" comment="" />
+    <item value="0x47" comment="" />
+    <item value="0x48" comment="" />
+    <item value="0x49" comment="" />
+    <item value="0x50" comment="" />
+    <item value="0x51" comment="" />
+    <item value="0x52" comment="" />
+    <item value="0x53" comment="" />
+    <item value="0x54" comment="" />
+    <item value="0x55" comment="" />
+    <item value="0x56" comment="" />
+    <item value="0x57" comment="" />
+    <item value="0x60" comment="" />
+    <item value="0x61" comment="" />
+    <item value="0x62" comment="" />
+    <item value="0x63" comment="" />
+    <item value="0x64" comment="" />
+    <item value="0x65" comment="" />
+    <item value="0x66" comment="" />
+    <item value="0x67" comment="" />
+    <item value="0x68" comment="" />
+    <item value="0x69" comment="" />
+    <item value="0x71" comment="" />
+    <item value="0x72" comment="" />
+    <item value="0x73" comment="" />
+    <item value="0x74" comment="" />
+    <item value="0x75" comment="" />
+    <item value="0x76" comment="" />
+  </enum>
+  <enum name="0x0509.Status">
+    <item value="0" comment="Succeeded" />
+    <item value="1" comment="Key code is not supported." />
+    <item value="2" comment="Requested key code is invalid in the context of the responder's current state." />
+  </enum>
+  <enum name="0x004A.DrynessLevel">
+    <item value="0" comment="Provides a low dryness level for the selected mode" />
+    <item value="1" comment="Provides the normal level of dryness for the selected mode" />
+    <item value="2" comment="Provides an extra dryness level for the selected mode" />
+    <item value="3" comment="Provides the max dryness level for the selected mode" />
+  </enum>
+  <enum name="0x0053.NumberOfRinses">
+    <item value="0" comment="This laundry washer mode does not perform rinse cycles" />
+    <item value="1" comment="This laundry washer mode performs normal rinse cycles determined by the manufacturer" />
+    <item value="2" comment="This laundry washer mode performs an extra rinse cycle" />
+    <item value="3" comment="This laundry washer mode performs the maximum number of rinse cycles determined by the manufacturer" />
+  </enum>
+  <bitmap name="0x0008.Options">
+    <item value="0x01" comment="Dependency on On/Off cluster" />
+    <item value="0x02" comment="Dependency on Color Control cluster" />
+  </bitmap>
+  <enum name="0x0008.MoveMode">
+    <item value="0" comment="Increase the level" />
+    <item value="1" comment="Decrease the level" />
+  </enum>
+  <enum name="0x0008.StepMode">
+    <item value="0" comment="Step upwards" />
+    <item value="1" comment="Step downwards" />
+  </enum>
+  <enum name="0x002C.CalendarType">
+    <item value="0" comment="Dates conveyed using the Buddhist calendar" />
+    <item value="1" comment="Dates conveyed using the Chinese calendar" />
+    <item value="2" comment="Dates conveyed using the Coptic calendar" />
+    <item value="3" comment="Dates conveyed using the Ethiopian calendar" />
+    <item value="4" comment="Dates conveyed using the Gregorian calendar" />
+    <item value="5" comment="Dates conveyed using the Hebrew calendar" />
+    <item value="6" comment="Dates conveyed using the Indian calendar" />
+    <item value="7" comment="Dates conveyed using the Islamic calendar" />
+    <item value="8" comment="Dates conveyed using the Japanese calendar" />
+    <item value="9" comment="Dates conveyed using the Korean calendar" />
+    <item value="10" comment="Dates conveyed using the Persian calendar" />
+    <item value="11" comment="Dates conveyed using the Taiwanese calendar" />
+    <item value="255" comment="calendar implied from active locale" />
+  </enum>
+  <enum name="0x002C.HourFormat">
+    <item value="0" comment="Time conveyed with a 12-hour clock" />
+    <item value="1" comment="Time conveyed with a 24-hour clock" />
+    <item value="255" comment="Use active locale clock" />
+  </enum>
+  <enum name="0x002D.TempUnit">
+    <item value="0" comment="Temperature conveyed in Fahrenheit" />
+    <item value="1" comment="Temperature conveyed in Celsius" />
+    <item value="2" comment="Temperature conveyed in Kelvin" />
+  </enum>
+  <enum name="0x0507.InputType">
+    <item value="0" comment="Indicates content not coming from a physical input." />
+    <item value="1" comment="" />
+    <item value="2" comment="" />
+    <item value="3" comment="" />
+    <item value="4" comment="" />
+    <item value="5" comment="" />
+    <item value="6" comment="" />
+    <item value="7" comment="" />
+    <item value="8" comment="" />
+    <item value="9" comment="" />
+    <item value="10" comment="" />
+    <item value="11" comment="" />
+  </enum>
+  <enum name="0x0506.Characteristic">
+    <item value="0" comment="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio." />
+    <item value="1" comment="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component" />
+    <item value="2" comment="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)]." />
+    <item value="3" comment="A media characteristic that indicates that a track selection option includes frame-based content." />
+    <item value="4" comment="Main media component(s) which is/are intended for presentation if no other information is provided" />
+    <item value="5" comment="A media characteristic that indicates that a track or media selection option contains original content." />
+    <item value="6" comment="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog." />
+    <item value="7" comment="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired." />
+    <item value="8" comment="Textual transcriptions of spoken dialog." />
+    <item value="9" comment="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired." />
+    <item value="10" comment="Media content component that is supplementary to a media content component of a different media component type." />
+    <item value="11" comment="Experience that contains a commentary (e.g. director’s commentary) (typically audio)" />
+    <item value="12" comment="Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)" />
+    <item value="13" comment="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component" />
+    <item value="14" comment="Media component containing information intended to be processed by application specific elements." />
+    <item value="15" comment="Experience containing an element for improved intelligibility of the dialogue." />
+    <item value="16" comment="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency." />
+    <item value="17" comment="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2]." />
+  </enum>
+  <enum name="0x0506.PlaybackState">
+    <item value="0" comment="Media is currently playing (includes FF and REW)" />
+    <item value="1" comment="Media is currently paused" />
+    <item value="2" comment="Media is not currently playing" />
+    <item value="3" comment="Media is not currently buffering and playback will start when buffer has been filled" />
+  </enum>
+  <enum name="0x0506.Status">
+    <item value="0" comment="Succeeded" />
+    <item value="1" comment="Requested playback command is invalid in the current playback state." />
+    <item value="2" comment="Requested playback command is not allowed in the current playback state. For example, attempting to fast-forward during a commercial might return NotAllowed." />
+    <item value="3" comment="This endpoint is not active for playback." />
+    <item value="4" comment="The FastForward or Rewind Command was issued but the media is already playing back at the fastest speed supported by the server in the respective direction." />
+    <item value="5" comment="The Seek Command was issued with a value of position outside of the allowed seek range of the media." />
+  </enum>
+  <bitmap name="0x0097.MessageControl">
+    <item value="0x01" comment="Message requires confirmation from user" />
+    <item value="0x02" comment="Message requires response from user" />
+    <item value="0x04" comment="Message supports reply message from user" />
+    <item value="0x08" comment="Message has already been confirmed" />
+    <item value="0x10" comment="Message required PIN/password protection" />
+  </bitmap>
+  <enum name="0x0097.FutureMessagePreference">
+    <item value="0" comment="Similar messages are allowed" />
+    <item value="1" comment="Similar messages should be sent more often" />
+    <item value="2" comment="Similar messages should be sent less often" />
+    <item value="3" comment="Similar messages should not be sent" />
+    <item value="4" comment="No further messages should be sent" />
+  </enum>
+  <enum name="0x0097.MessagePriority">
+    <item value="0" comment="Message to be transferred with a low level of importance" />
+    <item value="1" comment="Message to be transferred with a medium level of importance" />
+    <item value="2" comment="Message to be transferred with a high level of importance" />
+    <item value="3" comment="Message to be transferred with a critical level of importance" />
+  </enum>
+  <bitmap name="0x0031.ThreadCapabilities">
+    <item value="0x01" comment="Thread Border Router functionality is present" />
+    <item value="0x02" comment="Router mode is supported (interface could be in router or REED mode)" />
+    <item value="0x04" comment="Sleepy end-device mode is supported" />
+    <item value="0x08" comment="Device is a full Thread device (opposite of Minimal Thread Device)" />
+    <item value="0x10" comment="Synchronized sleepy end-device mode is supported" />
+  </bitmap>
+  <bitmap name="0x0031.WiFiSecurity">
+    <item value="0x01" comment="Supports unencrypted Wi-Fi" />
+    <item value="0x02" comment="Supports Wi-Fi using WEP security" />
+    <item value="0x04" comment="Supports Wi-Fi using WPA-Personal security" />
+    <item value="0x08" comment="Supports Wi-Fi using WPA2-Personal security" />
+    <item value="0x10" comment="Supports Wi-Fi using WPA3-Personal security" />
+  </bitmap>
+  <enum name="0x0031.NetworkCommissioningStatus">
+    <item value="0" comment="OK, no error" />
+    <item value="1" comment="&lt;see cref=&quot;OutOfRange&quot;/&gt; Value Outside Range" />
+    <item value="2" comment="&lt;see cref=&quot;BoundsExceeded&quot;/&gt; A collection would exceed its size limit" />
+    <item value="3" comment="&lt;see cref=&quot;NetworkIdNotFound&quot;/&gt; The NetworkID is not among the collection of added networks" />
+    <item value="4" comment="&lt;see cref=&quot;DuplicateNetworkId&quot;/&gt; The NetworkID is already among the collection of added networks" />
+    <item value="5" comment="&lt;see cref=&quot;NetworkNotFound&quot;/&gt; Cannot find AP: SSID Not found" />
+    <item value="6" comment="&lt;see cref=&quot;RegulatoryError&quot;/&gt; Cannot find AP: Mismatch on band/channels/regulatory domain / 2.4GHz vs 5GHz" />
+    <item value="7" comment="&lt;see cref=&quot;AuthFailure&quot;/&gt; Cannot associate due to authentication failure" />
+    <item value="8" comment="&lt;see cref=&quot;UnsupportedSecurity&quot;/&gt; Cannot associate due to unsupported security mode" />
+    <item value="9" comment="&lt;see cref=&quot;OtherConnectionFailure&quot;/&gt; Other association failure" />
+    <item value="10" comment="&lt;see cref=&quot;Ipv6Failed&quot;/&gt; Failure to generate an IPv6 address" />
+    <item value="11" comment="&lt;see cref=&quot;IpBindFailed&quot;/&gt; Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces" />
+    <item value="12" comment="&lt;see cref=&quot;UnknownError&quot;/&gt; Unknown error" />
+  </enum>
+  <enum name="0x0031.WiFiBand">
+    <item value="0" comment="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)" />
+    <item value="1" comment="3.65GHz - 3.655GHz to 3.695GHz (802.11y)" />
+    <item value="2" comment="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)" />
+    <item value="3" comment="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)" />
+    <item value="4" comment="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)" />
+    <item value="5" comment="Sub-1GHz - 755MHz to 931MHz (802.11ah)" />
+  </enum>
+  <bitmap name="0x0406.Occupancy">
+    <item value="0x01" comment="Indicates the sensed occupancy state" />
+  </bitmap>
+  <bitmap name="0x0406.OccupancySensorType">
+    <item value="0x01" comment="Indicates a passive infrared sensor." />
+    <item value="0x02" comment="Indicates a ultrasonic sensor." />
+    <item value="0x04" comment="Indicates a physical contact sensor." />
+  </bitmap>
+  <enum name="0x0406.OccupancySensorType">
+    <item value="0" comment="Indicates a passive infrared sensor." />
+    <item value="1" comment="Indicates a ultrasonic sensor." />
+    <item value="2" comment="Indicates a passive infrared and ultrasonic sensor." />
+    <item value="3" comment="Indicates a physical contact sensor." />
+  </enum>
+  <bitmap name="0x0006.OnOffControl">
+    <item value="0x01" comment="Indicates a command is only accepted when in On state." />
+  </bitmap>
+  <enum name="0x0006.DelayedAllOffEffectVariant">
+    <item value="0x00" comment="Fade to off in 0.8 seconds" />
+    <item value="0x01" comment="No fade" />
+    <item value="0x02" comment="50% dim down in 0.8 seconds then fade to off in 12 seconds" />
+  </enum>
+  <enum name="0x0006.DyingLightEffectVariant">
+    <item value="0x00" comment="20% dim up in 0.5s then fade to off in 1 second" />
+  </enum>
+  <enum name="0x0006.EffectIdentifier">
+    <item value="0x00" comment="Delayed All Off" />
+    <item value="0x01" comment="Dying Light" />
+  </enum>
+  <enum name="0x0006.StartUpOnOff">
+    <item value="0" comment="Set the OnOff attribute to FALSE" />
+    <item value="1" comment="Set the OnOff attribute to TRUE" />
+    <item value="2" comment="If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle)." />
+  </enum>
+  <enum name="0x003E.CertificateChainType">
+    <item value="1" comment="Request the DER-encoded DAC certificate" />
+    <item value="2" comment="Request the DER-encoded PAI certificate" />
+  </enum>
+  <enum name="0x003E.NodeOperationalCertStatus">
+    <item value="0" comment="OK, no error" />
+    <item value="1" comment="&lt;see cref=&quot;InvalidPublicKey&quot;/&gt; Public Key in the NOC does not match the public key in the NOCSR" />
+    <item value="2" comment="&lt;see cref=&quot;InvalidOperationalId&quot;/&gt; The Node Operational ID in the NOC is not formatted correctly." />
+    <item value="3" comment="&lt;see cref=&quot;InvalidNoc&quot;/&gt; Any other validation error in NOC chain" />
+    <item value="4" comment="&lt;see cref=&quot;MissingCsr&quot;/&gt; No record of prior CSR for which this NOC could match" />
+    <item value="5" comment="&lt;see cref=&quot;TableFull&quot;/&gt; NOCs table full, cannot add another one" />
+    <item value="6" comment="&lt;see cref=&quot;InvalidAdminSubject&quot;/&gt; Invalid CaseAdminSubject field for an AddNOC command." />
+    <item value="7" comment="Reserved for future use" />
+    <item value="8" comment="Reserved for future use" />
+    <item value="9" comment="&lt;see cref=&quot;FabricConflict&quot;/&gt; Trying to AddNOC instead of UpdateNOC against an existing Fabric." />
+    <item value="10" comment="&lt;see cref=&quot;LabelConflict&quot;/&gt; Label already exists on another Fabric." />
+    <item value="11" comment="&lt;see cref=&quot;InvalidFabricIndex&quot;/&gt; FabricIndex argument is invalid." />
+  </enum>
+  <enum name="0x0060.ErrorState">
+  </enum>
+  <enum name="0x0060.OperationalState">
+  </enum>
+  <enum name="0x0061.ErrorState">
+    <item value="0x40" comment="The device has failed to find or reach the charging dock" />
+    <item value="0x41" comment="The device is stuck and requires manual intervention" />
+    <item value="0x42" comment="The device has detected that its dust bin is missing" />
+    <item value="0x43" comment="The device has detected that its dust bin is full" />
+    <item value="0x44" comment="The device has detected that its water tank is empty" />
+    <item value="0x45" comment="The device has detected that its water tank is missing" />
+    <item value="0x46" comment="The device has detected that its water tank lid is open" />
+    <item value="0x47" comment="The device has detected that its cleaning pad is missing" />
+  </enum>
+  <enum name="0x0061.OperationalState">
+    <item value="0x40" comment="The device is en route to the charging dock" />
+    <item value="0x41" comment="The device is charging" />
+    <item value="0x42" comment="The device is on the dock, not charging" />
+  </enum>
+  <enum name="0x0029.ApplyUpdateAction">
+    <item value="0" comment="Apply the update." />
+    <item value="1" comment="Wait at least the given delay time." />
+    <item value="2" comment="The OTA Provider is conveying a desire to rescind a previously provided Software Image." />
+  </enum>
+  <enum name="0x0029.DownloadProtocol">
+    <item value="0" comment="Indicates support for synchronous BDX." />
+    <item value="1" comment="Indicates support for asynchronous BDX." />
+    <item value="2" comment="Indicates support for HTTPS." />
+    <item value="3" comment="Indicates support for vendor specific protocol." />
+  </enum>
+  <enum name="0x0029.Status">
+    <item value="0" comment="Indicates that the OTA Provider has an update available." />
+    <item value="1" comment="Indicates OTA Provider may have an update, but it is not ready yet." />
+    <item value="2" comment="Indicates that there is definitely no update currently available from the OTA Provider." />
+    <item value="3" comment="Indicates that the requested download protocol is not supported by the OTA Provider." />
+  </enum>
+  <enum name="0x002A.AnnouncementReason">
+    <item value="0" comment="An OTA Provider is announcing its presence." />
+    <item value="1" comment="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available." />
+    <item value="2" comment="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently." />
+  </enum>
+  <enum name="0x002A.ChangeReason">
+    <item value="0" comment="The reason for a state change is unknown." />
+    <item value="1" comment="The reason for a state change is the success of a prior operation." />
+    <item value="2" comment="The reason for a state change is the failure of a prior operation." />
+    <item value="3" comment="The reason for a state change is a time-out." />
+    <item value="4" comment="The reason for a state change is a request by the OTA Provider to wait." />
+  </enum>
+  <enum name="0x002A.UpdateState">
+    <item value="0" comment="Current state is not yet determined." />
+    <item value="1" comment="Indicate a Node not yet in the process of software update." />
+    <item value="2" comment="Indicate a Node in the process of querying an OTA Provider." />
+    <item value="3" comment="Indicate a Node waiting after a Busy response." />
+    <item value="4" comment="Indicate a Node currently in the process of downloading a software update." />
+    <item value="5" comment="Indicate a Node currently in the process of verifying and applying a software update." />
+    <item value="6" comment="Indicate a Node waiting caused by AwaitNextAction response." />
+    <item value="7" comment="Indicate a Node in the process of recovering to a previous version." />
+    <item value="8" comment="Indicate a Node is capable of user consent." />
+  </enum>
+  <enum name="0x002F.BatApprovedChemistry">
+    <item value="0" comment="Cell chemistry is unspecified or unknown" />
+    <item value="1" comment="Cell chemistry is alkaline" />
+    <item value="2" comment="Cell chemistry is lithium carbon fluoride" />
+    <item value="3" comment="Cell chemistry is lithium chromium oxide" />
+    <item value="4" comment="Cell chemistry is lithium copper oxide" />
+    <item value="5" comment="Cell chemistry is lithium iron disulfide" />
+    <item value="6" comment="Cell chemistry is lithium manganese dioxide" />
+    <item value="7" comment="Cell chemistry is lithium thionyl chloride" />
+    <item value="8" comment="Cell chemistry is magnesium" />
+    <item value="9" comment="Cell chemistry is mercury oxide" />
+    <item value="10" comment="Cell chemistry is nickel oxyhydride" />
+    <item value="11" comment="Cell chemistry is silver oxide" />
+    <item value="12" comment="Cell chemistry is zinc air" />
+    <item value="13" comment="Cell chemistry is zinc carbon" />
+    <item value="14" comment="Cell chemistry is zinc chloride" />
+    <item value="15" comment="Cell chemistry is zinc manganese dioxide" />
+    <item value="16" comment="Cell chemistry is lead acid" />
+    <item value="17" comment="Cell chemistry is lithium cobalt oxide" />
+    <item value="18" comment="Cell chemistry is lithium ion" />
+    <item value="19" comment="Cell chemistry is lithium ion polymer" />
+    <item value="20" comment="Cell chemistry is lithium iron phosphate" />
+    <item value="21" comment="Cell chemistry is lithium sulfur" />
+    <item value="22" comment="Cell chemistry is lithium titanate" />
+    <item value="23" comment="Cell chemistry is nickel cadmium" />
+    <item value="24" comment="Cell chemistry is nickel hydrogen" />
+    <item value="25" comment="Cell chemistry is nickel iron" />
+    <item value="26" comment="Cell chemistry is nickel metal hydride" />
+    <item value="27" comment="Cell chemistry is nickel zinc" />
+    <item value="28" comment="Cell chemistry is silver zinc" />
+    <item value="29" comment="Cell chemistry is sodium ion" />
+    <item value="30" comment="Cell chemistry is sodium sulfur" />
+    <item value="31" comment="Cell chemistry is zinc bromide" />
+    <item value="32" comment="Cell chemistry is zinc cerium" />
+  </enum>
+  <enum name="0x002F.BatChargeFault">
+    <item value="0" comment="The Node detects an unspecified fault on this battery source." />
+    <item value="1" comment="The Node detects the ambient temperature is above the nominal range for this battery source." />
+    <item value="2" comment="The Node detects the ambient temperature is below the nominal range for this battery source." />
+    <item value="3" comment="The Node detects the temperature of this battery source is above the nominal range." />
+    <item value="4" comment="The Node detects the temperature of this battery source is below the nominal range." />
+    <item value="5" comment="The Node detects this battery source is not present." />
+    <item value="6" comment="The Node detects this battery source is over voltage." />
+    <item value="7" comment="The Node detects this battery source is under voltage." />
+    <item value="8" comment="The Node detects the charger for this battery source is over voltage." />
+    <item value="9" comment="The Node detects the charger for this battery source is under voltage." />
+    <item value="10" comment="The Node detects a charging safety timeout for this battery source." />
+  </enum>
+  <enum name="0x002F.BatChargeLevel">
+    <item value="0" comment="Charge level is nominal" />
+    <item value="1" comment="Charge level is low, intervention may soon be required." />
+    <item value="2" comment="Charge level is critical, immediate intervention is required" />
+  </enum>
+  <enum name="0x002F.BatChargeState">
+    <item value="0" comment="Unable to determine the charging state" />
+    <item value="1" comment="The battery is charging" />
+    <item value="2" comment="The battery is at full charge" />
+    <item value="3" comment="The battery is not charging" />
+  </enum>
+  <enum name="0x002F.BatCommonDesignation">
+    <item value="0" comment="Common type is unknown or unspecified" />
+    <item value="1" comment="Common type is as specified" />
+    <item value="2" comment="Common type is as specified" />
+    <item value="3" comment="Common type is as specified" />
+    <item value="4" comment="Common type is as specified" />
+    <item value="5" comment="Common type is as specified" />
+    <item value="6" comment="Common type is as specified" />
+    <item value="7" comment="Common type is as specified" />
+    <item value="8" comment="Common type is as specified" />
+    <item value="9" comment="Common type is as specified" />
+    <item value="10" comment="Common type is as specified" />
+    <item value="11" comment="Common type is as specified" />
+    <item value="12" comment="Common type is as specified" />
+    <item value="13" comment="Common type is as specified" />
+    <item value="14" comment="Common type is as specified" />
+    <item value="15" comment="Common type is as specified" />
+    <item value="16" comment="Common type is as specified" />
+    <item value="17" comment="Common type is as specified" />
+    <item value="18" comment="Common type is as specified" />
+    <item value="19" comment="Common type is as specified" />
+    <item value="20" comment="Common type is as specified" />
+    <item value="21" comment="Common type is as specified" />
+    <item value="22" comment="Common type is as specified" />
+    <item value="23" comment="Common type is as specified" />
+    <item value="24" comment="Common type is as specified" />
+    <item value="25" comment="Common type is as specified" />
+    <item value="26" comment="Common type is as specified" />
+    <item value="27" comment="Common type is as specified" />
+    <item value="28" comment="Common type is as specified" />
+    <item value="29" comment="Common type is as specified" />
+    <item value="30" comment="Common type is as specified" />
+    <item value="31" comment="Common type is as specified" />
+    <item value="32" comment="Common type is as specified" />
+    <item value="33" comment="Common type is as specified" />
+    <item value="34" comment="Common type is as specified" />
+    <item value="35" comment="Common type is as specified" />
+    <item value="36" comment="Common type is as specified" />
+    <item value="37" comment="Common type is as specified" />
+    <item value="38" comment="Common type is as specified" />
+    <item value="39" comment="Common type is as specified" />
+    <item value="40" comment="Common type is as specified" />
+    <item value="41" comment="Common type is as specified" />
+    <item value="42" comment="Common type is as specified" />
+    <item value="43" comment="Common type is as specified" />
+    <item value="44" comment="Common type is as specified" />
+    <item value="45" comment="Common type is as specified" />
+    <item value="46" comment="Common type is as specified" />
+    <item value="47" comment="Common type is as specified" />
+    <item value="48" comment="Common type is as specified" />
+    <item value="49" comment="Common type is as specified" />
+    <item value="50" comment="Common type is as specified" />
+    <item value="51" comment="Common type is as specified" />
+    <item value="52" comment="Common type is as specified" />
+    <item value="53" comment="Common type is as specified" />
+    <item value="54" comment="Common type is as specified" />
+    <item value="55" comment="Common type is as specified" />
+    <item value="56" comment="Common type is as specified" />
+    <item value="57" comment="Common type is as specified" />
+    <item value="58" comment="Common type is as specified" />
+    <item value="59" comment="Common type is as specified" />
+    <item value="60" comment="Common type is as specified" />
+    <item value="61" comment="Common type is as specified" />
+    <item value="62" comment="Common type is as specified" />
+    <item value="63" comment="Common type is as specified" />
+    <item value="64" comment="Common type is as specified" />
+    <item value="65" comment="Common type is as specified" />
+    <item value="66" comment="Common type is as specified" />
+    <item value="67" comment="Common type is as specified" />
+    <item value="68" comment="Common type is as specified" />
+    <item value="69" comment="Common type is as specified" />
+    <item value="70" comment="Common type is as specified" />
+    <item value="71" comment="Common type is as specified" />
+    <item value="72" comment="Common type is as specified" />
+    <item value="73" comment="Common type is as specified" />
+    <item value="74" comment="Common type is as specified" />
+    <item value="75" comment="Common type is as specified" />
+    <item value="76" comment="Common type is as specified" />
+    <item value="77" comment="Common type is as specified" />
+    <item value="78" comment="Common type is as specified" />
+    <item value="79" comment="Common type is as specified" />
+    <item value="80" comment="Common type is as specified" />
+  </enum>
+  <enum name="0x002F.BatFault">
+    <item value="0" comment="The Node detects an unspecified fault on this battery power source." />
+    <item value="1" comment="The Node detects the temperature of this battery power source is above ideal operating conditions." />
+    <item value="2" comment="The Node detects the temperature of this battery power source is below ideal operating conditions." />
+  </enum>
+  <enum name="0x002F.BatReplaceability">
+    <item value="0" comment="The replaceability is unspecified or unknown." />
+    <item value="1" comment="The battery is not replaceable." />
+    <item value="2" comment="The battery is replaceable by the user or customer." />
+    <item value="3" comment="The battery is replaceable by an authorized factory technician." />
+  </enum>
+  <enum name="0x002F.PowerSourceStatus">
+    <item value="0" comment="Indicate the source status is not specified" />
+    <item value="1" comment="Indicate the source is available and currently supplying power" />
+    <item value="2" comment="Indicate the source is available, but is not currently supplying power" />
+    <item value="3" comment="Indicate the source is not currently available to supply power" />
+  </enum>
+  <enum name="0x002F.WiredCurrentType">
+    <item value="0" comment="Indicates AC current" />
+    <item value="1" comment="Indicates DC current" />
+  </enum>
+  <enum name="0x002F.WiredFault">
+    <item value="0" comment="The Node detects an unspecified fault on this wired power source." />
+    <item value="1" comment="The Node detects the supplied voltage is above maximum supported value for this wired power source." />
+    <item value="2" comment="The Node detects the supplied voltage is below maximum supported value for this wired power source." />
+  </enum>
+  <bitmap name="0x0200.PumpStatus">
+    <item value="0x0001" comment="A fault related to the system or pump device is detected." />
+    <item value="0x0002" comment="A fault related to the supply to the pump is detected." />
+    <item value="0x0004" comment="Setpoint is too low to achieve." />
+    <item value="0x0008" comment="Setpoint is too high to achieve." />
+    <item value="0x0010" comment="Device control is overridden by hardware, such as an external STOP button or via a local HMI." />
+    <item value="0x0020" comment="Pump is currently running" />
+    <item value="0x0040" comment="A remote pressure sensor is used as the sensor for the regulation of the pump." />
+    <item value="0x0080" comment="A remote flow sensor is used as the sensor for the regulation of the pump." />
+    <item value="0x0100" comment="A remote temperature sensor is used as the sensor for the regulation of the pump." />
+  </bitmap>
+  <enum name="0x0200.ControlMode">
+    <item value="0" comment="The pump is running at a constant speed." />
+    <item value="1" comment="The pump will regulate its speed to maintain a constant differential pressure over its flanges." />
+    <item value="2" comment="The pump will regulate its speed to maintain a constant differential pressure over its flanges." />
+    <item value="3" comment="The pump will regulate its speed to maintain a constant flow through the pump." />
+    <item value="5" comment="The pump will regulate its speed to maintain a constant temperature." />
+    <item value="7" comment="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings." />
+  </enum>
+  <enum name="0x0200.OperationMode">
+    <item value="0" comment="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute." />
+    <item value="1" comment="This value sets the pump to run at the minimum possible speed it can without being stopped." />
+    <item value="2" comment="This value sets the pump to run at its maximum possible speed." />
+    <item value="3" comment="This value sets the pump to run with the local settings of the pump, regardless of what these are." />
+  </enum>
+  <bitmap name="0x0057.Alarm">
+    <item value="0x01" comment="The cabinet's door has been open for a vendor defined amount of time." />
+  </bitmap>
+  <enum name="0x0071.ChangeIndication">
+    <item value="0" comment="Resource is in good condition, no intervention required" />
+    <item value="1" comment="Resource will be exhausted soon, intervention will shortly be required" />
+    <item value="2" comment="Resource is exhausted, immediate intervention is required" />
+  </enum>
+  <enum name="0x0071.DegradationDirection">
+    <item value="0" comment="The degradation of the resource is indicated by an upwards moving/increasing value" />
+    <item value="1" comment="The degradation of the resource is indicated by a downwards moving/decreasing value" />
+  </enum>
+  <enum name="0x0071.ProductIdentifierType">
+    <item value="0" comment="12-digit Universal Product Code" />
+    <item value="1" comment="8-digit Global Trade Item Number" />
+    <item value="2" comment="13-digit European Article Number" />
+    <item value="3" comment="14-digit Global Trade Item Number" />
+    <item value="4" comment="Original Equipment Manufacturer part number" />
+  </enum>
+  <bitmap name="0x0062.CopyMode">
+    <item value="0x01" comment="Copy all scenes in the scene table" />
+  </bitmap>
+  <enum name="0x0150.OperationalStatus">
+    <item value="0x00" comment="The device has not yet started operating at the given area, or has not finished operating at that area but it is not currently operating at the area" />
+    <item value="0x01" comment="The device is currently operating at the given area" />
+    <item value="0x02" comment="The device has skipped the given area, before or during operating at it, due to a SkipArea command, due an out of band command (e.g. from the vendor's application), due to a vendor specific reason, such as a time limit used by the device, or due the device ending operating unsuccessfully" />
+    <item value="0x03" comment="The device has completed operating at the given area" />
+  </enum>
+  <enum name="0x005C.AlarmState">
+    <item value="0" comment="Nominal state, the device is not alarming" />
+    <item value="1" comment="Warning state" />
+    <item value="2" comment="Critical state" />
+  </enum>
+  <enum name="0x005C.ContaminationState">
+    <item value="0" comment="Nominal state, the sensor is not contaminated" />
+    <item value="1" comment="Low contamination" />
+    <item value="2" comment="Warning state" />
+    <item value="3" comment="Critical state, will cause nuisance alarms" />
+  </enum>
+  <enum name="0x005C.EndOfService">
+    <item value="0" comment="Device has not expired" />
+    <item value="1" comment="Device has reached its end of service" />
+  </enum>
+  <enum name="0x005C.ExpressedState">
+    <item value="0" comment="Nominal state, the device is not alarming" />
+    <item value="1" comment="Smoke Alarm state" />
+    <item value="2" comment="CO Alarm state" />
+    <item value="3" comment="Battery Alert State" />
+    <item value="4" comment="Test in Progress" />
+    <item value="5" comment="Hardware Fault Alert State" />
+    <item value="6" comment="End of Service Alert State" />
+    <item value="7" comment="Interconnected Smoke Alarm State" />
+    <item value="8" comment="Interconnected CO Alarm State" />
+  </enum>
+  <enum name="0x005C.MuteState">
+    <item value="0" comment="Not Muted" />
+    <item value="1" comment="Muted" />
+  </enum>
+  <enum name="0x005C.Sensitivity">
+    <item value="0" comment="High sensitivity" />
+    <item value="1" comment="Standard Sensitivity" />
+    <item value="2" comment="Low sensitivity" />
+  </enum>
+  <enum name="0x0505.Status">
+    <item value="0" comment="Command succeeded" />
+    <item value="1" comment="Requested target was not found in the TargetList" />
+    <item value="2" comment="Target request is not allowed in current state." />
+  </enum>
+  <bitmap name="0x0201.ACErrorCode">
+    <item value="0x01" comment="Compressor Failure or Refrigerant Leakage" />
+    <item value="0x02" comment="Room Temperature Sensor Failure" />
+    <item value="0x04" comment="Outdoor Temperature Sensor Failure" />
+    <item value="0x08" comment="Indoor Coil Temperature Sensor Failure" />
+    <item value="0x10" comment="Fan Failure" />
+  </bitmap>
+  <bitmap name="0x0201.AlarmCode">
+    <item value="0x01" comment="Initialization failure. The device failed to complete initialization at power-up." />
+    <item value="0x02" comment="Hardware failure" />
+    <item value="0x04" comment="Self-calibration failure" />
+  </bitmap>
+  <bitmap name="0x0201.HVACSystemType">
+    <item value="0x03" comment="Stage of cooling the HVAC system is using." />
+    <item value="0x0C" comment="Stage of heating the HVAC system is using." />
+    <item value="0x10" comment="Is the heating type Heat Pump." />
+    <item value="0x20" comment="Does the HVAC system use fuel." />
+  </bitmap>
+  <bitmap name="0x0201.Occupancy">
+    <item value="0x01" comment="Indicates the occupancy state" />
+  </bitmap>
+  <bitmap name="0x0201.PresetTypeFeatures">
+    <item value="0x01" comment="Preset may be automatically activated by the thermostat" />
+    <item value="0x02" comment="Preset supports user-provided names" />
+  </bitmap>
+  <bitmap name="0x0201.ProgrammingOperationMode">
+    <item value="0x01" comment="Schedule programming mode. This enables any programmed weekly schedule configurations." />
+    <item value="0x02" comment="Auto/recovery mode" />
+    <item value="0x04" comment="Economy/EnergyStar mode" />
+  </bitmap>
+  <bitmap name="0x0201.RelayState">
+    <item value="0x01" comment="Heat Stage On" />
+    <item value="0x02" comment="Cool Stage On" />
+    <item value="0x04" comment="Fan Stage On" />
+    <item value="0x08" comment="Heat 2 Stage On" />
+    <item value="0x10" comment="Cool 2 Stage On" />
+    <item value="0x20" comment="Fan 2 Stage On" />
+    <item value="0x40" comment="Fan 3 Stage On" />
+  </bitmap>
+  <bitmap name="0x0201.RemoteSensing">
+    <item value="0x01" comment="Calculated Local Temperature is derived from a remote node" />
+    <item value="0x02" comment="OutdoorTemperature is derived from a remote node" />
+    <item value="0x04" comment="Occupancy is derived from a remote node" />
+  </bitmap>
+  <bitmap name="0x0201.ScheduleDayOfWeek">
+    <item value="0x01" comment="Sunday" />
+    <item value="0x02" comment="Monday" />
+    <item value="0x04" comment="Tuesday" />
+    <item value="0x08" comment="Wednesday" />
+    <item value="0x10" comment="Thursday" />
+    <item value="0x20" comment="Friday" />
+    <item value="0x40" comment="Saturday" />
+    <item value="0x80" comment="Away or Vacation" />
+  </bitmap>
+  <bitmap name="0x0201.ScheduleMode">
+    <item value="0x01" comment="Adjust Heat Setpoint" />
+    <item value="0x02" comment="Adjust Cool Setpoint" />
+  </bitmap>
+  <bitmap name="0x0201.ScheduleTypeFeatures">
+    <item value="0x01" comment="Supports presets" />
+    <item value="0x02" comment="Supports setpoints" />
+    <item value="0x04" comment="Supports user-provided names" />
+    <item value="0x08" comment="Supports transitioning to SystemModeOff" />
+  </bitmap>
+  <enum name="0x0201.ACCapacityFormat">
+    <item value="0" comment="British Thermal Unit per Hour" />
+  </enum>
+  <enum name="0x0201.ACCompressorType">
+    <item value="0" comment="Unknown compressor type" />
+    <item value="1" comment="Max working ambient 43 °C" />
+    <item value="2" comment="Max working ambient 35 °C" />
+    <item value="3" comment="Max working ambient 52 °C" />
+  </enum>
+  <enum name="0x0201.ACLouverPosition">
+    <item value="1" comment="Fully Closed" />
+    <item value="2" comment="Fully Open" />
+    <item value="3" comment="Quarter Open" />
+    <item value="4" comment="Half Open" />
+    <item value="5" comment="Three Quarters Open" />
+  </enum>
+  <enum name="0x0201.ACRefrigerantType">
+    <item value="0" comment="Unknown Refrigerant Type" />
+    <item value="1" comment="R22 Refrigerant" />
+    <item value="2" comment="R410a Refrigerant" />
+    <item value="3" comment="R407c Refrigerant" />
+  </enum>
+  <enum name="0x0201.ACType">
+    <item value="0" comment="Unknown AC Type" />
+    <item value="1" comment="Cooling and Fixed Speed" />
+    <item value="2" comment="Heat Pump and Fixed Speed" />
+    <item value="3" comment="Cooling and Inverter" />
+    <item value="4" comment="Heat Pump and Inverter" />
+  </enum>
+  <enum name="0x0201.ControlSequenceOfOperation">
+    <item value="0" comment="Heat and Emergency are not possible" />
+    <item value="1" comment="Heat and Emergency are not possible" />
+    <item value="2" comment="Cool and precooling (see ref_HvacTerms) are not possible" />
+    <item value="3" comment="Cool and precooling are not possible" />
+    <item value="4" comment="All modes are possible" />
+    <item value="5" comment="All modes are possible" />
+  </enum>
+  <enum name="0x0201.PresetScenario">
+    <item value="1" comment="The thermostat-controlled area is occupied" />
+    <item value="2" comment="The thermostat-controlled area is unoccupied" />
+    <item value="3" comment="Users are likely to be sleeping" />
+    <item value="4" comment="Users are likely to be waking up" />
+    <item value="5" comment="Users are on vacation" />
+    <item value="6" comment="Users are likely to be going to sleep" />
+    <item value="254" comment="Custom presets" />
+  </enum>
+  <enum name="0x0201.SetpointChangeSource">
+    <item value="0" comment="Manual, user-initiated setpoint change via the thermostat" />
+    <item value="1" comment="Schedule/internal programming-initiated setpoint change" />
+    <item value="2" comment="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)" />
+  </enum>
+  <enum name="0x0201.SetpointRaiseLowerMode">
+    <item value="0" comment="Adjust Heat Setpoint" />
+    <item value="1" comment="Adjust Cool Setpoint" />
+    <item value="2" comment="Adjust Heat Setpoint and Cool Setpoint" />
+  </enum>
+  <enum name="0x0201.StartOfWeek">
+    <item value="0" comment="" />
+    <item value="1" comment="" />
+    <item value="2" comment="" />
+    <item value="3" comment="" />
+    <item value="4" comment="" />
+    <item value="5" comment="" />
+    <item value="6" comment="" />
+  </enum>
+  <enum name="0x0201.SystemMode">
+    <item value="0" comment="The Thermostat does not generate demand for Cooling or Heating" />
+    <item value="1" comment="Demand is generated for either Cooling or Heating, as required" />
+    <item value="3" comment="Demand is only generated for Cooling" />
+    <item value="4" comment="Demand is only generated for Heating" />
+    <item value="5" comment="2 stage heating is in use to achieve desired temperature" />
+    <item value="6" comment="(see ref_HvacTerms)" />
+    <item value="7" comment="" />
+    <item value="8" comment="" />
+    <item value="9" comment="" />
+  </enum>
+  <enum name="0x0201.TemperatureSetpointHold">
+    <item value="0" comment="Follow scheduling program" />
+    <item value="1" comment="Maintain current setpoint, regardless of schedule transitions" />
+  </enum>
+  <enum name="0x0201.ThermostatRunningMode">
+    <item value="0" comment="The Thermostat does not generate demand for Cooling or Heating" />
+    <item value="3" comment="Demand is only generated for Cooling" />
+    <item value="4" comment="Demand is only generated for Heating" />
+  </enum>
+  <enum name="0x0204.KeypadLockout">
+    <item value="0" comment="All functionality available to the user" />
+    <item value="1" comment="Level 1 reduced functionality" />
+    <item value="2" comment="Level 2 reduced functionality" />
+    <item value="3" comment="Level 3 reduced functionality" />
+    <item value="4" comment="Level 4 reduced functionality" />
+    <item value="5" comment="Least functionality available to the user" />
+  </enum>
+  <enum name="0x0204.ScheduleProgrammingVisibility">
+    <item value="0" comment="Local schedule programming functionality is enabled at the thermostat" />
+    <item value="1" comment="Local schedule programming functionality is disabled at the thermostat" />
+  </enum>
+  <enum name="0x0204.TemperatureDisplayMode">
+    <item value="0" comment="Temperature displayed in °C" />
+    <item value="1" comment="Temperature displayed in °F" />
+  </enum>
+  <enum name="0x0038.Granularity">
+    <item value="0" comment="This indicates that the node is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only." />
+    <item value="1" comment="This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now &gt; 5 seconds." />
+    <item value="2" comment="This indicates the node is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds." />
+    <item value="3" comment="This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50 ms." />
+    <item value="4" comment="This indicates the node is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs." />
+  </enum>
+  <enum name="0x0038.TimeSource">
+    <item value="0" comment="Node is not currently synchronized with a UTC Time source." />
+    <item value="1" comment="Node uses an unlisted time source." />
+    <item value="2" comment="Node received time from a client using the SetUTCTime Command." />
+    <item value="3" comment="Synchronized time by querying the Time Synchronization cluster of another Node." />
+    <item value="4" comment="SNTP from a server not in the Matter network. NTS is not used." />
+    <item value="5" comment="NTP from servers not in the Matter network. None of the servers used NTS." />
+    <item value="6" comment="SNTP from a server within the Matter network. NTS is not used." />
+    <item value="7" comment="NTP from servers within the Matter network. None of the servers used NTS." />
+    <item value="8" comment="NTP from multiple servers in the Matter network and external. None of the servers used NTS." />
+    <item value="9" comment="SNTP from a server not in the Matter network. NTS is used." />
+    <item value="10" comment="NTP from servers not in the Matter network. NTS is used on at least one server." />
+    <item value="11" comment="SNTP from a server within the Matter network. NTS is used." />
+    <item value="12" comment="NTP from a server within the Matter network. NTS is used on at least one server." />
+    <item value="13" comment="NTP from multiple servers in the Matter network and external. NTS is used on at least one server." />
+    <item value="14" comment="Time synchronization comes from a vendor cloud-based source (e.g. &quot;Date&quot; header in authenticated HTTPS connection)." />
+    <item value="15" comment="Time synchronization comes from PTP." />
+    <item value="16" comment="Time synchronization comes from a GNSS source." />
+  </enum>
+  <enum name="0x0038.TimeZoneDatabase">
+    <item value="0" comment="Node has a full list of the available time zones" />
+    <item value="1" comment="Node has a partial list of the available time zones" />
+    <item value="2" comment="Node does not have a time zone database" />
+  </enum>
+  <bitmap name="0x0081.ValveFault">
+    <item value="0x01" comment="Unspecified fault detected" />
+    <item value="0x02" comment="Valve is blocked" />
+    <item value="0x04" comment="Valve has detected a leak" />
+    <item value="0x08" comment="No valve is connected to controller" />
+    <item value="0x10" comment="Short circuit is detected" />
+    <item value="0x20" comment="The available current has been exceeded" />
+  </bitmap>
+  <enum name="0x0081.ValveState">
+    <item value="0" comment="Valve is in closed position" />
+    <item value="1" comment="Valve is in open position" />
+    <item value="2" comment="Valve is transitioning between closed and open positions or between levels" />
+  </enum>
+  <bitmap name="0x0094.WaterHeaterHeatSource">
+    <item value="0x01" comment="Immersion Heating Element 1" />
+    <item value="0x02" comment="Immersion Heating Element 2" />
+    <item value="0x04" comment="Heat pump Heating" />
+    <item value="0x08" comment="Boiler Heating (e.g. Gas or Oil)" />
+    <item value="0x10" comment="Other Heating" />
+  </bitmap>
+  <enum name="0x0094.BoostState">
+    <item value="0" comment="Boost is not currently active" />
+    <item value="1" comment="Boost is currently active" />
+  </enum>
+  <bitmap name="0x0102.ConfigStatus">
+    <item value="0x01" comment="Device is operational." />
+    <item value="0x02" comment="" />
+    <item value="0x04" comment="The lift movement is reversed." />
+    <item value="0x08" comment="Supports the PositionAwareLift feature (PA_LF)." />
+    <item value="0x10" comment="Supports the PositionAwareTilt feature (PA_TL)." />
+    <item value="0x20" comment="Uses an encoder for lift." />
+    <item value="0x40" comment="Uses an encoder for tilt." />
+  </bitmap>
+  <bitmap name="0x0102.Mode">
+    <item value="0x01" comment="Reverse the lift direction." />
+    <item value="0x02" comment="Perform a calibration." />
+    <item value="0x04" comment="Freeze all motions for maintenance." />
+    <item value="0x08" comment="Control the LEDs feedback." />
+  </bitmap>
+  <bitmap name="0x0102.OperationalStatus">
+    <item value="0x03" comment="Global operational state." />
+    <item value="0x0C" comment="Lift operational state." />
+    <item value="0x30" comment="Tilt operational state." />
+  </bitmap>
+  <bitmap name="0x0102.SafetyStatus">
+    <item value="0x0001" comment="Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range." />
+    <item value="0x0002" comment="Tampering detected on sensors or any other safety equipment. Ex: a device has been forcedly moved without its actuator(s)." />
+    <item value="0x0004" comment="Communication failure to sensors or other safety equipment." />
+    <item value="0x0008" comment="Device has failed to reach the desired position. e.g. with position aware device, time expired before TargetPosition is reached." />
+    <item value="0x0010" comment="Motor(s) and/or electric circuit thermal protection activated." />
+    <item value="0x0020" comment="An obstacle is preventing actuator movement." />
+    <item value="0x0040" comment="Device has power related issue or limitation e.g. device is running w/ the help of a backup battery or power might not be fully available at the moment." />
+    <item value="0x0080" comment="Local safety sensor (not a direct obstacle) is preventing movements (e.g. Safety EU Standard EN60335)." />
+    <item value="0x0100" comment="Mechanical problem related to the motor(s) detected." />
+    <item value="0x0200" comment="PCB, fuse and other electrics problems." />
+    <item value="0x0400" comment="Actuator is manually operated and is preventing actuator movement (e.g. actuator is disengaged/decoupled)." />
+    <item value="0x0800" comment="Protection is activated." />
+  </bitmap>
+  <enum name="0x0102.EndProductType">
+    <item value="0" comment="Simple Roller Shade" />
+    <item value="1" comment="Roman Shade" />
+    <item value="2" comment="Balloon Shade" />
+    <item value="3" comment="Woven Wood" />
+    <item value="4" comment="Pleated Shade" />
+    <item value="5" comment="Cellular Shade" />
+    <item value="6" comment="Layered Shade" />
+    <item value="7" comment="Layered Shade 2D" />
+    <item value="8" comment="Sheer Shade" />
+    <item value="9" comment="Tilt Only Interior Blind" />
+    <item value="10" comment="Interior Blind" />
+    <item value="11" comment="Vertical Blind, Strip Curtain" />
+    <item value="12" comment="Interior Venetian Blind" />
+    <item value="13" comment="Exterior Venetian Blind" />
+    <item value="14" comment="Lateral Left Curtain" />
+    <item value="15" comment="Lateral Right Curtain" />
+    <item value="16" comment="Central Curtain" />
+    <item value="17" comment="Roller Shutter" />
+    <item value="18" comment="Exterior Vertical Screen" />
+    <item value="19" comment="Awning Terrace (Patio)" />
+    <item value="20" comment="Awning Vertical Screen" />
+    <item value="21" comment="Tilt Only Pergola" />
+    <item value="22" comment="Swinging Shutter" />
+    <item value="23" comment="Sliding Shutter" />
+    <item value="255" comment="Unknown" />
+  </enum>
+  <enum name="0x0102.Type">
+    <item value="0" comment="RollerShade" />
+    <item value="1" comment="RollerShade - 2 Motor" />
+    <item value="2" comment="RollerShade - Exterior" />
+    <item value="3" comment="RollerShade - Exterior - 2 Motor" />
+    <item value="4" comment="Drapery (curtain)" />
+    <item value="5" comment="Awning" />
+    <item value="6" comment="Shutter" />
+    <item value="7" comment="Tilt Blind - Tilt Only" />
+    <item value="8" comment="Tilt Blind - Lift &amp; Tilt" />
+    <item value="9" comment="Projector Screen" />
+    <item value="255" comment="Unknown" />
+  </enum>
+</comments>

@@ -145,11 +145,11 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Get the Operational State List attribute
         /// </summary>
-        public async Task<OperationalState[]> GetOperationalStateList(SecureSession session) {
+        public async Task<General.OperationalState.OperationalStatePayload[]> GetOperationalStateList(SecureSession session) {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            OperationalState[] list = new OperationalState[reader.Count];
+            General.OperationalState.OperationalStatePayload[] list = new General.OperationalState.OperationalStatePayload[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new OperationalState(reader.GetStruct(i)!);
+                list[i] = new General.OperationalState.OperationalStatePayload(reader.GetStruct(i)!);
             return list;
         }
 

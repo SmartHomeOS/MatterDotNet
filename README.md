@@ -1,4 +1,5 @@
 [![Build](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/SmartHomeOS/MatterDotNet/actions/workflows/dotnet.yml)
+[![Version](https://img.shields.io/nuget/v/MatterDotNet.svg)](https://www.nuget.org/packages/MatterDotNet)
 # MatterDotNet
 ##### A C# implementation of the Matter 1.4 (formerly Project CHIP) standard
 
@@ -8,18 +9,15 @@
 * Commissioning by QR code or PIN
 * Reading/Writing attributes
 * Executing cluster commands
+* All Matter 1.4 clusters generated
 
 #### In-Progress:
-* Matter 1.4 cluster generation
+* Events
 
 #### Coming Soon
 * Multicast/Group Control
 * Subscriptions
-* Events
 * Over the Air Software Updates
-
-#### Will Not Implement
-* Provisional specification items (including TermsAndConditions and Joint Fabric)
 
 #### Other Projects:
 * Check out my other projects for [HomeKit](https://github.com/SmartHomeOS/HomeKitDotNet) and [ZWave](https://github.com/SmartHomeOS/ZWaveDotNet)

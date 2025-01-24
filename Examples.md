@@ -37,8 +37,8 @@ _Option 3: Creates a commissioning payload from an NFC tag._
 Once we have the payload, we can activate commissioning which will automatically search bluetooth and/or the network and setup the device.
 
 ```c#
-    CommissioningState info = await controller.StartCommissioning(payload);
-    await controller.CompleteCommissioning(info);
+    CommissioningState state = await controller.StartCommissioning(payload);
+    await controller.CompleteCommissioning(state);
     controller.Save("example.fabric", "example.key");
 ```
 _Line 1 Find the device and begin commissioning._\
@@ -64,9 +64,9 @@ _Option 3: Creates a commissioning payload from an NFC tag._
 Once we have the payload, we can activate commissioning which will automatically search bluetooth and/or the network and setup the device.
 
 ```c#
-    CommissioningState info = await controller.StartCommissioning(payload);
-    var result = info.FindWiFi("Linksys-24G")!;
-    await controller.CompleteCommissioning(info, result, "password123");
+    CommissioningState state = await controller.StartCommissioning(payload);
+    var network = state.FindWiFi("Linksys-24G")!;
+    await controller.CompleteCommissioning(state, network, "password123");
     controller.Save("example.fabric", "example.key");
 ```
 _Line 1 Find the device and begin commissioning._\

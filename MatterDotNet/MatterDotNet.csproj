@@ -8,18 +8,18 @@
 	<Company>SmartHomeOS and Contributors</Company>
 	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
 	<Title>MatterDotNet</Title>
-	<Description>A C# implementation of the Matter 1.4 Standard (Formally known as project chip)</Description>
+	<Description>A C# implementation of the Matter 1.4 Standard (Formerly known as Project Chip)</Description>
 	<Copyright>Copyright MatterDotNet Contributors</Copyright>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/SmartHomeOS/MatterDotNet/</RepositoryUrl>
 	<PackageTags>matter; matter-controller; smarthome; project-chip; dotnet;</PackageTags>
-	<PackageReleaseNotes>Library is not yet functional. See README for details.</PackageReleaseNotes>
+	<PackageReleaseNotes>First functional release. See README for details.</PackageReleaseNotes>
 	<PackageIcon>logo.png</PackageIcon>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">
-    <TargetFrameworks>net8.0-windows10.0.19041.0; net9.0-windows10.0.19041.0; net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows10.0.19041.0; net9.0-windows10.0.19041.0; net8.0; net9.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">
     <TargetFrameworks>net8.0; net9.0</TargetFrameworks>
@@ -73,7 +73,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="logo.png">
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

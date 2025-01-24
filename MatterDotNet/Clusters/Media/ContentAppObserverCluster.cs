@@ -43,11 +43,11 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Data field in command was not understood by the Observer
             /// </summary>
-            UnexpectedData = 0x01,
+            UnexpectedData = 1,
         }
         #endregion Enums
 

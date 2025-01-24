@@ -55,19 +55,19 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// This laundry washer mode does not perform rinse cycles
             /// </summary>
-            None = 0x0,
+            None = 0,
             /// <summary>
             /// This laundry washer mode performs normal rinse cycles determined by the manufacturer
             /// </summary>
-            Normal = 0x1,
+            Normal = 1,
             /// <summary>
             /// This laundry washer mode performs an extra rinse cycle
             /// </summary>
-            Extra = 0x2,
+            Extra = 2,
             /// <summary>
             /// This laundry washer mode performs the maximum number of rinse cycles determined by the manufacturer
             /// </summary>
-            Max = 0x3,
+            Max = 3,
         }
         #endregion Enums
 

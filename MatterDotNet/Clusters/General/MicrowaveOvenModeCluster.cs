@@ -48,16 +48,16 @@ namespace MatterDotNet.Clusters.General
         /// Mode Tag
         /// </summary>
         public enum ModeTag : ushort {
-            Auto = 0x0000,
-            Quick = 0x0001,
-            Quiet = 0x0002,
-            LowNoise = 0x0003,
-            LowEnergy = 0x0004,
-            Vacation = 0x0005,
-            Min = 0x0006,
-            Max = 0x0007,
-            Night = 0x0008,
-            Day = 0x0009,
+            Auto = 0x0,
+            Quick = 0x1,
+            Quiet = 0x2,
+            LowNoise = 0x3,
+            LowEnergy = 0x4,
+            Vacation = 0x5,
+            Min = 0x6,
+            Max = 0x7,
+            Night = 0x8,
+            Day = 0x9,
             Normal = 0x4000,
             Defrost = 0x4001,
         }

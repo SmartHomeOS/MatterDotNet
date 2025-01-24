@@ -60,11 +60,11 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Boost is not currently active
             /// </summary>
-            Inactive = 0x00,
+            Inactive = 0,
             /// <summary>
             /// Boost is currently active
             /// </summary>
-            Active = 0x01,
+            Active = 1,
         }
 
         /// <summary>

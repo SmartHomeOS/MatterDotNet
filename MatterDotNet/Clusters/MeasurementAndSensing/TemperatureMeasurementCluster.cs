@@ -44,14 +44,14 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Min Measured Value attribute
         /// </summary>
         public async Task<short?> GetMinMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 1, true) ?? short.MinValue;
+            return (short?)(dynamic?)await GetAttribute(session, 1, true) ?? 0x8000;
         }
 
         /// <summary>
         /// Get the Max Measured Value attribute
         /// </summary>
         public async Task<short?> GetMaxMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 2, true) ?? short.MinValue;
+            return (short?)(dynamic?)await GetAttribute(session, 2, true) ?? 0x8000;
         }
 
         /// <summary>

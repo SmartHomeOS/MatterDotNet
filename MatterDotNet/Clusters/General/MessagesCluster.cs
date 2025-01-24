@@ -56,23 +56,23 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Similar messages are allowed
             /// </summary>
-            Allowed = 0x00,
+            Allowed = 0,
             /// <summary>
             /// Similar messages should be sent more often
             /// </summary>
-            Increased = 0x01,
+            Increased = 1,
             /// <summary>
             /// Similar messages should be sent less often
             /// </summary>
-            Reduced = 0x02,
+            Reduced = 2,
             /// <summary>
             /// Similar messages should not be sent
             /// </summary>
-            Disallowed = 0x03,
+            Disallowed = 3,
             /// <summary>
             /// No further messages should be sent
             /// </summary>
-            Banned = 0x04,
+            Banned = 4,
         }
 
         /// <summary>
@@ -82,19 +82,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Message to be transferred with a low level of importance
             /// </summary>
-            Low = 0x00,
+            Low = 0,
             /// <summary>
             /// Message to be transferred with a medium level of importance
             /// </summary>
-            Medium = 0x01,
+            Medium = 1,
             /// <summary>
             /// Message to be transferred with a high level of importance
             /// </summary>
-            High = 0x02,
+            High = 2,
             /// <summary>
             /// Message to be transferred with a critical level of importance
             /// </summary>
-            Critical = 0x03,
+            Critical = 3,
         }
 
         /// <summary>
@@ -109,19 +109,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Message requires confirmation from user
             /// </summary>
-            ConfirmationRequired = 0x1,
+            ConfirmationRequired = 0x01,
             /// <summary>
             /// Message requires response from user
             /// </summary>
-            ResponseRequired = 0x2,
+            ResponseRequired = 0x02,
             /// <summary>
             /// Message supports reply message from user
             /// </summary>
-            ReplyMessage = 0x4,
+            ReplyMessage = 0x04,
             /// <summary>
             /// Message has already been confirmed
             /// </summary>
-            MessageConfirmed = 0x8,
+            MessageConfirmed = 0x08,
             /// <summary>
             /// Message required PIN/password protection
             /// </summary>

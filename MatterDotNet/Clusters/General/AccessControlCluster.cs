@@ -59,23 +59,23 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Can read and observe all (except Access Control Cluster and as seen by a non-Proxy)
             /// </summary>
-            View = 0x01,
+            View = 1,
             /// <summary>
             /// Can read and observe all (as seen by a Proxy)
             /// </summary>
-            ProxyView = 0x02,
+            ProxyView = 2,
             /// <summary>
             /// View privileges, and can perform the primary function of this Node (except Access Control Cluster)
             /// </summary>
-            Operate = 0x03,
+            Operate = 3,
             /// <summary>
             /// Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)
             /// </summary>
-            Manage = 0x04,
+            Manage = 4,
             /// <summary>
             /// Manage privileges, and can observe and modify the Access Control Cluster
             /// </summary>
-            Administer = 0x05,
+            Administer = 5,
         }
 
         /// <summary>
@@ -85,15 +85,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Passcode authenticated session
             /// </summary>
-            PASE = 0x01,
+            PASE = 1,
             /// <summary>
             /// Certificate authenticated session
             /// </summary>
-            CASE = 0x02,
+            CASE = 2,
             /// <summary>
             /// Group authenticated session
             /// </summary>
-            Group = 0x03,
+            Group = 3,
         }
 
         /// <summary>
@@ -103,19 +103,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Clients on this fabric are currently forbidden from reading and writing an attribute
             /// </summary>
-            AttributeAccessForbidden = 0x00,
+            AttributeAccessForbidden = 0,
             /// <summary>
             /// Clients on this fabric are currently forbidden from writing an attribute
             /// </summary>
-            AttributeWriteForbidden = 0x01,
+            AttributeWriteForbidden = 1,
             /// <summary>
             /// Clients on this fabric are currently forbidden from invoking a command
             /// </summary>
-            CommandForbidden = 0x02,
+            CommandForbidden = 2,
             /// <summary>
             /// Clients on this fabric are currently forbidden from reading an event
             /// </summary>
-            EventForbidden = 0x03,
+            EventForbidden = 3,
         }
 
         /// <summary>
@@ -125,15 +125,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Entry or extension was changed
             /// </summary>
-            Changed = 0x00,
+            Changed = 0,
             /// <summary>
             /// Entry or extension was added
             /// </summary>
-            Added = 0x01,
+            Added = 1,
             /// <summary>
             /// Entry or extension was removed
             /// </summary>
-            Removed = 0x02,
+            Removed = 2,
         }
         #endregion Enums
 

@@ -41,10 +41,10 @@ namespace MatterDotNet.Clusters.General
         /// Operational State
         /// </summary>
         public enum OperationalStateEnum : byte {
-            Stopped = 0x00,
-            Running = 0x01,
-            Paused = 0x02,
-            Error = 0x03,
+            Stopped = 0,
+            Running = 1,
+            Paused = 2,
+            Error = 3,
         }
 
         /// <summary>

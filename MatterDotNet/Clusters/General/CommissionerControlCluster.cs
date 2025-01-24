@@ -48,7 +48,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Aggregators which support Fabric Synchronization may be commissioned.
             /// </summary>
-            FabricSynchronization = 0x1,
+            FabricSynchronization = 0x0001,
         }
         #endregion Enums
 

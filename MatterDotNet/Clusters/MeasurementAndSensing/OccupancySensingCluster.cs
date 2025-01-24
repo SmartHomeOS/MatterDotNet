@@ -81,19 +81,19 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>
-            PIR = 0x0,
+            PIR = 0,
             /// <summary>
             /// Indicates a ultrasonic sensor.
             /// </summary>
-            Ultrasonic = 0x1,
+            Ultrasonic = 1,
             /// <summary>
             /// Indicates a passive infrared and ultrasonic sensor.
             /// </summary>
-            PIRAndUltrasonic = 0x2,
+            PIRAndUltrasonic = 2,
             /// <summary>
             /// Indicates a physical contact sensor.
             /// </summary>
-            PhysicalContact = 0x3,
+            PhysicalContact = 3,
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Indicates the sensed occupancy state
             /// </summary>
-            Occupied = 0x1,
+            Occupied = 0x01,
         }
 
         /// <summary>

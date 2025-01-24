@@ -62,15 +62,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Set the OnOff attribute to FALSE
             /// </summary>
-            Off = 0x00,
+            Off = 0,
             /// <summary>
             /// Set the OnOff attribute to TRUE
             /// </summary>
-            On = 0x01,
+            On = 1,
             /// <summary>
             /// If the previous value of the OnOff attribute is equal to FALSE, set the OnOff attribute to TRUE. If the previous value of the OnOff attribute is equal to TRUE, set the OnOff attribute to FALSE (toggle).
             /// </summary>
-            Toggle = 0x02,
+            Toggle = 2,
         }
 
         /// <summary>
@@ -80,11 +80,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Delayed All Off
             /// </summary>
-            DelayedAllOff = 0x00,
+            DelayedAllOff = 0,
             /// <summary>
             /// Dying Light
             /// </summary>
-            DyingLight = 0x01,
+            DyingLight = 1,
         }
 
         /// <summary>
@@ -94,15 +94,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Fade to off in 0.8 seconds
             /// </summary>
-            DelayedOffFastFade = 0x00,
+            DelayedOffFastFade = 0,
             /// <summary>
             /// No fade
             /// </summary>
-            NoFade = 0x01,
+            NoFade = 1,
             /// <summary>
             /// 50% dim down in 0.8 seconds then fade to off in 12 seconds
             /// </summary>
-            DelayedOffSlowFade = 0x02,
+            DelayedOffSlowFade = 2,
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// 20% dim up in 0.5s then fade to off in 1 second
             /// </summary>
-            DyingLightFadeOff = 0x00,
+            DyingLightFadeOff = 0,
         }
 
         /// <summary>

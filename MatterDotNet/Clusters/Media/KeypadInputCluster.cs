@@ -62,35 +62,35 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Key code is not supported.
             /// </summary>
-            UnsupportedKey = 0x01,
+            UnsupportedKey = 1,
             /// <summary>
             /// Requested key code is invalid in the context of the responder's current state.
             /// </summary>
-            InvalidKeyInCurrentState = 0x02,
+            InvalidKeyInCurrentState = 2,
         }
 
         /// <summary>
         /// CEC Key Code
         /// </summary>
         public enum CECKeyCode : byte {
-            Select = 0x00,
-            Up = 0x01,
-            Down = 0x02,
-            Left = 0x03,
-            Right = 0x04,
-            RightUp = 0x05,
-            RightDown = 0x06,
-            LeftUp = 0x07,
-            LeftDown = 0x08,
-            RootMenu = 0x09,
-            SetupMenu = 0x0A,
-            ContentsMenu = 0x0B,
-            FavoriteMenu = 0x0C,
-            Exit = 0x0D,
+            Select = 0x0,
+            Up = 0x1,
+            Down = 0x2,
+            Left = 0x3,
+            Right = 0x4,
+            RightUp = 0x5,
+            RightDown = 0x6,
+            LeftUp = 0x7,
+            LeftDown = 0x8,
+            RootMenu = 0x9,
+            SetupMenu = 0xA,
+            ContentsMenu = 0xB,
+            FavoriteMenu = 0xC,
+            Exit = 0xD,
             MediaTopMenu = 0x10,
             MediaContextSensitiveMenu = 0x11,
             NumberEntryMode = 0x1D,

@@ -72,87 +72,87 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Approximately RGB #000000.
             /// </summary>
-            Black = 0,
+            Black = 0x0,
             /// <summary>
             /// Approximately RGB #000080.
             /// </summary>
-            Navy = 1,
+            Navy = 0x1,
             /// <summary>
             /// Approximately RGB #008000.
             /// </summary>
-            Green = 2,
+            Green = 0x2,
             /// <summary>
             /// Approximately RGB #008080.
             /// </summary>
-            Teal = 3,
+            Teal = 0x3,
             /// <summary>
             /// Approximately RGB #800080.
             /// </summary>
-            Maroon = 4,
+            Maroon = 0x4,
             /// <summary>
             /// Approximately RGB #800080.
             /// </summary>
-            Purple = 5,
+            Purple = 0x5,
             /// <summary>
             /// Approximately RGB #808000.
             /// </summary>
-            Olive = 6,
+            Olive = 0x6,
             /// <summary>
             /// Approximately RGB #808080.
             /// </summary>
-            Gray = 7,
+            Gray = 0x7,
             /// <summary>
             /// Approximately RGB #0000FF.
             /// </summary>
-            Blue = 8,
+            Blue = 0x8,
             /// <summary>
             /// Approximately RGB #00FF00.
             /// </summary>
-            Lime = 9,
+            Lime = 0x9,
             /// <summary>
             /// Approximately RGB #00FFFF.
             /// </summary>
-            Aqua = 10,
+            Aqua = 0xA,
             /// <summary>
             /// Approximately RGB #FF0000.
             /// </summary>
-            Red = 11,
+            Red = 0xB,
             /// <summary>
             /// Approximately RGB #FF00FF.
             /// </summary>
-            Fuchsia = 12,
+            Fuchsia = 0xC,
             /// <summary>
             /// Approximately RGB #FFFF00.
             /// </summary>
-            Yellow = 13,
+            Yellow = 0xD,
             /// <summary>
             /// Approximately RGB #FFFFFF.
             /// </summary>
-            White = 14,
+            White = 0xE,
             /// <summary>
             /// Typical hardware "Nickel" color.
             /// </summary>
-            Nickel = 15,
+            Nickel = 0xF,
             /// <summary>
             /// Typical hardware "Chrome" color.
             /// </summary>
-            Chrome = 16,
+            Chrome = 0x10,
             /// <summary>
             /// Typical hardware "Brass" color.
             /// </summary>
-            Brass = 17,
+            Brass = 0x11,
             /// <summary>
             /// Typical hardware "Copper" color.
             /// </summary>
-            Copper = 18,
+            Copper = 0x12,
             /// <summary>
             /// Typical hardware "Silver" color.
             /// </summary>
-            Silver = 19,
+            Silver = 0x13,
             /// <summary>
             /// Typical hardware "Gold" color.
             /// </summary>
-            Gold = 20,
+            Gold = 0x14,
         }
         #endregion Enums
 

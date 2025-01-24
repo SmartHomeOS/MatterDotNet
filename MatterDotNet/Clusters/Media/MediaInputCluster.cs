@@ -55,51 +55,51 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Indicates content not coming from a physical input.
             /// </summary>
-            Internal = 0x00,
+            Internal = 0x0,
             /// <summary>
             /// 
             /// </summary>
-            Aux = 0x01,
+            Aux = 0x1,
             /// <summary>
             /// 
             /// </summary>
-            Coax = 0x02,
+            Coax = 0x2,
             /// <summary>
             /// 
             /// </summary>
-            Composite = 0x03,
+            Composite = 0x3,
             /// <summary>
             /// 
             /// </summary>
-            HDMI = 0x04,
+            HDMI = 0x4,
             /// <summary>
             /// 
             /// </summary>
-            Input = 0x05,
+            Input = 0x5,
             /// <summary>
             /// 
             /// </summary>
-            Line = 0x06,
+            Line = 0x6,
             /// <summary>
             /// 
             /// </summary>
-            Optical = 0x07,
+            Optical = 0x7,
             /// <summary>
             /// 
             /// </summary>
-            Video = 0x08,
+            Video = 0x8,
             /// <summary>
             /// 
             /// </summary>
-            SCART = 0x09,
+            SCART = 0x9,
             /// <summary>
             /// 
             /// </summary>
-            USB = 0x0A,
+            USB = 0xA,
             /// <summary>
             /// 
             /// </summary>
-            Other = 0x0B,
+            Other = 0xB,
         }
         #endregion Enums
 

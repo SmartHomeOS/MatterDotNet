@@ -91,18 +91,42 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            PowerCycle = 0x1,
-            SettingsMenu = 0x2,
-            CustomInstruction = 0x4,
-            DeviceManual = 0x8,
-            ActuateSensor = 0x10,
-            ActuateSensorSeconds = 0x20,
-            ActuateSensorTimes = 0x40,
-            ActuateSensorLightsBlink = 0x80,
-            ResetButton = 0x100,
-            ResetButtonLightsBlink = 0x200,
-            ResetButtonSeconds = 0x400,
-            ResetButtonTimes = 0x800,
+            /// <summary>
+            /// Power Cycle to transition the device to ActiveMode
+            /// </summary>
+            PowerCycle = 0x0001,
+            /// <summary>
+            /// Settings menu on the device informs how to transition the device to ActiveMode
+            /// </summary>
+            SettingsMenu = 0x0002,
+            /// <summary>
+            /// Custom Instruction on how to transition the device to ActiveMode
+            /// </summary>
+            CustomInstruction = 0x0004,
+            /// <summary>
+            /// Device Manual informs how to transition the device to ActiveMode
+            /// </summary>
+            DeviceManual = 0x0008,
+            /// <summary>
+            /// Actuate Sensor to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensor = 0x0010,
+            /// <summary>
+            /// Actuate Sensor for N seconds to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorSeconds = 0x0020,
+            /// <summary>
+            /// Actuate Sensor N times to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorTimes = 0x0040,
+            /// <summary>
+            /// Actuate Sensor until light blinks to transition the device to ActiveMode
+            /// </summary>
+            ActuateSensorLightsBlink = 0x0080,
+            ResetButton = 0x00100,
+            ResetButtonLightsBlink = 0x00200,
+            ResetButtonSeconds = 0x00400,
+            ResetButtonTimes = 0x00800,
             /// <summary>
             /// Press Setup Button to transition the device to ActiveMode
             /// </summary>

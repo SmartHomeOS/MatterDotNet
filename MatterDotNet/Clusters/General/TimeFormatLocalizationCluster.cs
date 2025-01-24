@@ -51,11 +51,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Time conveyed with a 12-hour clock
             /// </summary>
-            _12hr = 0x00,
+            _12hr = 0x0,
             /// <summary>
             /// Time conveyed with a 24-hour clock
             /// </summary>
-            _24hr = 0x01,
+            _24hr = 0x1,
             /// <summary>
             /// Use active locale clock
             /// </summary>
@@ -69,51 +69,51 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Dates conveyed using the Buddhist calendar
             /// </summary>
-            Buddhist = 0x00,
+            Buddhist = 0x0,
             /// <summary>
             /// Dates conveyed using the Chinese calendar
             /// </summary>
-            Chinese = 0x01,
+            Chinese = 0x1,
             /// <summary>
             /// Dates conveyed using the Coptic calendar
             /// </summary>
-            Coptic = 0x02,
+            Coptic = 0x2,
             /// <summary>
             /// Dates conveyed using the Ethiopian calendar
             /// </summary>
-            Ethiopian = 0x03,
+            Ethiopian = 0x3,
             /// <summary>
             /// Dates conveyed using the Gregorian calendar
             /// </summary>
-            Gregorian = 0x04,
+            Gregorian = 0x4,
             /// <summary>
             /// Dates conveyed using the Hebrew calendar
             /// </summary>
-            Hebrew = 0x05,
+            Hebrew = 0x5,
             /// <summary>
             /// Dates conveyed using the Indian calendar
             /// </summary>
-            Indian = 0x06,
+            Indian = 0x6,
             /// <summary>
             /// Dates conveyed using the Islamic calendar
             /// </summary>
-            Islamic = 0x07,
+            Islamic = 0x7,
             /// <summary>
             /// Dates conveyed using the Japanese calendar
             /// </summary>
-            Japanese = 0x08,
+            Japanese = 0x8,
             /// <summary>
             /// Dates conveyed using the Korean calendar
             /// </summary>
-            Korean = 0x09,
+            Korean = 0x9,
             /// <summary>
             /// Dates conveyed using the Persian calendar
             /// </summary>
-            Persian = 0x0A,
+            Persian = 0xA,
             /// <summary>
             /// Dates conveyed using the Taiwanese calendar
             /// </summary>
-            Taiwanese = 0x0B,
+            Taiwanese = 0xB,
             /// <summary>
             /// calendar implied from active locale
             /// </summary>

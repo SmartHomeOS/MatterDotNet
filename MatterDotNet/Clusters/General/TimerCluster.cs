@@ -51,10 +51,10 @@ namespace MatterDotNet.Clusters.General
         /// Timer Status
         /// </summary>
         public enum TimerStatus : byte {
-            Running = 0x0,
-            Paused = 0x1,
-            Expired = 0x2,
-            Ready = 0x3,
+            Running = 0,
+            Paused = 1,
+            Expired = 2,
+            Ready = 3,
         }
         #endregion Enums
 

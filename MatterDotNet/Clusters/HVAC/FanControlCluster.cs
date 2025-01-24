@@ -74,31 +74,31 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Fan is off
             /// </summary>
-            Off = 0x00,
+            Off = 0,
             /// <summary>
             /// Fan using low speed
             /// </summary>
-            Low = 0x01,
+            Low = 1,
             /// <summary>
             /// Fan using medium speed
             /// </summary>
-            Medium = 0x02,
+            Medium = 2,
             /// <summary>
             /// Fan using high speed
             /// </summary>
-            High = 0x03,
+            High = 3,
             /// <summary>
             /// 
             /// </summary>
-            On = 0x04,
+            On = 4,
             /// <summary>
             /// Fan is using auto mode
             /// </summary>
-            Auto = 0x05,
+            Auto = 5,
             /// <summary>
             /// Fan is using smart mode
             /// </summary>
-            Smart = 0x06,
+            Smart = 6,
         }
 
         /// <summary>
@@ -108,27 +108,27 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Fan is capable of off, low, medium and high modes
             /// </summary>
-            OffLowMedHigh = 0x00,
+            OffLowMedHigh = 0,
             /// <summary>
             /// Fan is capable of off, low and high modes
             /// </summary>
-            OffLowHigh = 0x01,
+            OffLowHigh = 1,
             /// <summary>
             /// Fan is capable of off, low, medium, high and auto modes
             /// </summary>
-            OffLowMedHighAuto = 0x02,
+            OffLowMedHighAuto = 2,
             /// <summary>
             /// Fan is capable of off, low, high and auto modes
             /// </summary>
-            OffLowHighAuto = 0x03,
+            OffLowHighAuto = 3,
             /// <summary>
             /// Fan is capable of off, high and auto modes
             /// </summary>
-            OffHighAuto = 0x04,
+            OffHighAuto = 4,
             /// <summary>
             /// Fan is capable of off and high modes
             /// </summary>
-            OffHigh = 0x05,
+            OffHigh = 5,
         }
 
         /// <summary>
@@ -138,11 +138,11 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Step moves in increasing direction
             /// </summary>
-            Increase = 0x00,
+            Increase = 0,
             /// <summary>
             /// Step moves in decreasing direction
             /// </summary>
-            Decrease = 0x01,
+            Decrease = 1,
         }
 
         /// <summary>
@@ -152,11 +152,11 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Airflow is in the forward direction
             /// </summary>
-            Forward = 0x00,
+            Forward = 0,
             /// <summary>
             /// Airflow is in the reverse direction
             /// </summary>
-            Reverse = 0x01,
+            Reverse = 1,
         }
 
         /// <summary>

@@ -258,59 +258,59 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Unspecified or manufacturer specific lock user data added, cleared, or modified.
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x0,
             /// <summary>
             /// Lock programming PIN code was added, cleared, or modified.
             /// </summary>
-            ProgrammingCode = 1,
+            ProgrammingCode = 0x1,
             /// <summary>
             /// Lock user index was added, cleared, or modified.
             /// </summary>
-            UserIndex = 2,
+            UserIndex = 0x2,
             /// <summary>
             /// Lock user week day schedule was added, cleared, or modified.
             /// </summary>
-            WeekDaySchedule = 3,
+            WeekDaySchedule = 0x3,
             /// <summary>
             /// Lock user year day schedule was added, cleared, or modified.
             /// </summary>
-            YearDaySchedule = 4,
+            YearDaySchedule = 0x4,
             /// <summary>
             /// Lock holiday schedule was added, cleared, or modified.
             /// </summary>
-            HolidaySchedule = 5,
+            HolidaySchedule = 0x5,
             /// <summary>
             /// Lock user PIN code was added, cleared, or modified.
             /// </summary>
-            PIN = 6,
+            PIN = 0x6,
             /// <summary>
             /// Lock user RFID code was added, cleared, or modified.
             /// </summary>
-            RFID = 7,
+            RFID = 0x7,
             /// <summary>
             /// Lock user fingerprint was added, cleared, or modified.
             /// </summary>
-            Fingerprint = 8,
+            Fingerprint = 0x8,
             /// <summary>
             /// Lock user finger-vein information was added, cleared, or modified.
             /// </summary>
-            FingerVein = 9,
+            FingerVein = 0x9,
             /// <summary>
             /// Lock user face information was added, cleared, or modified.
             /// </summary>
-            Face = 10,
+            Face = 0xA,
             /// <summary>
             /// An Aliro credential issuer key credential was added, cleared, or modified.
             /// </summary>
-            AliroCredentialIssuerKey = 11,
+            AliroCredentialIssuerKey = 0xB,
             /// <summary>
             /// An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified.
             /// </summary>
-            AliroEvictableEndpointKey = 12,
+            AliroEvictableEndpointKey = 0xC,
             /// <summary>
             /// An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified.
             /// </summary>
-            AliroNonEvictableEndpointKey = 13,
+            AliroNonEvictableEndpointKey = 0xD,
         }
 
         /// <summary>
@@ -398,47 +398,47 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Lock/unlock operation came from unspecified source
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x0,
             /// <summary>
             /// Lock/unlock operation came from manual operation (key, thumbturn, handle, etc).
             /// </summary>
-            Manual = 1,
+            Manual = 0x1,
             /// <summary>
             /// Lock/unlock operation came from proprietary remote source (e.g. vendor app/cloud)
             /// </summary>
-            ProprietaryRemote = 2,
+            ProprietaryRemote = 0x2,
             /// <summary>
             /// Lock/unlock operation came from keypad
             /// </summary>
-            Keypad = 3,
+            Keypad = 0x3,
             /// <summary>
             /// Lock/unlock operation came from lock automatically (e.g. relock timer)
             /// </summary>
-            Auto = 4,
+            Auto = 0x4,
             /// <summary>
             /// Lock/unlock operation came from lock button (e.g. one touch or button)
             /// </summary>
-            Button = 5,
+            Button = 0x5,
             /// <summary>
             /// Lock/unlock operation came from lock due to a schedule
             /// </summary>
-            Schedule = 6,
+            Schedule = 0x6,
             /// <summary>
             /// Lock/unlock operation came from remote node
             /// </summary>
-            Remote = 7,
+            Remote = 0x7,
             /// <summary>
             /// Lock/unlock operation came from RFID card
             /// </summary>
-            RFID = 8,
+            RFID = 0x8,
             /// <summary>
             /// Lock/unlock operation came from biometric source (e.g. face, fingerprint/fingervein)
             /// </summary>
-            Biometric = 9,
+            Biometric = 0x9,
             /// <summary>
             /// Lock/unlock operation came from an interaction defined in ref_Aliro, or user change operation was a step-up credential provisioning as defined in ref_Aliro
             /// </summary>
-            Aliro = 10,
+            Aliro = 0xA,
         }
 
         /// <summary>
@@ -519,28 +519,28 @@ namespace MatterDotNet.Clusters.Closures
         /// Dl Lock Type
         /// </summary>
         public enum DlLockType : byte {
-            DeadBolt = 0,
-            Magnetic = 1,
-            Other = 2,
-            Mortise = 3,
-            Rim = 4,
-            LatchBolt = 5,
-            CylindricalLock = 6,
-            TubularLock = 7,
-            InterconnectedLock = 8,
-            DeadLatch = 9,
-            DoorFurniture = 10,
-            Eurocylinder = 11,
+            DeadBolt = 0x0,
+            Magnetic = 0x1,
+            Other = 0x2,
+            Mortise = 0x3,
+            Rim = 0x4,
+            LatchBolt = 0x5,
+            CylindricalLock = 0x6,
+            TubularLock = 0x7,
+            InterconnectedLock = 0x8,
+            DeadLatch = 0x9,
+            DoorFurniture = 0xA,
+            Eurocylinder = 0xB,
         }
 
         /// <summary>
         /// Dl Status
         /// </summary>
         public enum DlStatus : byte {
-            Success = 0x00,
-            Failure = 0x01,
-            Duplicate = 0x02,
-            Occupied = 0x03,
+            Success = 0x0,
+            Failure = 0x1,
+            Duplicate = 0x2,
+            Occupied = 0x3,
             InvalidField = 0x85,
             ResourceExhausted = 0x89,
             NotFound = 0x8B,
@@ -550,53 +550,53 @@ namespace MatterDotNet.Clusters.Closures
         /// Door Lock Set Pin Or Id Status
         /// </summary>
         public enum DoorLockSetPinOrIdStatus : byte {
-            Success = 0x00,
-            GeneralFailure = 0x01,
-            MemoryFull = 0x02,
-            DuplicateCodeError = 0x03,
+            Success = 0,
+            GeneralFailure = 1,
+            MemoryFull = 2,
+            DuplicateCodeError = 3,
         }
 
         /// <summary>
         /// Door Lock Operation Event Code
         /// </summary>
         public enum DoorLockOperationEventCode : byte {
-            UnknownOrMfgSpecific = 0x00,
-            Lock = 0x01,
-            Unlock = 0x02,
-            LockInvalidPinOrId = 0x03,
-            LockInvalidSchedule = 0x04,
-            UnlockInvalidPinOrId = 0x05,
-            UnlockInvalidSchedule = 0x06,
-            OneTouchLock = 0x07,
-            KeyLock = 0x08,
-            KeyUnlock = 0x09,
-            AutoLock = 0x0A,
-            ScheduleLock = 0x0B,
-            ScheduleUnlock = 0x0C,
-            ManualLock = 0x0D,
-            ManualUnlock = 0x0E,
+            UnknownOrMfgSpecific = 0x0,
+            Lock = 0x1,
+            Unlock = 0x2,
+            LockInvalidPinOrId = 0x3,
+            LockInvalidSchedule = 0x4,
+            UnlockInvalidPinOrId = 0x5,
+            UnlockInvalidSchedule = 0x6,
+            OneTouchLock = 0x7,
+            KeyLock = 0x8,
+            KeyUnlock = 0x9,
+            AutoLock = 0xA,
+            ScheduleLock = 0xB,
+            ScheduleUnlock = 0xC,
+            ManualLock = 0xD,
+            ManualUnlock = 0xE,
         }
 
         /// <summary>
         /// Door Lock Programming Event Code
         /// </summary>
         public enum DoorLockProgrammingEventCode : byte {
-            UnknownOrMfgSpecific = 0x00,
-            MasterCodeChanged = 0x01,
-            PinAdded = 0x02,
-            PinDeleted = 0x03,
-            PinChanged = 0x04,
-            IdAdded = 0x05,
-            IdDeleted = 0x06,
+            UnknownOrMfgSpecific = 0,
+            MasterCodeChanged = 1,
+            PinAdded = 2,
+            PinDeleted = 3,
+            PinChanged = 4,
+            IdAdded = 5,
+            IdDeleted = 6,
         }
 
         /// <summary>
         /// Door Lock User Status
         /// </summary>
         public enum DoorLockUserStatus : byte {
-            Available = 0x00,
-            OccupiedEnabled = 0x01,
-            OccupiedDisabled = 0x03,
+            Available = 0x0,
+            OccupiedEnabled = 0x1,
+            OccupiedDisabled = 0x3,
             NotSupported = 0xFF,
         }
 
@@ -604,11 +604,11 @@ namespace MatterDotNet.Clusters.Closures
         /// Door Lock User Type
         /// </summary>
         public enum DoorLockUserType : byte {
-            Unrestricted = 0x00,
-            YearDayScheduleUser = 0x01,
-            WeekDayScheduleUser = 0x02,
-            MasterUser = 0x03,
-            NonAccessUser = 0x04,
+            Unrestricted = 0x0,
+            YearDayScheduleUser = 0x1,
+            WeekDayScheduleUser = 0x2,
+            MasterUser = 0x3,
+            NonAccessUser = 0x4,
             NotSupported = 0xFF,
         }
 
@@ -667,11 +667,11 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Normal = 0x01,
-            Vacation = 0x02,
-            Privacy = 0x04,
-            NoRemoteLockUnlock = 0x08,
-            Passage = 0x10,
+            Normal = 0x0001,
+            Vacation = 0x0002,
+            Privacy = 0x0004,
+            NoRemoteLockUnlock = 0x0008,
+            Passage = 0x0010,
         }
 
         /// <summary>
@@ -683,12 +683,12 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            EnableLocalProgrammingEnabled = 0x01,
-            KeypadInterfaceDefaultAccessEnabled = 0x02,
-            RemoteInterfaceDefaultAccessIsEnabled = 0x04,
-            SoundEnabled = 0x20,
-            AutoRelockTimeSet = 0x40,
-            LEDSettingsSet = 0x80,
+            EnableLocalProgrammingEnabled = 0x0001,
+            KeypadInterfaceDefaultAccessEnabled = 0x0002,
+            RemoteInterfaceDefaultAccessIsEnabled = 0x0004,
+            SoundEnabled = 0x0020,
+            AutoRelockTimeSet = 0x0040,
+            LEDSettingsSet = 0x0080,
         }
 
         /// <summary>
@@ -715,14 +715,14 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            Lock = 0x02,
-            Unlock = 0x04,
-            LockInvalidPIN = 0x08,
-            LockInvalidSchedule = 0x10,
-            UnlockInvalidCode = 0x20,
-            UnlockInvalidSchedule = 0x40,
-            NonAccessUserOpEvent = 0x80,
+            Unknown = 0x0001,
+            Lock = 0x0002,
+            Unlock = 0x0004,
+            LockInvalidPIN = 0x0008,
+            LockInvalidSchedule = 0x0010,
+            UnlockInvalidCode = 0x0020,
+            UnlockInvalidSchedule = 0x0040,
+            NonAccessUserOpEvent = 0x0080,
         }
 
         /// <summary>
@@ -734,13 +734,13 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            Lock = 0x02,
-            Unlock = 0x04,
-            LockInvalidCode = 0x08,
-            LockInvalidSchedule = 0x10,
-            UnlockInvalidCode = 0x20,
-            UnlockInvalidSchedule = 0x40,
+            Unknown = 0x0001,
+            Lock = 0x0002,
+            Unlock = 0x0004,
+            LockInvalidCode = 0x0008,
+            LockInvalidSchedule = 0x0010,
+            UnlockInvalidCode = 0x0020,
+            UnlockInvalidSchedule = 0x0040,
         }
 
         /// <summary>
@@ -752,17 +752,17 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x001,
-            ThumbturnLock = 0x002,
-            ThumbturnUnlock = 0x004,
-            OneTouchLock = 0x008,
-            KeyLock = 0x010,
-            KeyUnlock = 0x020,
-            AutoLock = 0x040,
-            ScheduleLock = 0x080,
-            ScheduleUnlock = 0x100,
-            ManualLock = 0x200,
-            ManualUnlock = 0x400,
+            Unknown = 0x00001,
+            ThumbturnLock = 0x00002,
+            ThumbturnUnlock = 0x00004,
+            OneTouchLock = 0x00008,
+            KeyLock = 0x00010,
+            KeyUnlock = 0x00020,
+            AutoLock = 0x00040,
+            ScheduleLock = 0x00080,
+            ScheduleUnlock = 0x00100,
+            ManualLock = 0x00200,
+            ManualUnlock = 0x00400,
         }
 
         /// <summary>
@@ -774,13 +774,13 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            Lock = 0x02,
-            Unlock = 0x04,
-            LockInvalidRFID = 0x08,
-            LockInvalidSchedule = 0x10,
-            UnlockInvalidRFID = 0x20,
-            UnlockInvalidSchedule = 0x40,
+            Unknown = 0x0001,
+            Lock = 0x0002,
+            Unlock = 0x0004,
+            LockInvalidRFID = 0x0008,
+            LockInvalidSchedule = 0x0010,
+            UnlockInvalidRFID = 0x0020,
+            UnlockInvalidSchedule = 0x0040,
         }
 
         /// <summary>
@@ -792,11 +792,11 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            ProgrammingPINChanged = 0x02,
-            PINAdded = 0x04,
-            PINCleared = 0x08,
-            PINChanged = 0x10,
+            Unknown = 0x0001,
+            ProgrammingPINChanged = 0x0002,
+            PINAdded = 0x0004,
+            PINCleared = 0x0008,
+            PINChanged = 0x0010,
         }
 
         /// <summary>
@@ -808,13 +808,13 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            ProgrammingPINChanged = 0x02,
-            PINAdded = 0x04,
-            PINCleared = 0x08,
-            PINChanged = 0x10,
-            RFIDCodeAdded = 0x20,
-            RFIDCodeCleared = 0x40,
+            Unknown = 0x0001,
+            ProgrammingPINChanged = 0x0002,
+            PINAdded = 0x0004,
+            PINCleared = 0x0008,
+            PINChanged = 0x0010,
+            RFIDCodeAdded = 0x0020,
+            RFIDCodeCleared = 0x0040,
         }
 
         /// <summary>
@@ -826,9 +826,9 @@ namespace MatterDotNet.Clusters.Closures
             /// Nothing Set
             /// </summary>
             None = 0,
-            Unknown = 0x01,
-            RFIDCodeAdded = 0x20,
-            RFIDCodeCleared = 0x40,
+            Unknown = 0x0001,
+            RFIDCodeAdded = 0x0020,
+            RFIDCodeCleared = 0x0040,
         }
 
         /// <summary>

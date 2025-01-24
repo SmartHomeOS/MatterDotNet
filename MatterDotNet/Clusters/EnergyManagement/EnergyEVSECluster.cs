@@ -72,31 +72,31 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The EV is not plugged in.
             /// </summary>
-            NotPluggedIn = 0x00,
+            NotPluggedIn = 0,
             /// <summary>
             /// The EV is plugged in, but not demanding current.
             /// </summary>
-            PluggedInNoDemand = 0x01,
+            PluggedInNoDemand = 1,
             /// <summary>
             /// The EV is plugged in and is demanding current, but EVSE is not allowing current to flow.
             /// </summary>
-            PluggedInDemand = 0x02,
+            PluggedInDemand = 2,
             /// <summary>
             /// The EV is plugged in, charging is in progress, and current is flowing
             /// </summary>
-            PluggedInCharging = 0x03,
+            PluggedInCharging = 3,
             /// <summary>
             /// The EV is plugged in, discharging is in progress, and current is flowing
             /// </summary>
-            PluggedInDischarging = 0x04,
+            PluggedInDischarging = 4,
             /// <summary>
             /// The EVSE is transitioning from any plugged-in state to NotPluggedIn
             /// </summary>
-            SessionEnding = 0x05,
+            SessionEnding = 5,
             /// <summary>
             /// There is a fault (see FaultState Attribute attribute)
             /// </summary>
-            Fault = 0x06,
+            Fault = 6,
         }
 
         /// <summary>
@@ -106,27 +106,27 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The EV is not currently allowed to charge or discharge
             /// </summary>
-            Disabled = 0x00,
+            Disabled = 0,
             /// <summary>
             /// The EV is currently allowed to charge
             /// </summary>
-            ChargingEnabled = 0x01,
+            ChargingEnabled = 1,
             /// <summary>
             /// The EV is currently allowed to discharge
             /// </summary>
-            DischargingEnabled = 0x02,
+            DischargingEnabled = 2,
             /// <summary>
             /// The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue.
             /// </summary>
-            DisabledError = 0x03,
+            DisabledError = 3,
             /// <summary>
             /// The EV is not currently allowed to charge or discharge due to self-diagnostics mode.
             /// </summary>
-            DisabledDiagnostics = 0x04,
+            DisabledDiagnostics = 4,
             /// <summary>
             /// The EV is currently allowed to charge and discharge
             /// </summary>
-            Enabled = 0x05,
+            Enabled = 5,
         }
 
         /// <summary>
@@ -136,67 +136,67 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The EVSE is not in an error state.
             /// </summary>
-            NoError = 0x00,
+            NoError = 0x0,
             /// <summary>
             /// The EVSE is unable to obtain electrical measurements.
             /// </summary>
-            MeterFailure = 0x01,
+            MeterFailure = 0x1,
             /// <summary>
             /// The EVSE input voltage level is too high.
             /// </summary>
-            OverVoltage = 0x02,
+            OverVoltage = 0x2,
             /// <summary>
             /// The EVSE input voltage level is too low.
             /// </summary>
-            UnderVoltage = 0x03,
+            UnderVoltage = 0x3,
             /// <summary>
             /// The EVSE detected charging current higher than allowed by charger.
             /// </summary>
-            OverCurrent = 0x04,
+            OverCurrent = 0x4,
             /// <summary>
             /// The EVSE detected voltage on charging pins when the contactor is open.
             /// </summary>
-            ContactWetFailure = 0x05,
+            ContactWetFailure = 0x5,
             /// <summary>
             /// The EVSE detected absence of voltage after enabling contactor.
             /// </summary>
-            ContactDryFailure = 0x06,
+            ContactDryFailure = 0x6,
             /// <summary>
             /// The EVSE has an unbalanced current supply.
             /// </summary>
-            GroundFault = 0x07,
+            GroundFault = 0x7,
             /// <summary>
             /// The EVSE has detected a loss in power.
             /// </summary>
-            PowerLoss = 0x08,
+            PowerLoss = 0x8,
             /// <summary>
             /// The EVSE has detected another power quality issue (e.g. phase imbalance).
             /// </summary>
-            PowerQuality = 0x09,
+            PowerQuality = 0x9,
             /// <summary>
             /// The EVSE pilot signal amplitude short circuited to ground.
             /// </summary>
-            PilotShortCircuit = 0x0A,
+            PilotShortCircuit = 0xA,
             /// <summary>
             /// The emergency stop button was pressed.
             /// </summary>
-            EmergencyStop = 0x0B,
+            EmergencyStop = 0xB,
             /// <summary>
             /// The EVSE detected that the cable has been disconnected.
             /// </summary>
-            EVDisconnected = 0x0C,
+            EVDisconnected = 0xC,
             /// <summary>
             /// The EVSE could not determine proper power supply level.
             /// </summary>
-            WrongPowerSupply = 0x0D,
+            WrongPowerSupply = 0xD,
             /// <summary>
             /// The EVSE detected Live and Neutral are swapped.
             /// </summary>
-            LiveNeutralSwap = 0x0E,
+            LiveNeutralSwap = 0xE,
             /// <summary>
             /// The EVSE internal temperature is too high.
             /// </summary>
-            OverTemperature = 0x0F,
+            OverTemperature = 0xF,
             /// <summary>
             /// Any other reason.
             /// </summary>
@@ -210,15 +210,15 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The EV decided to stop
             /// </summary>
-            EVStopped = 0x00,
+            EVStopped = 0,
             /// <summary>
             /// The EVSE decided to stop
             /// </summary>
-            EVSEStopped = 0x01,
+            EVSEStopped = 1,
             /// <summary>
             /// An other unknown reason
             /// </summary>
-            Other = 0x02,
+            Other = 2,
         }
 
         /// <summary>

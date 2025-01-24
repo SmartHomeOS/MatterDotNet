@@ -310,7 +310,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Get the Expiry Date attribute
         /// </summary>
         public async Task<DateTime> GetExpiryDate(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)(await GetAttribute(session, 12)))!.Value;
+            return TimeUtil.FromEpochSeconds((uint)(dynamic?)(await GetAttribute(session, 12)))!;
         }
         #endregion Attributes
 

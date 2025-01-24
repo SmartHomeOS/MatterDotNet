@@ -55,35 +55,35 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// No error
             /// </summary>
-            OK = 0x0,
+            OK = 0,
             /// <summary>
             /// <see cref="ValueOutsideRange"/> Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.
             /// </summary>
-            ValueOutsideRange = 0x1,
+            ValueOutsideRange = 1,
             /// <summary>
             /// <see cref="InvalidAuthentication"/> Executed CommissioningComplete outside CASE session.
             /// </summary>
-            InvalidAuthentication = 0x2,
+            InvalidAuthentication = 2,
             /// <summary>
             /// <see cref="NoFailSafe"/> Executed CommissioningComplete when there was no active ArmFailSafe Command.
             /// </summary>
-            NoFailSafe = 0x3,
+            NoFailSafe = 3,
             /// <summary>
             /// <see cref="BusyWithOtherAdmin"/> Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.
             /// </summary>
-            BusyWithOtherAdmin = 0x4,
+            BusyWithOtherAdmin = 4,
             /// <summary>
             /// <see cref="RequiredTCNotAccepted"/> One or more required TC features from the Enhanced Setup Flow were not accepted.
             /// </summary>
-            RequiredTCNotAccepted = 0x5,
+            RequiredTCNotAccepted = 5,
             /// <summary>
-            /// <see cref="TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
+            /// <see cref="TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived"/> No acknowledgements from the user for the TC features were received.
             /// </summary>
-            TCAcknowledgementsNotReceived = 0x6,
+            TCAcknowledgementsNotReceived = 6,
             /// <summary>
-            /// <see cref="TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
+            /// <see cref="TCMinVersionNotMet, TCMinVersionNotMet"/> The version of the TC features acknowledged by the user did not meet the minimum required version.
             /// </summary>
-            TCMinVersionNotMet = 0x7,
+            TCMinVersionNotMet = 7,
         }
 
         /// <summary>
@@ -93,15 +93,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indoor only
             /// </summary>
-            Indoor = 0x0,
+            Indoor = 0,
             /// <summary>
             /// Outdoor only
             /// </summary>
-            Outdoor = 0x1,
+            Outdoor = 1,
             /// <summary>
             /// Indoor/Outdoor
             /// </summary>
-            IndoorOutdoor = 0x2,
+            IndoorOutdoor = 2,
         }
         #endregion Enums
 

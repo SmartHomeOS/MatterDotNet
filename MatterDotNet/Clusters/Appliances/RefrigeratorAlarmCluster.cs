@@ -45,7 +45,7 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// The cabinet's door has been open for a vendor defined amount of time.
             /// </summary>
-            DoorOpen = 0x01,
+            DoorOpen = 0x0001,
         }
         #endregion Enums
 

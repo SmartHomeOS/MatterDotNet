@@ -44,15 +44,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Logs to be used for end-user support
             /// </summary>
-            EndUserSupport = 0x0,
+            EndUserSupport = 0,
             /// <summary>
             /// Logs to be used for network diagnostics
             /// </summary>
-            NetworkDiag = 0x1,
+            NetworkDiag = 1,
             /// <summary>
             /// Obtain crash logs from the Node
             /// </summary>
-            CrashLogs = 0x2,
+            CrashLogs = 2,
         }
 
         /// <summary>
@@ -62,23 +62,23 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Successful transfer of logs
             /// </summary>
-            Success = 0x0,
+            Success = 0,
             /// <summary>
             /// All logs has been transferred
             /// </summary>
-            Exhausted = 0x1,
+            Exhausted = 1,
             /// <summary>
             /// No logs of the requested type available
             /// </summary>
-            NoLogs = 0x2,
+            NoLogs = 2,
             /// <summary>
             /// Unable to handle request, retry later
             /// </summary>
-            Busy = 0x3,
+            Busy = 3,
             /// <summary>
             /// The request is denied, no logs being transferred
             /// </summary>
-            Denied = 0x4,
+            Denied = 4,
         }
 
         /// <summary>
@@ -88,11 +88,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Logs to be returned as a response
             /// </summary>
-            ResponsePayload = 0x0,
+            ResponsePayload = 0,
             /// <summary>
             /// Logs to be returned using BDX
             /// </summary>
-            BDX = 0x1,
+            BDX = 1,
         }
         #endregion Enums
 

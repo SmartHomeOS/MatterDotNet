@@ -80,19 +80,19 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Financial cost
             /// </summary>
-            Financial = 0x00,
+            Financial = 0,
             /// <summary>
             /// Grid CO2e grams cost
             /// </summary>
-            GHGEmissions = 0x01,
+            GHGEmissions = 1,
             /// <summary>
             /// Consumer comfort impact cost
             /// </summary>
-            Comfort = 0x02,
+            Comfort = 2,
             /// <summary>
             /// Temperature impact cost
             /// </summary>
-            Temperature = 0x03,
+            Temperature = 3,
         }
 
         /// <summary>
@@ -102,59 +102,59 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// EV Supply Equipment
             /// </summary>
-            EVSE = 0x00,
+            EVSE = 0x0,
             /// <summary>
             /// Space heating appliance
             /// </summary>
-            SpaceHeating = 0x01,
+            SpaceHeating = 0x1,
             /// <summary>
             /// Water heating appliance
             /// </summary>
-            WaterHeating = 0x02,
+            WaterHeating = 0x2,
             /// <summary>
             /// Space cooling appliance
             /// </summary>
-            SpaceCooling = 0x03,
+            SpaceCooling = 0x3,
             /// <summary>
             /// Space heating and cooling appliance
             /// </summary>
-            SpaceHeatingCooling = 0x04,
+            SpaceHeatingCooling = 0x4,
             /// <summary>
             /// Battery Electric Storage System
             /// </summary>
-            BatteryStorage = 0x05,
+            BatteryStorage = 0x5,
             /// <summary>
             /// Solar PV inverter
             /// </summary>
-            SolarPV = 0x06,
+            SolarPV = 0x6,
             /// <summary>
             /// Fridge / Freezer
             /// </summary>
-            FridgeFreezer = 0x07,
+            FridgeFreezer = 0x7,
             /// <summary>
             /// Washing Machine
             /// </summary>
-            WashingMachine = 0x08,
+            WashingMachine = 0x8,
             /// <summary>
             /// Dishwasher
             /// </summary>
-            Dishwasher = 0x09,
+            Dishwasher = 0x9,
             /// <summary>
             /// Cooking appliance
             /// </summary>
-            Cooking = 0x0A,
+            Cooking = 0xA,
             /// <summary>
             /// Home water pump (e.g. drinking well)
             /// </summary>
-            HomeWaterPump = 0x0B,
+            HomeWaterPump = 0xB,
             /// <summary>
             /// Irrigation water pump
             /// </summary>
-            IrrigationWaterPump = 0x0C,
+            IrrigationWaterPump = 0xC,
             /// <summary>
             /// Pool pump
             /// </summary>
-            PoolPump = 0x0D,
+            PoolPump = 0xD,
             /// <summary>
             /// Other appliance type
             /// </summary>
@@ -168,23 +168,23 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The ESA is not available to the EMS (e.g. start-up, maintenance mode)
             /// </summary>
-            Offline = 0x00,
+            Offline = 0,
             /// <summary>
             /// The ESA is working normally and can be controlled by the EMS
             /// </summary>
-            Online = 0x01,
+            Online = 1,
             /// <summary>
             /// The ESA has developed a fault and cannot provide service
             /// </summary>
-            Fault = 0x02,
+            Fault = 2,
             /// <summary>
             /// The ESA is in the middle of a power adjustment event
             /// </summary>
-            PowerAdjustActive = 0x03,
+            PowerAdjustActive = 3,
             /// <summary>
             /// The ESA is currently paused by a client using the PauseRequest command
             /// </summary>
-            Paused = 0x04,
+            Paused = 4,
         }
 
         /// <summary>
@@ -194,23 +194,23 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The ESA completed the power adjustment as requested
             /// </summary>
-            NormalCompletion = 0x00,
+            NormalCompletion = 0,
             /// <summary>
             /// The ESA was set to offline
             /// </summary>
-            Offline = 0x01,
+            Offline = 1,
             /// <summary>
             /// The ESA has developed a fault could not complete the adjustment
             /// </summary>
-            Fault = 0x02,
+            Fault = 2,
             /// <summary>
             /// The user has disabled the ESA's flexibility capability
             /// </summary>
-            UserOptOut = 0x03,
+            UserOptOut = 3,
             /// <summary>
             /// The adjustment was cancelled by a client
             /// </summary>
-            Cancelled = 0x04,
+            Cancelled = 4,
         }
 
         /// <summary>
@@ -220,11 +220,11 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The adjustment is to optimize the local energy usage
             /// </summary>
-            LocalOptimization = 0x00,
+            LocalOptimization = 0,
             /// <summary>
             /// The adjustment is to optimize the grid energy usage
             /// </summary>
-            GridOptimization = 0x01,
+            GridOptimization = 1,
         }
 
         /// <summary>
@@ -234,15 +234,15 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The update was due to internal ESA device optimization
             /// </summary>
-            InternalOptimization = 0x00,
+            InternalOptimization = 0,
             /// <summary>
             /// The update was due to local EMS optimization
             /// </summary>
-            LocalOptimization = 0x01,
+            LocalOptimization = 1,
             /// <summary>
             /// The update was due to grid optimization
             /// </summary>
-            GridOptimization = 0x02,
+            GridOptimization = 2,
         }
 
         /// <summary>
@@ -252,19 +252,19 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// The user has not opted out of either local or grid optimizations
             /// </summary>
-            NoOptOut = 0x00,
+            NoOptOut = 0,
             /// <summary>
             /// The user has opted out of local EMS optimizations only
             /// </summary>
-            LocalOptOut = 0x01,
+            LocalOptOut = 1,
             /// <summary>
             /// The user has opted out of grid EMS optimizations only
             /// </summary>
-            GridOptOut = 0x02,
+            GridOptOut = 2,
             /// <summary>
             /// The user has opted out of all external optimizations
             /// </summary>
-            OptOut = 0x03,
+            OptOut = 3,
         }
 
         /// <summary>
@@ -274,15 +274,15 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// There is no Power Adjustment active
             /// </summary>
-            NoAdjustment = 0x00,
+            NoAdjustment = 0,
             /// <summary>
             /// There is PowerAdjustment active due to local EMS optimization
             /// </summary>
-            LocalOptimizationAdjustment = 0x01,
+            LocalOptimizationAdjustment = 1,
             /// <summary>
             /// There is PowerAdjustment active due to local EMS optimization
             /// </summary>
-            GridOptimizationAdjustment = 0x02,
+            GridOptimizationAdjustment = 2,
         }
         #endregion Enums
 

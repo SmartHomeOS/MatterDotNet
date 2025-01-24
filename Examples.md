@@ -61,7 +61,7 @@ _Option 1: Creates a commissioning payload from a PIN Number._\
 _Option 2: Creates a commissioning payload from a QR Code._\
 _Option 3: Creates a commissioning payload from an NFC tag._
 
-Once we have the payload, we can activate commissioning which will automatically search bluetooth and/or the network and setup the device.
+Once we have the payload, we can activate commissioning which will automatically search bluetooth and/or the network and setup the device. Since this is a new device, WiFi or Thread network selection is also required to join the device to the network.
 
 ```c#
     CommissioningState state = await controller.StartCommissioning(payload);

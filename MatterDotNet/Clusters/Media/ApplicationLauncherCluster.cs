@@ -55,27 +55,27 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Requested app is not available
             /// </summary>
-            AppNotAvailable = 0x01,
+            AppNotAvailable = 1,
             /// <summary>
             /// Video platform unable to honor command
             /// </summary>
-            SystemBusy = 0x02,
+            SystemBusy = 2,
             /// <summary>
             /// User approval for app download is pending
             /// </summary>
-            PendingUserApproval = 0x03,
+            PendingUserApproval = 3,
             /// <summary>
             /// Downloading the requested app
             /// </summary>
-            Downloading = 0x04,
+            Downloading = 4,
             /// <summary>
             /// Installing the requested app
             /// </summary>
-            Installing = 0x05,
+            Installing = 5,
         }
         #endregion Enums
 

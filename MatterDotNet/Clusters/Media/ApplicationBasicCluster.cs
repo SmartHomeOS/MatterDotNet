@@ -40,19 +40,19 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Application is not running.
             /// </summary>
-            Stopped = 0x00,
+            Stopped = 0,
             /// <summary>
             /// Application is running, is visible to the user, and is the active target for input.
             /// </summary>
-            ActiveVisibleFocus = 0x01,
+            ActiveVisibleFocus = 1,
             /// <summary>
             /// Application is running but not visible to the user.
             /// </summary>
-            ActiveHidden = 0x02,
+            ActiveHidden = 2,
             /// <summary>
             /// Application is running and visible, but is not the active target for input.
             /// </summary>
-            ActiveVisibleNotFocus = 0x03,
+            ActiveVisibleNotFocus = 3,
         }
         #endregion Enums
 

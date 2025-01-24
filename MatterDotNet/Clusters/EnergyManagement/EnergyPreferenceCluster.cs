@@ -57,19 +57,19 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// User comfort
             /// </summary>
-            Comfort = 0x00,
+            Comfort = 0,
             /// <summary>
             /// Speed of operation
             /// </summary>
-            Speed = 0x01,
+            Speed = 1,
             /// <summary>
             /// Amount of Energy consumed by the device
             /// </summary>
-            Efficiency = 0x02,
+            Efficiency = 2,
             /// <summary>
             /// Amount of water consumed by the device
             /// </summary>
-            WaterConsumption = 0x03,
+            WaterConsumption = 3,
         }
         #endregion Enums
 

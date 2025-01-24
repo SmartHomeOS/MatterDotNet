@@ -41,29 +41,29 @@ namespace MatterDotNet.Clusters.CHIP
         /// Status
         /// </summary>
         public enum Status : byte {
-            UpdateAvailable = 0x0,
-            Busy = 0x1,
-            NotAvailable = 0x2,
-            DownloadProtocolNotSupported = 0x3,
+            UpdateAvailable = 0,
+            Busy = 1,
+            NotAvailable = 2,
+            DownloadProtocolNotSupported = 3,
         }
 
         /// <summary>
         /// Apply Update Action
         /// </summary>
         public enum ApplyUpdateAction : byte {
-            Proceed = 0x0,
-            AwaitNextAction = 0x1,
-            Discontinue = 0x2,
+            Proceed = 0,
+            AwaitNextAction = 1,
+            Discontinue = 2,
         }
 
         /// <summary>
         /// Download Protocol
         /// </summary>
         public enum DownloadProtocol : byte {
-            BDXSynchronous = 0x0,
-            BDXAsynchronous = 0x1,
-            HTTPS = 0x2,
-            VendorSpecific = 0x3,
+            BDXSynchronous = 0,
+            BDXAsynchronous = 1,
+            HTTPS = 2,
+            VendorSpecific = 3,
         }
 
         /// <summary>
@@ -73,15 +73,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// An OTA Provider is announcing its presence.
             /// </summary>
-            SimpleAnnouncement = 0x0,
+            SimpleAnnouncement = 0,
             /// <summary>
             /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available.
             /// </summary>
-            UpdateAvailable = 0x1,
+            UpdateAvailable = 1,
             /// <summary>
             /// An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.
             /// </summary>
-            UrgentUpdateAvailable = 0x2,
+            UrgentUpdateAvailable = 2,
         }
 
         /// <summary>
@@ -91,39 +91,39 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Current state is not yet determined.
             /// </summary>
-            Unknown = 0x0,
+            Unknown = 0,
             /// <summary>
             /// Indicate a Node not yet in the process of software update.
             /// </summary>
-            Idle = 0x1,
+            Idle = 1,
             /// <summary>
             /// Indicate a Node in the process of querying an OTA Provider.
             /// </summary>
-            Querying = 0x2,
+            Querying = 2,
             /// <summary>
             /// Indicate a Node waiting after a Busy response.
             /// </summary>
-            DelayedOnQuery = 0x3,
+            DelayedOnQuery = 3,
             /// <summary>
             /// Indicate a Node currently in the process of downloading a software update.
             /// </summary>
-            Downloading = 0x4,
+            Downloading = 4,
             /// <summary>
             /// Indicate a Node currently in the process of verifying and applying a software update.
             /// </summary>
-            Applying = 0x5,
+            Applying = 5,
             /// <summary>
             /// Indicate a Node waiting caused by AwaitNextAction response.
             /// </summary>
-            DelayedOnApply = 0x6,
+            DelayedOnApply = 6,
             /// <summary>
             /// Indicate a Node in the process of recovering to a previous version.
             /// </summary>
-            RollingBack = 0x7,
+            RollingBack = 7,
             /// <summary>
             /// Indicate a Node is capable of user consent.
             /// </summary>
-            DelayedOnUserConsent = 0x8,
+            DelayedOnUserConsent = 8,
         }
 
         /// <summary>
@@ -133,23 +133,23 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// The reason for a state change is unknown.
             /// </summary>
-            Unknown = 0x0,
+            Unknown = 0,
             /// <summary>
             /// The reason for a state change is the success of a prior operation.
             /// </summary>
-            Success = 0x1,
+            Success = 1,
             /// <summary>
             /// The reason for a state change is the failure of a prior operation.
             /// </summary>
-            Failure = 0x2,
+            Failure = 2,
             /// <summary>
             /// The reason for a state change is a time-out.
             /// </summary>
-            TimeOut = 0x3,
+            TimeOut = 3,
             /// <summary>
             /// The reason for a state change is a request by the OTA Provider to wait.
             /// </summary>
-            DelayByProvider = 0x4,
+            DelayByProvider = 4,
         }
         #endregion Enums
 

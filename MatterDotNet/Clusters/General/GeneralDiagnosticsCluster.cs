@@ -57,47 +57,47 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The Node has encountered an unspecified fault.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0x0,
             /// <summary>
             /// The Node has encountered a fault with at least one of its radios.
             /// </summary>
-            Radio = 0x01,
+            Radio = 0x1,
             /// <summary>
             /// The Node has encountered a fault with at least one of its sensors.
             /// </summary>
-            Sensor = 0x02,
+            Sensor = 0x2,
             /// <summary>
             /// The Node has encountered an over-temperature fault that is resettable.
             /// </summary>
-            ResettableOverTemp = 0x03,
+            ResettableOverTemp = 0x3,
             /// <summary>
             /// The Node has encountered an over-temperature fault that is not resettable.
             /// </summary>
-            NonResettableOverTemp = 0x04,
+            NonResettableOverTemp = 0x4,
             /// <summary>
             /// The Node has encountered a fault with at least one of its power sources.
             /// </summary>
-            PowerSource = 0x05,
+            PowerSource = 0x5,
             /// <summary>
             /// The Node has encountered a fault with at least one of its visual displays.
             /// </summary>
-            VisualDisplayFault = 0x06,
+            VisualDisplayFault = 0x6,
             /// <summary>
             /// The Node has encountered a fault with at least one of its audio outputs.
             /// </summary>
-            AudioOutputFault = 0x07,
+            AudioOutputFault = 0x7,
             /// <summary>
             /// The Node has encountered a fault with at least one of its user interfaces.
             /// </summary>
-            UserInterfaceFault = 0x08,
+            UserInterfaceFault = 0x8,
             /// <summary>
             /// The Node has encountered a fault with its non-volatile memory.
             /// </summary>
-            NonVolatileMemoryError = 0x09,
+            NonVolatileMemoryError = 0x9,
             /// <summary>
             /// The Node has encountered disallowed physical tampering.
             /// </summary>
-            TamperDetected = 0x0A,
+            TamperDetected = 0xA,
         }
 
         /// <summary>
@@ -107,31 +107,31 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The Node has encountered an unspecified radio fault.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node has encountered a fault with its Wi-Fi radio.
             /// </summary>
-            WiFiFault = 0x01,
+            WiFiFault = 1,
             /// <summary>
             /// The Node has encountered a fault with its cellular radio.
             /// </summary>
-            CellularFault = 0x02,
+            CellularFault = 2,
             /// <summary>
             /// The Node has encountered a fault with its 802.15.4 radio.
             /// </summary>
-            ThreadFault = 0x03,
+            ThreadFault = 3,
             /// <summary>
             /// The Node has encountered a fault with its NFC radio.
             /// </summary>
-            NFCFault = 0x04,
+            NFCFault = 4,
             /// <summary>
             /// The Node has encountered a fault with its BLE radio.
             /// </summary>
-            BLEFault = 0x05,
+            BLEFault = 5,
             /// <summary>
             /// The Node has encountered a fault with its Ethernet controller.
             /// </summary>
-            EthernetFault = 0x06,
+            EthernetFault = 6,
         }
 
         /// <summary>
@@ -141,19 +141,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The Node has encountered an unspecified fault.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node has encountered a network fault as a result of a hardware failure.
             /// </summary>
-            HardwareFailure = 0x01,
+            HardwareFailure = 1,
             /// <summary>
             /// The Node has encountered a network fault as a result of a jammed network.
             /// </summary>
-            NetworkJammed = 0x02,
+            NetworkJammed = 2,
             /// <summary>
             /// The Node has encountered a network fault as a result of a failure to establish a connection.
             /// </summary>
-            ConnectionFailed = 0x03,
+            ConnectionFailed = 3,
         }
 
         /// <summary>
@@ -163,31 +163,31 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The Node is unable to identify the Power-On reason as one of the other provided enumeration values.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node has booted as the result of physical interaction with the device resulting in a reboot.
             /// </summary>
-            PowerOnReboot = 0x01,
+            PowerOnReboot = 1,
             /// <summary>
             /// The Node has rebooted as the result of a brown-out of the Node's power supply.
             /// </summary>
-            BrownOutReset = 0x02,
+            BrownOutReset = 2,
             /// <summary>
             /// The Node has rebooted as the result of a software watchdog timer.
             /// </summary>
-            SoftwareWatchdogReset = 0x03,
+            SoftwareWatchdogReset = 3,
             /// <summary>
             /// The Node has rebooted as the result of a hardware watchdog timer.
             /// </summary>
-            HardwareWatchdogReset = 0x04,
+            HardwareWatchdogReset = 4,
             /// <summary>
             /// The Node has rebooted as the result of a completed software update.
             /// </summary>
-            SoftwareUpdateCompleted = 0x05,
+            SoftwareUpdateCompleted = 5,
             /// <summary>
             /// The Node has rebooted as the result of a software initiated reboot.
             /// </summary>
-            SoftwareReset = 0x06,
+            SoftwareReset = 6,
         }
 
         /// <summary>
@@ -197,23 +197,23 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicates an interface of an unspecified type.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// Indicates a Wi-Fi interface.
             /// </summary>
-            WiFi = 0x01,
+            WiFi = 1,
             /// <summary>
             /// Indicates a Ethernet interface.
             /// </summary>
-            Ethernet = 0x02,
+            Ethernet = 2,
             /// <summary>
             /// Indicates a Cellular interface.
             /// </summary>
-            Cellular = 0x03,
+            Cellular = 3,
             /// <summary>
             /// Indicates a Thread interface.
             /// </summary>
-            Thread = 0x04,
+            Thread = 4,
         }
         #endregion Enums
 

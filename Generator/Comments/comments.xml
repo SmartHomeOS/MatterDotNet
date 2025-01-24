@@ -720,6 +720,164 @@
     <item value="2" comment="Amount of Energy consumed by the device" />
     <item value="3" comment="Amount of water consumed by the device" />
   </enum>
+  <enum name="0x009D.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="While in modes with this tag, and once enabled with the EnableCharging command, the EVSE will permit charging based on demand from the EV." />
+    <item value="0x4001" comment="While in modes with this tag, and once enabled with the EnableCharging command, the EVSE will attempt to automatically start charging based on the user’s charging targets." />
+    <item value="0x4002" comment="While in modes with this tag, and once enabled with the EnableCharging, the EVSE will attempt to automatically start charging based on available excess solar PV generation, limiting the charging power to avoid importing energy from the grid." />
+    <item value="0x4003" comment="While in modes with this tag, and once enabled with the EnableDischarging command, the EVSE will permit discharging based on the current charge state of the EV, and its control from an associated Device Energy Management cluster." />
+  </enum>
+  <enum name="0x009E.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="While in modes with this tag, the device will not attempt to keep the water warm." />
+    <item value="0x4001" comment="While in modes with this tag, the device will attempt to keep the water warm based on the OccupiedHeatingSetpoint attribute of the associated Thermostat cluster." />
+    <item value="0x4002" comment="While in modes with this tag, the device will attempt to keep the water warm based on the Schedules attribute of the associated Thermostat cluster." />
+  </enum>
+  <enum name="0x009F.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="The device prohibits optimization of energy usage management: its energy usage is determined only by the user configuration and internal device needs." />
+	<item value="0x4001" comment="The device is permitted to manage its own energy usage. For example, using tariff information it may obtain." />
+	<item value="0x4002" comment="The device permits management of energy usage by an energy manager to optimize the local energy usage." />
+	<item value="0x4003" comment="The device permits management of energy usage by an energy manager to optimize the grid energy usage." />
+  </enum>
+  <enum name="0x0049.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="This mode sets the device into baking mode for baking food items." />
+    <item value="0x4001" comment="This mode sets the device into convection mode which creates an airflow within the device during the cooking duration." />
+    <item value="0x4002" comment="This mode sets the device into grill mode for grilling food items. This is the same as Broil for many regions." />
+    <item value="0x4003" comment="This mode sets the device into roast mode for roasting food items." />
+	<item value="0x4004" comment="This mode sets the device into cleaning mode to clean the internal components of the appliance." />
+	<item value="0x4005" comment="This mode sets the device into convection bake mode which creates an airflow within the device during the baking duration." />
+	<item value="0x4006" comment="This mode sets the device into convection roast mode which creates an airflow within the device during the roasting duration." />
+	<item value="0x4007" comment="This mode sets the device into a warming mode which begins warming the cavity." />
+	<item value="0x4008" comment="This mode sets the device into proofing mode which creates an environment ready for proofing." />
+	<item value="0x4009" comment="Steam Cook" />
+  </enum>
+  <enum name="0x0051.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="The normal regime of operation." />
+    <item value="0x4001" comment="Mode optimized for washing delicate garments." />
+    <item value="0x4002" comment="Mode optimized for heavy washing." />
+    <item value="0x4003" comment="Mode optimized for stain removal on white fabrics." />
+  </enum>
+  <enum name="0x0052.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="This mode reduces the temperature rapidly, typically above freezing grade." />
+    <item value="0x4001" comment="This mode reduces the temperature rapidly, below freezing grade." />
+  </enum>
+  <enum name="0x0054.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="The device is not performing any of the main operations of the other modes. However, auxiliary actions, such as seeking the charger or charging, may occur." />
+    <item value="0x4001" comment="The device was asked to clean so it may be actively running, or paused due to an error, due to a pause command, or for recharging etc. If currently paused and the device can resume it will continue to clean." />
+    <item value="0x4002" comment="The device was asked to create a map of the space it is located in, so it may be actively running, or paused due to an error, due to a pause command, or for recharging etc. If currently paused and the device can resume, it will continue to map." />
+  </enum>
+  <enum name="0x0055.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="While in this mode, the device is optimizing for improved cleaning." />
+    <item value="0x4001" comment="The device’s vacuuming feature is enabled in this mode." />
+    <item value="0x4002" comment="The device’s mopping feature is enabled in this mode." />
+  </enum>
+  <enum name="0x0059.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="The normal regime of operation." />
+    <item value="0x4001" comment="Mode optimized for washing heavily-soiled dishes." />
+    <item value="0x4002" comment="Mode optimized for light washing." />
+  </enum>
+  <enum name="0x005E.ModeTag">
+	<item value="0x0000" comment="The device decides which options, features and setting values to use." />
+	<item value="0x0001" comment="The mode of the device is optimizing for faster completion." />
+	<item value="0x0002" comment="The device is silent or barely audible while in this mode." />
+	<item value="0x0003" comment="Either the mode is inherently low noise or the device optimizes for that." />
+	<item value="0x0004" comment="The device is optimizing for lower energy usage in this mode. Sometimes called &quot;Eco mode&quot;." />
+	<item value="0x0005" comment="A mode suitable for use during vacations or other extended absences." />
+	<item value="0x0006" comment="The mode uses the lowest available setting value." />
+	<item value="0x0007" comment="The mode uses the highest available setting value." />
+	<item value="0x0008" comment="The mode is recommended or suitable for use during night time." />
+	<item value="0x0009" comment="The mode is recommended or suitable for use during day time." />
+    <item value="0x4000" comment="This is the normal mode of operation for general cooking of food." />
+    <item value="0x4001" comment="This is a mode optimized for defrosting food." />
+  </enum>
   <bitmap name="0x0202.Rock">
     <item value="0x01" comment="Indicate rock left to right" />
     <item value="0x02" comment="Indicate rock up and down" />

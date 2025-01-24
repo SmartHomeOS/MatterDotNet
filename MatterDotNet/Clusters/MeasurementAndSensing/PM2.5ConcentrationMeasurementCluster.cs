@@ -68,34 +68,34 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Level Value
         /// </summary>
         public enum LevelValue : byte {
-            Unknown = 0x00,
-            Low = 0x01,
-            Medium = 0x02,
-            High = 0x03,
-            Critical = 0x04,
+            Unknown = 0,
+            Low = 1,
+            Medium = 2,
+            High = 3,
+            Critical = 4,
         }
 
         /// <summary>
         /// Measurement Unit
         /// </summary>
         public enum MeasurementUnit : byte {
-            PPM = 0x00,
-            PPB = 0x01,
-            PPT = 0x02,
-            MGM3 = 0x03,
-            UGM3 = 0x04,
-            NGM3 = 0x05,
-            PM3 = 0x06,
-            BQM3 = 0x07,
+            PPM = 0,
+            PPB = 1,
+            PPT = 2,
+            MGM3 = 3,
+            UGM3 = 4,
+            NGM3 = 5,
+            PM3 = 6,
+            BQM3 = 7,
         }
 
         /// <summary>
         /// Measurement Medium
         /// </summary>
         public enum MeasurementMedium : byte {
-            Air = 0x00,
-            Water = 0x01,
-            Soil = 0x02,
+            Air = 0,
+            Water = 1,
+            Soil = 2,
         }
         #endregion Enums
 

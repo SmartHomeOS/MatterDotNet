@@ -44,15 +44,15 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Requested target was not found in the TargetList
             /// </summary>
-            TargetNotFound = 0x01,
+            TargetNotFound = 1,
             /// <summary>
             /// Target request is not allowed in current state.
             /// </summary>
-            NotAllowed = 0x02,
+            NotAllowed = 2,
         }
         #endregion Enums
 

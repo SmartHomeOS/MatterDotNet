@@ -133,8 +133,8 @@ limitations under the License.
             cluster itself. Those attributes/commands are marked with a special comment. -->
 
         <!-- Attributes -->
-        <attribute side="server" code="0" define="LOCK_STATE" type="DlLockState" min="0" max="3" isNullable="true" reportable="true" writable="false">LockState</attribute>
-        <attribute side="server" code="1" define="LOCK_TYPE" type="DlLockType" min="0" max="11" writable="false">LockType</attribute>
+        <attribute side="server" code="0" define="LOCK_STATE" type="LockState" min="0" max="3" isNullable="true" reportable="true" writable="false">LockState</attribute>
+        <attribute side="server" code="1" define="LOCK_TYPE" type="LockType" min="0" max="11" writable="false">LockType</attribute>
         <attribute side="server" code="2" define="ACTUATOR_ENABLED" type="boolean" writable="false">ActuatorEnabled</attribute>
         <!-- Conformance feature DPS - for now optional -->
         <attribute side="server" code="3" define="DOOR_STATE" type="DoorStateEnum" min="0" max="5" isNullable="true" reportable="true" optional="true">DoorState</attribute>
@@ -177,7 +177,7 @@ limitations under the License.
         <!-- Conformance feature RID - for now optional -->
         <attribute side="server" code="26" define="MIN_RFID_CODE_LENGTH" type="int8u" writable="false" optional="true">MinRFIDCodeLength</attribute>
         <!-- Conformance feature USR - for now optional -->
-        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
+        <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="CredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
         <!-- Conformance feature USR - for now optional  -->
         <attribute side="server" code="28" define="NUM_CREDENTIALS_SUPPORTED_PER_USER" type="int8u" default="0" writable="false" optional="true">NumberOfCredentialsSupportedPerUser</attribute>
         <attribute side="server" code="33" define="LANGUAGE" type="char_string" length="3" reportable="true" writable="true" optional="true">
@@ -205,8 +205,8 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="DlSupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
-        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="DlDefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
+        <attribute side="server" code="38" define="SUPPORTED_OPERATING_MODES" type="SupportedOperatingModes" min="0x0000" max="0xFFFF" default="0xFFF6" writable="false">SupportedOperatingModes</attribute>
+        <attribute side="server" code="39" define="DEFAULT_CONFIGURATION_REGISTER" type="DefaultConfigurationRegister" min="0x0000" max="0xFFFF" reportable="true" default="0" writable="false" optional="true">DefaultConfigurationRegister</attribute>
         <attribute side="server" code="40" define="ENABLE_LOCAL_PROGRAMMING" type="boolean" reportable="true" default="1" writable="true" optional="true">
             <description>EnableLocalProgramming</description>
             <access op="read" role="view" />
@@ -227,7 +227,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="DlLocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
+        <attribute side="server" code="44" define="LOCAL_PROGRAMMING_FEATURES" type="LocalProgrammingFeatures" min="0x0" max="0x0F" reportable="true" default="0" writable="true" optional="true">
             <description>LocalProgrammingFeatures</description>
             <access op="read" role="view" />
             <access op="write" role="administer" />
@@ -345,7 +345,7 @@ limitations under the License.
             <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
             <arg name="WeekDayIndex" type="int8u" />
             <arg name="UserIndex" type="int16u" />
-            <arg name="Status" type="DlStatus" />
+            <arg name="Status" type="Status" />
             <arg name="DaysMask" type="DaysMaskMap" optional="true" />
             <arg name="StartHour" type="int8u" optional="true" />
             <arg name="StartMinute" type="int8u" optional="true" />
@@ -380,7 +380,7 @@ limitations under the License.
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
             <arg name="YearDayIndex" type="int8u" />
             <arg name="UserIndex" type="int16u" />
-            <arg name="Status" type="DlStatus" />
+            <arg name="Status" type="Status" />
             <arg name="LocalStartTime" type="epoch_s" optional="true" />
             <arg name="LocalEndTime" type="epoch_s" optional="true" />
         </command>
@@ -410,7 +410,7 @@ limitations under the License.
         <command source="server" code="18" name="GetHolidayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the Holiday Schedule Entry for the specified Holiday ID.</description>
             <arg name="HolidayIndex" type="int8u" />
-            <arg name="Status" type="DlStatus" />
+            <arg name="Status" type="Status" />
             <arg name="LocalStartTime" type="epoch_s" optional="true" />
             <arg name="LocalEndTime" type="epoch_s" optional="true" />
             <arg name="OperatingMode" type="OperatingModeEnum" optional="true" />
@@ -473,7 +473,7 @@ limitations under the License.
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the status for setting the specified credential.</description>
-            <arg name="Status" type="DlStatus" />
+            <arg name="Status" type="Status" />
             <arg name="UserIndex" type="int16u" isNullable="true" />
             <arg name="NextCredentialIndex" type="int16u" isNullable="true" />
         </command>
@@ -582,7 +582,7 @@ limitations under the License.
         <item value="2" name="Tri" />
     </enum>
 
-    <bitmap name="DlCredentialRuleMask" type="bitmap8">
+    <bitmap name="CredentialRuleMask" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="Single" />
         <field mask="0x02" name="Dual" />
@@ -720,7 +720,7 @@ limitations under the License.
 
     <!-- Auxiliary data types -->
     <!-- LockState Attribute Values -->
-    <enum name="DlLockState" type="enum8">
+    <enum name="LockState" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Not Fully Locked" />
         <item value="1" name="Locked" />
@@ -729,7 +729,7 @@ limitations under the License.
     </enum>
 
     <!-- LockType Attribute Values -->
-    <enum name="DlLockType" type="enum8">
+    <enum name="LockType" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Dead bolt" />
         <item value="1" name="Magnetic" />
@@ -746,7 +746,7 @@ limitations under the License.
     </enum>
 
     <!-- CredentialRulesSupport attribute bit meaning set -->
-    <bitmap name="DlCredentialRulesSupport" type="bitmap8">
+    <bitmap name="CredentialRulesSupport" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="Single" />
         <field mask="0x02" name="Dual" />
@@ -754,7 +754,7 @@ limitations under the License.
     </bitmap>
 
     <!-- SupportedOperatingModes attribute bit meaning set -->
-    <bitmap name="DlSupportedOperatingModes" type="bitmap16">
+    <bitmap name="SupportedOperatingModes" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Normal" />
         <field mask="0x02" name="Vacation" /> <!-- Could be optional -->
@@ -764,7 +764,7 @@ limitations under the License.
     </bitmap>
 
     <!-- DefaultConfigurationRegister attribute bit meaning set -->
-    <bitmap name="DlDefaultConfigurationRegister" type="bitmap16">
+    <bitmap name="DefaultConfigurationRegister" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="EnableLocalProgrammingEnabled" />
         <field mask="0x02" name="KeypadInterfaceDefaultAccessEnabled" />
@@ -775,7 +775,7 @@ limitations under the License.
     </bitmap>
 
     <!-- LocalProgrammingFeatures attribute bit meaning set -->
-    <bitmap name="DlLocalProgrammingFeatures" type="bitmap8">
+    <bitmap name="LocalProgrammingFeatures" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="AddUsersCredentialsSchedulesLocally" />
         <field mask="0x02" name="ModifyUsersCredentialsSchedulesLocally" />
@@ -784,7 +784,7 @@ limitations under the License.
     </bitmap>
 
     <!-- KeypadOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlKeypadOperationEventMask" type="bitmap16">
+    <bitmap name="KeypadOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -797,7 +797,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RemoteOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlRemoteOperationEventMask" type="bitmap16">
+    <bitmap name="RemoteOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -809,7 +809,7 @@ limitations under the License.
     </bitmap>
 
     <!-- ManualOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlManualOperationEventMask" type="bitmap16">
+    <bitmap name="ManualOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x001" name="Unknown" />
         <field mask="0x002" name="ThumbturnLock" />
@@ -825,7 +825,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RFIDOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlRFIDOperationEventMask" type="bitmap16">
+    <bitmap name="RFIDOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -837,7 +837,7 @@ limitations under the License.
     </bitmap>
 
     <!-- KeypadProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlKeypadProgrammingEventMask" type="bitmap16">
+    <bitmap name="KeypadProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="ProgrammingPINChanged" />
@@ -847,7 +847,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RemoteProgrammingEventMask attribute bit meaning set -->
-     <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
+     <bitmap name="RemoteProgrammingEventMask" type="bitmap16">
          <cluster code="0x0101" />
          <field mask="0x01" name="Unknown" />
          <field mask="0x02" name="ProgrammingPINChanged" />
@@ -859,14 +859,14 @@ limitations under the License.
      </bitmap>
 
     <!-- RFIDProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
+    <bitmap name="RFIDProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x20" name="RFIDCodeAdded" />
         <field mask="0x40" name="RFIDCodeCleared" />
     </bitmap>
 
-    <enum name="DlStatus" type="enum8">
+    <enum name="Status" type="enum8">
         <cluster code="0x0101" />
         <item value="0x00" name="Success" />
         <item value="0x01" name="Failure" />

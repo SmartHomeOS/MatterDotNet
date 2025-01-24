@@ -40,11 +40,11 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Indicates photodiode sensor type
             /// </summary>
-            Photodiode = 0x00,
+            Photodiode = 0,
             /// <summary>
             /// Indicates CMOS sensor type
             /// </summary>
-            CMOS = 0x01,
+            CMOS = 1,
         }
         #endregion Enums
 

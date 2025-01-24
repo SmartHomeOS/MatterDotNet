@@ -59,22 +59,22 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Valve is in closed position
             /// </summary>
-            Closed = 0x0,
+            Closed = 0,
             /// <summary>
             /// Valve is in open position
             /// </summary>
-            Open = 0x1,
+            Open = 1,
             /// <summary>
             /// Valve is transitioning between closed and open positions or between levels
             /// </summary>
-            Transitioning = 0x2,
+            Transitioning = 2,
         }
 
         /// <summary>
         /// Status Code
         /// </summary>
         public enum StatusCode : byte {
-            FailureDueToFault = 0x02,
+            FailureDueToFault = 2,
         }
 
         /// <summary>
@@ -86,12 +86,30 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            GeneralFault = 0x01,
-            Blocked = 0x02,
-            Leaking = 0x04,
-            NotConnected = 0x08,
-            ShortCircuit = 0x10,
-            CurrentExceeded = 0x20,
+            /// <summary>
+            /// Unspecified fault detected
+            /// </summary>
+            GeneralFault = 0x0001,
+            /// <summary>
+            /// Valve is blocked
+            /// </summary>
+            Blocked = 0x0002,
+            /// <summary>
+            /// Valve has detected a leak
+            /// </summary>
+            Leaking = 0x0004,
+            /// <summary>
+            /// No valve is connected to controller
+            /// </summary>
+            NotConnected = 0x0008,
+            /// <summary>
+            /// Short circuit is detected
+            /// </summary>
+            ShortCircuit = 0x0010,
+            /// <summary>
+            /// The available current has been exceeded
+            /// </summary>
+            CurrentExceeded = 0x0020,
         }
         #endregion Enums
 

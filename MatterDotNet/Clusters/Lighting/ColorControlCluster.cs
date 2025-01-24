@@ -70,19 +70,19 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Shortest distance
             /// </summary>
-            Shortest = 0x0,
+            Shortest = 0,
             /// <summary>
             /// Longest distance
             /// </summary>
-            Longest = 0x1,
+            Longest = 1,
             /// <summary>
             /// Up
             /// </summary>
-            Up = 0x2,
+            Up = 2,
             /// <summary>
             /// Down
             /// </summary>
-            Down = 0x3,
+            Down = 3,
         }
 
         /// <summary>
@@ -92,15 +92,15 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Stop the movement
             /// </summary>
-            Stop = 0x0,
+            Stop = 0,
             /// <summary>
             /// Move in an upwards direction
             /// </summary>
-            Up = 0x1,
+            Up = 1,
             /// <summary>
             /// Move in a downwards direction
             /// </summary>
-            Down = 0x3,
+            Down = 3,
         }
 
         /// <summary>
@@ -110,11 +110,11 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Step in an upwards direction
             /// </summary>
-            Up = 0x1,
+            Up = 1,
             /// <summary>
             /// Step in a downwards direction
             /// </summary>
-            Down = 0x3,
+            Down = 3,
         }
 
         /// <summary>
@@ -124,15 +124,15 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// The current hue and saturation attributes determine the color.
             /// </summary>
-            CurrentHueAndCurrentSaturation = 0x00,
+            CurrentHueAndCurrentSaturation = 0,
             /// <summary>
             /// The current X and Y attributes determine the color.
             /// </summary>
-            CurrentXAndCurrentY = 0x01,
+            CurrentXAndCurrentY = 1,
             /// <summary>
             /// The color temperature attribute determines the color.
             /// </summary>
-            ColorTemperatureMireds = 0x02,
+            ColorTemperatureMireds = 2,
         }
 
         /// <summary>
@@ -142,15 +142,15 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// De-activate the color loop.
             /// </summary>
-            Deactivate = 0x00,
+            Deactivate = 0,
             /// <summary>
             /// Activate the color loop from the value in the ColorLoopStartEnhancedHue field.
             /// </summary>
-            ActivateFromColorLoopStartEnhancedHue = 0x01,
+            ActivateFromColorLoopStartEnhancedHue = 1,
             /// <summary>
             /// Activate the color loop from the value of the EnhancedCurrentHue attribute.
             /// </summary>
-            ActivateFromEnhancedCurrentHue = 0x02,
+            ActivateFromEnhancedCurrentHue = 2,
         }
 
         /// <summary>
@@ -160,19 +160,19 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// The current hue and saturation attributes determine the color.
             /// </summary>
-            CurrentHueAndCurrentSaturation = 0x00,
+            CurrentHueAndCurrentSaturation = 0,
             /// <summary>
             /// The current X and Y attributes determine the color.
             /// </summary>
-            CurrentXAndCurrentY = 0x01,
+            CurrentXAndCurrentY = 1,
             /// <summary>
             /// The color temperature attribute determines the color.
             /// </summary>
-            ColorTemperatureMireds = 0x02,
+            ColorTemperatureMireds = 2,
             /// <summary>
             /// The enhanced current hue and saturation attributes determine the color.
             /// </summary>
-            EnhancedCurrentHueAndCurrentSaturation = 0x03,
+            EnhancedCurrentHueAndCurrentSaturation = 3,
         }
 
         /// <summary>
@@ -182,23 +182,23 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// There is no compensation.
             /// </summary>
-            None = 0x00,
+            None = 0,
             /// <summary>
             /// The compensation is based on other or unknown mechanism.
             /// </summary>
-            OtherOrUnknown = 0x01,
+            OtherOrUnknown = 1,
             /// <summary>
             /// The compensation is based on temperature monitoring.
             /// </summary>
-            TemperatureMonitoring = 0x02,
+            TemperatureMonitoring = 2,
             /// <summary>
             /// The compensation is based on optical luminance monitoring and feedback.
             /// </summary>
-            OpticalLuminanceMonitoringAndFeedback = 0x03,
+            OpticalLuminanceMonitoringAndFeedback = 3,
             /// <summary>
             /// The compensation is based on optical color monitoring and feedback.
             /// </summary>
-            OpticalColorMonitoringAndFeedback = 0x04,
+            OpticalColorMonitoringAndFeedback = 4,
         }
 
         /// <summary>
@@ -208,11 +208,11 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Decrement the hue in the color loop.
             /// </summary>
-            Decrement = 0x00,
+            Decrement = 0,
             /// <summary>
             /// Increment the hue in the color loop.
             /// </summary>
-            Increment = 0x01,
+            Increment = 1,
         }
 
         /// <summary>
@@ -224,10 +224,25 @@ namespace MatterDotNet.Clusters.Lighting
             /// Nothing Set
             /// </summary>
             None = 0,
+            /// <summary>
+            /// Supports color specification via hue/saturation.
+            /// </summary>
             HueSaturation = 0x0001,
+            /// <summary>
+            /// Enhanced hue is supported.
+            /// </summary>
             EnhancedHue = 0x0002,
+            /// <summary>
+            /// Color loop is supported.
+            /// </summary>
             ColorLoop = 0x0004,
+            /// <summary>
+            /// Supports color specification via XY.
+            /// </summary>
             XY = 0x0008,
+            /// <summary>
+            /// Supports color specification via color temperature.
+            /// </summary>
             ColorTemperature = 0x0010,
         }
 
@@ -270,7 +285,7 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Dependency on On/Off cluster
             /// </summary>
-            ExecuteIfOff = 0x1,
+            ExecuteIfOff = 0x01,
         }
         #endregion Enums
 

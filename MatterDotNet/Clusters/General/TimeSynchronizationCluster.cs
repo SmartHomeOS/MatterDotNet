@@ -65,7 +65,7 @@ namespace MatterDotNet.Clusters.General
         /// Status Code
         /// </summary>
         public enum StatusCode : byte {
-            TimeNotAccepted = 0x02,
+            TimeNotAccepted = 2,
         }
 
         /// <summary>
@@ -75,23 +75,23 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// This indicates that the node is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only.
             /// </summary>
-            NoTimeGranularity = 0x00,
+            NoTimeGranularity = 0,
             /// <summary>
             /// This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now > 5 seconds.
             /// </summary>
-            MinutesGranularity = 0x01,
+            MinutesGranularity = 1,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds.
             /// </summary>
-            SecondsGranularity = 0x02,
+            SecondsGranularity = 2,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50 ms.
             /// </summary>
-            MillisecondsGranularity = 0x03,
+            MillisecondsGranularity = 3,
             /// <summary>
             /// This indicates the node is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs.
             /// </summary>
-            MicrosecondsGranularity = 0x04,
+            MicrosecondsGranularity = 4,
         }
 
         /// <summary>
@@ -101,67 +101,67 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Node is not currently synchronized with a UTC Time source.
             /// </summary>
-            None = 0x00,
+            None = 0x0,
             /// <summary>
             /// Node uses an unlisted time source.
             /// </summary>
-            Unknown = 0x01,
+            Unknown = 0x1,
             /// <summary>
             /// Node received time from a client using the SetUTCTime Command.
             /// </summary>
-            Admin = 0x02,
+            Admin = 0x2,
             /// <summary>
             /// Synchronized time by querying the Time Synchronization cluster of another Node.
             /// </summary>
-            NodeTimeCluster = 0x03,
+            NodeTimeCluster = 0x3,
             /// <summary>
             /// SNTP from a server not in the Matter network. NTS is not used.
             /// </summary>
-            NonMatterSNTP = 0x04,
+            NonMatterSNTP = 0x4,
             /// <summary>
             /// NTP from servers not in the Matter network. None of the servers used NTS.
             /// </summary>
-            NonMatterNTP = 0x05,
+            NonMatterNTP = 0x5,
             /// <summary>
             /// SNTP from a server within the Matter network. NTS is not used.
             /// </summary>
-            MatterSNTP = 0x06,
+            MatterSNTP = 0x6,
             /// <summary>
             /// NTP from servers within the Matter network. None of the servers used NTS.
             /// </summary>
-            MatterNTP = 0x07,
+            MatterNTP = 0x7,
             /// <summary>
             /// NTP from multiple servers in the Matter network and external. None of the servers used NTS.
             /// </summary>
-            MixedNTP = 0x08,
+            MixedNTP = 0x8,
             /// <summary>
             /// SNTP from a server not in the Matter network. NTS is used.
             /// </summary>
-            NonMatterSNTPNTS = 0x09,
+            NonMatterSNTPNTS = 0x9,
             /// <summary>
             /// NTP from servers not in the Matter network. NTS is used on at least one server.
             /// </summary>
-            NonMatterNTPNTS = 0x0A,
+            NonMatterNTPNTS = 0xA,
             /// <summary>
             /// SNTP from a server within the Matter network. NTS is used.
             /// </summary>
-            MatterSNTPNTS = 0x0B,
+            MatterSNTPNTS = 0xB,
             /// <summary>
             /// NTP from a server within the Matter network. NTS is used on at least one server.
             /// </summary>
-            MatterNTPNTS = 0x0C,
+            MatterNTPNTS = 0xC,
             /// <summary>
             /// NTP from multiple servers in the Matter network and external. NTS is used on at least one server.
             /// </summary>
-            MixedNTPNTS = 0x0D,
+            MixedNTPNTS = 0xD,
             /// <summary>
             /// Time synchronization comes from a vendor cloud-based source (e.g. "Date" header in authenticated HTTPS connection).
             /// </summary>
-            CloudSource = 0x0E,
+            CloudSource = 0xE,
             /// <summary>
             /// Time synchronization comes from PTP.
             /// </summary>
-            PTP = 0x0F,
+            PTP = 0xF,
             /// <summary>
             /// Time synchronization comes from a GNSS source.
             /// </summary>
@@ -175,15 +175,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Node has a full list of the available time zones
             /// </summary>
-            Full = 0x00,
+            Full = 0,
             /// <summary>
             /// Node has a partial list of the available time zones
             /// </summary>
-            Partial = 0x01,
+            Partial = 1,
             /// <summary>
             /// Node does not have a time zone database
             /// </summary>
-            None = 0x02,
+            None = 2,
         }
         #endregion Enums
 
@@ -534,7 +534,7 @@ namespace MatterDotNet.Clusters.General
         /// Get the Local Time attribute
         /// </summary>
         public async Task<DateTime?> GetLocalTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? DateTime.MaxValue;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? 0xFFFFFFFFFFFFFFFF;
         }
 
         /// <summary>

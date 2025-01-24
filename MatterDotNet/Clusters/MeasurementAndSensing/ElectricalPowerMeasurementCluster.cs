@@ -70,15 +70,15 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// 
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// Direct current
             /// </summary>
-            DC = 0x01,
+            DC = 1,
             /// <summary>
             /// Alternating current, either single-phase or polyphase
             /// </summary>
-            AC = 0x02,
+            AC = 2,
         }
         #endregion Enums
 

@@ -57,27 +57,27 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicate the usage of an unspecified Wi-Fi security type
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// Indicate the usage of no Wi-Fi security
             /// </summary>
-            None = 0x01,
+            None = 1,
             /// <summary>
             /// Indicate the usage of WEP Wi-Fi security
             /// </summary>
-            WEP = 0x02,
+            WEP = 2,
             /// <summary>
             /// Indicate the usage of WPA Wi-Fi security
             /// </summary>
-            WPA = 0x03,
+            WPA = 3,
             /// <summary>
             /// Indicate the usage of WPA2 Wi-Fi security
             /// </summary>
-            WPA2 = 0x04,
+            WPA2 = 4,
             /// <summary>
             /// Indicate the usage of WPA3 Wi-Fi security
             /// </summary>
-            WPA3 = 0x05,
+            WPA3 = 5,
         }
 
         /// <summary>
@@ -87,31 +87,31 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicate the network interface is currently using 802.11a against the wireless access point.
             /// </summary>
-            A = 0x00,
+            A = 0,
             /// <summary>
             /// Indicate the network interface is currently using 802.11b against the wireless access point.
             /// </summary>
-            B = 0x01,
+            B = 1,
             /// <summary>
             /// Indicate the network interface is currently using 802.11g against the wireless access point.
             /// </summary>
-            G = 0x02,
+            G = 2,
             /// <summary>
             /// Indicate the network interface is currently using 802.11n against the wireless access point.
             /// </summary>
-            N = 0x03,
+            N = 3,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ac against the wireless access point.
             /// </summary>
-            Ac = 0x04,
+            Ac = 4,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ax against the wireless access point.
             /// </summary>
-            Ax = 0x05,
+            Ax = 5,
             /// <summary>
             /// Indicate the network interface is currently using 802.11ah against the wireless access point.
             /// </summary>
-            Ah = 0x06,
+            Ah = 6,
         }
 
         /// <summary>
@@ -121,19 +121,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The reason for the failure is unknown.
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// An error occurred during association.
             /// </summary>
-            AssociationFailed = 0x01,
+            AssociationFailed = 1,
             /// <summary>
             /// An error occurred during authentication.
             /// </summary>
-            AuthenticationFailed = 0x02,
+            AuthenticationFailed = 2,
             /// <summary>
             /// The specified SSID could not be found.
             /// </summary>
-            SsidNotFound = 0x03,
+            SsidNotFound = 3,
         }
 
         /// <summary>
@@ -143,11 +143,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicate the node is connected
             /// </summary>
-            Connected = 0x00,
+            Connected = 0,
             /// <summary>
             /// Indicate the node is not connected
             /// </summary>
-            NotConnected = 0x01,
+            NotConnected = 1,
         }
         #endregion Enums
 

@@ -44,7 +44,7 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Dimensions defined in a number of Pixels
             /// </summary>
-            Pixels = 0x00,
+            Pixels = 0,
             /// <summary>
             /// Dimensions defined as a percentage
             /// </summary>
@@ -58,43 +58,43 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Actor represents an actor credited in video media content; for example, “Gaby Hoffman”
             /// </summary>
-            Actor = 0x00,
+            Actor = 0x0,
             /// <summary>
             /// Channel represents the identifying data for a television channel; for example, "PBS"
             /// </summary>
-            Channel = 0x01,
+            Channel = 0x1,
             /// <summary>
             /// A character represented in video media content; for example, “Snow White”
             /// </summary>
-            Character = 0x02,
+            Character = 0x2,
             /// <summary>
             /// A director of the video media content; for example, “Spike Lee”
             /// </summary>
-            Director = 0x03,
+            Director = 0x3,
             /// <summary>
             /// An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for "Football games" would search for a 'game' event entity and a 'football' sport entity.
             /// </summary>
-            Event = 0x04,
+            Event = 0x4,
             /// <summary>
             /// A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise "Intergalactic Wars" which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as "Find Intergalactic Wars movies", which would search for all 'Intergalactic Wars' programs of the MOVIE MediaType, rather than attempting to match to a single title.
             /// </summary>
-            Franchise = 0x05,
+            Franchise = 0x5,
             /// <summary>
             /// Genre represents the genre of video media content such as action, drama or comedy.
             /// </summary>
-            Genre = 0x06,
+            Genre = 0x6,
             /// <summary>
             /// League represents the categorical information for a sporting league; for example, "NCAA"
             /// </summary>
-            League = 0x07,
+            League = 0x7,
             /// <summary>
             /// Popularity indicates whether the user asks for popular content.
             /// </summary>
-            Popularity = 0x08,
+            Popularity = 0x8,
             /// <summary>
             /// The provider (MSP) the user wants this media to be played on; for example, "Netflix".
             /// </summary>
-            Provider = 0x09,
+            Provider = 0x9,
             /// <summary>
             /// Sport represents the categorical information of a sport; for example, football
             /// </summary>
@@ -106,19 +106,19 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// The type of content requested. Supported types are "Movie", "MovieSeries", "TVSeries", "TVSeason", "TVEpisode", "Trailer", "SportsEvent", "LiveEvent", and "Video"
             /// </summary>
-            Type = 0x0C,
+            Type = 0xC,
             /// <summary>
             /// Video represents the identifying data for a specific piece of video content; for example, "Manchester by the Sea".
             /// </summary>
-            Video = 0x0D,
+            Video = 0xD,
             /// <summary>
             /// Season represents the specific season number within a TV series.
             /// </summary>
-            Season = 0x0E,
+            Season = 0xE,
             /// <summary>
             /// Episode represents a specific episode number within a Season in a TV series.
             /// </summary>
-            Episode = 0x0F,
+            Episode = 0xF,
             /// <summary>
             /// Represents a search text input across many parameter types or even outside of the defined param types.
             /// </summary>
@@ -132,45 +132,45 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Requested URL could not be reached by device.
             /// </summary>
-            URLNotAvailable = 0x01,
+            URLNotAvailable = 1,
             /// <summary>
             /// Requested URL returned 401 error code.
             /// </summary>
-            AuthFailed = 0x02,
+            AuthFailed = 2,
             /// <summary>
             /// Requested Text Track (in PlaybackPreferences) not available
             /// </summary>
-            TextTrackNotAvailable = 0x03,
+            TextTrackNotAvailable = 3,
             /// <summary>
             /// Requested Audio Track (in PlaybackPreferences) not available
             /// </summary>
-            AudioTrackNotAvailable = 0x04,
+            AudioTrackNotAvailable = 4,
         }
 
         /// <summary>
         /// Characteristic
         /// </summary>
         public enum Characteristic : byte {
-            ForcedSubtitles = 0x00,
-            DescribesVideo = 0x01,
-            EasyToRead = 0x02,
-            FrameBased = 0x03,
-            MainProgram = 0x04,
-            OriginalContent = 0x05,
-            VoiceOverTranslation = 0x06,
-            Caption = 0x07,
-            Subtitle = 0x08,
-            Alternate = 0x09,
-            Supplementary = 0x0A,
-            Commentary = 0x0B,
-            DubbedTranslation = 0x0C,
-            Description = 0x0D,
-            Metadata = 0x0E,
-            EnhancedAudioIntelligibility = 0x0F,
+            ForcedSubtitles = 0x0,
+            DescribesVideo = 0x1,
+            EasyToRead = 0x2,
+            FrameBased = 0x3,
+            MainProgram = 0x4,
+            OriginalContent = 0x5,
+            VoiceOverTranslation = 0x6,
+            Caption = 0x7,
+            Subtitle = 0x8,
+            Alternate = 0x9,
+            Supplementary = 0xA,
+            Commentary = 0xB,
+            DubbedTranslation = 0xC,
+            Description = 0xD,
+            Metadata = 0xE,
+            EnhancedAudioIntelligibility = 0xF,
             Emergency = 0x10,
             Karaoke = 0x11,
         }
@@ -187,11 +187,11 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Device supports Dynamic Adaptive Streaming over HTTP (DASH)
             /// </summary>
-            DASH = 0x1,
+            DASH = 0x0001,
             /// <summary>
             /// Device supports HTTP Live Streaming (HLS)
             /// </summary>
-            HLS = 0x2,
+            HLS = 0x0002,
         }
 
         /// <summary>
@@ -203,11 +203,11 @@ namespace MatterDotNet.Clusters.Media
             /// Nothing Set
             /// </summary>
             None = 0,
-            ContentSearch = 0x01,
-            URLPlayback = 0x02,
-            AdvancedSeek = 0x04,
-            TextTracks = 0x08,
-            AudioTracks = 0x10,
+            ContentSearch = 0x0001,
+            URLPlayback = 0x0002,
+            AdvancedSeek = 0x0004,
+            TextTracks = 0x0008,
+            AudioTracks = 0x0010,
         }
         #endregion Enums
 

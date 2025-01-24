@@ -78,11 +78,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// </summary>
             BoundsExceeded = 0x2,
             /// <summary>
-            /// <see cref="NetworkIdNotFound"/> The NetworkID is not among the collection of added networks
+            /// <see cref="NetworkIDNotFound"/> The NetworkID is not among the collection of added networks
             /// </summary>
             NetworkIDNotFound = 0x3,
             /// <summary>
-            /// <see cref="DuplicateNetworkId"/> The NetworkID is already among the collection of added networks
+            /// <see cref="DuplicateNetworkID"/> The NetworkID is already among the collection of added networks
             /// </summary>
             DuplicateNetworkID = 0x4,
             /// <summary>
@@ -108,15 +108,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// <see cref="IPV6Failed"/> Failure to generate an IPv6 address
             /// </summary>
-            IPV6Failed = 0xa,
+            IPV6Failed = 0xA,
             /// <summary>
             /// <see cref="IPBindFailed"/> Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces
             /// </summary>
-            IPBindFailed = 0xb,
+            IPBindFailed = 0xB,
             /// <summary>
             /// <see cref="UnknownError"/> Unknown error
             /// </summary>
-            UnknownError = 0xc,
+            UnknownError = 0xC,
         }
 
         /// <summary>
@@ -126,27 +126,27 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// 2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)
             /// </summary>
-            _2G4 = 0x0,
+            _2G4 = 0,
             /// <summary>
             /// 3.65GHz - 3.655GHz to 3.695GHz (802.11y)
             /// </summary>
-            _3G65 = 0x1,
+            _3G65 = 1,
             /// <summary>
             /// 5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)
             /// </summary>
-            _5G = 0x2,
+            _5G = 2,
             /// <summary>
             /// 6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)
             /// </summary>
-            _6G = 0x3,
+            _6G = 3,
             /// <summary>
             /// 60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)
             /// </summary>
-            _60G = 0x4,
+            _60G = 4,
             /// <summary>
             /// Sub-1GHz - 755MHz to 931MHz (802.11ah)
             /// </summary>
-            _1G = 0x5,
+            _1G = 5,
         }
 
         /// <summary>
@@ -161,19 +161,19 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Supports unencrypted Wi-Fi
             /// </summary>
-            Unencrypted = 0x1,
+            Unencrypted = 0x01,
             /// <summary>
             /// Supports Wi-Fi using WEP security
             /// </summary>
-            WEP = 0x2,
+            WEP = 0x02,
             /// <summary>
             /// Supports Wi-Fi using WPA-Personal security
             /// </summary>
-            WPAPERSONAL = 0x4,
+            WPAPERSONAL = 0x04,
             /// <summary>
             /// Supports Wi-Fi using WPA2-Personal security
             /// </summary>
-            WPA2PERSONAL = 0x8,
+            WPA2PERSONAL = 0x08,
             /// <summary>
             /// Supports Wi-Fi using WPA3-Personal security
             /// </summary>
@@ -193,23 +193,23 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Thread Border Router functionality is present
             /// </summary>
-            IsBorderRouterCapable = 0x1,
+            IsBorderRouterCapable = 0x0001,
             /// <summary>
             /// Router mode is supported (interface could be in router or REED mode)
             /// </summary>
-            IsRouterCapable = 0x2,
+            IsRouterCapable = 0x0002,
             /// <summary>
             /// Sleepy end-device mode is supported
             /// </summary>
-            IsSleepyEndDeviceCapable = 0x4,
+            IsSleepyEndDeviceCapable = 0x0004,
             /// <summary>
             /// Device is a full Thread device (opposite of Minimal Thread Device)
             /// </summary>
-            IsFullThreadDevice = 0x8,
+            IsFullThreadDevice = 0x0008,
             /// <summary>
             /// Synchronized sleepy end-device mode is supported
             /// </summary>
-            IsSynchronizedSleepyEndDeviceCapable = 0x10,
+            IsSynchronizedSleepyEndDeviceCapable = 0x0010,
         }
         #endregion Enums
 
@@ -240,7 +240,13 @@ namespace MatterDotNet.Clusters.CHIP
             public required byte[] SSID { get; set; }
             public required byte[] BSSID { get; set; }
             public required ushort Channel { get; set; }
+            /// <summary>
+            /// This field, if present, MAY be used to differentiate overlapping channel number values across different Wi-Fi frequency bands.
+            /// </summary>
             public required WiFiBand WiFiBand { get; set; }
+            /// <summary>
+            /// This field, if present, SHALL denote the signal strength in dBm of the associated scan result.
+            /// </summary>
             public required sbyte RSSI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -283,6 +289,9 @@ namespace MatterDotNet.Clusters.CHIP
             public required string NetworkName { get; set; }
             public required ushort Channel { get; set; }
             public required byte Version { get; set; }
+            /// <summary>
+            /// ExtendedAddress stands for an IEEE 802.15.4 Extended Address.
+            /// </summary>
             public required PhysicalAddress ExtendedAddress { get; set; }
             public required sbyte RSSI { get; set; }
             public required byte LQI { get; set; }

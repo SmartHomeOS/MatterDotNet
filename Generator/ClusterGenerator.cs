@@ -37,7 +37,7 @@ namespace Generator
             {
                 Dictionary<string, string> item = new Dictionary<string, string>();
                 foreach (var comment in bitmapComment.item)
-                    item.Add(comment.value, comment.comment); //.Replace("&lt;see cref=&quot;", "<see cref=\"").Replace("&quot;/&gt;", "\"/>"));
+                    item.Add(GeneratorUtil.EnsureHex(comment.value, 4), comment.comment);
                 bitmapComments.Add(bitmapComment.name, item);
             }
             foreach (var enumComment in comments.@enum)
@@ -46,7 +46,7 @@ namespace Generator
                     continue;
                 Dictionary<string, string> item = new Dictionary<string, string>();
                 foreach (var comment in enumComment.item)
-                    item.Add(GeneratorUtil.EnsureHex(comment.value), comment.comment); //Replace("&lt;see cref=&quot;", "<see cref=\"").Replace("&quot;/&gt;", "\"/>"));
+                    item.Add(GeneratorUtil.EnsureHex(comment.value, 4), comment.comment);
                 enumComments.Add(enumComment.name, item);
             }
 
@@ -1253,6 +1253,7 @@ namespace Generator
             writer.Write("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " : ");
             WriteType(false, enumType.type, writer, enumType.name);
             writer.WriteLine(" {");
+            string max = enumType.item.Last().value;
             foreach (rootConfiguratorEnumItem item in enumType.item)
             {
                 if (!string.IsNullOrWhiteSpace(item.value))
@@ -1267,11 +1268,11 @@ namespace Generator
                     string key = GeneratorUtil.EnsureHex(clusterId) + "." + GeneratorUtil.SanitizeName(enumType.name);
                     if (item.summary != null)
                         writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
-                    else if (enumComments.ContainsKey(key) && enumComments[key].ContainsKey(GeneratorUtil.EnsureHex(value)))
-                        writer.WriteLine("            /// <summary>\n            /// " + enumComments[key][GeneratorUtil.EnsureHex(value)] + "\n            /// </summary>");
+                    else if (enumComments.ContainsKey(key) && enumComments[key].ContainsKey(GeneratorUtil.EnsureHex(value, 4)))
+                        writer.WriteLine("            /// <summary>\n            /// " + enumComments[key][GeneratorUtil.EnsureHex(value, 4)] + "\n            /// </summary>");
                     else
                         Console.WriteLine("No comment found for " + item.name);
-                    writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + value + ",");
+                    writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + GeneratorUtil.FormatValue(value, max) + ",");
                 }
             }
             writer.WriteLine("        }");
@@ -1293,11 +1294,11 @@ namespace Generator
                 string key = GeneratorUtil.EnsureHex(clusterId) + "." + GeneratorUtil.SanitizeName(bitmapType.name);
                 if (item.summary != null)
                     writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
-                else if (bitmapComments.ContainsKey(key) && bitmapComments[key].ContainsKey(GeneratorUtil.EnsureHex(item.mask, bitmapType.type == "bitmap16" ? 4 : 2)))
-                    writer.WriteLine("            /// <summary>\n            /// " + bitmapComments[key][GeneratorUtil.EnsureHex(item.mask, bitmapType.type == "bitmap16" ? 4 : 2)] + "\n            /// </summary>");
+                else if (bitmapComments.ContainsKey(key) && bitmapComments[key].ContainsKey(GeneratorUtil.EnsureHex(item.mask, 4)))
+                    writer.WriteLine("            /// <summary>\n            /// " + bitmapComments[key][GeneratorUtil.EnsureHex(item.mask, 4)] + "\n            /// </summary>");
                 else
                     Console.WriteLine("No comment found for " + item.name);
-                writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + item.mask + ",");
+                writer.WriteLine("            " + GeneratorUtil.SanitizeName(item.name) + " = " + GeneratorUtil.EnsureHex(item.mask, bitmapType.type == "bitmap8" ? 2 : 4) + ",");
             }
             writer.WriteLine("        }");
         }

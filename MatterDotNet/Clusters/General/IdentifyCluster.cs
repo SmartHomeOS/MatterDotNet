@@ -43,27 +43,27 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// No presentation.
             /// </summary>
-            None = 0x00,
+            None = 0,
             /// <summary>
             /// Light output of a lighting product.
             /// </summary>
-            LightOutput = 0x01,
+            LightOutput = 1,
             /// <summary>
             /// Typically a small LED.
             /// </summary>
-            VisibleIndicator = 0x02,
+            VisibleIndicator = 2,
             /// <summary>
             /// 
             /// </summary>
-            AudibleBeep = 0x03,
+            AudibleBeep = 3,
             /// <summary>
             /// Presentation will be visible on display screen.
             /// </summary>
-            Display = 0x04,
+            Display = 4,
             /// <summary>
             /// Presentation will be conveyed by actuator functionality such as through a window blind operation or in-wall relay.
             /// </summary>
-            Actuator = 0x05,
+            Actuator = 5,
         }
 
         /// <summary>
@@ -73,19 +73,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// e.g., Light is turned on/off once.
             /// </summary>
-            Blink = 0x00,
+            Blink = 0x0,
             /// <summary>
             /// e.g., Light is turned on/off over 1 second and repeated 15 times.
             /// </summary>
-            Breathe = 0x01,
+            Breathe = 0x1,
             /// <summary>
             /// e.g., Colored light turns green for 1 second; non-colored light flashes twice.
             /// </summary>
-            Okay = 0x02,
+            Okay = 0x2,
             /// <summary>
             /// e.g., Colored light turns orange for 8 seconds; non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.
             /// </summary>
-            ChannelChange = 0x0B,
+            ChannelChange = 0xB,
             /// <summary>
             /// Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect (as above), first complete the current 1s breathe effect and then terminate the effect.
             /// </summary>
@@ -103,12 +103,12 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicates the default effect is used
             /// </summary>
-            Default = 0x00,
+            Default = 0,
         }
         #endregion Enums
 
         #region Payloads
-        private record IdentifyCommandPayload : TLVPayload {
+        private record IdentifyPayload : TLVPayload {
             public required ushort IdentifyTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);

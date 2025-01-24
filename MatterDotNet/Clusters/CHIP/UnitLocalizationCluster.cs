@@ -51,15 +51,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Temperature conveyed in Fahrenheit
             /// </summary>
-            Fahrenheit = 0x00,
+            Fahrenheit = 0,
             /// <summary>
             /// Temperature conveyed in Celsius
             /// </summary>
-            Celsius = 0x01,
+            Celsius = 1,
             /// <summary>
             /// Temperature conveyed in Kelvin
             /// </summary>
-            Kelvin = 0x02,
+            Kelvin = 2,
         }
         #endregion Enums
 

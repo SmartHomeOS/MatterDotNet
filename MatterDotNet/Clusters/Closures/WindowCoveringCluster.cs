@@ -70,47 +70,47 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// RollerShade
             /// </summary>
-            RollerShade = 0,
+            RollerShade = 0x0,
             /// <summary>
             /// RollerShade - 2 Motor
             /// </summary>
-            RollerShade2Motor = 1,
+            RollerShade2Motor = 0x1,
             /// <summary>
             /// RollerShade - Exterior
             /// </summary>
-            RollerShadeExterior = 2,
+            RollerShadeExterior = 0x2,
             /// <summary>
             /// RollerShade - Exterior - 2 Motor
             /// </summary>
-            RollerShadeExterior2Motor = 3,
+            RollerShadeExterior2Motor = 0x3,
             /// <summary>
             /// Drapery (curtain)
             /// </summary>
-            Drapery = 4,
+            Drapery = 0x4,
             /// <summary>
             /// Awning
             /// </summary>
-            Awning = 5,
+            Awning = 0x5,
             /// <summary>
             /// Shutter
             /// </summary>
-            Shutter = 6,
+            Shutter = 0x6,
             /// <summary>
             /// Tilt Blind - Tilt Only
             /// </summary>
-            TiltBlindTiltOnly = 7,
+            TiltBlindTiltOnly = 0x7,
             /// <summary>
             /// Tilt Blind - Lift &amp; Tilt
             /// </summary>
-            TiltBlindLiftAndTilt = 8,
+            TiltBlindLiftAndTilt = 0x8,
             /// <summary>
             /// Projector Screen
             /// </summary>
-            ProjectorScreen = 9,
+            ProjectorScreen = 0x9,
             /// <summary>
             /// Unknown
             /// </summary>
-            Unknown = 255,
+            Unknown = 0xFF,
         }
 
         /// <summary>
@@ -120,103 +120,103 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Simple Roller Shade
             /// </summary>
-            RollerShade = 0,
+            RollerShade = 0x0,
             /// <summary>
             /// Roman Shade
             /// </summary>
-            RomanShade = 1,
+            RomanShade = 0x1,
             /// <summary>
             /// Balloon Shade
             /// </summary>
-            BalloonShade = 2,
+            BalloonShade = 0x2,
             /// <summary>
             /// Woven Wood
             /// </summary>
-            WovenWood = 3,
+            WovenWood = 0x3,
             /// <summary>
             /// Pleated Shade
             /// </summary>
-            PleatedShade = 4,
+            PleatedShade = 0x4,
             /// <summary>
             /// Cellular Shade
             /// </summary>
-            CellularShade = 5,
+            CellularShade = 0x5,
             /// <summary>
             /// Layered Shade
             /// </summary>
-            LayeredShade = 6,
+            LayeredShade = 0x6,
             /// <summary>
             /// Layered Shade 2D
             /// </summary>
-            LayeredShade2D = 7,
+            LayeredShade2D = 0x7,
             /// <summary>
             /// Sheer Shade
             /// </summary>
-            SheerShade = 8,
+            SheerShade = 0x8,
             /// <summary>
             /// Tilt Only Interior Blind
             /// </summary>
-            TiltOnlyInteriorBlind = 9,
+            TiltOnlyInteriorBlind = 0x9,
             /// <summary>
             /// Interior Blind
             /// </summary>
-            InteriorBlind = 10,
+            InteriorBlind = 0xA,
             /// <summary>
             /// Vertical Blind, Strip Curtain
             /// </summary>
-            VerticalBlindStripCurtain = 11,
+            VerticalBlindStripCurtain = 0xB,
             /// <summary>
             /// Interior Venetian Blind
             /// </summary>
-            InteriorVenetianBlind = 12,
+            InteriorVenetianBlind = 0xC,
             /// <summary>
             /// Exterior Venetian Blind
             /// </summary>
-            ExteriorVenetianBlind = 13,
+            ExteriorVenetianBlind = 0xD,
             /// <summary>
             /// Lateral Left Curtain
             /// </summary>
-            LateralLeftCurtain = 14,
+            LateralLeftCurtain = 0xE,
             /// <summary>
             /// Lateral Right Curtain
             /// </summary>
-            LateralRightCurtain = 15,
+            LateralRightCurtain = 0xF,
             /// <summary>
             /// Central Curtain
             /// </summary>
-            CentralCurtain = 16,
+            CentralCurtain = 0x10,
             /// <summary>
             /// Roller Shutter
             /// </summary>
-            RollerShutter = 17,
+            RollerShutter = 0x11,
             /// <summary>
             /// Exterior Vertical Screen
             /// </summary>
-            ExteriorVerticalScreen = 18,
+            ExteriorVerticalScreen = 0x12,
             /// <summary>
             /// Awning Terrace (Patio)
             /// </summary>
-            AwningTerracePatio = 19,
+            AwningTerracePatio = 0x13,
             /// <summary>
             /// Awning Vertical Screen
             /// </summary>
-            AwningVerticalScreen = 20,
+            AwningVerticalScreen = 0x14,
             /// <summary>
             /// Tilt Only Pergola
             /// </summary>
-            TiltOnlyPergola = 21,
+            TiltOnlyPergola = 0x15,
             /// <summary>
             /// Swinging Shutter
             /// </summary>
-            SwingingShutter = 22,
+            SwingingShutter = 0x16,
             /// <summary>
             /// Sliding Shutter
             /// </summary>
-            SlidingShutter = 23,
+            SlidingShutter = 0x17,
             /// <summary>
             /// Unknown
             /// </summary>
-            Unknown = 255,
+            Unknown = 0xFF,
         }
 
         /// <summary>

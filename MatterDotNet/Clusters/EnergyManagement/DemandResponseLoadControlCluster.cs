@@ -77,52 +77,52 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// Load Control Event Change Source
         /// </summary>
         public enum LoadControlEventChangeSource : byte {
-            Automatic = 0x00,
-            UserAction = 0x01,
+            Automatic = 0,
+            UserAction = 1,
         }
 
         /// <summary>
         /// Load Control Event Status
         /// </summary>
         public enum LoadControlEventStatus : byte {
-            Unknown = 0x00,
-            Received = 0x01,
-            InProgress = 0x02,
-            Completed = 0x03,
-            OptedOut = 0x04,
-            OptedIn = 0x05,
-            Canceled = 0x06,
-            Superseded = 0x07,
-            PartialOptedOut = 0x08,
-            PartialOptedIn = 0x09,
-            NoParticipation = 0x0A,
-            Unavailable = 0x0B,
-            Failed = 0x0C,
+            Unknown = 0x0,
+            Received = 0x1,
+            InProgress = 0x2,
+            Completed = 0x3,
+            OptedOut = 0x4,
+            OptedIn = 0x5,
+            Canceled = 0x6,
+            Superseded = 0x7,
+            PartialOptedOut = 0x8,
+            PartialOptedIn = 0x9,
+            NoParticipation = 0xA,
+            Unavailable = 0xB,
+            Failed = 0xC,
         }
 
         /// <summary>
         /// Criticality Level
         /// </summary>
         public enum CriticalityLevel : byte {
-            Unknown = 0x00,
-            Green = 0x01,
-            Level1 = 0x02,
-            Level2 = 0x03,
-            Level3 = 0x04,
-            Level4 = 0x05,
-            Level5 = 0x06,
-            Emergency = 0x07,
-            PlannedOutage = 0x08,
-            ServiceDisconnect = 0x09,
+            Unknown = 0,
+            Green = 1,
+            Level1 = 2,
+            Level2 = 3,
+            Level3 = 4,
+            Level4 = 5,
+            Level5 = 6,
+            Emergency = 7,
+            PlannedOutage = 8,
+            ServiceDisconnect = 9,
         }
 
         /// <summary>
         /// Heating Source
         /// </summary>
         public enum HeatingSource : byte {
-            Any = 0x0,
-            Electric = 0x1,
-            NonElectric = 0x2,
+            Any = 0,
+            Electric = 1,
+            NonElectric = 2,
         }
 
         /// <summary>
@@ -134,14 +134,14 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            HVAC = 0x01,
-            StripHeater = 0x02,
-            WaterHeater = 0x04,
-            PoolPump = 0x08,
-            SmartAppliance = 0x10,
-            IrrigationPump = 0x20,
-            CommercialLoad = 0x40,
-            ResidentialLoad = 0x80,
+            HVAC = 0x0001,
+            StripHeater = 0x0002,
+            WaterHeater = 0x0004,
+            PoolPump = 0x0008,
+            SmartAppliance = 0x0010,
+            IrrigationPump = 0x0020,
+            CommercialLoad = 0x0040,
+            ResidentialLoad = 0x0080,
             ExteriorLighting = 0x0100,
             InteriorLighting = 0x0200,
             EV = 0x0400,
@@ -162,7 +162,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            RandomStart = 0x01,
+            RandomStart = 0x0001,
         }
 
         /// <summary>
@@ -174,8 +174,8 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            RandomDuration = 0x01,
-            IgnoreOptOut = 0x02,
+            RandomDuration = 0x0001,
+            IgnoreOptOut = 0x0002,
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            RandomEnd = 0x01,
+            RandomEnd = 0x0001,
         }
         #endregion Enums
 

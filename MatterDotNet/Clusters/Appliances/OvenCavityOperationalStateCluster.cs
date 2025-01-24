@@ -40,20 +40,20 @@ namespace MatterDotNet.Clusters.Appliances
         /// Operational State
         /// </summary>
         public enum OperationalState : byte {
-            Stopped = 0x00,
-            Running = 0x01,
-            Paused = 0x02,
-            Error = 0x03,
+            Stopped = 0,
+            Running = 1,
+            Paused = 2,
+            Error = 3,
         }
 
         /// <summary>
         /// Error State
         /// </summary>
         public enum ErrorState : byte {
-            NoError = 0x00,
-            UnableToStartOrResume = 0x01,
-            UnableToCompleteOperation = 0x02,
-            CommandInvalidInState = 0x03,
+            NoError = 0,
+            UnableToStartOrResume = 1,
+            UnableToCompleteOperation = 2,
+            CommandInvalidInState = 3,
         }
         #endregion Enums
 

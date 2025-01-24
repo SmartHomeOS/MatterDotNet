@@ -71,11 +71,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Visual alarming
             /// </summary>
-            Visual = 0x1,
+            Visual = 0x01,
             /// <summary>
             /// Audible alarming
             /// </summary>
-            Audible = 0x2,
+            Audible = 0x02,
         }
 
         /// <summary>
@@ -87,7 +87,10 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            GeneralFault = 0x1,
+            /// <summary>
+            /// Unspecified fault detected
+            /// </summary>
+            GeneralFault = 0x0001,
         }
         #endregion Enums
 

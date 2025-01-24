@@ -51,9 +51,9 @@ namespace MatterDotNet.Clusters.General
         /// Status Code
         /// </summary>
         public enum StatusCode : byte {
-            Busy = 0x02,
-            PAKEParameterError = 0x03,
-            WindowNotOpen = 0x04,
+            Busy = 2,
+            PAKEParameterError = 3,
+            WindowNotOpen = 4,
         }
 
         /// <summary>
@@ -63,15 +63,15 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Commissioning window not open
             /// </summary>
-            WindowNotOpen = 0x00,
+            WindowNotOpen = 0,
             /// <summary>
             /// An Enhanced Commissioning Method window is open
             /// </summary>
-            EnhancedWindowOpen = 0x01,
+            EnhancedWindowOpen = 1,
             /// <summary>
             /// A Basic Commissioning Method window is open
             /// </summary>
-            BasicWindowOpen = 0x02,
+            BasicWindowOpen = 2,
         }
         #endregion Enums
 

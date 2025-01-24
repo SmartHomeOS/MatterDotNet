@@ -72,19 +72,19 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Media is currently playing (includes FF and REW)
             /// </summary>
-            Playing = 0x00,
+            Playing = 0,
             /// <summary>
             /// Media is currently paused
             /// </summary>
-            Paused = 0x01,
+            Paused = 1,
             /// <summary>
             /// Media is not currently playing
             /// </summary>
-            NotPlaying = 0x02,
+            NotPlaying = 2,
             /// <summary>
             /// Media is not currently buffering and playback will start when buffer has been filled
             /// </summary>
-            Buffering = 0x03,
+            Buffering = 3,
         }
 
         /// <summary>
@@ -94,27 +94,27 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// Requested playback command is invalid in the current playback state.
             /// </summary>
-            InvalidStateForCommand = 0x01,
+            InvalidStateForCommand = 1,
             /// <summary>
             /// Requested playback command is not allowed in the current playback state. For example, attempting to fast-forward during a commercial might return NotAllowed.
             /// </summary>
-            NotAllowed = 0x02,
+            NotAllowed = 2,
             /// <summary>
             /// This endpoint is not active for playback.
             /// </summary>
-            NotActive = 0x03,
+            NotActive = 3,
             /// <summary>
             /// The FastForward or Rewind Command was issued but the media is already playing back at the fastest speed supported by the server in the respective direction.
             /// </summary>
-            SpeedOutOfRange = 0x04,
+            SpeedOutOfRange = 4,
             /// <summary>
             /// The Seek Command was issued with a value of position outside of the allowed seek range of the media.
             /// </summary>
-            SeekOutOfRange = 0x05,
+            SeekOutOfRange = 5,
         }
 
         /// <summary>
@@ -124,67 +124,67 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.
             /// </summary>
-            ForcedSubtitles = 0x00,
+            ForcedSubtitles = 0x0,
             /// <summary>
             /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
             /// </summary>
-            DescribesVideo = 0x01,
+            DescribesVideo = 0x1,
             /// <summary>
             /// Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].
             /// </summary>
-            EasyToRead = 0x02,
+            EasyToRead = 0x2,
             /// <summary>
             /// A media characteristic that indicates that a track selection option includes frame-based content.
             /// </summary>
-            FrameBased = 0x03,
+            FrameBased = 0x3,
             /// <summary>
             /// Main media component(s) which is/are intended for presentation if no other information is provided
             /// </summary>
-            MainProgram = 0x04,
+            MainProgram = 0x4,
             /// <summary>
             /// A media characteristic that indicates that a track or media selection option contains original content.
             /// </summary>
-            OriginalContent = 0x05,
+            OriginalContent = 0x5,
             /// <summary>
             /// A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.
             /// </summary>
-            VoiceOverTranslation = 0x06,
+            VoiceOverTranslation = 0x6,
             /// <summary>
             /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
             /// </summary>
-            Caption = 0x07,
+            Caption = 0x7,
             /// <summary>
             /// Textual transcriptions of spoken dialog.
             /// </summary>
-            Subtitle = 0x08,
+            Subtitle = 0x8,
             /// <summary>
             /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
             /// </summary>
-            Alternate = 0x09,
+            Alternate = 0x9,
             /// <summary>
             /// Media content component that is supplementary to a media content component of a different media component type.
             /// </summary>
-            Supplementary = 0x0A,
+            Supplementary = 0xA,
             /// <summary>
             /// Experience that contains a commentary (e.g. director’s commentary) (typically audio)
             /// </summary>
-            Commentary = 0x0B,
+            Commentary = 0xB,
             /// <summary>
             /// Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)
             /// </summary>
-            DubbedTranslation = 0x0C,
+            DubbedTranslation = 0xC,
             /// <summary>
             /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
             /// </summary>
-            Description = 0x0D,
+            Description = 0xD,
             /// <summary>
             /// Media component containing information intended to be processed by application specific elements.
             /// </summary>
-            Metadata = 0x0E,
+            Metadata = 0xE,
             /// <summary>
             /// Experience containing an element for improved intelligibility of the dialogue.
             /// </summary>
-            EnhancedAudioIntelligibility = 0x0F,
+            EnhancedAudioIntelligibility = 0xF,
             /// <summary>
             /// Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.
             /// </summary>
@@ -587,7 +587,7 @@ namespace MatterDotNet.Clusters.Media
         /// Get the Start Time attribute
         /// </summary>
         public async Task<DateTime?> GetStartTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? TimeUtil.EPOCH;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? 0x00;
         }
 
         /// <summary>

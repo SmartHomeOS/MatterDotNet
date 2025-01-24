@@ -44,19 +44,19 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Indicates that the OTA Provider has an update available.
             /// </summary>
-            UpdateAvailable = 0x0,
+            UpdateAvailable = 0,
             /// <summary>
             /// Indicates OTA Provider may have an update, but it is not ready yet.
             /// </summary>
-            Busy = 0x1,
+            Busy = 1,
             /// <summary>
             /// Indicates that there is definitely no update currently available from the OTA Provider.
             /// </summary>
-            NotAvailable = 0x2,
+            NotAvailable = 2,
             /// <summary>
             /// Indicates that the requested download protocol is not supported by the OTA Provider.
             /// </summary>
-            DownloadProtocolNotSupported = 0x3,
+            DownloadProtocolNotSupported = 3,
         }
 
         /// <summary>
@@ -66,15 +66,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Apply the update.
             /// </summary>
-            Proceed = 0x0,
+            Proceed = 0,
             /// <summary>
             /// Wait at least the given delay time.
             /// </summary>
-            AwaitNextAction = 0x1,
+            AwaitNextAction = 1,
             /// <summary>
             /// The OTA Provider is conveying a desire to rescind a previously provided Software Image.
             /// </summary>
-            Discontinue = 0x2,
+            Discontinue = 2,
         }
 
         /// <summary>
@@ -84,55 +84,22 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Indicates support for synchronous BDX.
             /// </summary>
-            BDXSynchronous = 0x0,
+            BDXSynchronous = 0,
             /// <summary>
             /// Indicates support for asynchronous BDX.
             /// </summary>
-            BDXAsynchronous = 0x1,
+            BDXAsynchronous = 1,
             /// <summary>
             /// Indicates support for HTTPS.
             /// </summary>
-            HTTPS = 0x2,
+            HTTPS = 2,
             /// <summary>
             /// Indicates support for vendor specific protocol.
             /// </summary>
-            VendorSpecific = 0x3,
+            VendorSpecific = 3,
         }
 
-        /// <summary>
-        /// Announcement Reason
-        /// </summary>
-        public enum AnnouncementReason : byte {
-            SimpleAnnouncement = 0x0,
-            UpdateAvailable = 0x1,
-            UrgentUpdateAvailable = 0x2,
-        }
-
-        /// <summary>
-        /// Update State
-        /// </summary>
-        public enum UpdateState : byte {
-            Unknown = 0x0,
-            Idle = 0x1,
-            Querying = 0x2,
-            DelayedOnQuery = 0x3,
-            Downloading = 0x4,
-            Applying = 0x5,
-            DelayedOnApply = 0x6,
-            RollingBack = 0x7,
-            DelayedOnUserConsent = 0x8,
-        }
-
-        /// <summary>
-        /// Change Reason
-        /// </summary>
-        public enum ChangeReason : byte {
-            Unknown = 0x0,
-            Success = 0x1,
-            Failure = 0x2,
-            TimeOut = 0x3,
-            DelayByProvider = 0x4,
-        }
+        
         #endregion Enums
 
         #region Records

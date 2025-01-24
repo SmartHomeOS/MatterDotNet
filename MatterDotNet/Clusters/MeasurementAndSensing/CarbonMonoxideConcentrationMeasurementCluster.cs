@@ -71,23 +71,23 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// The level is Unknown
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// The level is considered Low
             /// </summary>
-            Low = 0x01,
+            Low = 1,
             /// <summary>
             /// The level is considered Medium
             /// </summary>
-            Medium = 0x02,
+            Medium = 2,
             /// <summary>
             /// The level is considered High
             /// </summary>
-            High = 0x03,
+            High = 3,
             /// <summary>
             /// The level is considered Critical
             /// </summary>
-            Critical = 0x04,
+            Critical = 4,
         }
 
         /// <summary>
@@ -97,35 +97,35 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Parts per Million (10)
             /// </summary>
-            PPM = 0x00,
+            PPM = 0,
             /// <summary>
             /// Parts per Billion (10)
             /// </summary>
-            PPB = 0x01,
+            PPB = 1,
             /// <summary>
             /// Parts per Trillion (10)
             /// </summary>
-            PPT = 0x02,
+            PPT = 2,
             /// <summary>
             /// Milligram per m
             /// </summary>
-            MGM3 = 0x03,
+            MGM3 = 3,
             /// <summary>
             /// Microgram per m
             /// </summary>
-            UGM3 = 0x04,
+            UGM3 = 4,
             /// <summary>
             /// Nanogram per m
             /// </summary>
-            NGM3 = 0x05,
+            NGM3 = 5,
             /// <summary>
             /// Particles per m
             /// </summary>
-            PM3 = 0x06,
+            PM3 = 6,
             /// <summary>
             /// Becquerel per m
             /// </summary>
-            BQM3 = 0x07,
+            BQM3 = 7,
         }
 
         /// <summary>
@@ -135,15 +135,15 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// The measurement is being made in Air
             /// </summary>
-            Air = 0x00,
+            Air = 0,
             /// <summary>
             /// The measurement is being made in Water
             /// </summary>
-            Water = 0x01,
+            Water = 1,
             /// <summary>
             /// The measurement is being made in Soil
             /// </summary>
-            Soil = 0x02,
+            Soil = 2,
         }
         #endregion Enums
 

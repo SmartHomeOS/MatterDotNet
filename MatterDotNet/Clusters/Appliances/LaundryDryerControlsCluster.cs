@@ -40,19 +40,19 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// Provides a low dryness level for the selected mode
             /// </summary>
-            Low = 0x0,
+            Low = 0,
             /// <summary>
             /// Provides the normal level of dryness for the selected mode
             /// </summary>
-            Normal = 0x1,
+            Normal = 1,
             /// <summary>
             /// Provides an extra dryness level for the selected mode
             /// </summary>
-            Extra = 0x2,
+            Extra = 2,
             /// <summary>
             /// Provides the max dryness level for the selected mode
             /// </summary>
-            Max = 0x3,
+            Max = 3,
         }
         #endregion Enums
 

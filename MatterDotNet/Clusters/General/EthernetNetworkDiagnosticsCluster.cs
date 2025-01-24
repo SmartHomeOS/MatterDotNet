@@ -57,43 +57,43 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// PHY rate is 10Mbps
             /// </summary>
-            Rate10M = 0x00,
+            Rate10M = 0,
             /// <summary>
             /// PHY rate is 100Mbps
             /// </summary>
-            Rate100M = 0x01,
+            Rate100M = 1,
             /// <summary>
             /// PHY rate is 1Gbps
             /// </summary>
-            Rate1G = 0x02,
+            Rate1G = 2,
             /// <summary>
             /// PHY rate is 2.5Gbps
             /// </summary>
-            Rate2_5G = 0x03,
+            Rate2_5G = 3,
             /// <summary>
             /// PHY rate is 5Gbps
             /// </summary>
-            Rate5G = 0x04,
+            Rate5G = 4,
             /// <summary>
             /// PHY rate is 10Gbps
             /// </summary>
-            Rate10G = 0x05,
+            Rate10G = 5,
             /// <summary>
             /// PHY rate is 40Gbps
             /// </summary>
-            Rate40G = 0x06,
+            Rate40G = 6,
             /// <summary>
             /// PHY rate is 100Gbps
             /// </summary>
-            Rate100G = 0x07,
+            Rate100G = 7,
             /// <summary>
             /// PHY rate is 200Gbps
             /// </summary>
-            Rate200G = 0x08,
+            Rate200G = 8,
             /// <summary>
             /// PHY rate is 400Gbps
             /// </summary>
-            Rate400G = 0x09,
+            Rate400G = 9,
         }
         #endregion Enums
 

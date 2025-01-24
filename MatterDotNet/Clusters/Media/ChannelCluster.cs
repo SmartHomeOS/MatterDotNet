@@ -68,7 +68,7 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Multi System Operator
             /// </summary>
-            MSO = 0x00,
+            MSO = 0,
         }
 
         /// <summary>
@@ -78,15 +78,15 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Command succeeded
             /// </summary>
-            Success = 0x00,
+            Success = 0,
             /// <summary>
             /// More than one equal match for the ChannelInfoStruct passed in.
             /// </summary>
-            MultipleMatches = 0x01,
+            MultipleMatches = 1,
             /// <summary>
             /// No matches for the ChannelInfoStruct passed in.
             /// </summary>
-            NoMatches = 0x02,
+            NoMatches = 2,
         }
 
         /// <summary>
@@ -96,19 +96,19 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// The channel is sourced from a satellite provider.
             /// </summary>
-            Satellite = 0x00,
+            Satellite = 0,
             /// <summary>
             /// The channel is sourced from a cable provider.
             /// </summary>
-            Cable = 0x01,
+            Cable = 1,
             /// <summary>
             /// The channel is sourced from a terrestrial provider.
             /// </summary>
-            Terrestrial = 0x02,
+            Terrestrial = 2,
             /// <summary>
             /// The channel is sourced from an OTT provider.
             /// </summary>
-            OTT = 0x03,
+            OTT = 3,
         }
 
         /// <summary>
@@ -123,15 +123,15 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// The program is scheduled for recording.
             /// </summary>
-            Scheduled = 0x1,
+            Scheduled = 0x0001,
             /// <summary>
             /// The program series is scheduled for recording.
             /// </summary>
-            RecordSeries = 0x2,
+            RecordSeries = 0x0002,
             /// <summary>
             /// The program is recorded and available to be played.
             /// </summary>
-            Recorded = 0x4,
+            Recorded = 0x0004,
         }
         #endregion Enums
 
@@ -295,7 +295,7 @@ namespace MatterDotNet.Clusters.Media
             public string? ReleaseDate { get; set; }
             public string? ParentalGuidanceText { get; set; }
             public RecordingFlag? RecordingFlag { get; set; }
-            public SeriesInfo? SeriesInfo { get; set; }
+            public SeriesInfo? SeriesInfo { get; set; } = 0x0;
             public ProgramCategory[]? CategoryList { get; set; }
             public ProgramCast[]? CastList { get; set; }
             public ProgramCast[]? ExternalIDList { get; set; }
@@ -510,8 +510,8 @@ namespace MatterDotNet.Clusters.Media
                 PreviousToken = new PageToken((object[])fields[0]);
                 NextToken = new PageToken((object[])fields[1]);
             }
-            public PageToken? PreviousToken { get; set; }
-            public PageToken? NextToken { get; set; }
+            public PageToken? PreviousToken { get; set; } = 0x0;
+            public PageToken? NextToken { get; set; } = 0x0;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (PreviousToken != null)
@@ -808,14 +808,14 @@ namespace MatterDotNet.Clusters.Media
         /// Get the Lineup attribute
         /// </summary>
         public async Task<LineupInfo?> GetLineup(SecureSession session) {
-            return new LineupInfo((object[])(await GetAttribute(session, 1))!);
+            return new LineupInfo((object[])(await GetAttribute(session, 1))!) ?? 0x0;
         }
 
         /// <summary>
         /// Get the Current Channel attribute
         /// </summary>
         public async Task<ChannelInfo?> GetCurrentChannel(SecureSession session) {
-            return new ChannelInfo((object[])(await GetAttribute(session, 2))!);
+            return new ChannelInfo((object[])(await GetAttribute(session, 2))!) ?? 0x0;
         }
         #endregion Attributes
 

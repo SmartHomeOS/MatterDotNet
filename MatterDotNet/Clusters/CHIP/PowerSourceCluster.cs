@@ -65,15 +65,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// The Node detects an unspecified fault on this wired power source.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node detects the supplied voltage is above maximum supported value for this wired power source.
             /// </summary>
-            OverVoltage = 0x01,
+            OverVoltage = 1,
             /// <summary>
             /// The Node detects the supplied voltage is below maximum supported value for this wired power source.
             /// </summary>
-            UnderVoltage = 0x02,
+            UnderVoltage = 2,
         }
 
         /// <summary>
@@ -83,15 +83,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// The Node detects an unspecified fault on this battery power source.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node detects the temperature of this battery power source is above ideal operating conditions.
             /// </summary>
-            OverTemp = 0x01,
+            OverTemp = 1,
             /// <summary>
             /// The Node detects the temperature of this battery power source is below ideal operating conditions.
             /// </summary>
-            UnderTemp = 0x02,
+            UnderTemp = 2,
         }
 
         /// <summary>
@@ -101,47 +101,47 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// The Node detects an unspecified fault on this battery source.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0x0,
             /// <summary>
             /// The Node detects the ambient temperature is above the nominal range for this battery source.
             /// </summary>
-            AmbientTooHot = 0x01,
+            AmbientTooHot = 0x1,
             /// <summary>
             /// The Node detects the ambient temperature is below the nominal range for this battery source.
             /// </summary>
-            AmbientTooCold = 0x02,
+            AmbientTooCold = 0x2,
             /// <summary>
             /// The Node detects the temperature of this battery source is above the nominal range.
             /// </summary>
-            BatteryTooHot = 0x03,
+            BatteryTooHot = 0x3,
             /// <summary>
             /// The Node detects the temperature of this battery source is below the nominal range.
             /// </summary>
-            BatteryTooCold = 0x04,
+            BatteryTooCold = 0x4,
             /// <summary>
             /// The Node detects this battery source is not present.
             /// </summary>
-            BatteryAbsent = 0x05,
+            BatteryAbsent = 0x5,
             /// <summary>
             /// The Node detects this battery source is over voltage.
             /// </summary>
-            BatteryOverVoltage = 0x06,
+            BatteryOverVoltage = 0x6,
             /// <summary>
             /// The Node detects this battery source is under voltage.
             /// </summary>
-            BatteryUnderVoltage = 0x07,
+            BatteryUnderVoltage = 0x7,
             /// <summary>
             /// The Node detects the charger for this battery source is over voltage.
             /// </summary>
-            ChargerOverVoltage = 0x08,
+            ChargerOverVoltage = 0x8,
             /// <summary>
             /// The Node detects the charger for this battery source is under voltage.
             /// </summary>
-            ChargerUnderVoltage = 0x09,
+            ChargerUnderVoltage = 0x9,
             /// <summary>
             /// The Node detects a charging safety timeout for this battery source.
             /// </summary>
-            SafetyTimeout = 0x0A,
+            SafetyTimeout = 0xA,
         }
 
         /// <summary>
@@ -151,19 +151,19 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Indicate the source status is not specified
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// Indicate the source is available and currently supplying power
             /// </summary>
-            Active = 0x01,
+            Active = 1,
             /// <summary>
             /// Indicate the source is available, but is not currently supplying power
             /// </summary>
-            Standby = 0x02,
+            Standby = 2,
             /// <summary>
             /// Indicate the source is not currently available to supply power
             /// </summary>
-            Unavailable = 0x03,
+            Unavailable = 3,
         }
 
         /// <summary>
@@ -173,11 +173,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Indicates AC current
             /// </summary>
-            AC = 0x00,
+            AC = 0,
             /// <summary>
             /// Indicates DC current
             /// </summary>
-            DC = 0x01,
+            DC = 1,
         }
 
         /// <summary>
@@ -187,15 +187,15 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Charge level is nominal
             /// </summary>
-            OK = 0x00,
+            OK = 0,
             /// <summary>
             /// Charge level is low, intervention may soon be required.
             /// </summary>
-            Warning = 0x01,
+            Warning = 1,
             /// <summary>
             /// Charge level is critical, immediate intervention is required
             /// </summary>
-            Critical = 0x02,
+            Critical = 2,
         }
 
         /// <summary>
@@ -205,19 +205,19 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// The replaceability is unspecified or unknown.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The battery is not replaceable.
             /// </summary>
-            NotReplaceable = 0x01,
+            NotReplaceable = 1,
             /// <summary>
             /// The battery is replaceable by the user or customer.
             /// </summary>
-            UserReplaceable = 0x02,
+            UserReplaceable = 2,
             /// <summary>
             /// The battery is replaceable by an authorized factory technician.
             /// </summary>
-            FactoryReplaceable = 0x03,
+            FactoryReplaceable = 3,
         }
 
         /// <summary>
@@ -227,19 +227,19 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Unable to determine the charging state
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// The battery is charging
             /// </summary>
-            IsCharging = 0x01,
+            IsCharging = 1,
             /// <summary>
             /// The battery is at full charge
             /// </summary>
-            IsAtFullCharge = 0x02,
+            IsAtFullCharge = 2,
             /// <summary>
             /// The battery is not charging
             /// </summary>
-            IsNotCharging = 0x03,
+            IsNotCharging = 3,
         }
 
         /// <summary>
@@ -249,327 +249,327 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Common type is unknown or unspecified
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x0,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            AAA = 1,
+            AAA = 0x1,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            AA = 2,
+            AA = 0x2,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            C = 3,
+            C = 0x3,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            D = 4,
+            D = 0x4,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _4v5 = 5,
+            _4v5 = 0x5,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _6v0 = 6,
+            _6v0 = 0x6,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _9v0 = 7,
+            _9v0 = 0x7,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _1_2AA = 8,
+            _1_2AA = 0x8,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            AAAA = 9,
+            AAAA = 0x9,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A = 10,
+            A = 0xA,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            B = 11,
+            B = 0xB,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            F = 12,
+            F = 0xC,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            N = 13,
+            N = 0xD,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            No6 = 14,
+            No6 = 0xE,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SubC = 15,
+            SubC = 0xF,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A23 = 16,
+            A23 = 0x10,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A27 = 17,
+            A27 = 0x11,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            BA5800 = 18,
+            BA5800 = 0x12,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            Duplex = 19,
+            Duplex = 0x13,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _4SR44 = 20,
+            _4SR44 = 0x14,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _523 = 21,
+            _523 = 0x15,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _531 = 22,
+            _531 = 0x16,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _15v0 = 23,
+            _15v0 = 0x17,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _22v5 = 24,
+            _22v5 = 0x18,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _30v0 = 25,
+            _30v0 = 0x19,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _45v0 = 26,
+            _45v0 = 0x1A,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _67v5 = 27,
+            _67v5 = 0x1B,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            J = 28,
+            J = 0x1C,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            CR123A = 29,
+            CR123A = 0x1D,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            CR2 = 30,
+            CR2 = 0x1E,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _2CR5 = 31,
+            _2CR5 = 0x1F,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            CR_P2 = 32,
+            CR_P2 = 0x20,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            CR_V3 = 33,
+            CR_V3 = 0x21,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR41 = 34,
+            SR41 = 0x22,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR43 = 35,
+            SR43 = 0x23,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR44 = 36,
+            SR44 = 0x24,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR45 = 37,
+            SR45 = 0x25,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR48 = 38,
+            SR48 = 0x26,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR54 = 39,
+            SR54 = 0x27,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR55 = 40,
+            SR55 = 0x28,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR57 = 41,
+            SR57 = 0x29,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR58 = 42,
+            SR58 = 0x2A,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR59 = 43,
+            SR59 = 0x2B,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR60 = 44,
+            SR60 = 0x2C,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR63 = 45,
+            SR63 = 0x2D,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR64 = 46,
+            SR64 = 0x2E,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR65 = 47,
+            SR65 = 0x2F,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR66 = 48,
+            SR66 = 0x30,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR67 = 49,
+            SR67 = 0x31,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR68 = 50,
+            SR68 = 0x32,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR69 = 51,
+            SR69 = 0x33,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR516 = 52,
+            SR516 = 0x34,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR731 = 53,
+            SR731 = 0x35,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            SR712 = 54,
+            SR712 = 0x36,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            LR932 = 55,
+            LR932 = 0x37,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A5 = 56,
+            A5 = 0x38,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A10 = 57,
+            A10 = 0x39,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A13 = 58,
+            A13 = 0x3A,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A312 = 59,
+            A312 = 0x3B,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            A675 = 60,
+            A675 = 0x3C,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            AC41E = 61,
+            AC41E = 0x3D,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _10180 = 62,
+            _10180 = 0x3E,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _10280 = 63,
+            _10280 = 0x3F,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _10440 = 64,
+            _10440 = 0x40,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _14250 = 65,
+            _14250 = 0x41,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _14430 = 66,
+            _14430 = 0x42,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _14500 = 67,
+            _14500 = 0x43,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _14650 = 68,
+            _14650 = 0x44,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _15270 = 69,
+            _15270 = 0x45,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _16340 = 70,
+            _16340 = 0x46,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            RCR123A = 71,
+            RCR123A = 0x47,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _17500 = 72,
+            _17500 = 0x48,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _17670 = 73,
+            _17670 = 0x49,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _18350 = 74,
+            _18350 = 0x4A,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _18500 = 75,
+            _18500 = 0x4B,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _18650 = 76,
+            _18650 = 0x4C,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _19670 = 77,
+            _19670 = 0x4D,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _25500 = 78,
+            _25500 = 0x4E,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _26650 = 79,
+            _26650 = 0x4F,
             /// <summary>
             /// Common type is as specified
             /// </summary>
-            _32600 = 80,
+            _32600 = 0x50,
         }
 
         /// <summary>
@@ -579,135 +579,135 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Cell chemistry is unspecified or unknown
             /// </summary>
-            Unspecified = 0,
+            Unspecified = 0x0,
             /// <summary>
             /// Cell chemistry is alkaline
             /// </summary>
-            Alkaline = 1,
+            Alkaline = 0x1,
             /// <summary>
             /// Cell chemistry is lithium carbon fluoride
             /// </summary>
-            LithiumCarbonFluoride = 2,
+            LithiumCarbonFluoride = 0x2,
             /// <summary>
             /// Cell chemistry is lithium chromium oxide
             /// </summary>
-            LithiumChromiumOxide = 3,
+            LithiumChromiumOxide = 0x3,
             /// <summary>
             /// Cell chemistry is lithium copper oxide
             /// </summary>
-            LithiumCopperOxide = 4,
+            LithiumCopperOxide = 0x4,
             /// <summary>
             /// Cell chemistry is lithium iron disulfide
             /// </summary>
-            LithiumIronDisulfide = 5,
+            LithiumIronDisulfide = 0x5,
             /// <summary>
             /// Cell chemistry is lithium manganese dioxide
             /// </summary>
-            LithiumManganeseDioxide = 6,
+            LithiumManganeseDioxide = 0x6,
             /// <summary>
             /// Cell chemistry is lithium thionyl chloride
             /// </summary>
-            LithiumThionylChloride = 7,
+            LithiumThionylChloride = 0x7,
             /// <summary>
             /// Cell chemistry is magnesium
             /// </summary>
-            Magnesium = 8,
+            Magnesium = 0x8,
             /// <summary>
             /// Cell chemistry is mercury oxide
             /// </summary>
-            MercuryOxide = 9,
+            MercuryOxide = 0x9,
             /// <summary>
             /// Cell chemistry is nickel oxyhydride
             /// </summary>
-            NickelOxyhydride = 10,
+            NickelOxyhydride = 0xA,
             /// <summary>
             /// Cell chemistry is silver oxide
             /// </summary>
-            SilverOxide = 11,
+            SilverOxide = 0xB,
             /// <summary>
             /// Cell chemistry is zinc air
             /// </summary>
-            ZincAir = 12,
+            ZincAir = 0xC,
             /// <summary>
             /// Cell chemistry is zinc carbon
             /// </summary>
-            ZincCarbon = 13,
+            ZincCarbon = 0xD,
             /// <summary>
             /// Cell chemistry is zinc chloride
             /// </summary>
-            ZincChloride = 14,
+            ZincChloride = 0xE,
             /// <summary>
             /// Cell chemistry is zinc manganese dioxide
             /// </summary>
-            ZincManganeseDioxide = 15,
+            ZincManganeseDioxide = 0xF,
             /// <summary>
             /// Cell chemistry is lead acid
             /// </summary>
-            LeadAcid = 16,
+            LeadAcid = 0x10,
             /// <summary>
             /// Cell chemistry is lithium cobalt oxide
             /// </summary>
-            LithiumCobaltOxide = 17,
+            LithiumCobaltOxide = 0x11,
             /// <summary>
             /// Cell chemistry is lithium ion
             /// </summary>
-            LithiumIon = 18,
+            LithiumIon = 0x12,
             /// <summary>
             /// Cell chemistry is lithium ion polymer
             /// </summary>
-            LithiumIonPolymer = 19,
+            LithiumIonPolymer = 0x13,
             /// <summary>
             /// Cell chemistry is lithium iron phosphate
             /// </summary>
-            LithiumIronPhosphate = 20,
+            LithiumIronPhosphate = 0x14,
             /// <summary>
             /// Cell chemistry is lithium sulfur
             /// </summary>
-            LithiumSulfur = 21,
+            LithiumSulfur = 0x15,
             /// <summary>
             /// Cell chemistry is lithium titanate
             /// </summary>
-            LithiumTitanate = 22,
+            LithiumTitanate = 0x16,
             /// <summary>
             /// Cell chemistry is nickel cadmium
             /// </summary>
-            NickelCadmium = 23,
+            NickelCadmium = 0x17,
             /// <summary>
             /// Cell chemistry is nickel hydrogen
             /// </summary>
-            NickelHydrogen = 24,
+            NickelHydrogen = 0x18,
             /// <summary>
             /// Cell chemistry is nickel iron
             /// </summary>
-            NickelIron = 25,
+            NickelIron = 0x19,
             /// <summary>
             /// Cell chemistry is nickel metal hydride
             /// </summary>
-            NickelMetalHydride = 26,
+            NickelMetalHydride = 0x1A,
             /// <summary>
             /// Cell chemistry is nickel zinc
             /// </summary>
-            NickelZinc = 27,
+            NickelZinc = 0x1B,
             /// <summary>
             /// Cell chemistry is silver zinc
             /// </summary>
-            SilverZinc = 28,
+            SilverZinc = 0x1C,
             /// <summary>
             /// Cell chemistry is sodium ion
             /// </summary>
-            SodiumIon = 29,
+            SodiumIon = 0x1D,
             /// <summary>
             /// Cell chemistry is sodium sulfur
             /// </summary>
-            SodiumSulfur = 30,
+            SodiumSulfur = 0x1E,
             /// <summary>
             /// Cell chemistry is zinc bromide
             /// </summary>
-            ZincBromide = 31,
+            ZincBromide = 0x1F,
             /// <summary>
             /// Cell chemistry is zinc cerium
             /// </summary>
-            ZincCerium = 32,
+            ZincCerium = 0x20,
         }
         #endregion Enums
 

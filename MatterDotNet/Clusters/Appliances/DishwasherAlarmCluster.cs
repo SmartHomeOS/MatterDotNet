@@ -59,27 +59,27 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// Water inflow is abnormal
             /// </summary>
-            InflowError = 0x01,
+            InflowError = 0x0001,
             /// <summary>
             /// Water draining is abnormal
             /// </summary>
-            DrainError = 0x02,
+            DrainError = 0x0002,
             /// <summary>
             /// Door or door lock is abnormal
             /// </summary>
-            DoorError = 0x04,
+            DoorError = 0x0004,
             /// <summary>
             /// Unable to reach normal temperature
             /// </summary>
-            TempTooLow = 0x08,
+            TempTooLow = 0x0008,
             /// <summary>
             /// Temperature is too high
             /// </summary>
-            TempTooHigh = 0x10,
+            TempTooHigh = 0x0010,
             /// <summary>
             /// Water level is abnormal
             /// </summary>
-            WaterLevelError = 0x20,
+            WaterLevelError = 0x0020,
         }
         #endregion Enums
 

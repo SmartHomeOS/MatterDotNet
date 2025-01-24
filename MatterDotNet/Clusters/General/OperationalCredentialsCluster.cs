@@ -44,43 +44,43 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// OK, no error
             /// </summary>
-            OK = 0x00,
+            OK = 0x0,
             /// <summary>
             /// <see cref="InvalidPublicKey"/> Public Key in the NOC does not match the public key in the NOCSR
             /// </summary>
-            InvalidPublicKey = 0x01,
+            InvalidPublicKey = 0x1,
             /// <summary>
             /// <see cref="InvalidOperationalId"/> The Node Operational ID in the NOC is not formatted correctly.
             /// </summary>
-            InvalidNodeOpId = 0x02,
+            InvalidNodeOpId = 0x2,
             /// <summary>
             /// <see cref="InvalidNoc"/> Any other validation error in NOC chain
             /// </summary>
-            InvalidNOC = 0x03,
+            InvalidNOC = 0x3,
             /// <summary>
             /// <see cref="MissingCsr"/> No record of prior CSR for which this NOC could match
             /// </summary>
-            MissingCsr = 0x04,
+            MissingCsr = 0x4,
             /// <summary>
             /// <see cref="TableFull"/> NOCs table full, cannot add another one
             /// </summary>
-            TableFull = 0x05,
+            TableFull = 0x5,
             /// <summary>
             /// <see cref="InvalidAdminSubject"/> Invalid CaseAdminSubject field for an AddNOC command.
             /// </summary>
-            InvalidAdminSubject = 0x06,
+            InvalidAdminSubject = 0x6,
             /// <summary>
             /// <see cref="FabricConflict"/> Trying to AddNOC instead of UpdateNOC against an existing Fabric.
             /// </summary>
-            FabricConflict = 0x09,
+            FabricConflict = 0x9,
             /// <summary>
             /// <see cref="LabelConflict"/> Label already exists on another Fabric.
             /// </summary>
-            LabelConflict = 0x0a,
+            LabelConflict = 0xA,
             /// <summary>
             /// <see cref="InvalidFabricIndex"/> FabricIndex argument is invalid.
             /// </summary>
-            InvalidFabricIndex = 0x0b,
+            InvalidFabricIndex = 0xB,
         }
 
         /// <summary>
@@ -90,11 +90,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Request the DER-encoded DAC certificate
             /// </summary>
-            DACCertificate = 0x01,
+            DACCertificate = 1,
             /// <summary>
             /// Request the DER-encoded PAI certificate
             /// </summary>
-            PAICertificate = 0x02,
+            PAICertificate = 2,
         }
         #endregion Enums
 

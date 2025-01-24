@@ -64,39 +64,39 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// The device has not yet started operating at the given area, or has not finished operating at that area but it is not currently operating at the area
             /// </summary>
-            Pending = 0x00,
+            Pending = 0,
             /// <summary>
             /// The device is currently operating at the given area
             /// </summary>
-            Operating = 0x01,
+            Operating = 1,
             /// <summary>
             /// The device has skipped the given area, before or during operating at it, due to a SkipArea command, due an out of band command (e.g. from the vendor's application), due to a vendor specific reason, such as a time limit used by the device, or due the device ending operating unsuccessfully
             /// </summary>
-            Skipped = 0x02,
+            Skipped = 2,
             /// <summary>
             /// The device has completed operating at the given area
             /// </summary>
-            Completed = 0x03,
+            Completed = 3,
         }
 
         /// <summary>
         /// Select Areas Status
         /// </summary>
         public enum SelectAreasStatus : byte {
-            Success = 0x00,
-            UnsupportedArea = 0x01,
-            InvalidInMode = 0x02,
-            InvalidSet = 0x03,
+            Success = 0,
+            UnsupportedArea = 1,
+            InvalidInMode = 2,
+            InvalidSet = 3,
         }
 
         /// <summary>
         /// Skip Area Status
         /// </summary>
         public enum SkipAreaStatus : byte {
-            Success = 0x00,
-            InvalidAreaList = 0x01,
-            InvalidInMode = 0x02,
-            InvalidSkippedArea = 0x03,
+            Success = 0,
+            InvalidAreaList = 1,
+            InvalidInMode = 2,
+            InvalidSkippedArea = 3,
         }
         #endregion Enums
 

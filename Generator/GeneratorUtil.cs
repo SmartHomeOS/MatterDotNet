@@ -60,7 +60,7 @@ namespace Generator
 
         public static string SanitizeClassName(string name)
         {
-            return name.Replace(" ", "").Replace('/', '_').Replace("-", "").Replace("&", "And");
+            return name.Replace(" ", "").Replace('/', '_').Replace("-", "").Replace("&", "And").Replace('.', '_');
         }
 
         public static string FieldNameToComment(string name, string? type = null)
@@ -172,6 +172,18 @@ namespace Generator
             }
             long raw = long.Parse(value);
             return "0x" + raw.ToString(hexLength == 2 ? "X2" : "X4");
+        }
+
+        internal static string FormatValue(string value, string max)
+        {
+            long val = value.StartsWith("0x") ? Convert.ToInt64(value, 16) : long.Parse(value);
+            long maxVal = 0;
+            if (max != null)
+                maxVal = max.StartsWith("0x") ? Convert.ToInt64(max, 16) : long.Parse(max);
+            if (maxVal >= 10)
+                return "0x" + val.ToString("X");
+            else
+                return val.ToString();
         }
     }
 }

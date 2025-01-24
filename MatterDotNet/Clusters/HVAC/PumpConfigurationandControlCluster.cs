@@ -75,19 +75,19 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.
             /// </summary>
-            Normal = 0x0,
+            Normal = 0,
             /// <summary>
             /// This value sets the pump to run at the minimum possible speed it can without being stopped.
             /// </summary>
-            Minimum = 0x1,
+            Minimum = 1,
             /// <summary>
             /// This value sets the pump to run at its maximum possible speed.
             /// </summary>
-            Maximum = 0x2,
+            Maximum = 2,
             /// <summary>
             /// This value sets the pump to run with the local settings of the pump, regardless of what these are.
             /// </summary>
-            Local = 0x3,
+            Local = 3,
         }
 
         /// <summary>
@@ -97,27 +97,27 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// The pump is running at a constant speed.
             /// </summary>
-            ConstantSpeed = 0x0,
+            ConstantSpeed = 0,
             /// <summary>
             /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
             /// </summary>
-            ConstantPressure = 0x1,
+            ConstantPressure = 1,
             /// <summary>
             /// The pump will regulate its speed to maintain a constant differential pressure over its flanges.
             /// </summary>
-            ProportionalPressure = 0x2,
+            ProportionalPressure = 2,
             /// <summary>
             /// The pump will regulate its speed to maintain a constant flow through the pump.
             /// </summary>
-            ConstantFlow = 0x3,
+            ConstantFlow = 3,
             /// <summary>
             /// The pump will regulate its speed to maintain a constant temperature.
             /// </summary>
-            ConstantTemperature = 0x5,
+            ConstantTemperature = 5,
             /// <summary>
             /// The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.
             /// </summary>
-            Automatic = 0x7,
+            Automatic = 7,
         }
 
         /// <summary>
@@ -132,36 +132,36 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// A fault related to the system or pump device is detected.
             /// </summary>
-            DeviceFault = 0x1,
+            DeviceFault = 0x0001,
             /// <summary>
             /// A fault related to the supply to the pump is detected.
             /// </summary>
-            SupplyFault = 0x2,
+            SupplyFault = 0x0002,
             /// <summary>
             /// Setpoint is too low to achieve.
             /// </summary>
-            SpeedLow = 0x4,
+            SpeedLow = 0x0004,
             /// <summary>
             /// Setpoint is too high to achieve.
             /// </summary>
-            SpeedHigh = 0x8,
+            SpeedHigh = 0x0008,
             /// <summary>
             /// Device control is overridden by hardware, such as an external STOP button or via a local HMI.
             /// </summary>
-            LocalOverride = 0x10,
+            LocalOverride = 0x0010,
             /// <summary>
             /// Pump is currently running
             /// </summary>
-            Running = 0x20,
+            Running = 0x0020,
             /// <summary>
             /// A remote pressure sensor is used as the sensor for the regulation of the pump.
             /// </summary>
-            RemotePressure = 0x40,
+            RemotePressure = 0x0040,
             /// <summary>
             /// A remote flow sensor is used as the sensor for the regulation of the pump.
             /// </summary>
-            RemoteFlow = 0x80,
-            RemoteTemperature = 0x100,
+            RemoteFlow = 0x0080,
+            RemoteTemperature = 0x00100,
         }
         #endregion Enums
 

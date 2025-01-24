@@ -56,11 +56,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Message counter synchronization using trust-first
             /// </summary>
-            TrustFirst = 0x00,
+            TrustFirst = 0,
             /// <summary>
             /// Message counter synchronization using cache-and-sync
             /// </summary>
-            CacheAndSync = 0x01,
+            CacheAndSync = 1,
         }
         #endregion Enums
 

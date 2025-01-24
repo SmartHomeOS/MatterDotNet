@@ -67,19 +67,19 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Indicates an unspecified fault.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// Indicates the Thread link is down.
             /// </summary>
-            LinkDown = 0x01,
+            LinkDown = 1,
             /// <summary>
             /// Indicates there has been Thread hardware failure.
             /// </summary>
-            HardwareFailure = 0x02,
+            HardwareFailure = 2,
             /// <summary>
             /// Indicates the Thread network is jammed.
             /// </summary>
-            NetworkJammed = 0x03,
+            NetworkJammed = 3,
         }
 
         /// <summary>
@@ -89,31 +89,31 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Unspecified routing role.
             /// </summary>
-            Unspecified = 0x00,
+            Unspecified = 0,
             /// <summary>
             /// The Node does not currently have a role as a result of the Thread interface not currently being configured or operational.
             /// </summary>
-            Unassigned = 0x01,
+            Unassigned = 1,
             /// <summary>
             /// The Node acts as a Sleepy End Device with RX-off-when-idle sleepy radio behavior.
             /// </summary>
-            SleepyEndDevice = 0x02,
+            SleepyEndDevice = 2,
             /// <summary>
             /// The Node acts as an End Device without RX-off-when-idle sleepy radio behavior.
             /// </summary>
-            EndDevice = 0x03,
+            EndDevice = 3,
             /// <summary>
             /// The Node acts as an Router Eligible End Device.
             /// </summary>
-            REED = 0x04,
+            REED = 4,
             /// <summary>
             /// The Node acts as a Router Device.
             /// </summary>
-            Router = 0x05,
+            Router = 5,
             /// <summary>
             /// The Node acts as a Leader Device.
             /// </summary>
-            Leader = 0x06,
+            Leader = 6,
         }
 
         /// <summary>
@@ -123,11 +123,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Node is connected
             /// </summary>
-            Connected = 0x00,
+            Connected = 0,
             /// <summary>
             /// Node is not connected
             /// </summary>
-            NotConnected = 0x01,
+            NotConnected = 1,
         }
         #endregion Enums
 

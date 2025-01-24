@@ -62,11 +62,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Increase the level
             /// </summary>
-            Up = 0x0,
+            Up = 0,
             /// <summary>
             /// Decrease the level
             /// </summary>
-            Down = 0x1,
+            Down = 1,
         }
 
         /// <summary>
@@ -76,11 +76,11 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Step upwards
             /// </summary>
-            Up = 0x0,
+            Up = 0,
             /// <summary>
             /// Step downwards
             /// </summary>
-            Down = 0x1,
+            Down = 1,
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Dependency on On/Off cluster
             /// </summary>
-            ExecuteIfOff = 0x1,
+            ExecuteIfOff = 0x01,
             /// <summary>
             /// Dependency on Color Control cluster
             /// </summary>

@@ -45,7 +45,7 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
             /// Nothing Set
             /// </summary>
             None = 0,
-            PANChange = 0x1,
+            PANChange = 0x0001,
         }
         #endregion Enums
 

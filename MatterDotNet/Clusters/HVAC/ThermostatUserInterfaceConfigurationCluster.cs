@@ -40,27 +40,27 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// All functionality available to the user
             /// </summary>
-            NoLockout = 0x00,
+            NoLockout = 0,
             /// <summary>
             /// Level 1 reduced functionality
             /// </summary>
-            Lockout1 = 0x01,
+            Lockout1 = 1,
             /// <summary>
             /// Level 2 reduced functionality
             /// </summary>
-            Lockout2 = 0x02,
+            Lockout2 = 2,
             /// <summary>
             /// Level 3 reduced functionality
             /// </summary>
-            Lockout3 = 0x03,
+            Lockout3 = 3,
             /// <summary>
             /// Level 4 reduced functionality
             /// </summary>
-            Lockout4 = 0x04,
+            Lockout4 = 4,
             /// <summary>
             /// Least functionality available to the user
             /// </summary>
-            Lockout5 = 0x05,
+            Lockout5 = 5,
         }
 
         /// <summary>
@@ -70,11 +70,11 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Local schedule programming functionality is enabled at the thermostat
             /// </summary>
-            ScheduleProgrammingPermitted = 0x00,
+            ScheduleProgrammingPermitted = 0,
             /// <summary>
             /// Local schedule programming functionality is disabled at the thermostat
             /// </summary>
-            ScheduleProgrammingDenied = 0x01,
+            ScheduleProgrammingDenied = 1,
         }
 
         /// <summary>
@@ -84,11 +84,11 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Temperature displayed in °C
             /// </summary>
-            Celsius = 0x00,
+            Celsius = 0,
             /// <summary>
             /// Temperature displayed in °F
             /// </summary>
-            Fahrenheit = 0x01,
+            Fahrenheit = 1,
         }
         #endregion Enums
 

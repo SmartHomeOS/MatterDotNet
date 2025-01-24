@@ -55,27 +55,27 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// HDMI
             /// </summary>
-            HDMI = 0x00,
+            HDMI = 0,
             /// <summary>
             /// 
             /// </summary>
-            BT = 0x01,
+            BT = 1,
             /// <summary>
             /// 
             /// </summary>
-            Optical = 0x02,
+            Optical = 2,
             /// <summary>
             /// 
             /// </summary>
-            Headphone = 0x03,
+            Headphone = 3,
             /// <summary>
             /// 
             /// </summary>
-            Internal = 0x04,
+            Internal = 4,
             /// <summary>
             /// 
             /// </summary>
-            Other = 0x05,
+            Other = 5,
         }
         #endregion Enums
 

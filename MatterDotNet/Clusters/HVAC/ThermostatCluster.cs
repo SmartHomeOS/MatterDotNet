@@ -89,39 +89,39 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// The Thermostat does not generate demand for Cooling or Heating
             /// </summary>
-            Off = 0x00,
+            Off = 0,
             /// <summary>
             /// Demand is generated for either Cooling or Heating, as required
             /// </summary>
-            Auto = 0x01,
+            Auto = 1,
             /// <summary>
             /// Demand is only generated for Cooling
             /// </summary>
-            Cool = 0x03,
+            Cool = 3,
             /// <summary>
             /// Demand is only generated for Heating
             /// </summary>
-            Heat = 0x04,
+            Heat = 4,
             /// <summary>
             /// 2 stage heating is in use to achieve desired temperature
             /// </summary>
-            EmergencyHeat = 0x05,
+            EmergencyHeat = 5,
             /// <summary>
             /// (see ref_HvacTerms)
             /// </summary>
-            Precooling = 0x06,
+            Precooling = 6,
             /// <summary>
             /// 
             /// </summary>
-            FanOnly = 0x07,
+            FanOnly = 7,
             /// <summary>
             /// 
             /// </summary>
-            Dry = 0x08,
+            Dry = 8,
             /// <summary>
             /// 
             /// </summary>
-            Sleep = 0x09,
+            Sleep = 9,
         }
 
         /// <summary>
@@ -131,15 +131,15 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// The Thermostat does not generate demand for Cooling or Heating
             /// </summary>
-            Off = 0x00,
+            Off = 0,
             /// <summary>
             /// Demand is only generated for Cooling
             /// </summary>
-            Cool = 0x03,
+            Cool = 3,
             /// <summary>
             /// Demand is only generated for Heating
             /// </summary>
-            Heat = 0x04,
+            Heat = 4,
         }
 
         /// <summary>
@@ -149,31 +149,31 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// 
             /// </summary>
-            Sunday = 0x00,
+            Sunday = 0,
             /// <summary>
             /// 
             /// </summary>
-            Monday = 0x01,
+            Monday = 1,
             /// <summary>
             /// 
             /// </summary>
-            Tuesday = 0x02,
+            Tuesday = 2,
             /// <summary>
             /// 
             /// </summary>
-            Wednesday = 0x03,
+            Wednesday = 3,
             /// <summary>
             /// 
             /// </summary>
-            Thursday = 0x04,
+            Thursday = 4,
             /// <summary>
             /// 
             /// </summary>
-            Friday = 0x05,
+            Friday = 5,
             /// <summary>
             /// 
             /// </summary>
-            Saturday = 0x06,
+            Saturday = 6,
         }
 
         /// <summary>
@@ -183,27 +183,27 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Heat and Emergency are not possible
             /// </summary>
-            CoolingOnly = 0x00,
+            CoolingOnly = 0,
             /// <summary>
             /// Heat and Emergency are not possible
             /// </summary>
-            CoolingWithReheat = 0x01,
+            CoolingWithReheat = 1,
             /// <summary>
             /// Cool and precooling (see ref_HvacTerms) are not possible
             /// </summary>
-            HeatingOnly = 0x02,
+            HeatingOnly = 2,
             /// <summary>
             /// Cool and precooling are not possible
             /// </summary>
-            HeatingWithReheat = 0x03,
+            HeatingWithReheat = 3,
             /// <summary>
             /// All modes are possible
             /// </summary>
-            CoolingAndHeating = 0x04,
+            CoolingAndHeating = 4,
             /// <summary>
             /// All modes are possible
             /// </summary>
-            CoolingAndHeatingWithReheat = 0x05,
+            CoolingAndHeatingWithReheat = 5,
         }
 
         /// <summary>
@@ -213,11 +213,11 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Follow scheduling program
             /// </summary>
-            SetpointHoldOff = 0x00,
+            SetpointHoldOff = 0,
             /// <summary>
             /// Maintain current setpoint, regardless of schedule transitions
             /// </summary>
-            SetpointHoldOn = 0x01,
+            SetpointHoldOn = 1,
         }
 
         /// <summary>
@@ -227,15 +227,15 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Adjust Heat Setpoint
             /// </summary>
-            Heat = 0x00,
+            Heat = 0,
             /// <summary>
             /// Adjust Cool Setpoint
             /// </summary>
-            Cool = 0x01,
+            Cool = 1,
             /// <summary>
             /// Adjust Heat Setpoint and Cool Setpoint
             /// </summary>
-            Both = 0x02,
+            Both = 2,
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// British Thermal Unit per Hour
             /// </summary>
-            BTUh = 0x00,
+            BTUh = 0,
         }
 
         /// <summary>
@@ -255,19 +255,19 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Unknown compressor type
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// Max working ambient 43 °C
             /// </summary>
-            T1 = 0x01,
+            T1 = 1,
             /// <summary>
             /// Max working ambient 35 °C
             /// </summary>
-            T2 = 0x02,
+            T2 = 2,
             /// <summary>
             /// Max working ambient 52 °C
             /// </summary>
-            T3 = 0x03,
+            T3 = 3,
         }
 
         /// <summary>
@@ -277,23 +277,23 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Fully Closed
             /// </summary>
-            Closed = 0x01,
+            Closed = 1,
             /// <summary>
             /// Fully Open
             /// </summary>
-            Open = 0x02,
+            Open = 2,
             /// <summary>
             /// Quarter Open
             /// </summary>
-            Quarter = 0x03,
+            Quarter = 3,
             /// <summary>
             /// Half Open
             /// </summary>
-            Half = 0x04,
+            Half = 4,
             /// <summary>
             /// Three Quarters Open
             /// </summary>
-            ThreeQuarters = 0x05,
+            ThreeQuarters = 5,
         }
 
         /// <summary>
@@ -303,19 +303,19 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Unknown Refrigerant Type
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// R22 Refrigerant
             /// </summary>
-            R22 = 0x01,
+            R22 = 1,
             /// <summary>
             /// R410a Refrigerant
             /// </summary>
-            R410a = 0x02,
+            R410a = 2,
             /// <summary>
             /// R407c Refrigerant
             /// </summary>
-            R407c = 0x03,
+            R407c = 3,
         }
 
         /// <summary>
@@ -325,23 +325,23 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Unknown AC Type
             /// </summary>
-            Unknown = 0x00,
+            Unknown = 0,
             /// <summary>
             /// Cooling and Fixed Speed
             /// </summary>
-            CoolingFixed = 0x01,
+            CoolingFixed = 1,
             /// <summary>
             /// Heat Pump and Fixed Speed
             /// </summary>
-            HeatPumpFixed = 0x02,
+            HeatPumpFixed = 2,
             /// <summary>
             /// Cooling and Inverter
             /// </summary>
-            CoolingInverter = 0x03,
+            CoolingInverter = 3,
             /// <summary>
             /// Heat Pump and Inverter
             /// </summary>
-            HeatPumpInverter = 0x04,
+            HeatPumpInverter = 4,
         }
 
         /// <summary>
@@ -351,15 +351,15 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Manual, user-initiated setpoint change via the thermostat
             /// </summary>
-            Manual = 0x00,
+            Manual = 0,
             /// <summary>
             /// Schedule/internal programming-initiated setpoint change
             /// </summary>
-            Schedule = 0x01,
+            Schedule = 1,
             /// <summary>
             /// Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)
             /// </summary>
-            External = 0x02,
+            External = 2,
         }
 
         /// <summary>
@@ -369,27 +369,27 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// The thermostat-controlled area is occupied
             /// </summary>
-            Occupied = 0x01,
+            Occupied = 0x1,
             /// <summary>
             /// The thermostat-controlled area is unoccupied
             /// </summary>
-            Unoccupied = 0x02,
+            Unoccupied = 0x2,
             /// <summary>
             /// Users are likely to be sleeping
             /// </summary>
-            Sleep = 0x03,
+            Sleep = 0x3,
             /// <summary>
             /// Users are likely to be waking up
             /// </summary>
-            Wake = 0x04,
+            Wake = 0x4,
             /// <summary>
             /// Users are on vacation
             /// </summary>
-            Vacation = 0x05,
+            Vacation = 0x5,
             /// <summary>
             /// Users are likely to be going to sleep
             /// </summary>
-            GoingToSleep = 0x06,
+            GoingToSleep = 0x6,
             /// <summary>
             /// Custom presets
             /// </summary>
@@ -408,23 +408,23 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Compressor Failure or Refrigerant Leakage
             /// </summary>
-            CompressorFail = 0x01,
+            CompressorFail = 0x0001,
             /// <summary>
             /// Room Temperature Sensor Failure
             /// </summary>
-            RoomSensorFail = 0x02,
+            RoomSensorFail = 0x0002,
             /// <summary>
             /// Outdoor Temperature Sensor Failure
             /// </summary>
-            OutdoorSensorFail = 0x04,
+            OutdoorSensorFail = 0x0004,
             /// <summary>
             /// Indoor Coil Temperature Sensor Failure
             /// </summary>
-            CoilSensorFail = 0x08,
+            CoilSensorFail = 0x0008,
             /// <summary>
             /// Fan Failure
             /// </summary>
-            FanFail = 0x10,
+            FanFail = 0x0010,
         }
 
         /// <summary>
@@ -501,10 +501,22 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            SupportsPresets = 0x01,
-            SupportsSetpoints = 0x02,
-            SupportsNames = 0x04,
-            SupportsOff = 0x08,
+            /// <summary>
+            /// Supports presets
+            /// </summary>
+            SupportsPresets = 0x0001,
+            /// <summary>
+            /// Supports setpoints
+            /// </summary>
+            SupportsSetpoints = 0x0002,
+            /// <summary>
+            /// Supports user-provided names
+            /// </summary>
+            SupportsNames = 0x0004,
+            /// <summary>
+            /// Supports transitioning to SystemModeOff
+            /// </summary>
+            SupportsOff = 0x0008,
         }
 
         /// <summary>
@@ -516,13 +528,34 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            Heat = 0x01,
-            Cool = 0x02,
-            Fan = 0x04,
-            HeatStage2 = 0x08,
-            CoolStage2 = 0x10,
-            FanStage2 = 0x20,
-            FanStage3 = 0x40,
+            /// <summary>
+            /// Heat Stage On
+            /// </summary>
+            Heat = 0x0001,
+            /// <summary>
+            /// Cool Stage On
+            /// </summary>
+            Cool = 0x0002,
+            /// <summary>
+            /// Fan Stage On
+            /// </summary>
+            Fan = 0x0004,
+            /// <summary>
+            /// Heat 2 Stage On
+            /// </summary>
+            HeatStage2 = 0x0008,
+            /// <summary>
+            /// Cool 2 Stage On
+            /// </summary>
+            CoolStage2 = 0x0010,
+            /// <summary>
+            /// Fan 2 Stage On
+            /// </summary>
+            FanStage2 = 0x0020,
+            /// <summary>
+            /// Fan 3 Stage On
+            /// </summary>
+            FanStage3 = 0x0040,
         }
 
         /// <summary>
@@ -619,8 +652,14 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            Automatic = 0x01,
-            SupportsNames = 0x02,
+            /// <summary>
+            /// Preset may be automatically activated by the thermostat
+            /// </summary>
+            Automatic = 0x0001,
+            /// <summary>
+            /// Preset supports user-provided names
+            /// </summary>
+            SupportsNames = 0x0002,
         }
         #endregion Enums
 

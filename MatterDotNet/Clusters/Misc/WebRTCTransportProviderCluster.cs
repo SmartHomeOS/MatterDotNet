@@ -41,28 +41,28 @@ namespace MatterDotNet.Clusters.Misc
         /// Stream Type
         /// </summary>
         public enum StreamType : byte {
-            Internal = 0x00,
-            Recording = 0x01,
-            Analysis = 0x02,
-            LiveView = 0x03,
+            Internal = 0,
+            Recording = 1,
+            Analysis = 2,
+            LiveView = 3,
         }
 
         /// <summary>
         /// Web RTC End Reason
         /// </summary>
         public enum WebRTCEndReason : byte {
-            IceFailed = 0x00,
-            IceTimeout = 0x01,
-            UserHangup = 0x02,
-            UserBusy = 0x03,
-            Replaced = 0x04,
-            NoUserMedia = 0x05,
-            InviteTimeout = 0x06,
-            AnsweredElsewhere = 0x07,
-            OutOfResources = 0x08,
-            MediaTimeout = 0x09,
-            LowPower = 0x0A,
-            UnknownReason = 0x0B,
+            IceFailed = 0x0,
+            IceTimeout = 0x1,
+            UserHangup = 0x2,
+            UserBusy = 0x3,
+            Replaced = 0x4,
+            NoUserMedia = 0x5,
+            InviteTimeout = 0x6,
+            AnsweredElsewhere = 0x7,
+            OutOfResources = 0x8,
+            MediaTimeout = 0x9,
+            LowPower = 0xA,
+            UnknownReason = 0xB,
         }
 
         /// <summary>

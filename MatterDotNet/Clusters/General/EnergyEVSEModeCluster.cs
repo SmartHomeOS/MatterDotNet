@@ -52,18 +52,57 @@ namespace MatterDotNet.Clusters.General
         /// Mode Tag
         /// </summary>
         public enum ModeTag : ushort {
+            /// <summary>
+            /// The device decides which options, features and setting values to use.
+            /// </summary>
             Auto = 0x0,
+            /// <summary>
+            /// The mode of the device is optimizing for faster completion.
+            /// </summary>
             Quick = 0x1,
+            /// <summary>
+            /// The device is silent or barely audible while in this mode.
+            /// </summary>
             Quiet = 0x2,
+            /// <summary>
+            /// Either the mode is inherently low noise or the device optimizes for that.
+            /// </summary>
             LowNoise = 0x3,
+            /// <summary>
+            /// The device is optimizing for lower energy usage in this mode. Sometimes called "Eco mode".
+            /// </summary>
             LowEnergy = 0x4,
+            /// <summary>
+            /// A mode suitable for use during vacations or other extended absences.
+            /// </summary>
             Vacation = 0x5,
+            /// <summary>
+            /// The mode uses the lowest available setting value.
+            /// </summary>
             Min = 0x6,
+            /// <summary>
+            /// The mode uses the highest available setting value.
+            /// </summary>
             Max = 0x7,
+            /// <summary>
+            /// The mode is recommended or suitable for use during night time.
+            /// </summary>
             Night = 0x8,
+            /// <summary>
+            /// The mode is recommended or suitable for use during day time.
+            /// </summary>
             Day = 0x9,
+            /// <summary>
+            /// While in modes with this tag, and once enabled with the EnableCharging command, the EVSE will permit charging based on demand from the EV.
+            /// </summary>
             Manual = 0x4000,
+            /// <summary>
+            /// While in modes with this tag, and once enabled with the EnableCharging command, the EVSE will attempt to automatically start charging based on the user’s charging targets.
+            /// </summary>
             TimeOfUse = 0x4001,
+            /// <summary>
+            /// While in modes with this tag, and once enabled with the EnableCharging, the EVSE will attempt to automatically start charging based on available excess solar PV generation, limiting the charging power to avoid importing energy from the grid.
+            /// </summary>
             SolarCharging = 0x4002,
         }
         #endregion Enums

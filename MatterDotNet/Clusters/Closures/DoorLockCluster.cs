@@ -506,37 +506,85 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Lock State
+        /// Lock State
         /// </summary>
-        public enum DlLockState : byte {
+        public enum LockState : byte {
+            /// <summary>
+            /// Lock state is not fully locked
+            /// </summary>
             NotFullyLocked = 0,
+            /// <summary>
+            /// Lock state is fully locked
+            /// </summary>
             Locked = 1,
+            /// <summary>
+            /// Lock state is fully unlocked
+            /// </summary>
             Unlocked = 2,
+            /// <summary>
+            /// Lock state is fully unlocked and the latch is pulled
+            /// </summary>
             Unlatched = 3,
         }
 
         /// <summary>
-        /// Dl Lock Type
+        /// Lock Type
         /// </summary>
-        public enum DlLockType : byte {
+        public enum LockType : byte {
+            /// <summary>
+            /// Physical lock type is dead bolt
+            /// </summary>
             DeadBolt = 0x0,
+            /// <summary>
+            /// Physical lock type is magnetic
+            /// </summary>
             Magnetic = 0x1,
+            /// <summary>
+            /// Physical lock type is other
+            /// </summary>
             Other = 0x2,
+            /// <summary>
+            /// Physical lock type is mortise
+            /// </summary>
             Mortise = 0x3,
+            /// <summary>
+            /// Physical lock type is rim
+            /// </summary>
             Rim = 0x4,
+            /// <summary>
+            /// Physical lock type is latch bolt
+            /// </summary>
             LatchBolt = 0x5,
+            /// <summary>
+            /// Physical lock type is cylindrical lock
+            /// </summary>
             CylindricalLock = 0x6,
+            /// <summary>
+            /// Physical lock type is tubular lock
+            /// </summary>
             TubularLock = 0x7,
+            /// <summary>
+            /// Physical lock type is interconnected lock
+            /// </summary>
             InterconnectedLock = 0x8,
+            /// <summary>
+            /// Physical lock type is dead latch
+            /// </summary>
             DeadLatch = 0x9,
+            /// <summary>
+            /// Physical lock type is door furniture
+            /// </summary>
             DoorFurniture = 0xA,
+            /// <summary>
+            /// Physical lock type is euro cylinder
+            /// </summary>
             Eurocylinder = 0xB,
         }
 
         /// <summary>
-        /// Dl Status
+        /// Status
         /// </summary>
-        public enum DlStatus : byte {
+        public enum Status : byte {
             Success = 0x0,
             Failure = 0x1,
             Duplicate = 0x2,
@@ -613,10 +661,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Credential Rule Mask
+        /// Credential Rule Mask
         /// </summary>
         [Flags]
-        public enum DlCredentialRuleMask : byte {
+        public enum CredentialRuleMask : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -645,10 +693,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Credential Rules Support
+        /// Credential Rules Support
         /// </summary>
         [Flags]
-        public enum DlCredentialRulesSupport : byte {
+        public enum CredentialRulesSupport : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -659,10 +707,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Supported Operating Modes
+        /// Supported Operating Modes
         /// </summary>
         [Flags]
-        public enum DlSupportedOperatingModes : ushort {
+        public enum SupportedOperatingModes : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -675,10 +723,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Default Configuration Register
+        /// Default Configuration Register
         /// </summary>
         [Flags]
-        public enum DlDefaultConfigurationRegister : ushort {
+        public enum DefaultConfigurationRegister : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -692,25 +740,37 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Local Programming Features
+        /// Local Programming Features
         /// </summary>
         [Flags]
-        public enum DlLocalProgrammingFeatures : byte {
+        public enum LocalProgrammingFeatures : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
             None = 0,
+            /// <summary>
+            /// The state of the ability to add users, credentials or schedules on the device
+            /// </summary>
             AddUsersCredentialsSchedulesLocally = 0x01,
+            /// <summary>
+            /// The state of the ability to modify users, credentials or schedules on the device
+            /// </summary>
             ModifyUsersCredentialsSchedulesLocally = 0x02,
+            /// <summary>
+            /// The state of the ability to clear users, credentials or schedules on the device
+            /// </summary>
             ClearUsersCredentialsSchedulesLocally = 0x04,
+            /// <summary>
+            /// The state of the ability to adjust settings on the device
+            /// </summary>
             AdjustLockSettingsLocally = 0x08,
         }
 
         /// <summary>
-        /// Dl Keypad Operation Event Mask
+        /// Keypad Operation Event Mask
         /// </summary>
         [Flags]
-        public enum DlKeypadOperationEventMask : ushort {
+        public enum KeypadOperationEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -726,10 +786,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Remote Operation Event Mask
+        /// Remote Operation Event Mask
         /// </summary>
         [Flags]
-        public enum DlRemoteOperationEventMask : ushort {
+        public enum RemoteOperationEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -744,10 +804,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Manual Operation Event Mask
+        /// Manual Operation Event Mask
         /// </summary>
         [Flags]
-        public enum DlManualOperationEventMask : ushort {
+        public enum ManualOperationEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -766,10 +826,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl RFID Operation Event Mask
+        /// RFID Operation Event Mask
         /// </summary>
         [Flags]
-        public enum DlRFIDOperationEventMask : ushort {
+        public enum RFIDOperationEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -784,10 +844,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Keypad Programming Event Mask
+        /// Keypad Programming Event Mask
         /// </summary>
         [Flags]
-        public enum DlKeypadProgrammingEventMask : ushort {
+        public enum KeypadProgrammingEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -800,10 +860,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl Remote Programming Event Mask
+        /// Remote Programming Event Mask
         /// </summary>
         [Flags]
-        public enum DlRemoteProgrammingEventMask : ushort {
+        public enum RemoteProgrammingEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -818,10 +878,10 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Dl RFID Programming Event Mask
+        /// RFID Programming Event Mask
         /// </summary>
         [Flags]
-        public enum DlRFIDProgrammingEventMask : ushort {
+        public enum RFIDProgrammingEventMask : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -951,7 +1011,7 @@ namespace MatterDotNet.Clusters.Closures
         public struct GetWeekDayScheduleResponse() {
             public required byte WeekDayIndex { get; set; }
             public required ushort UserIndex { get; set; }
-            public required DlStatus Status { get; set; }
+            public required Status Status { get; set; }
             public DaysMaskMap? DaysMask { get; set; }
             public byte? StartHour { get; set; }
             public byte? StartMinute { get; set; }
@@ -1002,7 +1062,7 @@ namespace MatterDotNet.Clusters.Closures
         public struct GetYearDayScheduleResponse() {
             public required byte YearDayIndex { get; set; }
             public required ushort UserIndex { get; set; }
-            public required DlStatus Status { get; set; }
+            public required Status Status { get; set; }
             public DateTime? LocalStartTime { get; set; }
             public DateTime? LocalEndTime { get; set; }
         }
@@ -1047,7 +1107,7 @@ namespace MatterDotNet.Clusters.Closures
         /// </summary>
         public struct GetHolidayScheduleResponse() {
             public required byte HolidayIndex { get; set; }
-            public required DlStatus Status { get; set; }
+            public required Status Status { get; set; }
             public DateTime? LocalStartTime { get; set; }
             public DateTime? LocalEndTime { get; set; }
             public OperatingMode? OperatingMode { get; set; }
@@ -1140,7 +1200,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Set Credential Response - Reply from server
         /// </summary>
         public struct SetCredentialResponse() {
-            public required DlStatus Status { get; set; }
+            public required Status Status { get; set; }
             public required ushort? UserIndex { get; set; }
             public required ushort? NextCredentialIndex { get; set; }
         }
@@ -1271,7 +1331,7 @@ namespace MatterDotNet.Clusters.Closures
             return new GetWeekDayScheduleResponse() {
                 WeekDayIndex = (byte)GetField(resp, 0),
                 UserIndex = (ushort)GetField(resp, 1),
-                Status = (DlStatus)(byte)GetField(resp, 2),
+                Status = (Status)(byte)GetField(resp, 2),
                 DaysMask = (DaysMaskMap?)(byte?)GetOptionalField(resp, 3),
                 StartHour = (byte?)GetOptionalField(resp, 4),
                 StartMinute = (byte?)GetOptionalField(resp, 5),
@@ -1320,7 +1380,7 @@ namespace MatterDotNet.Clusters.Closures
             return new GetYearDayScheduleResponse() {
                 YearDayIndex = (byte)GetField(resp, 0),
                 UserIndex = (ushort)GetField(resp, 1),
-                Status = (DlStatus)(byte)GetField(resp, 2),
+                Status = (Status)(byte)GetField(resp, 2),
                 LocalStartTime = (DateTime?)GetOptionalField(resp, 3),
                 LocalEndTime = (DateTime?)GetOptionalField(resp, 4),
             };
@@ -1364,7 +1424,7 @@ namespace MatterDotNet.Clusters.Closures
                 return null;
             return new GetHolidayScheduleResponse() {
                 HolidayIndex = (byte)GetField(resp, 0),
-                Status = (DlStatus)(byte)GetField(resp, 1),
+                Status = (Status)(byte)GetField(resp, 1),
                 LocalStartTime = (DateTime?)GetOptionalField(resp, 2),
                 LocalEndTime = (DateTime?)GetOptionalField(resp, 3),
                 OperatingMode = (OperatingMode?)(byte?)GetOptionalField(resp, 4),
@@ -1450,7 +1510,7 @@ namespace MatterDotNet.Clusters.Closures
             if (!ValidateResponse(resp))
                 return null;
             return new SetCredentialResponse() {
-                Status = (DlStatus)(byte)GetField(resp, 0),
+                Status = (Status)(byte)GetField(resp, 0),
                 UserIndex = (ushort?)GetField(resp, 1),
                 NextCredentialIndex = (ushort?)GetField(resp, 2),
             };
@@ -1546,15 +1606,15 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Get the Lock State attribute
         /// </summary>
-        public async Task<DlLockState?> GetLockState(SecureSession session) {
-            return (DlLockState?)await GetEnumAttribute(session, 0, true);
+        public async Task<LockState?> GetLockState(SecureSession session) {
+            return (LockState?)await GetEnumAttribute(session, 0, true);
         }
 
         /// <summary>
         /// Get the Lock Type attribute
         /// </summary>
-        public async Task<DlLockType> GetLockType(SecureSession session) {
-            return (DlLockType)await GetEnumAttribute(session, 1);
+        public async Task<LockType> GetLockType(SecureSession session) {
+            return (LockType)await GetEnumAttribute(session, 1);
         }
 
         /// <summary>
@@ -1686,8 +1746,8 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Get the Credential Rules Support attribute
         /// </summary>
-        public async Task<DlCredentialRuleMask> GetCredentialRulesSupport(SecureSession session) {
-            return (DlCredentialRuleMask)await GetEnumAttribute(session, 39);
+        public async Task<CredentialRuleMask> GetCredentialRulesSupport(SecureSession session) {
+            return (CredentialRuleMask)await GetEnumAttribute(session, 39);
         }
 
         /// <summary>
@@ -1770,15 +1830,15 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Get the Supported Operating Modes attribute
         /// </summary>
-        public async Task<DlSupportedOperatingModes> GetSupportedOperatingModes(SecureSession session) {
-            return (DlSupportedOperatingModes)await GetEnumAttribute(session, 56);
+        public async Task<SupportedOperatingModes> GetSupportedOperatingModes(SecureSession session) {
+            return (SupportedOperatingModes)await GetEnumAttribute(session, 56);
         }
 
         /// <summary>
         /// Get the Default Configuration Register attribute
         /// </summary>
-        public async Task<DlDefaultConfigurationRegister> GetDefaultConfigurationRegister(SecureSession session) {
-            return (DlDefaultConfigurationRegister)await GetEnumAttribute(session, 57);
+        public async Task<DefaultConfigurationRegister> GetDefaultConfigurationRegister(SecureSession session) {
+            return (DefaultConfigurationRegister)await GetEnumAttribute(session, 57);
         }
 
         /// <summary>
@@ -1840,14 +1900,14 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Get the Local Programming Features attribute
         /// </summary>
-        public async Task<DlLocalProgrammingFeatures> GetLocalProgrammingFeatures(SecureSession session) {
-            return (DlLocalProgrammingFeatures)await GetEnumAttribute(session, 68);
+        public async Task<LocalProgrammingFeatures> GetLocalProgrammingFeatures(SecureSession session) {
+            return (LocalProgrammingFeatures)await GetEnumAttribute(session, 68);
         }
 
         /// <summary>
         /// Set the Local Programming Features attribute
         /// </summary>
-        public async Task SetLocalProgrammingFeatures (SecureSession session, DlLocalProgrammingFeatures value) {
+        public async Task SetLocalProgrammingFeatures (SecureSession session, LocalProgrammingFeatures value) {
             await SetAttribute(session, 68, value);
         }
 

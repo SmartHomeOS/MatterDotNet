@@ -52,24 +52,81 @@ namespace MatterDotNet.Clusters.General
         /// Mode Tag
         /// </summary>
         public enum ModeTag : ushort {
+            /// <summary>
+            /// The device decides which options, features and setting values to use.
+            /// </summary>
             Auto = 0x0,
+            /// <summary>
+            /// The mode of the device is optimizing for faster completion.
+            /// </summary>
             Quick = 0x1,
+            /// <summary>
+            /// The device is silent or barely audible while in this mode.
+            /// </summary>
             Quiet = 0x2,
+            /// <summary>
+            /// Either the mode is inherently low noise or the device optimizes for that.
+            /// </summary>
             LowNoise = 0x3,
+            /// <summary>
+            /// The device is optimizing for lower energy usage in this mode. Sometimes called "Eco mode".
+            /// </summary>
             LowEnergy = 0x4,
+            /// <summary>
+            /// A mode suitable for use during vacations or other extended absences.
+            /// </summary>
             Vacation = 0x5,
+            /// <summary>
+            /// The mode uses the lowest available setting value.
+            /// </summary>
             Min = 0x6,
+            /// <summary>
+            /// The mode uses the highest available setting value.
+            /// </summary>
             Max = 0x7,
+            /// <summary>
+            /// The mode is recommended or suitable for use during night time.
+            /// </summary>
             Night = 0x8,
+            /// <summary>
+            /// The mode is recommended or suitable for use during day time.
+            /// </summary>
             Day = 0x9,
+            /// <summary>
+            /// This mode sets the device into baking mode for baking food items.
+            /// </summary>
             Bake = 0x4000,
+            /// <summary>
+            /// This mode sets the device into convection mode which creates an airflow within the device during the cooking duration.
+            /// </summary>
             Convection = 0x4001,
+            /// <summary>
+            /// This mode sets the device into grill mode for grilling food items. This is the same as Broil for many regions.
+            /// </summary>
             Grill = 0x4002,
+            /// <summary>
+            /// This mode sets the device into roast mode for roasting food items.
+            /// </summary>
             Roast = 0x4003,
+            /// <summary>
+            /// This mode sets the device into cleaning mode to clean the internal components of the appliance.
+            /// </summary>
             Clean = 0x4004,
+            /// <summary>
+            /// This mode sets the device into convection bake mode which creates an airflow within the device during the baking duration.
+            /// </summary>
             ConvectionBake = 0x4005,
+            /// <summary>
+            /// This mode sets the device into convection roast mode which creates an airflow within the device during the roasting duration.
+            /// </summary>
             ConvectionRoast = 0x4006,
+            /// <summary>
+            /// This mode sets the device into a warming mode which begins warming the cavity.
+            /// </summary>
             Warming = 0x4007,
+            /// <summary>
+            /// This mode sets the device into proofing mode which creates an environment ready for proofing.
+            /// </summary>
             Proofing = 0x4008,
         }
         #endregion Enums

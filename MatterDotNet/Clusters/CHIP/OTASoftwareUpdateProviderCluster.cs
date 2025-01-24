@@ -99,7 +99,7 @@ namespace MatterDotNet.Clusters.CHIP
             VendorSpecific = 3,
         }
 
-        
+
         #endregion Enums
 
         #region Records

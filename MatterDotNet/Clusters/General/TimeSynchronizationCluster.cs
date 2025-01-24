@@ -534,7 +534,7 @@ namespace MatterDotNet.Clusters.General
         /// Get the Local Time attribute
         /// </summary>
         public async Task<DateTime?> GetLocalTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? 0xFFFFFFFFFFFFFFFF;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? DateTime.MaxValue;
         }
 
         /// <summary>

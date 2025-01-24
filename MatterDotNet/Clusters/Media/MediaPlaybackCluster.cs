@@ -587,7 +587,7 @@ namespace MatterDotNet.Clusters.Media
         /// Get the Start Time attribute
         /// </summary>
         public async Task<DateTime?> GetStartTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? 0x00;
+            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? TimeUtil.EPOCH;
         }
 
         /// <summary>

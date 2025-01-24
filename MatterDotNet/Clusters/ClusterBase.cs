@@ -302,8 +302,6 @@ namespace MatterDotNet.Clusters
                     return new EthernetNetworkDiagnostics(endPoint);
                 case FanControl.CLUSTER_ID:
                     return new FanControl(endPoint);
-                case FaultInjection.CLUSTER_ID:
-                    return new FaultInjection(endPoint);
                 case FixedLabel.CLUSTER_ID:
                     return new FixedLabel(endPoint);
                 case FlowMeasurement.CLUSTER_ID:

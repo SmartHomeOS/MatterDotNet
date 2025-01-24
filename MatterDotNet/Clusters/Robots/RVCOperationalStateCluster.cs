@@ -177,26 +177,29 @@ namespace MatterDotNet.Clusters.Robots
         /// <summary>
         /// Get the Operational State List attribute
         /// </summary>
-        public async Task<OperationalState[]> GetOperationalStateList(SecureSession session) {
+        public async Task<General.OperationalState.OperationalStatePayload[]> GetOperationalStateList(SecureSession session)
+        {
             FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            OperationalState[] list = new OperationalState[reader.Count];
+            General.OperationalState.OperationalStatePayload[] list = new General.OperationalState.OperationalStatePayload[reader.Count];
             for (int i = 0; i < reader.Count; i++)
-                list[i] = new OperationalState(reader.GetStruct(i)!);
+                list[i] = new General.OperationalState.OperationalStatePayload(reader.GetStruct(i)!);
             return list;
         }
 
         /// <summary>
         /// Get the Operational State attribute
         /// </summary>
-        public async Task<byte> GetOperationalState(SecureSession session) {
+        public async Task<byte> GetOperationalState(SecureSession session)
+        {
             return (byte)(dynamic?)(await GetAttribute(session, 4))!;
         }
 
         /// <summary>
         /// Get the Operational Error attribute
         /// </summary>
-        public async Task<ErrorState> GetOperationalError(SecureSession session) {
-            return (ErrorState)(dynamic?)(await GetAttribute(session, 5))!;
+        public async Task<General.OperationalState.ErrorStatePayload> GetOperationalError(SecureSession session)
+        {
+            return new General.OperationalState.ErrorStatePayload((object[])(await GetAttribute(session, 5))!);
         }
         #endregion Attributes
 

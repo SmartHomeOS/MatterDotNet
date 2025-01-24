@@ -295,7 +295,7 @@ namespace MatterDotNet.Clusters.Media
             public string? ReleaseDate { get; set; }
             public string? ParentalGuidanceText { get; set; }
             public RecordingFlag? RecordingFlag { get; set; }
-            public SeriesInfo? SeriesInfo { get; set; } = 0x0;
+            public SeriesInfo? SeriesInfo { get; set; }
             public ProgramCategory[]? CategoryList { get; set; }
             public ProgramCast[]? CastList { get; set; }
             public ProgramCast[]? ExternalIDList { get; set; }
@@ -510,8 +510,8 @@ namespace MatterDotNet.Clusters.Media
                 PreviousToken = new PageToken((object[])fields[0]);
                 NextToken = new PageToken((object[])fields[1]);
             }
-            public PageToken? PreviousToken { get; set; } = 0x0;
-            public PageToken? NextToken { get; set; } = 0x0;
+            public PageToken? PreviousToken { get; set; }
+            public PageToken? NextToken { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (PreviousToken != null)
@@ -808,14 +808,14 @@ namespace MatterDotNet.Clusters.Media
         /// Get the Lineup attribute
         /// </summary>
         public async Task<LineupInfo?> GetLineup(SecureSession session) {
-            return new LineupInfo((object[])(await GetAttribute(session, 1))!) ?? 0x0;
+            return new LineupInfo((object[])(await GetAttribute(session, 1))!);
         }
 
         /// <summary>
         /// Get the Current Channel attribute
         /// </summary>
         public async Task<ChannelInfo?> GetCurrentChannel(SecureSession session) {
-            return new ChannelInfo((object[])(await GetAttribute(session, 2))!) ?? 0x0;
+            return new ChannelInfo((object[])(await GetAttribute(session, 2))!);
         }
         #endregion Attributes
 

@@ -108,7 +108,7 @@ namespace MatterDotNet.Clusters.General
         #endregion Enums
 
         #region Payloads
-        private record IdentifyPayload : TLVPayload {
+        private record IdentifyCommandPayload : TLVPayload {
             public required ushort IdentifyTime { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);

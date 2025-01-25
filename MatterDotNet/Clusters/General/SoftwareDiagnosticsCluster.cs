@@ -152,22 +152,22 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Thread Metrics Attribute
+        /// Thread Metrics Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ThreadMetricsStruct[]> ThreadMetrics { get; init; }
 
         /// <summary>
-        /// Current Heap Free Attribute
+        /// Current Heap Free Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> CurrentHeapFree { get; init; }
 
         /// <summary>
-        /// Current Heap Used Attribute
+        /// Current Heap Used Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> CurrentHeapUsed { get; init; }
 
         /// <summary>
-        /// Current Heap High Watermark Attribute
+        /// Current Heap High Watermark Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> CurrentHeapHighWatermark { get; init; }
         #endregion Attributes

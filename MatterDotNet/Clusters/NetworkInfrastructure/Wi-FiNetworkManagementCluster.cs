@@ -70,12 +70,12 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// SSID Attribute
+        /// SSID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> SSID { get; init; }
 
         /// <summary>
-        /// Passphrase Surrogate Attribute
+        /// Passphrase Surrogate Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> PassphraseSurrogate { get; init; }
         #endregion Attributes

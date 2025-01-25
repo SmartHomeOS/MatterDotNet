@@ -67,7 +67,7 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             PANChange = 0x0001,
         }
         #endregion Enums
@@ -153,32 +153,32 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// Border Router Name Attribute
+        /// Border Router Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> BorderRouterName { get; init; }
 
         /// <summary>
-        /// Border Agent ID Attribute
+        /// Border Agent ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]> BorderAgentID { get; init; }
 
         /// <summary>
-        /// Thread Version Attribute
+        /// Thread Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ThreadVersion { get; init; }
 
         /// <summary>
-        /// Interface Enabled Attribute
+        /// Interface Enabled Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> InterfaceEnabled { get; init; }
 
         /// <summary>
-        /// Active Dataset Timestamp Attribute
+        /// Active Dataset Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> ActiveDatasetTimestamp { get; init; }
 
         /// <summary>
-        /// Pending Dataset Timestamp Attribute
+        /// Pending Dataset Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> PendingDatasetTimestamp { get; init; }
         #endregion Attributes

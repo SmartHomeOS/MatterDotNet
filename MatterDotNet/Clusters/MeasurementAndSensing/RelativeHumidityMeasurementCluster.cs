@@ -50,22 +50,22 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
 
         #region Attributes
         /// <summary>
-        /// Measured Value Attribute
+        /// Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Min Measured Value Attribute
+        /// Min Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Max Measured Value Attribute
+        /// Max Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Tolerance Attribute
+        /// Tolerance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Tolerance { get; init; }
         #endregion Attributes

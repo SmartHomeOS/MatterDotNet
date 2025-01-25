@@ -166,17 +166,17 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Set Time Attribute
+        /// Set Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> SetTime { get; init; }
 
         /// <summary>
-        /// Time Remaining Attribute
+        /// Time Remaining Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> TimeRemaining { get; init; }
 
         /// <summary>
-        /// Timer State Attribute
+        /// Timer State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimerStatus> TimerState { get; init; }
         #endregion Attributes

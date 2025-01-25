@@ -44,12 +44,12 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// MAC Address Attribute
+        /// MAC Address Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> MACAddress { get; init; }
 
         /// <summary>
-        /// Link Local Address Attribute
+        /// Link Local Address Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]> LinkLocalAddress { get; init; }
         #endregion Attributes

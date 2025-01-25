@@ -72,9 +72,19 @@ namespace MatterDotNet.Protocol.Parsers
             throw new InvalidDataException($"Tag {tagNumber}: Expected type ushort but received {fields[(int)tagNumber].GetType()}");
         }
 
-        public decimal? GetDecimal(long tagNumber, bool nullable = false)
+        public decimal? GetUDecimal(long tagNumber, bool nullable = false)
         {
             ushort? val = GetUShort(tagNumber, nullable);
+            if (!val.HasValue)
+                return val;
+            decimal ret = (int)(val.Value / 100);
+            ret += (val.Value % 100) / 100M;
+            return ret;
+        }
+
+        public decimal? GetDecimal(long tagNumber, bool nullable = false)
+        {
+            short? val = GetShort(tagNumber, nullable);
             if (!val.HasValue)
                 return val;
             decimal ret = (int)(val.Value / 100);

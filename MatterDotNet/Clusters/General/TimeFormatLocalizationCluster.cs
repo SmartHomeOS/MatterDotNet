@@ -163,17 +163,17 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Hour Format Attribute
+        /// Hour Format Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<HourFormatEnum> HourFormat { get; init; }
 
         /// <summary>
-        /// Active Calendar Type Attribute
+        /// Active Calendar Type Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<CalendarType> ActiveCalendarType { get; init; }
 
         /// <summary>
-        /// Supported Calendar Types Attribute
+        /// Supported Calendar Types Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CalendarType[]> SupportedCalendarTypes { get; init; }
         #endregion Attributes

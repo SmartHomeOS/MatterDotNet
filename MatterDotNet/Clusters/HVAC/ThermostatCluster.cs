@@ -39,29 +39,29 @@ namespace MatterDotNet.Clusters.HVAC
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected Thermostat(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            LocalTemperature = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
-                Deserialize = x => (short?)(dynamic?)x
+            LocalTemperature = new ReadAttribute<decimal?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
             };
-            OutdoorTemperature = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
-                Deserialize = x => (short?)(dynamic?)x
+            OutdoorTemperature = new ReadAttribute<decimal?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
             };
             Occupancy = new ReadAttribute<OccupancyBitmap>(cluster, endPoint, 2) {
                 Deserialize = x => (OccupancyBitmap)DeserializeEnum(x)!
             };
-            AbsMinHeatSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 3) {
-                Deserialize = x => (short?)(dynamic?)x ?? 700
+            AbsMinHeatSetpointLimit = new ReadAttribute<decimal>(cluster, endPoint, 3) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 7.00M
 
             };
-            AbsMaxHeatSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 4) {
-                Deserialize = x => (short?)(dynamic?)x ?? 3000
+            AbsMaxHeatSetpointLimit = new ReadAttribute<decimal>(cluster, endPoint, 4) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 30.00M
 
             };
-            AbsMinCoolSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 5) {
-                Deserialize = x => (short?)(dynamic?)x ?? 1600
+            AbsMinCoolSetpointLimit = new ReadAttribute<decimal>(cluster, endPoint, 5) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 16.00M
 
             };
-            AbsMaxCoolSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 6) {
-                Deserialize = x => (short?)(dynamic?)x ?? 3200
+            AbsMaxCoolSetpointLimit = new ReadAttribute<decimal>(cluster, endPoint, 6) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 32.00M
 
             };
             PICoolingDemand = new ReadAttribute<byte>(cluster, endPoint, 7) {
@@ -77,36 +77,36 @@ namespace MatterDotNet.Clusters.HVAC
                 Deserialize = x => (sbyte?)(dynamic?)x ?? 0x00
 
             };
-            OccupiedCoolingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 17) {
-                Deserialize = x => (short?)(dynamic?)x ?? 2600
+            OccupiedCoolingSetpoint = new ReadWriteAttribute<decimal>(cluster, endPoint, 17) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 26.00M
 
             };
-            OccupiedHeatingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 18) {
-                Deserialize = x => (short?)(dynamic?)x ?? 2000
+            OccupiedHeatingSetpoint = new ReadWriteAttribute<decimal>(cluster, endPoint, 18) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 20.00M
 
             };
-            UnoccupiedCoolingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 19) {
-                Deserialize = x => (short?)(dynamic?)x ?? 2600
+            UnoccupiedCoolingSetpoint = new ReadWriteAttribute<decimal>(cluster, endPoint, 19) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 26.00M
 
             };
-            UnoccupiedHeatingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 20) {
-                Deserialize = x => (short?)(dynamic?)x ?? 2000
+            UnoccupiedHeatingSetpoint = new ReadWriteAttribute<decimal>(cluster, endPoint, 20) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 20.00M
 
             };
-            MinHeatSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 21) {
-                Deserialize = x => (short?)(dynamic?)x ?? 700
+            MinHeatSetpointLimit = new ReadWriteAttribute<decimal>(cluster, endPoint, 21) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 7.00M
 
             };
-            MaxHeatSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 22) {
-                Deserialize = x => (short?)(dynamic?)x ?? 3000
+            MaxHeatSetpointLimit = new ReadWriteAttribute<decimal>(cluster, endPoint, 22) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 30.00M
 
             };
-            MinCoolSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 23) {
-                Deserialize = x => (short?)(dynamic?)x ?? 1600
+            MinCoolSetpointLimit = new ReadWriteAttribute<decimal>(cluster, endPoint, 23) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 16.00M
 
             };
-            MaxCoolSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 24) {
-                Deserialize = x => (short?)(dynamic?)x ?? 3200
+            MaxCoolSetpointLimit = new ReadWriteAttribute<decimal>(cluster, endPoint, 24) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 32.00M
 
             };
             MinSetpointDeadBand = new ReadWriteAttribute<sbyte>(cluster, endPoint, 25) {
@@ -199,8 +199,8 @@ namespace MatterDotNet.Clusters.HVAC
             ACLouverPosition = new ReadWriteAttribute<ACLouverPositionEnum>(cluster, endPoint, 69) {
                 Deserialize = x => (ACLouverPositionEnum)DeserializeEnum(x)!
             };
-            ACCoilTemperature = new ReadAttribute<short?>(cluster, endPoint, 70, true) {
-                Deserialize = x => (short?)(dynamic?)x
+            ACCoilTemperature = new ReadAttribute<decimal?>(cluster, endPoint, 70, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
             };
             ACCapacityformat = new ReadWriteAttribute<ACCapacityFormat>(cluster, endPoint, 71) {
                 Deserialize = x => (ACCapacityFormat)DeserializeEnum(x)!
@@ -633,7 +633,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Compressor Failure or Refrigerant Leakage
             /// </summary>
@@ -664,10 +664,22 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Stage of cooling the HVAC system is using.
+            /// </summary>
             CoolingStage = 0x03,
+            /// <summary>
+            /// Stage of heating the HVAC system is using.
+            /// </summary>
             HeatingStage = 0x0C,
+            /// <summary>
+            /// Is the heating type Heat Pump.
+            /// </summary>
             HeatingIsHeatPump = 0x10,
+            /// <summary>
+            /// Does the HVAC system use fuel.
+            /// </summary>
             HeatingUsesFuel = 0x20,
         }
 
@@ -679,7 +691,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Indicates the occupancy state
             /// </summary>
@@ -694,9 +706,18 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Schedule programming mode. This enables any programmed weekly schedule configurations.
+            /// </summary>
             ScheduleActive = 0x01,
+            /// <summary>
+            /// Auto/recovery mode
+            /// </summary>
             AutoRecovery = 0x02,
+            /// <summary>
+            /// Economy/EnergyStar mode
+            /// </summary>
             Economy = 0x04,
         }
 
@@ -708,10 +729,22 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Supports presets
+            /// </summary>
             SupportsPresets = 0x0001,
+            /// <summary>
+            /// Supports setpoints
+            /// </summary>
             SupportsSetpoints = 0x0002,
+            /// <summary>
+            /// Supports user-provided names
+            /// </summary>
             SupportsNames = 0x0004,
+            /// <summary>
+            /// Supports transitioning to SystemModeOff
+            /// </summary>
             SupportsOff = 0x0008,
         }
 
@@ -723,13 +756,34 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Heat Stage On
+            /// </summary>
             Heat = 0x0001,
+            /// <summary>
+            /// Cool Stage On
+            /// </summary>
             Cool = 0x0002,
+            /// <summary>
+            /// Fan Stage On
+            /// </summary>
             Fan = 0x0004,
+            /// <summary>
+            /// Heat 2 Stage On
+            /// </summary>
             HeatStage2 = 0x0008,
+            /// <summary>
+            /// Cool 2 Stage On
+            /// </summary>
             CoolStage2 = 0x0010,
+            /// <summary>
+            /// Fan 2 Stage On
+            /// </summary>
             FanStage2 = 0x0020,
+            /// <summary>
+            /// Fan 3 Stage On
+            /// </summary>
             FanStage3 = 0x0040,
         }
 
@@ -741,7 +795,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Calculated Local Temperature is derived from a remote node
             /// </summary>
@@ -764,14 +818,38 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Sunday
+            /// </summary>
             Sunday = 0x01,
+            /// <summary>
+            /// Monday
+            /// </summary>
             Monday = 0x02,
+            /// <summary>
+            /// Tuesday
+            /// </summary>
             Tuesday = 0x04,
+            /// <summary>
+            /// Wednesday
+            /// </summary>
             Wednesday = 0x08,
+            /// <summary>
+            /// Thursday
+            /// </summary>
             Thursday = 0x10,
+            /// <summary>
+            /// Friday
+            /// </summary>
             Friday = 0x20,
+            /// <summary>
+            /// Saturday
+            /// </summary>
             Saturday = 0x40,
+            /// <summary>
+            /// Away or Vacation
+            /// </summary>
             Away = 0x80,
         }
 
@@ -783,8 +861,14 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Adjust Heat Setpoint
+            /// </summary>
             HeatSetpointPresent = 0x01,
+            /// <summary>
+            /// Adjust Cool Setpoint
+            /// </summary>
             CoolSetpointPresent = 0x02,
         }
 
@@ -796,8 +880,14 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Preset may be automatically activated by the thermostat
+            /// </summary>
             Automatic = 0x0001,
+            /// <summary>
+            /// Preset supports user-provided names
+            /// </summary>
             SupportsNames = 0x0002,
         }
         #endregion Enums
@@ -819,17 +909,17 @@ namespace MatterDotNet.Clusters.HVAC
             public WeeklyScheduleTransition(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 TransitionTime = reader.GetUShort(0)!.Value;
-                HeatSetpoint = reader.GetShort(1, true);
-                CoolSetpoint = reader.GetShort(2, true);
+                HeatSetpoint = reader.GetDecimal(1, true);
+                CoolSetpoint = reader.GetDecimal(2, true);
             }
             public required ushort TransitionTime { get; set; }
-            public required short? HeatSetpoint { get; set; }
-            public required short? CoolSetpoint { get; set; }
+            public required decimal? HeatSetpoint { get; set; }
+            public required decimal? CoolSetpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, TransitionTime, 1439);
-                writer.WriteShort(1, HeatSetpoint);
-                writer.WriteShort(2, CoolSetpoint);
+                writer.WriteDecimal(1, HeatSetpoint);
+                writer.WriteDecimal(2, CoolSetpoint);
                 writer.EndContainer();
             }
         }
@@ -883,15 +973,15 @@ namespace MatterDotNet.Clusters.HVAC
                 PresetHandle = reader.GetBytes(0, false, 16)!;
                 PresetScenario = (PresetScenario)reader.GetUShort(1)!.Value;
                 Name = reader.GetString(2, true, 64);
-                CoolingSetpoint = reader.GetShort(3, true);
-                HeatingSetpoint = reader.GetShort(4, true);
+                CoolingSetpoint = reader.GetDecimal(3, true);
+                HeatingSetpoint = reader.GetDecimal(4, true);
                 BuiltIn = reader.GetBool(5, true);
             }
             public required byte[]? PresetHandle { get; set; }
             public required PresetScenario PresetScenario { get; set; }
             public string? Name { get; set; }
-            public short? CoolingSetpoint { get; set; } = 0x0A28;
-            public short? HeatingSetpoint { get; set; } = 0x07D0;
+            public decimal? CoolingSetpoint { get; set; } = 0x0A28;
+            public decimal? HeatingSetpoint { get; set; } = 0x07D0;
             public required bool? BuiltIn { get; set; } = false;
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -900,9 +990,9 @@ namespace MatterDotNet.Clusters.HVAC
                 if (Name != null)
                     writer.WriteString(2, Name, 64);
                 if (CoolingSetpoint != null)
-                    writer.WriteShort(3, CoolingSetpoint);
+                    writer.WriteDecimal(3, CoolingSetpoint);
                 if (HeatingSetpoint != null)
-                    writer.WriteShort(4, HeatingSetpoint);
+                    writer.WriteDecimal(4, HeatingSetpoint);
                 writer.WriteBool(5, BuiltIn);
                 writer.EndContainer();
             }
@@ -1011,15 +1101,15 @@ namespace MatterDotNet.Clusters.HVAC
                 TransitionTime = reader.GetUShort(1)!.Value;
                 PresetHandle = reader.GetBytes(2, true, 16);
                 SystemMode = (SystemModeEnum?)reader.GetUShort(3, true);
-                CoolingSetpoint = reader.GetShort(4, true);
-                HeatingSetpoint = reader.GetShort(5, true);
+                CoolingSetpoint = reader.GetDecimal(4, true);
+                HeatingSetpoint = reader.GetDecimal(5, true);
             }
             public required ScheduleDayOfWeek DayOfWeek { get; set; }
             public required ushort TransitionTime { get; set; }
             public byte[]? PresetHandle { get; set; }
             public SystemModeEnum? SystemMode { get; set; }
-            public short? CoolingSetpoint { get; set; }
-            public short? HeatingSetpoint { get; set; }
+            public decimal? CoolingSetpoint { get; set; }
+            public decimal? HeatingSetpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, (uint)DayOfWeek);
@@ -1029,9 +1119,9 @@ namespace MatterDotNet.Clusters.HVAC
                 if (SystemMode != null)
                     writer.WriteUShort(3, (ushort)SystemMode);
                 if (CoolingSetpoint != null)
-                    writer.WriteShort(4, CoolingSetpoint);
+                    writer.WriteDecimal(4, CoolingSetpoint);
                 if (HeatingSetpoint != null)
-                    writer.WriteShort(5, HeatingSetpoint);
+                    writer.WriteDecimal(5, HeatingSetpoint);
                 writer.EndContainer();
             }
         }
@@ -1259,302 +1349,302 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Local Temperature Attribute
+        /// Local Temperature [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> LocalTemperature { get; init; }
+        public required ReadAttribute<decimal?> LocalTemperature { get; init; }
 
         /// <summary>
-        /// Outdoor Temperature Attribute
+        /// Outdoor Temperature [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> OutdoorTemperature { get; init; }
+        public required ReadAttribute<decimal?> OutdoorTemperature { get; init; }
 
         /// <summary>
-        /// Occupancy Attribute
+        /// Occupancy Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OccupancyBitmap> Occupancy { get; init; }
 
         /// <summary>
-        /// Abs Min Heat Setpoint Limit Attribute
+        /// Abs Min Heat Setpoint Limit [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> AbsMinHeatSetpointLimit { get; init; }
+        public required ReadAttribute<decimal> AbsMinHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Abs Max Heat Setpoint Limit Attribute
+        /// Abs Max Heat Setpoint Limit [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> AbsMaxHeatSetpointLimit { get; init; }
+        public required ReadAttribute<decimal> AbsMaxHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Abs Min Cool Setpoint Limit Attribute
+        /// Abs Min Cool Setpoint Limit [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> AbsMinCoolSetpointLimit { get; init; }
+        public required ReadAttribute<decimal> AbsMinCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Abs Max Cool Setpoint Limit Attribute
+        /// Abs Max Cool Setpoint Limit [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> AbsMaxCoolSetpointLimit { get; init; }
+        public required ReadAttribute<decimal> AbsMaxCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// PI Cooling Demand Attribute
+        /// PI Cooling Demand Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PICoolingDemand { get; init; }
 
         /// <summary>
-        /// PI Heating Demand Attribute
+        /// PI Heating Demand Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PIHeatingDemand { get; init; }
 
         /// <summary>
-        /// HVAC System Type Configuration Attribute
+        /// HVAC System Type Configuration Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<HVACSystemType> HVACSystemTypeConfiguration { get; init; }
 
         /// <summary>
-        /// Local Temperature Calibration Attribute
+        /// Local Temperature Calibration Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<sbyte> LocalTemperatureCalibration { get; init; }
 
         /// <summary>
-        /// Occupied Cooling Setpoint Attribute
+        /// Occupied Cooling Setpoint [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> OccupiedCoolingSetpoint { get; init; }
+        public required ReadWriteAttribute<decimal> OccupiedCoolingSetpoint { get; init; }
 
         /// <summary>
-        /// Occupied Heating Setpoint Attribute
+        /// Occupied Heating Setpoint [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> OccupiedHeatingSetpoint { get; init; }
+        public required ReadWriteAttribute<decimal> OccupiedHeatingSetpoint { get; init; }
 
         /// <summary>
-        /// Unoccupied Cooling Setpoint Attribute
+        /// Unoccupied Cooling Setpoint [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> UnoccupiedCoolingSetpoint { get; init; }
+        public required ReadWriteAttribute<decimal> UnoccupiedCoolingSetpoint { get; init; }
 
         /// <summary>
-        /// Unoccupied Heating Setpoint Attribute
+        /// Unoccupied Heating Setpoint [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> UnoccupiedHeatingSetpoint { get; init; }
+        public required ReadWriteAttribute<decimal> UnoccupiedHeatingSetpoint { get; init; }
 
         /// <summary>
-        /// Min Heat Setpoint Limit Attribute
+        /// Min Heat Setpoint Limit [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> MinHeatSetpointLimit { get; init; }
+        public required ReadWriteAttribute<decimal> MinHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Max Heat Setpoint Limit Attribute
+        /// Max Heat Setpoint Limit [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> MaxHeatSetpointLimit { get; init; }
+        public required ReadWriteAttribute<decimal> MaxHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Min Cool Setpoint Limit Attribute
+        /// Min Cool Setpoint Limit [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> MinCoolSetpointLimit { get; init; }
+        public required ReadWriteAttribute<decimal> MinCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Max Cool Setpoint Limit Attribute
+        /// Max Cool Setpoint Limit [°C] Attribute [Read/Write]
         /// </summary>
-        public required ReadWriteAttribute<short> MaxCoolSetpointLimit { get; init; }
+        public required ReadWriteAttribute<decimal> MaxCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Min Setpoint Dead Band Attribute
+        /// Min Setpoint Dead Band Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<sbyte> MinSetpointDeadBand { get; init; }
 
         /// <summary>
-        /// Remote Sensing Attribute
+        /// Remote Sensing Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<RemoteSensingBitmap> RemoteSensing { get; init; }
 
         /// <summary>
-        /// Control Sequence Of Operation Attribute
+        /// Control Sequence Of Operation Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ControlSequenceOfOperationEnum> ControlSequenceOfOperation { get; init; }
 
         /// <summary>
-        /// System Mode Attribute
+        /// System Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<SystemModeEnum> SystemMode { get; init; }
 
         /// <summary>
-        /// Thermostat Running Mode Attribute
+        /// Thermostat Running Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ThermostatRunningModeEnum> ThermostatRunningMode { get; init; }
 
         /// <summary>
-        /// Start Of Week Attribute
+        /// Start Of Week Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<StartOfWeekEnum> StartOfWeek { get; init; }
 
         /// <summary>
-        /// Number Of Weekly Transitions Attribute
+        /// Number Of Weekly Transitions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfWeeklyTransitions { get; init; }
 
         /// <summary>
-        /// Number Of Daily Transitions Attribute
+        /// Number Of Daily Transitions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfDailyTransitions { get; init; }
 
         /// <summary>
-        /// Temperature Setpoint Hold Attribute
+        /// Temperature Setpoint Hold Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<TemperatureSetpointHoldEnum> TemperatureSetpointHold { get; init; }
 
         /// <summary>
-        /// Temperature Setpoint Hold Duration Attribute
+        /// Temperature Setpoint Hold Duration Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort?> TemperatureSetpointHoldDuration { get; init; }
 
         /// <summary>
-        /// Thermostat Programming Operation Mode Attribute
+        /// Thermostat Programming Operation Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ProgrammingOperationMode> ThermostatProgrammingOperationMode { get; init; }
 
         /// <summary>
-        /// Thermostat Running State Attribute
+        /// Thermostat Running State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RelayState> ThermostatRunningState { get; init; }
 
         /// <summary>
-        /// Setpoint Change Source Attribute
+        /// Setpoint Change Source Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SetpointChangeSourceEnum> SetpointChangeSource { get; init; }
 
         /// <summary>
-        /// Setpoint Change Amount Attribute
+        /// Setpoint Change Amount Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> SetpointChangeAmount { get; init; }
 
         /// <summary>
-        /// Setpoint Change Source Timestamp Attribute
+        /// Setpoint Change Source Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime> SetpointChangeSourceTimestamp { get; init; }
 
         /// <summary>
-        /// Occupied Setback Attribute
+        /// Occupied Setback Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> OccupiedSetback { get; init; }
 
         /// <summary>
-        /// Occupied Setback Min Attribute
+        /// Occupied Setback Min Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> OccupiedSetbackMin { get; init; }
 
         /// <summary>
-        /// Occupied Setback Max Attribute
+        /// Occupied Setback Max Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> OccupiedSetbackMax { get; init; }
 
         /// <summary>
-        /// Unoccupied Setback Attribute
+        /// Unoccupied Setback Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> UnoccupiedSetback { get; init; }
 
         /// <summary>
-        /// Unoccupied Setback Min Attribute
+        /// Unoccupied Setback Min Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> UnoccupiedSetbackMin { get; init; }
 
         /// <summary>
-        /// Unoccupied Setback Max Attribute
+        /// Unoccupied Setback Max Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> UnoccupiedSetbackMax { get; init; }
 
         /// <summary>
-        /// Emergency Heat Delta Attribute
+        /// Emergency Heat Delta Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> EmergencyHeatDelta { get; init; }
 
         /// <summary>
-        /// AC Type Attribute
+        /// AC Type Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACTypeEnum> ACType { get; init; }
 
         /// <summary>
-        /// AC Capacity Attribute
+        /// AC Capacity Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ACCapacity { get; init; }
 
         /// <summary>
-        /// AC Refrigerant Type Attribute
+        /// AC Refrigerant Type Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACRefrigerantTypeEnum> ACRefrigerantType { get; init; }
 
         /// <summary>
-        /// AC Compressor Type Attribute
+        /// AC Compressor Type Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACCompressorTypeEnum> ACCompressorType { get; init; }
 
         /// <summary>
-        /// AC Error Code Attribute
+        /// AC Error Code Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACErrorCodeBitmap> ACErrorCode { get; init; }
 
         /// <summary>
-        /// AC Louver Position Attribute
+        /// AC Louver Position Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACLouverPositionEnum> ACLouverPosition { get; init; }
 
         /// <summary>
-        /// AC Coil Temperature Attribute
+        /// AC Coil Temperature [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> ACCoilTemperature { get; init; }
+        public required ReadAttribute<decimal?> ACCoilTemperature { get; init; }
 
         /// <summary>
-        /// AC Capacityformat Attribute
+        /// AC Capacityformat Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ACCapacityFormat> ACCapacityformat { get; init; }
 
         /// <summary>
-        /// Preset Types Attribute
+        /// Preset Types Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PresetType[]> PresetTypes { get; init; }
 
         /// <summary>
-        /// Schedule Types Attribute
+        /// Schedule Types Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ScheduleType[]> ScheduleTypes { get; init; }
 
         /// <summary>
-        /// Number Of Presets Attribute
+        /// Number Of Presets Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfPresets { get; init; }
 
         /// <summary>
-        /// Number Of Schedules Attribute
+        /// Number Of Schedules Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfSchedules { get; init; }
 
         /// <summary>
-        /// Number Of Schedule Transitions Attribute
+        /// Number Of Schedule Transitions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfScheduleTransitions { get; init; }
 
         /// <summary>
-        /// Number Of Schedule Transition Per Day Attribute
+        /// Number Of Schedule Transition Per Day Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> NumberOfScheduleTransitionPerDay { get; init; }
 
         /// <summary>
-        /// Active Preset Handle Attribute
+        /// Active Preset Handle Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> ActivePresetHandle { get; init; }
 
         /// <summary>
-        /// Active Schedule Handle Attribute
+        /// Active Schedule Handle Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> ActiveScheduleHandle { get; init; }
 
         /// <summary>
-        /// Presets Attribute
+        /// Presets Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Preset[]> Presets { get; init; }
 
         /// <summary>
-        /// Schedules Attribute
+        /// Schedules Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Schedule[]> Schedules { get; init; }
 
         /// <summary>
-        /// Setpoint Hold Expiry Timestamp Attribute
+        /// Setpoint Hold Expiry Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> SetpointHoldExpiryTimestamp { get; init; }
         #endregion Attributes

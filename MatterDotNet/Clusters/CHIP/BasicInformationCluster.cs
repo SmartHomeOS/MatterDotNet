@@ -293,117 +293,117 @@ namespace MatterDotNet.Clusters.CHIP
 
         #region Attributes
         /// <summary>
-        /// Data Model Revision Attribute
+        /// Data Model Revision Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> DataModelRevision { get; init; }
 
         /// <summary>
-        /// Vendor Name Attribute
+        /// Vendor Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Vendor ID Attribute
+        /// Vendor ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Product Name Attribute
+        /// Product Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductName { get; init; }
 
         /// <summary>
-        /// Product ID Attribute
+        /// Product ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Node Label Attribute
+        /// Node Label Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> NodeLabel { get; init; }
 
         /// <summary>
-        /// Location Attribute
+        /// Location Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> Location { get; init; }
 
         /// <summary>
-        /// Hardware Version Attribute
+        /// Hardware Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> HardwareVersion { get; init; }
 
         /// <summary>
-        /// Hardware Version String Attribute
+        /// Hardware Version String Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> HardwareVersionString { get; init; }
 
         /// <summary>
-        /// Software Version Attribute
+        /// Software Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> SoftwareVersion { get; init; }
 
         /// <summary>
-        /// Software Version String Attribute
+        /// Software Version String Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> SoftwareVersionString { get; init; }
 
         /// <summary>
-        /// Manufacturing Date Attribute
+        /// Manufacturing Date Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ManufacturingDate { get; init; }
 
         /// <summary>
-        /// Part Number Attribute
+        /// Part Number Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> PartNumber { get; init; }
 
         /// <summary>
-        /// Product URL Attribute
+        /// Product URL Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductURL { get; init; }
 
         /// <summary>
-        /// Product Label Attribute
+        /// Product Label Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductLabel { get; init; }
 
         /// <summary>
-        /// Serial Number Attribute
+        /// Serial Number Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> SerialNumber { get; init; }
 
         /// <summary>
-        /// Local Config Disabled Attribute
+        /// Local Config Disabled Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> LocalConfigDisabled { get; init; }
 
         /// <summary>
-        /// Reachable Attribute
+        /// Reachable Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> Reachable { get; init; }
 
         /// <summary>
-        /// Unique ID Attribute
+        /// Unique ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> UniqueID { get; init; }
 
         /// <summary>
-        /// Capability Minima Attribute
+        /// Capability Minima Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CapabilityMinimaStruct> CapabilityMinima { get; init; }
 
         /// <summary>
-        /// Product Appearance Attribute
+        /// Product Appearance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ProductAppearanceStruct> ProductAppearance { get; init; }
 
         /// <summary>
-        /// Specification Version Attribute
+        /// Specification Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> SpecificationVersion { get; init; }
 
         /// <summary>
-        /// Max Paths Per Invoke Attribute
+        /// Max Paths Per Invoke Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> MaxPathsPerInvoke { get; init; }
         #endregion Attributes

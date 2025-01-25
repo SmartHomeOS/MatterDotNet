@@ -78,7 +78,7 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Label List Attribute
+        /// Label List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Label[]> LabelList { get; init; }
         #endregion Attributes

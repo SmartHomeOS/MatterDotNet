@@ -85,7 +85,7 @@ namespace MatterDotNet.Clusters.Misc
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             DataTLV = 0x01,
         }
         #endregion Enums
@@ -388,7 +388,7 @@ namespace MatterDotNet.Clusters.Misc
 
         #region Attributes
         /// <summary>
-        /// Current Sessions Attribute
+        /// Current Sessions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WebRTCSession[]> CurrentSessions { get; init; }
         #endregion Attributes

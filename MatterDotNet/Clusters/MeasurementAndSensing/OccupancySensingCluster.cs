@@ -158,7 +158,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Indicates the sensed occupancy state
             /// </summary>
@@ -173,7 +173,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>
@@ -245,72 +245,72 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Occupancy Attribute
+        /// Occupancy Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OccupancyBitmap> Occupancy { get; init; }
 
         /// <summary>
-        /// Occupancy Sensor Type Attribute
+        /// Occupancy Sensor Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OccupancySensorTypeEnum> OccupancySensorType { get; init; }
 
         /// <summary>
-        /// Occupancy Sensor Type Attribute
+        /// Occupancy Sensor Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OccupancySensorTypeBitmap> OccupancySensorTypeBitmapAttribute { get; init; }
 
         /// <summary>
-        /// Hold Time Attribute
+        /// Hold Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> HoldTime { get; init; }
 
         /// <summary>
-        /// Hold Time Limits Attribute
+        /// Hold Time Limits Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<HoldTimeLimitsStruct> HoldTimeLimits { get; init; }
 
         /// <summary>
-        /// PIR Occupied To Unoccupied Delay Attribute
+        /// PIR Occupied To Unoccupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> PIROccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// PIR Unoccupied To Occupied Delay Attribute
+        /// PIR Unoccupied To Occupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> PIRUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// PIR Unoccupied To Occupied Threshold Attribute
+        /// PIR Unoccupied To Occupied Threshold Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> PIRUnoccupiedToOccupiedThreshold { get; init; }
 
         /// <summary>
-        /// Ultrasonic Occupied To Unoccupied Delay Attribute
+        /// Ultrasonic Occupied To Unoccupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> UltrasonicOccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// Ultrasonic Unoccupied To Occupied Delay Attribute
+        /// Ultrasonic Unoccupied To Occupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> UltrasonicUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// Ultrasonic Unoccupied To Occupied Threshold Attribute
+        /// Ultrasonic Unoccupied To Occupied Threshold Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> UltrasonicUnoccupiedToOccupiedThreshold { get; init; }
 
         /// <summary>
-        /// Physical Contact Occupied To Unoccupied Delay Attribute
+        /// Physical Contact Occupied To Unoccupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> PhysicalContactOccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// Physical Contact Unoccupied To Occupied Delay Attribute
+        /// Physical Contact Unoccupied To Occupied Delay Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> PhysicalContactUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// Physical Contact Unoccupied To Occupied Threshold Attribute
+        /// Physical Contact Unoccupied To Occupied Threshold Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> PhysicalContactUnoccupiedToOccupiedThreshold { get; init; }
         #endregion Attributes

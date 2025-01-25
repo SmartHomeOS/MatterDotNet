@@ -852,42 +852,42 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// ESA Type Attribute
+        /// ESA Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ESATypeEnum> ESAType { get; init; }
 
         /// <summary>
-        /// ESA Can Generate Attribute
+        /// ESA Can Generate Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> ESACanGenerate { get; init; }
 
         /// <summary>
-        /// ESA State Attribute
+        /// ESA State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ESAStateEnum> ESAState { get; init; }
 
         /// <summary>
-        /// Abs Min Power [mW] Attribute
+        /// Abs Min Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> AbsMinPower { get; init; }
 
         /// <summary>
-        /// Abs Max Power [mW] Attribute
+        /// Abs Max Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> AbsMaxPower { get; init; }
 
         /// <summary>
-        /// Power Adjustment Capability Attribute
+        /// Power Adjustment Capability Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PowerAdjustCapability?> PowerAdjustmentCapability { get; init; }
 
         /// <summary>
-        /// Forecast Attribute
+        /// Forecast Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ForecastStruct?> Forecast { get; init; }
 
         /// <summary>
-        /// Opt Out State Attribute
+        /// Opt Out State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OptOutStateEnum> OptOutState { get; init; }
         #endregion Attributes

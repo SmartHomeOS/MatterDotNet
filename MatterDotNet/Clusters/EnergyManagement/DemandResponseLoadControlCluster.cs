@@ -183,7 +183,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             HVAC = 0x0001,
             StripHeater = 0x0002,
             WaterHeater = 0x0004,
@@ -211,7 +211,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             RandomStart = 0x0001,
         }
 
@@ -223,7 +223,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             RandomDuration = 0x0001,
             IgnoreOptOut = 0x0002,
         }
@@ -236,7 +236,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             RandomEnd = 0x0001,
         }
         #endregion Enums
@@ -259,13 +259,13 @@ namespace MatterDotNet.Clusters.EnergyManagement
                 FieldReader reader = new FieldReader(fields);
                 CoolingTempOffset = reader.GetUShort(0, true);
                 HeatingtTempOffset = reader.GetUShort(1, true);
-                CoolingTempSetpoint = reader.GetShort(2, true);
-                HeatingTempSetpoint = reader.GetShort(3, true);
+                CoolingTempSetpoint = reader.GetDecimal(2, true);
+                HeatingTempSetpoint = reader.GetDecimal(3, true);
             }
             public ushort? CoolingTempOffset { get; set; }
             public ushort? HeatingtTempOffset { get; set; }
-            public short? CoolingTempSetpoint { get; set; }
-            public short? HeatingTempSetpoint { get; set; }
+            public decimal? CoolingTempSetpoint { get; set; }
+            public decimal? HeatingTempSetpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (CoolingTempOffset != null)
@@ -273,9 +273,9 @@ namespace MatterDotNet.Clusters.EnergyManagement
                 if (HeatingtTempOffset != null)
                     writer.WriteUShort(1, HeatingtTempOffset);
                 if (CoolingTempSetpoint != null)
-                    writer.WriteShort(2, CoolingTempSetpoint);
+                    writer.WriteDecimal(2, CoolingTempSetpoint);
                 if (HeatingTempSetpoint != null)
-                    writer.WriteShort(3, HeatingTempSetpoint);
+                    writer.WriteDecimal(3, HeatingTempSetpoint);
                 writer.EndContainer();
             }
         }
@@ -645,42 +645,42 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Load Control Programs Attribute
+        /// Load Control Programs Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LoadControlProgram[]> LoadControlPrograms { get; init; }
 
         /// <summary>
-        /// Number Of Load Control Programs Attribute
+        /// Number Of Load Control Programs Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfLoadControlPrograms { get; init; }
 
         /// <summary>
-        /// Events Attribute
+        /// Events Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LoadControlEvent[]> Events { get; init; }
 
         /// <summary>
-        /// Active Events Attribute
+        /// Active Events Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LoadControlEvent[]> ActiveEvents { get; init; }
 
         /// <summary>
-        /// Number Of Events Per Program Attribute
+        /// Number Of Events Per Program Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfEventsPerProgram { get; init; }
 
         /// <summary>
-        /// Number Of Transitions Attribute
+        /// Number Of Transitions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfTransitions { get; init; }
 
         /// <summary>
-        /// Default Random Start Attribute
+        /// Default Random Start Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> DefaultRandomStart { get; init; }
 
         /// <summary>
-        /// Default Random Duration Attribute
+        /// Default Random Duration Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> DefaultRandomDuration { get; init; }
         #endregion Attributes

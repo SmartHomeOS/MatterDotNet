@@ -629,317 +629,317 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Channel Attribute
+        /// Channel Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> Channel { get; init; }
 
         /// <summary>
-        /// Routing Role Attribute
+        /// Routing Role Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RoutingRoleEnum?> RoutingRole { get; init; }
 
         /// <summary>
-        /// Network Name Attribute
+        /// Network Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string?> NetworkName { get; init; }
 
         /// <summary>
-        /// Pan Id Attribute
+        /// Pan Id Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> PanId { get; init; }
 
         /// <summary>
-        /// Extended Pan Id Attribute
+        /// Extended Pan Id Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> ExtendedPanId { get; init; }
 
         /// <summary>
-        /// Mesh Local Prefix Attribute
+        /// Mesh Local Prefix Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> MeshLocalPrefix { get; init; }
 
         /// <summary>
-        /// Overrun Count Attribute
+        /// Overrun Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> OverrunCount { get; init; }
 
         /// <summary>
-        /// Neighbor Table Attribute
+        /// Neighbor Table Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NeighborTableStruct[]> NeighborTable { get; init; }
 
         /// <summary>
-        /// Route Table Attribute
+        /// Route Table Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RouteTableStruct[]> RouteTable { get; init; }
 
         /// <summary>
-        /// Partition Id Attribute
+        /// Partition Id Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> PartitionId { get; init; }
 
         /// <summary>
-        /// Weighting Attribute
+        /// Weighting Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> Weighting { get; init; }
 
         /// <summary>
-        /// Data Version Attribute
+        /// Data Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> DataVersion { get; init; }
 
         /// <summary>
-        /// Stable Data Version Attribute
+        /// Stable Data Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> StableDataVersion { get; init; }
 
         /// <summary>
-        /// Leader Router Id Attribute
+        /// Leader Router Id Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> LeaderRouterId { get; init; }
 
         /// <summary>
-        /// Detached Role Count Attribute
+        /// Detached Role Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> DetachedRoleCount { get; init; }
 
         /// <summary>
-        /// Child Role Count Attribute
+        /// Child Role Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ChildRoleCount { get; init; }
 
         /// <summary>
-        /// Router Role Count Attribute
+        /// Router Role Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> RouterRoleCount { get; init; }
 
         /// <summary>
-        /// Leader Role Count Attribute
+        /// Leader Role Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> LeaderRoleCount { get; init; }
 
         /// <summary>
-        /// Attach Attempt Count Attribute
+        /// Attach Attempt Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> AttachAttemptCount { get; init; }
 
         /// <summary>
-        /// Partition Id Change Count Attribute
+        /// Partition Id Change Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> PartitionIdChangeCount { get; init; }
 
         /// <summary>
-        /// Better Partition Attach Attempt Count Attribute
+        /// Better Partition Attach Attempt Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> BetterPartitionAttachAttemptCount { get; init; }
 
         /// <summary>
-        /// Parent Change Count Attribute
+        /// Parent Change Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ParentChangeCount { get; init; }
 
         /// <summary>
-        /// Tx Total Count Attribute
+        /// Tx Total Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxTotalCount { get; init; }
 
         /// <summary>
-        /// Tx Unicast Count Attribute
+        /// Tx Unicast Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxUnicastCount { get; init; }
 
         /// <summary>
-        /// Tx Broadcast Count Attribute
+        /// Tx Broadcast Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxBroadcastCount { get; init; }
 
         /// <summary>
-        /// Tx Ack Requested Count Attribute
+        /// Tx Ack Requested Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxAckRequestedCount { get; init; }
 
         /// <summary>
-        /// Tx Acked Count Attribute
+        /// Tx Acked Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxAckedCount { get; init; }
 
         /// <summary>
-        /// Tx No Ack Requested Count Attribute
+        /// Tx No Ack Requested Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxNoAckRequestedCount { get; init; }
 
         /// <summary>
-        /// Tx Data Count Attribute
+        /// Tx Data Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxDataCount { get; init; }
 
         /// <summary>
-        /// Tx Data Poll Count Attribute
+        /// Tx Data Poll Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxDataPollCount { get; init; }
 
         /// <summary>
-        /// Tx Beacon Count Attribute
+        /// Tx Beacon Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxBeaconCount { get; init; }
 
         /// <summary>
-        /// Tx Beacon Request Count Attribute
+        /// Tx Beacon Request Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxBeaconRequestCount { get; init; }
 
         /// <summary>
-        /// Tx Other Count Attribute
+        /// Tx Other Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxOtherCount { get; init; }
 
         /// <summary>
-        /// Tx Retry Count Attribute
+        /// Tx Retry Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxRetryCount { get; init; }
 
         /// <summary>
-        /// Tx Direct Max Retry Expiry Count Attribute
+        /// Tx Direct Max Retry Expiry Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxDirectMaxRetryExpiryCount { get; init; }
 
         /// <summary>
-        /// Tx Indirect Max Retry Expiry Count Attribute
+        /// Tx Indirect Max Retry Expiry Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxIndirectMaxRetryExpiryCount { get; init; }
 
         /// <summary>
-        /// Tx Err Cca Count Attribute
+        /// Tx Err Cca Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxErrCcaCount { get; init; }
 
         /// <summary>
-        /// Tx Err Abort Count Attribute
+        /// Tx Err Abort Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxErrAbortCount { get; init; }
 
         /// <summary>
-        /// Tx Err Busy Channel Count Attribute
+        /// Tx Err Busy Channel Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TxErrBusyChannelCount { get; init; }
 
         /// <summary>
-        /// Rx Total Count Attribute
+        /// Rx Total Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxTotalCount { get; init; }
 
         /// <summary>
-        /// Rx Unicast Count Attribute
+        /// Rx Unicast Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxUnicastCount { get; init; }
 
         /// <summary>
-        /// Rx Broadcast Count Attribute
+        /// Rx Broadcast Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxBroadcastCount { get; init; }
 
         /// <summary>
-        /// Rx Data Count Attribute
+        /// Rx Data Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxDataCount { get; init; }
 
         /// <summary>
-        /// Rx Data Poll Count Attribute
+        /// Rx Data Poll Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxDataPollCount { get; init; }
 
         /// <summary>
-        /// Rx Beacon Count Attribute
+        /// Rx Beacon Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxBeaconCount { get; init; }
 
         /// <summary>
-        /// Rx Beacon Request Count Attribute
+        /// Rx Beacon Request Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxBeaconRequestCount { get; init; }
 
         /// <summary>
-        /// Rx Other Count Attribute
+        /// Rx Other Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxOtherCount { get; init; }
 
         /// <summary>
-        /// Rx Address Filtered Count Attribute
+        /// Rx Address Filtered Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxAddressFilteredCount { get; init; }
 
         /// <summary>
-        /// Rx Dest Addr Filtered Count Attribute
+        /// Rx Dest Addr Filtered Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxDestAddrFilteredCount { get; init; }
 
         /// <summary>
-        /// Rx Duplicated Count Attribute
+        /// Rx Duplicated Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxDuplicatedCount { get; init; }
 
         /// <summary>
-        /// Rx Err No Frame Count Attribute
+        /// Rx Err No Frame Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrNoFrameCount { get; init; }
 
         /// <summary>
-        /// Rx Err Unknown Neighbor Count Attribute
+        /// Rx Err Unknown Neighbor Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrUnknownNeighborCount { get; init; }
 
         /// <summary>
-        /// Rx Err Invalid Src Addr Count Attribute
+        /// Rx Err Invalid Src Addr Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrInvalidSrcAddrCount { get; init; }
 
         /// <summary>
-        /// Rx Err Sec Count Attribute
+        /// Rx Err Sec Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrSecCount { get; init; }
 
         /// <summary>
-        /// Rx Err Fcs Count Attribute
+        /// Rx Err Fcs Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrFcsCount { get; init; }
 
         /// <summary>
-        /// Rx Err Other Count Attribute
+        /// Rx Err Other Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> RxErrOtherCount { get; init; }
 
         /// <summary>
-        /// Active Timestamp Attribute
+        /// Active Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> ActiveTimestamp { get; init; }
 
         /// <summary>
-        /// Pending Timestamp Attribute
+        /// Pending Timestamp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> PendingTimestamp { get; init; }
 
         /// <summary>
-        /// Delay Attribute
+        /// Delay Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> Delay { get; init; }
 
         /// <summary>
-        /// Security Policy Attribute
+        /// Security Policy Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SecurityPolicyStruct?> SecurityPolicy { get; init; }
 
         /// <summary>
-        /// Channel Page0 Mask Attribute
+        /// Channel Page0 Mask Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> ChannelPage0Mask { get; init; }
 
         /// <summary>
-        /// Operational Dataset Components Attribute
+        /// Operational Dataset Components Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationalDatasetComponentsStruct?> OperationalDatasetComponents { get; init; }
 
         /// <summary>
-        /// Active Network Faults List Attribute
+        /// Active Network Faults List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NetworkFault[]> ActiveNetworkFaultsList { get; init; }
         #endregion Attributes

@@ -167,12 +167,12 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Identify Time Attribute
+        /// Identify Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> IdentifyTime { get; init; }
 
         /// <summary>
-        /// Identify Type Attribute
+        /// Identify Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<IdentifyTypeEnum> IdentifyType { get; init; }
         #endregion Attributes

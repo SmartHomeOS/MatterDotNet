@@ -50,12 +50,12 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Active Locale Attribute
+        /// Active Locale Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> ActiveLocale { get; init; }
 
         /// <summary>
-        /// Supported Locales Attribute
+        /// Supported Locales Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]> SupportedLocales { get; init; }
         #endregion Attributes

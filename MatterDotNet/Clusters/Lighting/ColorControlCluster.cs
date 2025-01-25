@@ -359,11 +359,26 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Supports color specification via hue/saturation.
+            /// </summary>
             HueSaturation = 0x0001,
+            /// <summary>
+            /// Enhanced hue is supported.
+            /// </summary>
             EnhancedHue = 0x0002,
+            /// <summary>
+            /// Color loop is supported.
+            /// </summary>
             ColorLoop = 0x0004,
+            /// <summary>
+            /// Supports color specification via XY.
+            /// </summary>
             XY = 0x0008,
+            /// <summary>
+            /// Supports color specification via color temperature.
+            /// </summary>
             ColorTemperature = 0x0010,
         }
 
@@ -375,10 +390,22 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Device adheres to the associated action field.
+            /// </summary>
             UpdateAction = 0x01,
+            /// <summary>
+            /// Device updates the associated direction attribute.
+            /// </summary>
             UpdateDirection = 0x02,
+            /// <summary>
+            /// Device updates the associated time attribute.
+            /// </summary>
             UpdateTime = 0x04,
+            /// <summary>
+            /// Device updates the associated start hue attribute.
+            /// </summary>
             UpdateStartHue = 0x08,
         }
 
@@ -390,7 +417,7 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Dependency on On/Off cluster
             /// </summary>
@@ -762,212 +789,212 @@ namespace MatterDotNet.Clusters.Lighting
         }
 
         /// <summary>
-        /// Current Hue Attribute
+        /// Current Hue Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentHue { get; init; }
 
         /// <summary>
-        /// Current Saturation Attribute
+        /// Current Saturation Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentSaturation { get; init; }
 
         /// <summary>
-        /// Remaining Time Attribute
+        /// Remaining Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> RemainingTime { get; init; }
 
         /// <summary>
-        /// CurrentX Attribute
+        /// CurrentX Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> CurrentX { get; init; }
 
         /// <summary>
-        /// CurrentY Attribute
+        /// CurrentY Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> CurrentY { get; init; }
 
         /// <summary>
-        /// Drift Compensation Attribute
+        /// Drift Compensation Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DriftCompensationEnum> DriftCompensation { get; init; }
 
         /// <summary>
-        /// Compensation Text Attribute
+        /// Compensation Text Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> CompensationText { get; init; }
 
         /// <summary>
-        /// Color Temperature Mireds Attribute
+        /// Color Temperature Mireds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ColorTemperatureMireds { get; init; }
 
         /// <summary>
-        /// Color Mode Attribute
+        /// Color Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ColorModeEnum> ColorMode { get; init; }
 
         /// <summary>
-        /// Options Attribute
+        /// Options Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<OptionsBitmap> Options { get; init; }
 
         /// <summary>
-        /// Number Of Primaries Attribute
+        /// Number Of Primaries Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> NumberOfPrimaries { get; init; }
 
         /// <summary>
-        /// Primary1X Attribute
+        /// Primary1X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary1X { get; init; }
 
         /// <summary>
-        /// Primary1Y Attribute
+        /// Primary1Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary1Y { get; init; }
 
         /// <summary>
-        /// Primary1 Intensity Attribute
+        /// Primary1 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary1Intensity { get; init; }
 
         /// <summary>
-        /// Primary2X Attribute
+        /// Primary2X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary2X { get; init; }
 
         /// <summary>
-        /// Primary2Y Attribute
+        /// Primary2Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary2Y { get; init; }
 
         /// <summary>
-        /// Primary2 Intensity Attribute
+        /// Primary2 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary2Intensity { get; init; }
 
         /// <summary>
-        /// Primary3X Attribute
+        /// Primary3X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary3X { get; init; }
 
         /// <summary>
-        /// Primary3Y Attribute
+        /// Primary3Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary3Y { get; init; }
 
         /// <summary>
-        /// Primary3 Intensity Attribute
+        /// Primary3 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary3Intensity { get; init; }
 
         /// <summary>
-        /// Primary4X Attribute
+        /// Primary4X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary4X { get; init; }
 
         /// <summary>
-        /// Primary4Y Attribute
+        /// Primary4Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary4Y { get; init; }
 
         /// <summary>
-        /// Primary4 Intensity Attribute
+        /// Primary4 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary4Intensity { get; init; }
 
         /// <summary>
-        /// Primary5X Attribute
+        /// Primary5X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary5X { get; init; }
 
         /// <summary>
-        /// Primary5Y Attribute
+        /// Primary5Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary5Y { get; init; }
 
         /// <summary>
-        /// Primary5 Intensity Attribute
+        /// Primary5 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary5Intensity { get; init; }
 
         /// <summary>
-        /// Primary6X Attribute
+        /// Primary6X Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary6X { get; init; }
 
         /// <summary>
-        /// Primary6Y Attribute
+        /// Primary6Y Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Primary6Y { get; init; }
 
         /// <summary>
-        /// Primary6 Intensity Attribute
+        /// Primary6 Intensity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> Primary6Intensity { get; init; }
 
         /// <summary>
-        /// White PointX Attribute
+        /// White PointX Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> WhitePointX { get; init; }
 
         /// <summary>
-        /// White PointY Attribute
+        /// White PointY Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> WhitePointY { get; init; }
 
         /// <summary>
-        /// Color Point RX Attribute
+        /// Color Point RX Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointRX { get; init; }
 
         /// <summary>
-        /// Color Point RY Attribute
+        /// Color Point RY Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointRY { get; init; }
 
         /// <summary>
-        /// Color Point R Intensity Attribute
+        /// Color Point R Intensity Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> ColorPointRIntensity { get; init; }
 
         /// <summary>
-        /// Color Point GX Attribute
+        /// Color Point GX Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointGX { get; init; }
 
         /// <summary>
-        /// Color Point GY Attribute
+        /// Color Point GY Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointGY { get; init; }
 
         /// <summary>
-        /// Color Point G Intensity Attribute
+        /// Color Point G Intensity Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> ColorPointGIntensity { get; init; }
 
         /// <summary>
-        /// Color Point BX Attribute
+        /// Color Point BX Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointBX { get; init; }
 
         /// <summary>
-        /// Color Point BY Attribute
+        /// Color Point BY Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ColorPointBY { get; init; }
 
         /// <summary>
-        /// Color Point B Intensity Attribute
+        /// Color Point B Intensity Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> ColorPointBIntensity { get; init; }
 
         /// <summary>
-        /// Couple Color Temp To Level Min Mireds Attribute
+        /// Couple Color Temp To Level Min Mireds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> CoupleColorTempToLevelMinMireds { get; init; }
 
         /// <summary>
-        /// Start Up Color Temperature Mireds Attribute
+        /// Start Up Color Temperature Mireds Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort?> StartUpColorTemperatureMireds { get; init; }
         #endregion Attributes

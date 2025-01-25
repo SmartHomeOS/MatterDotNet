@@ -97,6 +97,37 @@
     <item value="4" comment="Product has a rugged finish." />
     <item value="5" comment="Product has a fabric finish." />
   </enum>
+  <enum name="0x0039.Color">
+    <item value="0" comment="Approximately RGB #000000." />
+	<item value="1" comment="Approximately RGB #000080." />
+	<item value="2" comment="Approximately RGB #008000." />
+	<item value="3" comment="Approximately RGB #008080." />
+	<item value="4" comment="Approximately RGB #800080." />
+	<item value="5" comment="Approximately RGB #800080." />
+	<item value="6" comment="Approximately RGB #808000." />
+	<item value="7" comment="Approximately RGB #808080." />
+	<item value="8" comment="Approximately RGB #0000FF." />
+	<item value="9" comment="Approximately RGB #00FF00." />
+	<item value="10" comment="Approximately RGB #00FFFF." />
+	<item value="11" comment="Approximately RGB #FF0000." />
+	<item value="12" comment="Approximately RGB #FF00FF." />
+	<item value="13" comment="Approximately RGB #FFFF00." />
+	<item value="14" comment="Approximately RGB #FFFFFF." />
+	<item value="15" comment="Typical hardware &quot;Nickel&quot; color." />
+	<item value="16" comment="Typical hardware &quot;Chrome&quot; color." />
+	<item value="17" comment="Typical hardware &quot;Brass&quot; color." />
+	<item value="18" comment="Typical hardware &quot;Copper&quot; color." />
+	<item value="19" comment="Typical hardware &quot;Silver&quot; color." />
+	<item value="20" comment="Typical hardware &quot;Gold&quot; color." />
+  </enum>
+  <enum name="0x0039.ProductFinish">
+	<item value="0" comment="Product has some other finish not listed below." />
+	<item value="1" comment="Product has a matte finish." />
+	<item value="2" comment="Product has a satin finish." />
+	<item value="3" comment="Product has a polished or shiny finish." />
+	<item value="4" comment="Product has a rugged finish." />
+	<item value="5" comment="Product has a fabric finish." />
+  </enum>
   <bitmap name="0x0080.AlarmMode">
     <item value="0x01" comment="Visual alarming" />
     <item value="0x02" comment="Audible alarming" />
@@ -474,6 +505,15 @@
     <item value="0x10" comment="Temperature is too high" />
     <item value="0x20" comment="Water level is abnormal" />
   </bitmap>
+  <bitmap name="0x0101.DoorLockDayOfWeek">
+	<item value="0x01" comment="Sunday" />
+	<item value="0x02" comment="Monday" />
+	<item value="0x04" comment="Tuesday" />
+	<item value="0x08" comment="Wednesday" />
+	<item value="0x10" comment="Thursday" />
+	<item value="0x20" comment="Friday" />
+	<item value="0x40" comment="Saturday" />
+  </bitmap>
   <bitmap name="0x0101.AlarmMask">
     <item value="0x01" comment="Locking Mechanism Jammed" />
     <item value="0x02" comment="Lock Reset to Factory Defaults" />
@@ -482,7 +522,7 @@
     <item value="0x20" comment="Tamper Alarm - front escutcheon removed from main" />
     <item value="0x40" comment="Forced Door Open under Door Locked Condition" />
   </bitmap>
-  <bitmap name="0x0101.ConfigurationRegister">
+  <bitmap name="0x0101.DefaultConfigurationRegister">
     <item value="0x01" comment="The state of local programming functionality" />
     <item value="0x02" comment="The state of the keypad interface" />
     <item value="0x04" comment="The state of the remote interface" />
@@ -490,12 +530,22 @@
     <item value="0x40" comment="Auto relock time it set to 0" />
     <item value="0x80" comment="LEDs is disabled" />
   </bitmap>
-  <bitmap name="0x0101.CredentialRules">
-    <item value="0x01" comment="Only one credential is required for lock operation" />
-    <item value="0x02" comment="Any two credentials are required for lock operation" />
-    <item value="0x04" comment="Any three credentials are required for lock operation" />
-  </bitmap>
-  <bitmap name="0x0101.DaysMask">
+  <enum name="0x0101.CredentialRule">
+    <item value="0x00" comment="Only one credential is required for lock operation" />
+    <item value="0x01" comment="Any two credentials are required for lock operation" />
+    <item value="0x02" comment="Any three credentials are required for lock operation" />
+  </enum>
+	<bitmap name="0x0101.CredentialRuleMask">
+		<item value="0x01" comment="Only one credential is required for lock operation" />
+		<item value="0x02" comment="Any two credentials are required for lock operation" />
+		<item value="0x04" comment="Any three credentials are required for lock operation" />
+	</bitmap>
+	<bitmap name="0x0101.CredentialRulesSupport">
+		<item value="0x01" comment="Only one credential is required for lock operation" />
+		<item value="0x02" comment="Any two credentials are required for lock operation" />
+		<item value="0x04" comment="Any three credentials are required for lock operation" />
+	</bitmap>
+  <bitmap name="0x0101.DaysMaskMap">
     <item value="0x01" comment="Schedule is applied on Sunday" />
     <item value="0x02" comment="Schedule is applied on Monday" />
     <item value="0x04" comment="Schedule is applied on Tuesday" />
@@ -510,7 +560,7 @@
     <item value="0x04" comment="The state of the ability to clear users, credentials or schedules on the device" />
     <item value="0x08" comment="The state of the ability to adjust settings on the device" />
   </bitmap>
-  <bitmap name="0x0101.OperatingModes">
+  <bitmap name="0x0101.SupportedOperatingModes">
     <item value="0x01" comment="Normal operation mode" />
     <item value="0x02" comment="Vacation operation mode" />
     <item value="0x04" comment="Privacy operation mode" />
@@ -527,7 +577,7 @@
     <item value="7" comment="Door ajar" />
     <item value="8" comment="Force User SOS alarm" />
   </enum>
-  <enum name="0x0101.CredentialRule">
+  <enum name="0x0101.CredentialRulesSupport">
     <item value="0" comment="Only one credential is required for lock operation" />
     <item value="1" comment="Any two credentials are required for lock operation" />
     <item value="2" comment="Any three credentials are required for lock operation" />
@@ -1160,6 +1210,26 @@
     <item value="10" comment="" />
     <item value="11" comment="" />
   </enum>
+  <enum name="0x050A.Characteristic">
+    <item value="0" comment="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio." />
+	  <item value="1" comment="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component" />
+	  <item value="2" comment="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)]." />
+	  <item value="3" comment="A media characteristic that indicates that a track selection option includes frame-based content." />
+	  <item value="4" comment="Main media component(s) which is/are intended for presentation if no other information is provided" />
+	  <item value="5" comment="A media characteristic that indicates that a track or media selection option contains original content." />
+	  <item value="6" comment="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog." />
+	  <item value="7" comment="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired." />
+	  <item value="8" comment="Textual transcriptions of spoken dialog." />
+	  <item value="9" comment="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired." />
+	  <item value="10" comment="Media content component that is supplementary to a media content component of a different media component type." />
+	  <item value="11" comment="Experience that contains a commentary (e.g. director’s commentary) (typically audio)" />
+	  <item value="12" comment="Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)" />
+	  <item value="13" comment="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component" />
+	  <item value="14" comment="Media component containing information intended to be processed by application specific elements." />
+	  <item value="15" comment="Experience containing an element for improved intelligibility of the dialogue." />
+	  <item value="16" comment="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency." />
+	  <item value="17" comment="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2]." />
+  </enum>
   <enum name="0x0506.Characteristic">
     <item value="0" comment="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio." />
     <item value="1" comment="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component" />
@@ -1303,11 +1373,35 @@
     <item value="10" comment="&lt;see cref=&quot;LabelConflict&quot;/&gt; Label already exists on another Fabric." />
     <item value="11" comment="&lt;see cref=&quot;InvalidFabricIndex&quot;/&gt; FabricIndex argument is invalid." />
   </enum>
+  <enum name="0x0048.ErrorState">
+    <item value="0x00" comment="The device is not in an error state" />
+    <item value="0x01" comment="The device is unable to start or resume operation" />
+    <item value="0x02" comment="The device was unable to complete the current operation" />
+    <item value="0x03" comment="The device cannot process the command in its current state" />
+  </enum>
+  <enum name="0x0048.OperationalState">
+    <item value="0x00" comment="The device is stopped" />
+    <item value="0x01" comment="The device is operating" />
+    <item value="0x02" comment="The device is paused during an operation" />
+    <item value="0x03" comment="The device is in an error state" />
+  </enum>
   <enum name="0x0060.ErrorState">
+	<item value="0x00" comment="The device is not in an error state" />
+	<item value="0x01" comment="The device is unable to start or resume operation" />
+	<item value="0x02" comment="The device was unable to complete the current operation" />
+	<item value="0x03" comment="The device cannot process the command in its current state" />
   </enum>
   <enum name="0x0060.OperationalState">
+	<item value="0x00" comment="The device is stopped" />
+	<item value="0x01" comment="The device is operating" />
+	<item value="0x02" comment="The device is paused during an operation" />
+	<item value="0x03" comment="The device is in an error state" />
   </enum>
   <enum name="0x0061.ErrorState">
+	<item value="0x00" comment="The device is not in an error state" />
+	<item value="0x01" comment="The device is unable to start or resume operation" />
+	<item value="0x02" comment="The device was unable to complete the current operation" />
+	<item value="0x03" comment="The device cannot process the command in its current state" />
     <item value="0x40" comment="The device has failed to find or reach the charging dock" />
     <item value="0x41" comment="The device is stuck and requires manual intervention" />
     <item value="0x42" comment="The device has detected that its dust bin is missing" />
@@ -1318,6 +1412,10 @@
     <item value="0x47" comment="The device has detected that its cleaning pad is missing" />
   </enum>
   <enum name="0x0061.OperationalState">
+	<item value="0x00" comment="The device is stopped" />
+	<item value="0x01" comment="The device is operating" />
+	<item value="0x02" comment="The device is paused during an operation" />
+	<item value="0x03" comment="The device is in an error state" />
     <item value="0x40" comment="The device is en route to the charging dock" />
     <item value="0x41" comment="The device is charging" />
     <item value="0x42" comment="The device is on the dock, not charging" />

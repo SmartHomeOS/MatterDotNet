@@ -94,42 +94,42 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Vendor Name Attribute
+        /// Vendor Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Vendor ID Attribute
+        /// Vendor ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Application Name Attribute
+        /// Application Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ApplicationName { get; init; }
 
         /// <summary>
-        /// Product ID Attribute
+        /// Product ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Application Attribute
+        /// Application Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ApplicationLauncher.Application> Application { get; init; }
 
         /// <summary>
-        /// Status Attribute
+        /// Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ApplicationStatus> Status { get; init; }
 
         /// <summary>
-        /// Application Version Attribute
+        /// Application Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ApplicationVersion { get; init; }
 
         /// <summary>
-        /// Allowed Vendor List Attribute
+        /// Allowed Vendor List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> AllowedVendorList { get; init; }
         #endregion Attributes

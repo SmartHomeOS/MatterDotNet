@@ -95,8 +95,14 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Visual alarming
+            /// </summary>
             Visual = 0x01,
+            /// <summary>
+            /// Audible alarming
+            /// </summary>
             Audible = 0x02,
         }
 
@@ -108,7 +114,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Unspecified fault detected
             /// </summary>
@@ -183,42 +189,42 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Current Sensitivity Level Attribute
+        /// Current Sensitivity Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> CurrentSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Supported Sensitivity Levels Attribute
+        /// Supported Sensitivity Levels Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SupportedSensitivityLevels { get; init; }
 
         /// <summary>
-        /// Default Sensitivity Level Attribute
+        /// Default Sensitivity Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> DefaultSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Alarms Active Attribute
+        /// Alarms Active Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmMode> AlarmsActive { get; init; }
 
         /// <summary>
-        /// Alarms Suppressed Attribute
+        /// Alarms Suppressed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmMode> AlarmsSuppressed { get; init; }
 
         /// <summary>
-        /// Alarms Enabled Attribute
+        /// Alarms Enabled Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmMode> AlarmsEnabled { get; init; }
 
         /// <summary>
-        /// Alarms Supported Attribute
+        /// Alarms Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmMode> AlarmsSupported { get; init; }
 
         /// <summary>
-        /// Sensor Fault Attribute
+        /// Sensor Fault Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SensorFaultBitmap> SensorFault { get; init; }
         #endregion Attributes

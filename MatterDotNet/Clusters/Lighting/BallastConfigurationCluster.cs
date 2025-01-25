@@ -95,7 +95,7 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Operational state of the ballast.
             /// </summary>
@@ -114,7 +114,7 @@ namespace MatterDotNet.Clusters.Lighting
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// State of LampBurnHours alarm generation
             /// </summary>
@@ -124,72 +124,72 @@ namespace MatterDotNet.Clusters.Lighting
 
         #region Attributes
         /// <summary>
-        /// Physical Min Level Attribute
+        /// Physical Min Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PhysicalMinLevel { get; init; }
 
         /// <summary>
-        /// Physical Max Level Attribute
+        /// Physical Max Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PhysicalMaxLevel { get; init; }
 
         /// <summary>
-        /// Ballast Status Attribute
+        /// Ballast Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BallastStatusBitmap> BallastStatus { get; init; }
 
         /// <summary>
-        /// Min Level Attribute
+        /// Min Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> MinLevel { get; init; }
 
         /// <summary>
-        /// Max Level Attribute
+        /// Max Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> MaxLevel { get; init; }
 
         /// <summary>
-        /// Intrinsic Ballast Factor Attribute
+        /// Intrinsic Ballast Factor Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> IntrinsicBallastFactor { get; init; }
 
         /// <summary>
-        /// Ballast Factor Adjustment Attribute
+        /// Ballast Factor Adjustment Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> BallastFactorAdjustment { get; init; }
 
         /// <summary>
-        /// Lamp Quantity Attribute
+        /// Lamp Quantity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> LampQuantity { get; init; }
 
         /// <summary>
-        /// Lamp Type Attribute
+        /// Lamp Type Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> LampType { get; init; }
 
         /// <summary>
-        /// Lamp Manufacturer Attribute
+        /// Lamp Manufacturer Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> LampManufacturer { get; init; }
 
         /// <summary>
-        /// Lamp Rated Hours Attribute
+        /// Lamp Rated Hours Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint?> LampRatedHours { get; init; }
 
         /// <summary>
-        /// Lamp Burn Hours Attribute
+        /// Lamp Burn Hours Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint?> LampBurnHours { get; init; }
 
         /// <summary>
-        /// Lamp Alarm Mode Attribute
+        /// Lamp Alarm Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<LampAlarmModeBitmap> LampAlarmMode { get; init; }
 
         /// <summary>
-        /// Lamp Burn Hours Trip Point Attribute
+        /// Lamp Burn Hours Trip Point Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint?> LampBurnHoursTripPoint { get; init; }
         #endregion Attributes

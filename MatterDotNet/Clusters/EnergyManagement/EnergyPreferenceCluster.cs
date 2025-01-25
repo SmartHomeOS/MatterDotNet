@@ -163,27 +163,27 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Energy Balances Attribute
+        /// Energy Balances Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Balance[]> EnergyBalances { get; init; }
 
         /// <summary>
-        /// Current Energy Balance Attribute
+        /// Current Energy Balance Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> CurrentEnergyBalance { get; init; }
 
         /// <summary>
-        /// Energy Priorities Attribute
+        /// Energy Priorities Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EnergyPriority[]> EnergyPriorities { get; init; }
 
         /// <summary>
-        /// Low Power Mode Sensitivities Attribute
+        /// Low Power Mode Sensitivities Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Balance[]> LowPowerModeSensitivities { get; init; }
 
         /// <summary>
-        /// Current Low Power Mode Sensitivity Attribute
+        /// Current Low Power Mode Sensitivity Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> CurrentLowPowerModeSensitivity { get; init; }
         #endregion Attributes

@@ -213,22 +213,22 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Supported Modes Attribute
+        /// Supported Modes Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ModeOption[]> SupportedModes { get; init; }
 
         /// <summary>
-        /// Current Mode Attribute
+        /// Current Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentMode { get; init; }
 
         /// <summary>
-        /// Start Up Mode Attribute
+        /// Start Up Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> StartUpMode { get; init; }
 
         /// <summary>
-        /// On Mode Attribute
+        /// On Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> OnMode { get; init; }
         #endregion Attributes

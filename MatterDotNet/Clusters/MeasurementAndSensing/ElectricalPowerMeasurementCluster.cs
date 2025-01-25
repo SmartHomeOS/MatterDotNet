@@ -282,97 +282,97 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Power Mode Attribute
+        /// Power Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PowerModeEnum> PowerMode { get; init; }
 
         /// <summary>
-        /// Number Of Measurement Types Attribute
+        /// Number Of Measurement Types Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfMeasurementTypes { get; init; }
 
         /// <summary>
-        /// Accuracy Attribute
+        /// Accuracy Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MeasurementAccuracy[]> Accuracy { get; init; }
 
         /// <summary>
-        /// Ranges Attribute
+        /// Ranges Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MeasurementRange[]> Ranges { get; init; }
 
         /// <summary>
-        /// Voltage [mV] Attribute
+        /// Voltage [mV] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> Voltage { get; init; }
 
         /// <summary>
-        /// Active Current [mA] Attribute
+        /// Active Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ActiveCurrent { get; init; }
 
         /// <summary>
-        /// Reactive Current [mA] Attribute
+        /// Reactive Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ReactiveCurrent { get; init; }
 
         /// <summary>
-        /// Apparent Current [mA] Attribute
+        /// Apparent Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ApparentCurrent { get; init; }
 
         /// <summary>
-        /// Active Power [mW] Attribute
+        /// Active Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ActivePower { get; init; }
 
         /// <summary>
-        /// Reactive Power [mW] Attribute
+        /// Reactive Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ReactivePower { get; init; }
 
         /// <summary>
-        /// Apparent Power [mW] Attribute
+        /// Apparent Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> ApparentPower { get; init; }
 
         /// <summary>
-        /// RMS Voltage [mV] Attribute
+        /// RMS Voltage [mV] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> RMSVoltage { get; init; }
 
         /// <summary>
-        /// RMS Current [mA] Attribute
+        /// RMS Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> RMSCurrent { get; init; }
 
         /// <summary>
-        /// RMS Power [mW] Attribute
+        /// RMS Power [mW] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> RMSPower { get; init; }
 
         /// <summary>
-        /// Frequency Attribute
+        /// Frequency Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> Frequency { get; init; }
 
         /// <summary>
-        /// Harmonic Currents Attribute
+        /// Harmonic Currents Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<HarmonicMeasurement[]?> HarmonicCurrents { get; init; }
 
         /// <summary>
-        /// Harmonic Phases Attribute
+        /// Harmonic Phases Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<HarmonicMeasurement[]?> HarmonicPhases { get; init; }
 
         /// <summary>
-        /// Power Factor Attribute
+        /// Power Factor Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> PowerFactor { get; init; }
 
         /// <summary>
-        /// Neutral Current [mA] Attribute
+        /// Neutral Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> NeutralCurrent { get; init; }
         #endregion Attributes

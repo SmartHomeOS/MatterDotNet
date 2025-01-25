@@ -126,11 +126,26 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Message requires confirmation from user
+            /// </summary>
             ConfirmationRequired = 0x01,
+            /// <summary>
+            /// Message requires response from user
+            /// </summary>
             ResponseRequired = 0x02,
+            /// <summary>
+            /// Message supports reply message from user
+            /// </summary>
             ReplyMessage = 0x04,
+            /// <summary>
+            /// Message has already been confirmed
+            /// </summary>
             MessageConfirmed = 0x08,
+            /// <summary>
+            /// Message required PIN/password protection
+            /// </summary>
             MessageProtected = 0x10,
         }
         #endregion Enums
@@ -328,12 +343,12 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Messages Attribute
+        /// Messages Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Message[]> MessagesAttribute { get; init; }
 
         /// <summary>
-        /// Active Message I Ds Attribute
+        /// Active Message I Ds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[][]> ActiveMessageIDs { get; init; }
         #endregion Attributes

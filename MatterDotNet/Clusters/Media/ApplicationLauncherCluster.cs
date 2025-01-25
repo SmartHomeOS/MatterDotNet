@@ -270,12 +270,12 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Catalog List Attribute
+        /// Catalog List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> CatalogList { get; init; }
 
         /// <summary>
-        /// Current App Attribute
+        /// Current App Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ApplicationEP?> CurrentApp { get; init; }
         #endregion Attributes

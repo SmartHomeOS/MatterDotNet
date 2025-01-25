@@ -145,7 +145,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Dependency on On/Off cluster
             /// </summary>
@@ -430,72 +430,72 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Current Level Attribute
+        /// Current Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentLevel { get; init; }
 
         /// <summary>
-        /// Remaining Time Attribute
+        /// Remaining Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> RemainingTime { get; init; }
 
         /// <summary>
-        /// Min Level Attribute
+        /// Min Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MinLevel { get; init; }
 
         /// <summary>
-        /// Max Level Attribute
+        /// Max Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MaxLevel { get; init; }
 
         /// <summary>
-        /// Current Frequency Attribute
+        /// Current Frequency Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> CurrentFrequency { get; init; }
 
         /// <summary>
-        /// Min Frequency Attribute
+        /// Min Frequency Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> MinFrequency { get; init; }
 
         /// <summary>
-        /// Max Frequency Attribute
+        /// Max Frequency Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> MaxFrequency { get; init; }
 
         /// <summary>
-        /// On Off Transition Time Attribute
+        /// On Off Transition Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> OnOffTransitionTime { get; init; }
 
         /// <summary>
-        /// On Level Attribute
+        /// On Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> OnLevel { get; init; }
 
         /// <summary>
-        /// On Transition Time Attribute
+        /// On Transition Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort?> OnTransitionTime { get; init; }
 
         /// <summary>
-        /// Off Transition Time Attribute
+        /// Off Transition Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort?> OffTransitionTime { get; init; }
 
         /// <summary>
-        /// Default Move Rate Attribute
+        /// Default Move Rate Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> DefaultMoveRate { get; init; }
 
         /// <summary>
-        /// Options Attribute
+        /// Options Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<OptionsBitmap> Options { get; init; }
 
         /// <summary>
-        /// Start Up Current Level Attribute
+        /// Start Up Current Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> StartUpCurrentLevel { get; init; }
         #endregion Attributes

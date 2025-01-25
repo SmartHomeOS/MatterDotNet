@@ -628,57 +628,57 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Current State Attribute
+        /// Current State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PlaybackState> CurrentState { get; init; }
 
         /// <summary>
-        /// Start Time Attribute
+        /// Start Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> StartTime { get; init; }
 
         /// <summary>
-        /// Duration Attribute
+        /// Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> Duration { get; init; }
 
         /// <summary>
-        /// Sampled Position Attribute
+        /// Sampled Position Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PlaybackPosition?> SampledPosition { get; init; }
 
         /// <summary>
-        /// Playback Speed Attribute
+        /// Playback Speed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float> PlaybackSpeed { get; init; }
 
         /// <summary>
-        /// Seek Range End Attribute
+        /// Seek Range End Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> SeekRangeEnd { get; init; }
 
         /// <summary>
-        /// Seek Range Start Attribute
+        /// Seek Range Start Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> SeekRangeStart { get; init; }
 
         /// <summary>
-        /// Active Audio Track Attribute
+        /// Active Audio Track Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Track?> ActiveAudioTrack { get; init; }
 
         /// <summary>
-        /// Available Audio Tracks Attribute
+        /// Available Audio Tracks Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Track[]?> AvailableAudioTracks { get; init; }
 
         /// <summary>
-        /// Active Text Track Attribute
+        /// Active Text Track Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Track?> ActiveTextTrack { get; init; }
 
         /// <summary>
-        /// Available Text Tracks Attribute
+        /// Available Text Tracks Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Track[]?> AvailableTextTracks { get; init; }
         #endregion Attributes

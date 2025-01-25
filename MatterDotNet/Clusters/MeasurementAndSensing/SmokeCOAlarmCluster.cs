@@ -259,67 +259,67 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Expressed State Attribute
+        /// Expressed State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ExpressedStateEnum> ExpressedState { get; init; }
 
         /// <summary>
-        /// Smoke State Attribute
+        /// Smoke State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmState> SmokeState { get; init; }
 
         /// <summary>
-        /// CO State Attribute
+        /// CO State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmState> COState { get; init; }
 
         /// <summary>
-        /// Battery Alert Attribute
+        /// Battery Alert Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmState> BatteryAlert { get; init; }
 
         /// <summary>
-        /// Device Muted Attribute
+        /// Device Muted Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MuteState> DeviceMuted { get; init; }
 
         /// <summary>
-        /// Test In Progress Attribute
+        /// Test In Progress Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> TestInProgress { get; init; }
 
         /// <summary>
-        /// Hardware Fault Alert Attribute
+        /// Hardware Fault Alert Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> HardwareFaultAlert { get; init; }
 
         /// <summary>
-        /// End Of Service Alert Attribute
+        /// End Of Service Alert Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EndOfService> EndOfServiceAlert { get; init; }
 
         /// <summary>
-        /// Interconnect Smoke Alarm Attribute
+        /// Interconnect Smoke Alarm Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmState> InterconnectSmokeAlarm { get; init; }
 
         /// <summary>
-        /// Interconnect CO Alarm Attribute
+        /// Interconnect CO Alarm Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AlarmState> InterconnectCOAlarm { get; init; }
 
         /// <summary>
-        /// Contamination State Attribute
+        /// Contamination State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ContaminationStateEnum> ContaminationState { get; init; }
 
         /// <summary>
-        /// Smoke Sensitivity Level Attribute
+        /// Smoke Sensitivity Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Sensitivity> SmokeSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Expiry Date Attribute
+        /// Expiry Date Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime> ExpiryDate { get; init; }
         #endregion Attributes

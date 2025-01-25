@@ -305,7 +305,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Reverse the lift direction.
             /// </summary>
@@ -332,7 +332,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Global operational state.
             /// </summary>
@@ -355,7 +355,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Device is operational.
             /// </summary>
@@ -394,7 +394,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range.
             /// </summary>
@@ -460,7 +460,7 @@ namespace MatterDotNet.Clusters.Closures
             public required decimal LiftPercentValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteDecimal(0, LiftPercentValue);
+                writer.WriteUDecimal(0, LiftPercentValue);
                 writer.EndContainer();
             }
         }
@@ -478,7 +478,7 @@ namespace MatterDotNet.Clusters.Closures
             public required decimal TiltPercentValue { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                writer.WriteDecimal(0, TiltPercentValue);
+                writer.WriteUDecimal(0, TiltPercentValue);
                 writer.EndContainer();
             }
         }
@@ -577,112 +577,112 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Type Attribute
+        /// Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TypeEnum> Type { get; init; }
 
         /// <summary>
-        /// Physical Closed Limit Lift Attribute
+        /// Physical Closed Limit Lift Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> PhysicalClosedLimitLift { get; init; }
 
         /// <summary>
-        /// Physical Closed Limit Tilt Attribute
+        /// Physical Closed Limit Tilt Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> PhysicalClosedLimitTilt { get; init; }
 
         /// <summary>
-        /// Current Position Lift Attribute
+        /// Current Position Lift Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> CurrentPositionLift { get; init; }
 
         /// <summary>
-        /// Current Position Tilt Attribute
+        /// Current Position Tilt Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> CurrentPositionTilt { get; init; }
 
         /// <summary>
-        /// Number Of Actuations Lift Attribute
+        /// Number Of Actuations Lift Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfActuationsLift { get; init; }
 
         /// <summary>
-        /// Number Of Actuations Tilt Attribute
+        /// Number Of Actuations Tilt Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfActuationsTilt { get; init; }
 
         /// <summary>
-        /// Config Status Attribute
+        /// Config Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ConfigStatusBitmap> ConfigStatus { get; init; }
 
         /// <summary>
-        /// Current Position Lift Percentage [%] Attribute
+        /// Current Position Lift Percentage [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentPositionLiftPercentage { get; init; }
 
         /// <summary>
-        /// Current Position Tilt Percentage [%] Attribute
+        /// Current Position Tilt Percentage [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentPositionTiltPercentage { get; init; }
 
         /// <summary>
-        /// Operational Status Attribute
+        /// Operational Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationalStatusBitmap> OperationalStatus { get; init; }
 
         /// <summary>
-        /// Target Position Lift Percent100ths [%] Attribute
+        /// Target Position Lift Percent100ths [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<decimal?> TargetPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Target Position Tilt Percent100ths [%] Attribute
+        /// Target Position Tilt Percent100ths [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<decimal?> TargetPositionTiltPercent { get; init; }
 
         /// <summary>
-        /// End Product Type Attribute
+        /// End Product Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EndProductTypeEnum> EndProductType { get; init; }
 
         /// <summary>
-        /// Current Position Lift Percent100ths [%] Attribute
+        /// Current Position Lift Percent100ths [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<decimal?> CurrentPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Current Position Tilt Percent100ths [%] Attribute
+        /// Current Position Tilt Percent100ths [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<decimal?> CurrentPositionTiltPercent { get; init; }
 
         /// <summary>
-        /// Installed Open Limit Lift Attribute
+        /// Installed Open Limit Lift Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> InstalledOpenLimitLift { get; init; }
 
         /// <summary>
-        /// Installed Closed Limit Lift Attribute
+        /// Installed Closed Limit Lift Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> InstalledClosedLimitLift { get; init; }
 
         /// <summary>
-        /// Installed Open Limit Tilt Attribute
+        /// Installed Open Limit Tilt Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> InstalledOpenLimitTilt { get; init; }
 
         /// <summary>
-        /// Installed Closed Limit Tilt Attribute
+        /// Installed Closed Limit Tilt Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> InstalledClosedLimitTilt { get; init; }
 
         /// <summary>
-        /// Mode Attribute
+        /// Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ModeBitmap> Mode { get; init; }
 
         /// <summary>
-        /// Safety Status Attribute
+        /// Safety Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SafetyStatusBitmap> SafetyStatus { get; init; }
         #endregion Attributes

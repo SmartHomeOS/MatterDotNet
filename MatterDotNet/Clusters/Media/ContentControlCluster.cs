@@ -322,42 +322,42 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Enabled Attribute
+        /// Enabled Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> Enabled { get; init; }
 
         /// <summary>
-        /// On Demand Ratings Attribute
+        /// On Demand Ratings Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RatingName[]> OnDemandRatings { get; init; }
 
         /// <summary>
-        /// On Demand Rating Threshold Attribute
+        /// On Demand Rating Threshold Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> OnDemandRatingThreshold { get; init; }
 
         /// <summary>
-        /// Scheduled Content Ratings Attribute
+        /// Scheduled Content Ratings Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RatingName[]> ScheduledContentRatings { get; init; }
 
         /// <summary>
-        /// Scheduled Content Rating Threshold Attribute
+        /// Scheduled Content Rating Threshold Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ScheduledContentRatingThreshold { get; init; }
 
         /// <summary>
-        /// Screen Daily Time Attribute
+        /// Screen Daily Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> ScreenDailyTime { get; init; }
 
         /// <summary>
-        /// Remaining Screen Time Attribute
+        /// Remaining Screen Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> RemainingScreenTime { get; init; }
 
         /// <summary>
-        /// Block Unrated Attribute
+        /// Block Unrated Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> BlockUnrated { get; init; }
         #endregion Attributes

@@ -47,7 +47,7 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Label List Attribute
+        /// Label List Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<FixedLabel.Label[]> LabelList { get; init; }
         #endregion Attributes

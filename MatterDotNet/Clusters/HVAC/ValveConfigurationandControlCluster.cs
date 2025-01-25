@@ -123,7 +123,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Unspecified fault detected
             /// </summary>
@@ -211,57 +211,57 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Open Duration Attribute
+        /// Open Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan?> OpenDuration { get; init; }
 
         /// <summary>
-        /// Default Open Duration Attribute
+        /// Default Open Duration Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<TimeSpan?> DefaultOpenDuration { get; init; }
 
         /// <summary>
-        /// Auto Close Time Attribute
+        /// Auto Close Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> AutoCloseTime { get; init; }
 
         /// <summary>
-        /// Remaining Duration Attribute
+        /// Remaining Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan?> RemainingDuration { get; init; }
 
         /// <summary>
-        /// Current State Attribute
+        /// Current State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ValveState?> CurrentState { get; init; }
 
         /// <summary>
-        /// Target State Attribute
+        /// Target State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ValveState?> TargetState { get; init; }
 
         /// <summary>
-        /// Current Level [%] Attribute
+        /// Current Level [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentLevel { get; init; }
 
         /// <summary>
-        /// Target Level [%] Attribute
+        /// Target Level [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> TargetLevel { get; init; }
 
         /// <summary>
-        /// Default Open Level [%] Attribute
+        /// Default Open Level [%] Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> DefaultOpenLevel { get; init; }
 
         /// <summary>
-        /// Valve Fault Attribute
+        /// Valve Fault Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ValveFaultBitmap> ValveFault { get; init; }
 
         /// <summary>
-        /// Level Step Attribute
+        /// Level Step Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> LevelStep { get; init; }
         #endregion Attributes

@@ -47,7 +47,7 @@ namespace MatterDotNet.Clusters.CHIP
 
         #region Attributes
         /// <summary>
-        /// Sources Attribute
+        /// Sources Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> Sources { get; init; }
         #endregion Attributes

@@ -107,17 +107,17 @@ namespace MatterDotNet.Clusters.HVAC
 
         #region Attributes
         /// <summary>
-        /// Temperature Display Mode Attribute
+        /// Temperature Display Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<TemperatureDisplayModeEnum> TemperatureDisplayMode { get; init; }
 
         /// <summary>
-        /// Keypad Lockout Attribute
+        /// Keypad Lockout Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<KeypadLockoutEnum> KeypadLockout { get; init; }
 
         /// <summary>
-        /// Schedule Programming Visibility Attribute
+        /// Schedule Programming Visibility Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ScheduleProgrammingVisibilityEnum> ScheduleProgrammingVisibility { get; init; }
         #endregion Attributes

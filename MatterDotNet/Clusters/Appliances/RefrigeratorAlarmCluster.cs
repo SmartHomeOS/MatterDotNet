@@ -54,24 +54,27 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// The cabinet's door has been open for a vendor defined amount of time.
+            /// </summary>
             DoorOpen = 0x0001,
         }
         #endregion Enums
 
         #region Attributes
         /// <summary>
-        /// Mask Attribute
+        /// Mask Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> Mask { get; init; }
 
         /// <summary>
-        /// State Attribute
+        /// State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> State { get; init; }
 
         /// <summary>
-        /// Supported Attribute
+        /// Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> Supported { get; init; }
         #endregion Attributes

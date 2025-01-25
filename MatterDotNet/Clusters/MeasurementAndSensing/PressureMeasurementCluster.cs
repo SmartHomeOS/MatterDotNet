@@ -105,47 +105,47 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Measured Value Attribute
+        /// Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Min Measured Value Attribute
+        /// Min Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Max Measured Value Attribute
+        /// Max Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Tolerance Attribute
+        /// Tolerance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Tolerance { get; init; }
 
         /// <summary>
-        /// Scaled Value Attribute
+        /// Scaled Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> ScaledValue { get; init; }
 
         /// <summary>
-        /// Min Scaled Value Attribute
+        /// Min Scaled Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MinScaledValue { get; init; }
 
         /// <summary>
-        /// Max Scaled Value Attribute
+        /// Max Scaled Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxScaledValue { get; init; }
 
         /// <summary>
-        /// Scaled Tolerance Attribute
+        /// Scaled Tolerance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ScaledTolerance { get; init; }
 
         /// <summary>
-        /// Scale Attribute
+        /// Scale Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<sbyte> Scale { get; init; }
         #endregion Attributes

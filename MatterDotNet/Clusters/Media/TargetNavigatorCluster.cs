@@ -145,12 +145,12 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Target List Attribute
+        /// Target List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TargetInfo[]> TargetList { get; init; }
 
         /// <summary>
-        /// Current Target Attribute
+        /// Current Target Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentTarget { get; init; }
         #endregion Attributes

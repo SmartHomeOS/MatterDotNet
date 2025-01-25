@@ -71,12 +71,30 @@ namespace MatterDotNet.Clusters.Appliances
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Water inflow is abnormal
+            /// </summary>
             InflowError = 0x0001,
+            /// <summary>
+            /// Water draining is abnormal
+            /// </summary>
             DrainError = 0x0002,
+            /// <summary>
+            /// Door or door lock is abnormal
+            /// </summary>
             DoorError = 0x0004,
+            /// <summary>
+            /// Unable to reach normal temperature
+            /// </summary>
             TempTooLow = 0x0008,
+            /// <summary>
+            /// Temperature is too high
+            /// </summary>
             TempTooHigh = 0x0010,
+            /// <summary>
+            /// Water level is abnormal
+            /// </summary>
             WaterLevelError = 0x0020,
         }
         #endregion Enums
@@ -148,22 +166,22 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Mask Attribute
+        /// Mask Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> Mask { get; init; }
 
         /// <summary>
-        /// Latch Attribute
+        /// Latch Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> Latch { get; init; }
 
         /// <summary>
-        /// State Attribute
+        /// State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> State { get; init; }
 
         /// <summary>
-        /// Supported Attribute
+        /// Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Alarm> Supported { get; init; }
         #endregion Attributes

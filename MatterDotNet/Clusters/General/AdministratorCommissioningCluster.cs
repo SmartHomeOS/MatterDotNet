@@ -175,17 +175,17 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Window Status Attribute
+        /// Window Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CommissioningWindowStatus> WindowStatus { get; init; }
 
         /// <summary>
-        /// Admin Fabric Index Attribute
+        /// Admin Fabric Index Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> AdminFabricIndex { get; init; }
 
         /// <summary>
-        /// Admin Vendor Id Attribute
+        /// Admin Vendor Id Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> AdminVendorId { get; init; }
         #endregion Attributes

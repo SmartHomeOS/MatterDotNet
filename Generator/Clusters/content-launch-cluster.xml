@@ -110,7 +110,7 @@ limitations under the License.
     <item name="Popularity" value="0x08"/>
     <item name="Provider" value="0x09"/>
     <item name="Sport" value="0x0A"/>
-    <item name="SportsTeam" value="0x00B"/>
+    <item name="SportsTeam" value="0x0B"/>
     <item name="Type" value="0x0C"/>
     <item name="Video" value="0x0D"/>
     <item name="Season" value="0x0E"/>

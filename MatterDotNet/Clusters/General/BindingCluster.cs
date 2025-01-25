@@ -88,7 +88,7 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Binding Attribute
+        /// Binding Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Target[]> BindingAttribute { get; init; }
         #endregion Attributes

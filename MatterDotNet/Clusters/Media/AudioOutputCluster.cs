@@ -198,12 +198,12 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Output List Attribute
+        /// Output List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OutputInfo[]> OutputList { get; init; }
 
         /// <summary>
-        /// Current Output Attribute
+        /// Current Output Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentOutput { get; init; }
         #endregion Attributes

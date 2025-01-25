@@ -99,11 +99,26 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Immersion Heating Element 1
+            /// </summary>
             ImmersionElement1 = 0x01,
+            /// <summary>
+            /// Immersion Heating Element 2
+            /// </summary>
             ImmersionElement2 = 0x02,
+            /// <summary>
+            /// Heat pump Heating
+            /// </summary>
             HeatPump = 0x04,
+            /// <summary>
+            /// Boiler Heating (e.g. Gas or Oil)
+            /// </summary>
             Boiler = 0x08,
+            /// <summary>
+            /// Other Heating
+            /// </summary>
             Other = 0x10,
         }
         #endregion Enums
@@ -127,14 +142,14 @@ namespace MatterDotNet.Clusters.EnergyManagement
                 Duration = TimeUtil.FromSeconds(reader.GetUInt(0))!.Value;
                 OneShot = reader.GetBool(1, true);
                 EmergencyBoost = reader.GetBool(2, true);
-                TemporarySetpoint = reader.GetShort(3, true);
+                TemporarySetpoint = reader.GetDecimal(3, true);
                 TargetPercentage = reader.GetByte(4, true);
                 TargetReheat = reader.GetByte(5, true);
             }
             public required TimeSpan Duration { get; set; }
             public bool? OneShot { get; set; } = false;
             public bool? EmergencyBoost { get; set; } = false;
-            public short? TemporarySetpoint { get; set; }
+            public decimal? TemporarySetpoint { get; set; }
             public byte? TargetPercentage { get; set; }
             public byte? TargetReheat { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -145,7 +160,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
                 if (EmergencyBoost != null)
                     writer.WriteBool(2, EmergencyBoost);
                 if (TemporarySetpoint != null)
-                    writer.WriteShort(3, TemporarySetpoint);
+                    writer.WriteDecimal(3, TemporarySetpoint);
                 if (TargetPercentage != null)
                     writer.WriteByte(4, TargetPercentage);
                 if (TargetReheat != null)
@@ -210,32 +225,32 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Heater Types Attribute
+        /// Heater Types Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WaterHeaterHeatSource> HeaterTypes { get; init; }
 
         /// <summary>
-        /// Heat Demand Attribute
+        /// Heat Demand Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WaterHeaterHeatSource> HeatDemand { get; init; }
 
         /// <summary>
-        /// Tank Volume Attribute
+        /// Tank Volume Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> TankVolume { get; init; }
 
         /// <summary>
-        /// Estimated Heat Required [mWh] Attribute
+        /// Estimated Heat Required [mWh] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> EstimatedHeatRequired { get; init; }
 
         /// <summary>
-        /// Tank Percentage [%] Attribute
+        /// Tank Percentage [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> TankPercentage { get; init; }
 
         /// <summary>
-        /// Boost State Attribute
+        /// Boost State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BoostStateEnum> BoostState { get; init; }
         #endregion Attributes

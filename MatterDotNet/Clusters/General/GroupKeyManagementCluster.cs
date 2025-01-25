@@ -336,22 +336,22 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Group Key Map Attribute
+        /// Group Key Map Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<GroupKeyMapStruct[]> GroupKeyMap { get; init; }
 
         /// <summary>
-        /// Group Table Attribute
+        /// Group Table Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<GroupInfoMap[]> GroupTable { get; init; }
 
         /// <summary>
-        /// Max Groups Per Fabric Attribute
+        /// Max Groups Per Fabric Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> MaxGroupsPerFabric { get; init; }
 
         /// <summary>
-        /// Max Group Keys Per Fabric Attribute
+        /// Max Group Keys Per Fabric Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> MaxGroupKeysPerFabric { get; init; }
         #endregion Attributes

@@ -209,32 +209,32 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Condition [%] Attribute
+        /// Condition [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> Condition { get; init; }
 
         /// <summary>
-        /// Degradation Direction Attribute
+        /// Degradation Direction Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DegradationDirectionEnum> DegradationDirection { get; init; }
 
         /// <summary>
-        /// Change Indication Attribute
+        /// Change Indication Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ChangeIndicationEnum> ChangeIndication { get; init; }
 
         /// <summary>
-        /// In Place Indicator Attribute
+        /// In Place Indicator Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> InPlaceIndicator { get; init; }
 
         /// <summary>
-        /// Last Changed Time Attribute
+        /// Last Changed Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<DateTime?> LastChangedTime { get; init; }
 
         /// <summary>
-        /// Replacement Product List Attribute
+        /// Replacement Product List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ReplacementProduct[]> ReplacementProductList { get; init; }
         #endregion Attributes

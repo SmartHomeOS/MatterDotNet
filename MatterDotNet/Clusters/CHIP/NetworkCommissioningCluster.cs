@@ -205,11 +205,26 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Supports unencrypted Wi-Fi
+            /// </summary>
             Unencrypted = 0x01,
+            /// <summary>
+            /// Supports Wi-Fi using WEP security
+            /// </summary>
             WEP = 0x02,
+            /// <summary>
+            /// Supports Wi-Fi using WPA-Personal security
+            /// </summary>
             WPAPERSONAL = 0x04,
+            /// <summary>
+            /// Supports Wi-Fi using WPA2-Personal security
+            /// </summary>
             WPA2PERSONAL = 0x08,
+            /// <summary>
+            /// Supports Wi-Fi using WPA3-Personal security
+            /// </summary>
             WPA3PERSONAL = 0x10,
             WPA3MatterPDC = 0x20,
         }
@@ -222,11 +237,26 @@ namespace MatterDotNet.Clusters.CHIP
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Thread Border Router functionality is present
+            /// </summary>
             IsBorderRouterCapable = 0x0001,
+            /// <summary>
+            /// Router mode is supported (interface could be in router or REED mode)
+            /// </summary>
             IsRouterCapable = 0x0002,
+            /// <summary>
+            /// Sleepy end-device mode is supported
+            /// </summary>
             IsSleepyEndDeviceCapable = 0x0004,
+            /// <summary>
+            /// Device is a full Thread device (opposite of Minimal Thread Device)
+            /// </summary>
             IsFullThreadDevice = 0x0008,
+            /// <summary>
+            /// Synchronized sleepy end-device mode is supported
+            /// </summary>
             IsSynchronizedSleepyEndDeviceCapable = 0x0010,
         }
         #endregion Enums
@@ -657,57 +687,57 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Max Networks Attribute
+        /// Max Networks Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MaxNetworks { get; init; }
 
         /// <summary>
-        /// Networks Attribute
+        /// Networks Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NetworkInfo[]> Networks { get; init; }
 
         /// <summary>
-        /// Scan Max Time Seconds Attribute
+        /// Scan Max Time Seconds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> ScanMaxTimeSeconds { get; init; }
 
         /// <summary>
-        /// Connect Max Time Seconds Attribute
+        /// Connect Max Time Seconds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> ConnectMaxTimeSeconds { get; init; }
 
         /// <summary>
-        /// Interface Enabled Attribute
+        /// Interface Enabled Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> InterfaceEnabled { get; init; }
 
         /// <summary>
-        /// Last Networking Status Attribute
+        /// Last Networking Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NetworkCommissioningStatus?> LastNetworkingStatus { get; init; }
 
         /// <summary>
-        /// Last Network ID Attribute
+        /// Last Network ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> LastNetworkID { get; init; }
 
         /// <summary>
-        /// Last Connect Error Value Attribute
+        /// Last Connect Error Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<int?> LastConnectErrorValue { get; init; }
 
         /// <summary>
-        /// Supported WiFi Bands Attribute
+        /// Supported WiFi Bands Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WiFiBand[]> SupportedWiFiBands { get; init; }
 
         /// <summary>
-        /// Supported Thread Features Attribute
+        /// Supported Thread Features Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ThreadCapabilities> SupportedThreadFeatures { get; init; }
 
         /// <summary>
-        /// Thread Version Attribute
+        /// Thread Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ThreadVersion { get; init; }
         #endregion Attributes

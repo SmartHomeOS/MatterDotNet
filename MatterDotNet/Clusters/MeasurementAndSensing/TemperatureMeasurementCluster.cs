@@ -34,15 +34,15 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected TemperatureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            MeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
-                Deserialize = x => (short?)(dynamic?)x
+            MeasuredValue = new ReadAttribute<decimal?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
             };
-            MinMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
-                Deserialize = x => (short?)(dynamic?)x ?? short.MinValue
+            MinMeasuredValue = new ReadAttribute<decimal?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 0x8000
 
             };
-            MaxMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 2, true) {
-                Deserialize = x => (short?)(dynamic?)x ?? short.MinValue
+            MaxMeasuredValue = new ReadAttribute<decimal?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (decimal?)(dynamic?)x ?? 0x8000
 
             };
             Tolerance = new ReadAttribute<ushort>(cluster, endPoint, 3) {
@@ -53,22 +53,22 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
 
         #region Attributes
         /// <summary>
-        /// Measured Value Attribute
+        /// Measured Value [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> MeasuredValue { get; init; }
+        public required ReadAttribute<decimal?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Min Measured Value Attribute
+        /// Min Measured Value [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> MinMeasuredValue { get; init; }
+        public required ReadAttribute<decimal?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Max Measured Value Attribute
+        /// Max Measured Value [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short?> MaxMeasuredValue { get; init; }
+        public required ReadAttribute<decimal?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Tolerance Attribute
+        /// Tolerance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> Tolerance { get; init; }
         #endregion Attributes

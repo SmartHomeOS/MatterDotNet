@@ -484,37 +484,37 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// ACL Attribute
+        /// ACL Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<AccessControlEntry[]> ACL { get; init; }
 
         /// <summary>
-        /// Extension Attribute
+        /// Extension Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<AccessControlExtension[]> Extension { get; init; }
 
         /// <summary>
-        /// Subjects Per Access Control Entry Attribute
+        /// Subjects Per Access Control Entry Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> SubjectsPerAccessControlEntry { get; init; }
 
         /// <summary>
-        /// Targets Per Access Control Entry Attribute
+        /// Targets Per Access Control Entry Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> TargetsPerAccessControlEntry { get; init; }
 
         /// <summary>
-        /// Access Control Entries Per Fabric Attribute
+        /// Access Control Entries Per Fabric Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> AccessControlEntriesPerFabric { get; init; }
 
         /// <summary>
-        /// Commissioning ARL Attribute
+        /// Commissioning ARL Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CommissioningAccessRestrictionEntry[]> CommissioningARL { get; init; }
 
         /// <summary>
-        /// ARL Attribute
+        /// ARL Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AccessRestrictionEntry[]> ARL { get; init; }
         #endregion Attributes

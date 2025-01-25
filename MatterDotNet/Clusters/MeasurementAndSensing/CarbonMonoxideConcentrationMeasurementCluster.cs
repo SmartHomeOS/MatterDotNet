@@ -210,57 +210,57 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Measured Value Attribute
+        /// Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Min Measured Value Attribute
+        /// Min Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Max Measured Value Attribute
+        /// Max Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Peak Measured Value Attribute
+        /// Peak Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float?> PeakMeasuredValue { get; init; }
 
         /// <summary>
-        /// Peak Measured Value Window Attribute
+        /// Peak Measured Value Window Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> PeakMeasuredValueWindow { get; init; }
 
         /// <summary>
-        /// Average Measured Value Attribute
+        /// Average Measured Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float?> AverageMeasuredValue { get; init; }
 
         /// <summary>
-        /// Average Measured Value Window Attribute
+        /// Average Measured Value Window Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> AverageMeasuredValueWindow { get; init; }
 
         /// <summary>
-        /// Uncertainty Attribute
+        /// Uncertainty Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<float> Uncertainty { get; init; }
 
         /// <summary>
-        /// Measurement Unit Attribute
+        /// Measurement Unit Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MeasurementUnitEnum> MeasurementUnit { get; init; }
 
         /// <summary>
-        /// Measurement Medium Attribute
+        /// Measurement Medium Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MeasurementMediumEnum> MeasurementMedium { get; init; }
 
         /// <summary>
-        /// Level Value Attribute
+        /// Level Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LevelValueEnum> LevelValue { get; init; }
         #endregion Attributes

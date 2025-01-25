@@ -833,9 +833,18 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Only one credential is required for lock operation
+            /// </summary>
             Single = 0x01,
+            /// <summary>
+            /// Any two credentials are required for lock operation
+            /// </summary>
             Dual = 0x02,
+            /// <summary>
+            /// Any three credentials are required for lock operation
+            /// </summary>
             Tri = 0x04,
         }
 
@@ -847,13 +856,34 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Schedule is applied on Sunday
+            /// </summary>
             Sunday = 0x01,
+            /// <summary>
+            /// Schedule is applied on Monday
+            /// </summary>
             Monday = 0x02,
+            /// <summary>
+            /// Schedule is applied on Tuesday
+            /// </summary>
             Tuesday = 0x04,
+            /// <summary>
+            /// Schedule is applied on Wednesday
+            /// </summary>
             Wednesday = 0x08,
+            /// <summary>
+            /// Schedule is applied on Thursday
+            /// </summary>
             Thursday = 0x10,
+            /// <summary>
+            /// Schedule is applied on Friday
+            /// </summary>
             Friday = 0x20,
+            /// <summary>
+            /// Schedule is applied on Saturday
+            /// </summary>
             Saturday = 0x40,
         }
 
@@ -865,9 +895,18 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Only one credential is required for lock operation
+            /// </summary>
             Single = 0x01,
+            /// <summary>
+            /// Any two credentials are required for lock operation
+            /// </summary>
             Dual = 0x02,
+            /// <summary>
+            /// Any three credentials are required for lock operation
+            /// </summary>
             Tri = 0x04,
         }
 
@@ -879,11 +918,26 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Normal operation mode
+            /// </summary>
             Normal = 0x0001,
+            /// <summary>
+            /// Vacation operation mode
+            /// </summary>
             Vacation = 0x0002,
+            /// <summary>
+            /// Privacy operation mode
+            /// </summary>
             Privacy = 0x0004,
+            /// <summary>
+            /// No remote lock and unlock operation mode
+            /// </summary>
             NoRemoteLockUnlock = 0x0008,
+            /// <summary>
+            /// Passage operation mode
+            /// </summary>
             Passage = 0x0010,
         }
 
@@ -895,12 +949,30 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// The state of local programming functionality
+            /// </summary>
             EnableLocalProgrammingEnabled = 0x0001,
+            /// <summary>
+            /// The state of the keypad interface
+            /// </summary>
             KeypadInterfaceDefaultAccessEnabled = 0x0002,
+            /// <summary>
+            /// The state of the remote interface
+            /// </summary>
             RemoteInterfaceDefaultAccessIsEnabled = 0x0004,
+            /// <summary>
+            /// Sound volume is set to Silent value
+            /// </summary>
             SoundEnabled = 0x0020,
+            /// <summary>
+            /// Auto relock time it set to 0
+            /// </summary>
             AutoRelockTimeSet = 0x0040,
+            /// <summary>
+            /// LEDs is disabled
+            /// </summary>
             LEDSettingsSet = 0x0080,
         }
 
@@ -912,7 +984,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// The state of the ability to add users, credentials or schedules on the device
             /// </summary>
@@ -939,7 +1011,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             Lock = 0x0002,
             Unlock = 0x0004,
@@ -958,7 +1030,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             Lock = 0x0002,
             Unlock = 0x0004,
@@ -976,7 +1048,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x00001,
             ThumbturnLock = 0x00002,
             ThumbturnUnlock = 0x00004,
@@ -998,7 +1070,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             Lock = 0x0002,
             Unlock = 0x0004,
@@ -1016,7 +1088,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             ProgrammingPINChanged = 0x0002,
             PINAdded = 0x0004,
@@ -1032,7 +1104,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             ProgrammingPINChanged = 0x0002,
             PINAdded = 0x0004,
@@ -1050,7 +1122,7 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             Unknown = 0x0001,
             RFIDCodeAdded = 0x0020,
             RFIDCodeCleared = 0x0040,
@@ -1064,13 +1136,34 @@ namespace MatterDotNet.Clusters.Closures
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Sunday
+            /// </summary>
             Sunday = 0x01,
+            /// <summary>
+            /// Monday
+            /// </summary>
             Monday = 0x02,
+            /// <summary>
+            /// Tuesday
+            /// </summary>
             Tuesday = 0x04,
+            /// <summary>
+            /// Wednesday
+            /// </summary>
             Wednesday = 0x08,
+            /// <summary>
+            /// Thursday
+            /// </summary>
             Thursday = 0x10,
+            /// <summary>
+            /// Friday
+            /// </summary>
             Friday = 0x20,
+            /// <summary>
+            /// Saturday
+            /// </summary>
             Saturday = 0x40,
         }
         #endregion Enums
@@ -1769,227 +1862,227 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Lock State Attribute
+        /// Lock State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LockStateEnum?> LockState { get; init; }
 
         /// <summary>
-        /// Lock Type Attribute
+        /// Lock Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LockTypeEnum> LockType { get; init; }
 
         /// <summary>
-        /// Actuator Enabled Attribute
+        /// Actuator Enabled Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> ActuatorEnabled { get; init; }
 
         /// <summary>
-        /// Door State Attribute
+        /// Door State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DoorStateEnum?> DoorState { get; init; }
 
         /// <summary>
-        /// Door Open Events Attribute
+        /// Door Open Events Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint> DoorOpenEvents { get; init; }
 
         /// <summary>
-        /// Door Closed Events Attribute
+        /// Door Closed Events Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint> DoorClosedEvents { get; init; }
 
         /// <summary>
-        /// Open Period Attribute
+        /// Open Period Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> OpenPeriod { get; init; }
 
         /// <summary>
-        /// Number Of Total Users Supported Attribute
+        /// Number Of Total Users Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfTotalUsersSupported { get; init; }
 
         /// <summary>
-        /// Number Of PIN Users Supported Attribute
+        /// Number Of PIN Users Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfPINUsersSupported { get; init; }
 
         /// <summary>
-        /// Number Of RFID Users Supported Attribute
+        /// Number Of RFID Users Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfRFIDUsersSupported { get; init; }
 
         /// <summary>
-        /// Number Of Week Day Schedules Supported Per User Attribute
+        /// Number Of Week Day Schedules Supported Per User Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfWeekDaySchedulesSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Number Of Year Day Schedules Supported Per User Attribute
+        /// Number Of Year Day Schedules Supported Per User Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfYearDaySchedulesSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Number Of Holiday Schedules Supported Attribute
+        /// Number Of Holiday Schedules Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfHolidaySchedulesSupported { get; init; }
 
         /// <summary>
-        /// Max PIN Code Length Attribute
+        /// Max PIN Code Length Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MaxPINCodeLength { get; init; }
 
         /// <summary>
-        /// Min PIN Code Length Attribute
+        /// Min PIN Code Length Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MinPINCodeLength { get; init; }
 
         /// <summary>
-        /// Max RFID Code Length Attribute
+        /// Max RFID Code Length Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MaxRFIDCodeLength { get; init; }
 
         /// <summary>
-        /// Min RFID Code Length Attribute
+        /// Min RFID Code Length Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MinRFIDCodeLength { get; init; }
 
         /// <summary>
-        /// Credential Rules Support Attribute
+        /// Credential Rules Support Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CredentialRuleMask> CredentialRulesSupport { get; init; }
 
         /// <summary>
-        /// Number Of Credentials Supported Per User Attribute
+        /// Number Of Credentials Supported Per User Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfCredentialsSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Language Attribute
+        /// Language Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> Language { get; init; }
 
         /// <summary>
-        /// LED Settings Attribute
+        /// LED Settings Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> LEDSettings { get; init; }
 
         /// <summary>
-        /// Auto Relock Time Attribute
+        /// Auto Relock Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint> AutoRelockTime { get; init; }
 
         /// <summary>
-        /// Sound Volume Attribute
+        /// Sound Volume Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> SoundVolume { get; init; }
 
         /// <summary>
-        /// Operating Mode Attribute
+        /// Operating Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<OperatingModeEnum> OperatingMode { get; init; }
 
         /// <summary>
-        /// Supported Operating Modes Attribute
+        /// Supported Operating Modes Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SupportedOperatingModesBitmap> SupportedOperatingModes { get; init; }
 
         /// <summary>
-        /// Default Configuration Register Attribute
+        /// Default Configuration Register Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DefaultConfigurationRegisterBitmap> DefaultConfigurationRegister { get; init; }
 
         /// <summary>
-        /// Enable Local Programming Attribute
+        /// Enable Local Programming Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> EnableLocalProgramming { get; init; }
 
         /// <summary>
-        /// Enable One Touch Locking Attribute
+        /// Enable One Touch Locking Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> EnableOneTouchLocking { get; init; }
 
         /// <summary>
-        /// Enable Inside Status LED Attribute
+        /// Enable Inside Status LED Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> EnableInsideStatusLED { get; init; }
 
         /// <summary>
-        /// Enable Privacy Mode Button Attribute
+        /// Enable Privacy Mode Button Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> EnablePrivacyModeButton { get; init; }
 
         /// <summary>
-        /// Local Programming Features Attribute
+        /// Local Programming Features Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<LocalProgrammingFeaturesBitmap> LocalProgrammingFeatures { get; init; }
 
         /// <summary>
-        /// Wrong Code Entry Limit Attribute
+        /// Wrong Code Entry Limit Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> WrongCodeEntryLimit { get; init; }
 
         /// <summary>
-        /// User Code Temporary Disable Time Attribute
+        /// User Code Temporary Disable Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> UserCodeTemporaryDisableTime { get; init; }
 
         /// <summary>
-        /// Send PIN Over The Air Attribute
+        /// Send PIN Over The Air Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> SendPINOverTheAir { get; init; }
 
         /// <summary>
-        /// Require PI Nfor Remote Operation Attribute
+        /// Require PI Nfor Remote Operation Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> RequirePINforRemoteOperation { get; init; }
 
         /// <summary>
-        /// Expiring User Timeout Attribute
+        /// Expiring User Timeout Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> ExpiringUserTimeout { get; init; }
 
         /// <summary>
-        /// Aliro Reader Verification Key Attribute
+        /// Aliro Reader Verification Key Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> AliroReaderVerificationKey { get; init; }
 
         /// <summary>
-        /// Aliro Reader Group Identifier Attribute
+        /// Aliro Reader Group Identifier Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> AliroReaderGroupIdentifier { get; init; }
 
         /// <summary>
-        /// Aliro Reader Group Sub Identifier Attribute
+        /// Aliro Reader Group Sub Identifier Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]> AliroReaderGroupSubIdentifier { get; init; }
 
         /// <summary>
-        /// Aliro Expedited Transaction Supported Protocol Versions Attribute
+        /// Aliro Expedited Transaction Supported Protocol Versions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[][]> AliroExpeditedTransactionSupportedProtocolVersions { get; init; }
 
         /// <summary>
-        /// Aliro Group Resolving Key Attribute
+        /// Aliro Group Resolving Key Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> AliroGroupResolvingKey { get; init; }
 
         /// <summary>
-        /// Aliro Supported BLEUWB Protocol Versions Attribute
+        /// Aliro Supported BLEUWB Protocol Versions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[][]> AliroSupportedBLEUWBProtocolVersions { get; init; }
 
         /// <summary>
-        /// Aliro BLE Advertising Version Attribute
+        /// Aliro BLE Advertising Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> AliroBLEAdvertisingVersion { get; init; }
 
         /// <summary>
-        /// Number Of Aliro Credential Issuer Keys Supported Attribute
+        /// Number Of Aliro Credential Issuer Keys Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfAliroCredentialIssuerKeysSupported { get; init; }
 
         /// <summary>
-        /// Number Of Aliro Endpoint Keys Supported Attribute
+        /// Number Of Aliro Endpoint Keys Supported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> NumberOfAliroEndpointKeysSupported { get; init; }
         #endregion Attributes

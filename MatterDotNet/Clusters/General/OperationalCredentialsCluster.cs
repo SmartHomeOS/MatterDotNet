@@ -461,32 +461,32 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// NO Cs Attribute
+        /// NO Cs Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NOC[]> NOCs { get; init; }
 
         /// <summary>
-        /// Fabrics Attribute
+        /// Fabrics Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<FabricDescriptor[]> Fabrics { get; init; }
 
         /// <summary>
-        /// Supported Fabrics Attribute
+        /// Supported Fabrics Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SupportedFabrics { get; init; }
 
         /// <summary>
-        /// Commissioned Fabrics Attribute
+        /// Commissioned Fabrics Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CommissionedFabrics { get; init; }
 
         /// <summary>
-        /// Trusted Root Certificates Attribute
+        /// Trusted Root Certificates Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[][]> TrustedRootCertificates { get; init; }
 
         /// <summary>
-        /// Current Fabric Index Attribute
+        /// Current Fabric Index Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentFabricIndex { get; init; }
         #endregion Attributes

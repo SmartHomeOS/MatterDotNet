@@ -103,17 +103,17 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Number Of Positions Attribute
+        /// Number Of Positions Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> NumberOfPositions { get; init; }
 
         /// <summary>
-        /// Current Position Attribute
+        /// Current Position Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentPosition { get; init; }
 
         /// <summary>
-        /// Multi Press Max Attribute
+        /// Multi Press Max Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MultiPressMax { get; init; }
         #endregion Attributes

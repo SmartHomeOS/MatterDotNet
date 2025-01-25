@@ -452,47 +452,47 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Network Interfaces Attribute
+        /// Network Interfaces Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NetworkInterface[]> NetworkInterfaces { get; init; }
 
         /// <summary>
-        /// Reboot Count Attribute
+        /// Reboot Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> RebootCount { get; init; }
 
         /// <summary>
-        /// Up Time Attribute
+        /// Up Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> UpTime { get; init; }
 
         /// <summary>
-        /// Total Operational Hours Attribute
+        /// Total Operational Hours Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> TotalOperationalHours { get; init; }
 
         /// <summary>
-        /// Boot Reason Attribute
+        /// Boot Reason Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BootReasonEnum> BootReason { get; init; }
 
         /// <summary>
-        /// Active Hardware Faults Attribute
+        /// Active Hardware Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<HardwareFault[]> ActiveHardwareFaults { get; init; }
 
         /// <summary>
-        /// Active Radio Faults Attribute
+        /// Active Radio Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RadioFault[]> ActiveRadioFaults { get; init; }
 
         /// <summary>
-        /// Active Network Faults Attribute
+        /// Active Network Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NetworkFault[]> ActiveNetworkFaults { get; init; }
 
         /// <summary>
-        /// Test Event Triggers Enabled Attribute
+        /// Test Event Triggers Enabled Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> TestEventTriggersEnabled { get; init; }
         #endregion Attributes

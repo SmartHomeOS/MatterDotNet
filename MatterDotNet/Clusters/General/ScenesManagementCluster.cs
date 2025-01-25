@@ -76,7 +76,10 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Copy all scenes in the scene table
+            /// </summary>
             CopyAllScenes = 0x01,
         }
         #endregion Enums
@@ -560,17 +563,17 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Last Configured By Attribute
+        /// Last Configured By Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> LastConfiguredBy { get; init; }
 
         /// <summary>
-        /// Scene Table Size Attribute
+        /// Scene Table Size Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> SceneTableSize { get; init; }
 
         /// <summary>
-        /// Fabric Scene Info Attribute
+        /// Fabric Scene Info Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SceneInfo[]> FabricSceneInfo { get; init; }
         #endregion Attributes

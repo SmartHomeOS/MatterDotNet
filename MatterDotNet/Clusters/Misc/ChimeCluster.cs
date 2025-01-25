@@ -101,17 +101,17 @@ namespace MatterDotNet.Clusters.Misc
 
         #region Attributes
         /// <summary>
-        /// Installed Chime Sounds Attribute
+        /// Installed Chime Sounds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ChimeSound[]> InstalledChimeSounds { get; init; }
 
         /// <summary>
-        /// Active Chime ID Attribute
+        /// Active Chime ID Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte> ActiveChimeID { get; init; }
 
         /// <summary>
-        /// Enabled Attribute
+        /// Enabled Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<bool> Enabled { get; init; }
         #endregion Attributes

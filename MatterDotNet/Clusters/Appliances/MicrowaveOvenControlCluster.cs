@@ -182,47 +182,47 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Cook Time Attribute
+        /// Cook Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> CookTime { get; init; }
 
         /// <summary>
-        /// Max Cook Time Attribute
+        /// Max Cook Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan> MaxCookTime { get; init; }
 
         /// <summary>
-        /// Power Setting Attribute
+        /// Power Setting Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PowerSetting { get; init; }
 
         /// <summary>
-        /// Min Power Attribute
+        /// Min Power Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MinPower { get; init; }
 
         /// <summary>
-        /// Max Power Attribute
+        /// Max Power Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> MaxPower { get; init; }
 
         /// <summary>
-        /// Power Step Attribute
+        /// Power Step Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PowerStep { get; init; }
 
         /// <summary>
-        /// Supported Watts Attribute
+        /// Supported Watts Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> SupportedWatts { get; init; }
 
         /// <summary>
-        /// Selected Watt Index Attribute
+        /// Selected Watt Index Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SelectedWattIndex { get; init; }
 
         /// <summary>
-        /// Watt Rating Attribute
+        /// Watt Rating Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> WattRating { get; init; }
         #endregion Attributes

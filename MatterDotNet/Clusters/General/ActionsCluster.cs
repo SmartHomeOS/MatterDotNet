@@ -157,7 +157,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// Indicate support for InstantAction command
             /// </summary>
@@ -606,17 +606,17 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Action List Attribute
+        /// Action List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Action[]> ActionList { get; init; }
 
         /// <summary>
-        /// Endpoint Lists Attribute
+        /// Endpoint Lists Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EndpointList[]> EndpointLists { get; init; }
 
         /// <summary>
-        /// Setup URL Attribute
+        /// Setup URL Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> SetupURL { get; init; }
         #endregion Attributes

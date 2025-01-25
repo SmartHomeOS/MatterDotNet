@@ -212,9 +212,18 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Indicate rock left to right
+            /// </summary>
             RockLeftRight = 0x01,
+            /// <summary>
+            /// Indicate rock up and down
+            /// </summary>
             RockUpDown = 0x02,
+            /// <summary>
+            /// Indicate rock around
+            /// </summary>
             RockRound = 0x04,
         }
 
@@ -226,8 +235,14 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Indicate sleep wind
+            /// </summary>
             SleepWind = 0x01,
+            /// <summary>
+            /// Indicate natural wind
+            /// </summary>
             NaturalWind = 0x02,
         }
         #endregion Enums
@@ -287,62 +302,62 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Fan Mode Attribute
+        /// Fan Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<FanModeEnum> FanMode { get; init; }
 
         /// <summary>
-        /// Fan Mode Sequence Attribute
+        /// Fan Mode Sequence Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<FanModeSequenceEnum> FanModeSequence { get; init; }
 
         /// <summary>
-        /// Percent Setting [%] Attribute
+        /// Percent Setting [%] Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> PercentSetting { get; init; }
 
         /// <summary>
-        /// Percent Current [%] Attribute
+        /// Percent Current [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> PercentCurrent { get; init; }
 
         /// <summary>
-        /// Speed Max Attribute
+        /// Speed Max Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SpeedMax { get; init; }
 
         /// <summary>
-        /// Speed Setting Attribute
+        /// Speed Setting Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> SpeedSetting { get; init; }
 
         /// <summary>
-        /// Speed Current Attribute
+        /// Speed Current Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SpeedCurrent { get; init; }
 
         /// <summary>
-        /// Rock Support Attribute
+        /// Rock Support Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Rock> RockSupport { get; init; }
 
         /// <summary>
-        /// Rock Setting Attribute
+        /// Rock Setting Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Rock> RockSetting { get; init; }
 
         /// <summary>
-        /// Wind Support Attribute
+        /// Wind Support Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Wind> WindSupport { get; init; }
 
         /// <summary>
-        /// Wind Setting Attribute
+        /// Wind Setting Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<Wind> WindSetting { get; init; }
 
         /// <summary>
-        /// Airflow Direction Attribute
+        /// Airflow Direction Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<AirflowDirectionEnum> AirflowDirection { get; init; }
         #endregion Attributes

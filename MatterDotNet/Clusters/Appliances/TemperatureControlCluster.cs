@@ -37,17 +37,17 @@ namespace MatterDotNet.Clusters.Appliances
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected TemperatureControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            TemperatureSetpoint = new ReadAttribute<short>(cluster, endPoint, 0) {
-                Deserialize = x => (short)(dynamic?)x!
+            TemperatureSetpoint = new ReadAttribute<decimal>(cluster, endPoint, 0) {
+                Deserialize = x => (decimal)(dynamic?)x!
             };
-            MinTemperature = new ReadAttribute<short>(cluster, endPoint, 1) {
-                Deserialize = x => (short)(dynamic?)x!
+            MinTemperature = new ReadAttribute<decimal>(cluster, endPoint, 1) {
+                Deserialize = x => (decimal)(dynamic?)x!
             };
-            MaxTemperature = new ReadAttribute<short>(cluster, endPoint, 2) {
-                Deserialize = x => (short)(dynamic?)x!
+            MaxTemperature = new ReadAttribute<decimal>(cluster, endPoint, 2) {
+                Deserialize = x => (decimal)(dynamic?)x!
             };
-            Step = new ReadAttribute<short>(cluster, endPoint, 3) {
-                Deserialize = x => (short)(dynamic?)x!
+            Step = new ReadAttribute<decimal>(cluster, endPoint, 3) {
+                Deserialize = x => (decimal)(dynamic?)x!
             };
             SelectedTemperatureLevel = new ReadAttribute<byte>(cluster, endPoint, 4) {
                 Deserialize = x => (byte)(dynamic?)x!
@@ -86,12 +86,12 @@ namespace MatterDotNet.Clusters.Appliances
 
         #region Payloads
         private record SetTemperaturePayload : TLVPayload {
-            public short? TargetTemperature { get; set; }
+            public decimal? TargetTemperature { get; set; }
             public byte? TargetTemperatureLevel { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 if (TargetTemperature != null)
-                    writer.WriteShort(0, TargetTemperature);
+                    writer.WriteDecimal(0, TargetTemperature);
                 if (TargetTemperatureLevel != null)
                     writer.WriteByte(1, TargetTemperatureLevel);
                 writer.EndContainer();
@@ -103,7 +103,7 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Set Temperature
         /// </summary>
-        public async Task<bool> SetTemperature(SecureSession session, short? targetTemperature, byte? targetTemperatureLevel) {
+        public async Task<bool> SetTemperature(SecureSession session, decimal? targetTemperature, byte? targetTemperatureLevel) {
             SetTemperaturePayload requestFields = new SetTemperaturePayload() {
                 TargetTemperature = targetTemperature,
                 TargetTemperatureLevel = targetTemperatureLevel,
@@ -136,32 +136,32 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Temperature Setpoint Attribute
+        /// Temperature Setpoint [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> TemperatureSetpoint { get; init; }
+        public required ReadAttribute<decimal> TemperatureSetpoint { get; init; }
 
         /// <summary>
-        /// Min Temperature Attribute
+        /// Min Temperature [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> MinTemperature { get; init; }
+        public required ReadAttribute<decimal> MinTemperature { get; init; }
 
         /// <summary>
-        /// Max Temperature Attribute
+        /// Max Temperature [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> MaxTemperature { get; init; }
+        public required ReadAttribute<decimal> MaxTemperature { get; init; }
 
         /// <summary>
-        /// Step Attribute
+        /// Step [°C] Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<short> Step { get; init; }
+        public required ReadAttribute<decimal> Step { get; init; }
 
         /// <summary>
-        /// Selected Temperature Level Attribute
+        /// Selected Temperature Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> SelectedTemperatureLevel { get; init; }
 
         /// <summary>
-        /// Supported Temperature Levels Attribute
+        /// Supported Temperature Levels Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]> SupportedTemperatureLevels { get; init; }
         #endregion Attributes

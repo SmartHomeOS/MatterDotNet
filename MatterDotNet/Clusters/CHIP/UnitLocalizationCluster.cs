@@ -93,7 +93,7 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Temperature Unit Attribute
+        /// Temperature Unit Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<TempUnit> TemperatureUnit { get; init; }
         #endregion Attributes

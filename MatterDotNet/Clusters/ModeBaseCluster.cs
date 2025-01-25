@@ -18,75 +18,75 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters
 {
-    /// <summary>
-    /// Mode Tag
-    /// </summary>
-    public record ModeTag : TLVPayload {
         /// <summary>
         /// Mode Tag
         /// </summary>
-        public ModeTag() { }
+        public record ModeTag : TLVPayload {
+            /// <summary>
+            /// Mode Tag
+            /// </summary>
+            public ModeTag() { }
 
-        /// <summary>
-        /// Mode Tag
-        /// </summary>
-        [SetsRequiredMembers]
-        public ModeTag(object[] fields) {
-            FieldReader reader = new FieldReader(fields);
-            MfgCode = reader.GetUShort(0, true);
-            Value = reader.GetUShort(1)!.Value;
-        }
-        public ushort? MfgCode { get; set; }
-        public required ushort Value { get; set; }
-        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-            writer.StartStructure(structNumber);
-            if (MfgCode != null)
-                writer.WriteUShort(0, MfgCode);
-            writer.WriteUShort(1, Value);
-            writer.EndContainer();
-        }
-    }
-
-    /// <summary>
-    /// Mode Option
-    /// </summary>
-    public record ModeOption : TLVPayload {
-        /// <summary>
-        /// Mode Option
-        /// </summary>
-        public ModeOption() { }
-
-        /// <summary>
-        /// Mode Option
-        /// </summary>
-        [SetsRequiredMembers]
-        public ModeOption(object[] fields) {
-            FieldReader reader = new FieldReader(fields);
-            Label = reader.GetString(0, false, 64)!;
-            Mode = reader.GetByte(1)!.Value;
-            {
-                ModeTags = new ModeTag[reader.GetStruct(2)!.Length];
-                for (int n = 0; n < ModeTags.Length; n++) {
-                    ModeTags[n] = new ModeTag((object[])((object[])fields[2])[n]);
-                }
+            /// <summary>
+            /// Mode Tag
+            /// </summary>
+            [SetsRequiredMembers]
+            public ModeTag(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                MfgCode = reader.GetUShort(0, true);
+                Value = reader.GetUShort(1)!.Value;
+            }
+            public ushort? MfgCode { get; set; }
+            public required ushort Value { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                if (MfgCode != null)
+                    writer.WriteUShort(0, MfgCode);
+                writer.WriteUShort(1, Value);
+                writer.EndContainer();
             }
         }
-        public required string Label { get; set; }
-        public required byte Mode { get; set; }
-        public required ModeTag[] ModeTags { get; set; }
-        internal override void Serialize(TLVWriter writer, long structNumber = -1) {
-            writer.StartStructure(structNumber);
-            writer.WriteString(0, Label, 64);
-            writer.WriteByte(1, Mode);
-            {
-                Constrain(ModeTags, 0, 8);
-                writer.StartArray(2);
-                foreach (var item in ModeTags) {
-                    item.Serialize(writer, -1);
+
+        /// <summary>
+        /// Mode Option
+        /// </summary>
+        public record ModeOption : TLVPayload {
+            /// <summary>
+            /// Mode Option
+            /// </summary>
+            public ModeOption() { }
+
+            /// <summary>
+            /// Mode Option
+            /// </summary>
+            [SetsRequiredMembers]
+            public ModeOption(object[] fields) {
+                FieldReader reader = new FieldReader(fields);
+                Label = reader.GetString(0, false, 64)!;
+                Mode = reader.GetByte(1)!.Value;
+                {
+                    ModeTags = new ModeTag[reader.GetStruct(2)!.Length];
+                    for (int n = 0; n < ModeTags.Length; n++) {
+                        ModeTags[n] = new ModeTag((object[])((object[])fields[2])[n]);
+                    }
+                }
+            }
+            public required string Label { get; set; }
+            public required byte Mode { get; set; }
+            public required ModeTag[] ModeTags { get; set; }
+            internal override void Serialize(TLVWriter writer, long structNumber = -1) {
+                writer.StartStructure(structNumber);
+                writer.WriteString(0, Label, 64);
+                writer.WriteByte(1, Mode);
+                {
+                    Constrain(ModeTags, 0, 8);
+                    writer.StartArray(2);
+                    foreach (var item in ModeTags) {
+                        item.Serialize(writer, -1);
+                    }
+                    writer.EndContainer();
                 }
                 writer.EndContainer();
             }
-            writer.EndContainer();
         }
-    }
 }

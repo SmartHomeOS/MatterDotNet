@@ -452,13 +452,19 @@ namespace Generator
                         writer.Write(", sbyte.MaxValue");
                     break;
                 case "int16s":
-                case "temperature":
-                case "TemperatureDifference":
                     writer.Write($"{totalIndent}writer.WriteShort({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null)
                         writer.Write(", short.MaxValue");
+                    break;
+                case "temperature":
+                case "TemperatureDifference":
+                    writer.Write($"{totalIndent}writer.WriteDecimal({id}, {name}");
+                    if (to != null)
+                        writer.Write($", {to.Value}");
+                    else if (from != null && from != 0)
+                        writer.Write(", short.MaxValue"); //Intentionally ushort
                     break;
                 case "int24s":
                 case "int32s":
@@ -514,7 +520,7 @@ namespace Generator
                     unsigned = true;
                     break;
                 case "percent100ths":
-                    writer.Write($"{totalIndent}writer.WriteDecimal({id}, {name}");
+                    writer.Write($"{totalIndent}writer.WriteUDecimal({id}, {name}");
                     if (to != null)
                         writer.Write($", {to.Value}");
                     else if (from != null && from != 0)
@@ -741,9 +747,11 @@ namespace Generator
                     writer.Write($"reader.GetSByte({id}");
                     break;
                 case "int16s":
+                    writer.Write($"reader.GetShort({id}");
+                    break;
                 case "temperature":
                 case "TemperatureDifference":
-                    writer.Write($"reader.GetShort({id}");
+                    writer.Write($"reader.GetDecimal({id}");
                     break;
                 case "int24s":
                 case "int32s":
@@ -781,7 +789,7 @@ namespace Generator
                     writer.Write($"reader.GetUShort({id}");
                     break;
                 case "percent100ths":
-                    writer.Write($"reader.GetDecimal({id}");
+                    writer.Write($"reader.GetUDecimal({id}");
                     break;
                 case "int24u":
                 case "int32u":
@@ -1312,10 +1320,10 @@ namespace Generator
             WriteType(false, bitmapType.type, writer, bitmapType.name, clusterConfig, cluster);
             writer.WriteLine(" {");
             writer.WriteLine("            /// <summary>\n            /// Nothing Set\n            /// </summary>");
-            writer.WriteLine("            None = 0,");
+            writer.WriteLine("            None = 0x0,");
             foreach (rootConfiguratorBitmapField item in bitmapType.field)
             {
-                string key = GeneratorUtil.EnsureHex(cluster?.code) + "." + GeneratorUtil.SanitizeName(bitmapType.name, false, HasAttribute(cluster, bitmapType.name));
+                string key = GeneratorUtil.EnsureHex(cluster?.code) + "." + GeneratorUtil.SanitizeName(bitmapType.name);
                 if (item.summary != null)
                     writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                 else if (bitmapComments.ContainsKey(key) && bitmapComments[key].ContainsKey(GeneratorUtil.EnsureHex(item.mask, 4)))
@@ -1438,7 +1446,7 @@ namespace Generator
 
         private static void WriteAttribute(configurator clusterConfig, rootConfiguratorClusterAttribute attribute, rootConfiguratorCluster cluster, TextWriter writer)
         {
-            writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} Attribute\n        /// </summary>");
+            writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} Attribute [{(attribute.writable ? "Read/Write" : "Read Only")}]\n        /// </summary>");
             if (attribute.writable)
                 writer.Write("        public required ReadWriteAttribute<");
             else
@@ -1537,9 +1545,11 @@ namespace Generator
                     writer.Write("sbyte");
                     break;
                 case "int16s":
+                    writer.Write("short");
+                    break;
                 case "temperature":
                 case "TemperatureDifference":
-                    writer.Write("short");
+                    writer.Write("decimal");
                     break;
                 case "int24s":
                 case "int32s":
@@ -1626,7 +1636,7 @@ namespace Generator
             }
             if (type == "int16s" && value == "0x8000")
                 return "short.MinValue";
-            if ((value == "0" || value == "0x0") && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
+            if ((value == "0" || value == "0x00") && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
                 return "TimeUtil.EPOCH";
             if (value == "0xFFFFFFFFFFFFFFFF" && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
                 return "DateTime.MinValue";
@@ -1650,9 +1660,8 @@ namespace Generator
             {
                 if (value == "null")
                     return value;
-                if (value.EndsWith("°C"))
-                    value = value.Substring(0, value.Length - 2);
-                return value;
+                short val = short.Parse(value);
+                return (val / 100M).ToString("0.00") + "M";
             }
             return value.ToLowerInvariant();
         }

@@ -203,7 +203,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// A fault related to the system or pump device is detected.
             /// </summary>
@@ -263,117 +263,117 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Max Pressure Attribute
+        /// Max Pressure Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxPressure { get; init; }
 
         /// <summary>
-        /// Max Speed Attribute
+        /// Max Speed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MaxSpeed { get; init; }
 
         /// <summary>
-        /// Max Flow Attribute
+        /// Max Flow Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MaxFlow { get; init; }
 
         /// <summary>
-        /// Min Const Pressure Attribute
+        /// Min Const Pressure Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MinConstPressure { get; init; }
 
         /// <summary>
-        /// Max Const Pressure Attribute
+        /// Max Const Pressure Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxConstPressure { get; init; }
 
         /// <summary>
-        /// Min Comp Pressure Attribute
+        /// Min Comp Pressure Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MinCompPressure { get; init; }
 
         /// <summary>
-        /// Max Comp Pressure Attribute
+        /// Max Comp Pressure Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxCompPressure { get; init; }
 
         /// <summary>
-        /// Min Const Speed Attribute
+        /// Min Const Speed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MinConstSpeed { get; init; }
 
         /// <summary>
-        /// Max Const Speed Attribute
+        /// Max Const Speed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MaxConstSpeed { get; init; }
 
         /// <summary>
-        /// Min Const Flow Attribute
+        /// Min Const Flow Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MinConstFlow { get; init; }
 
         /// <summary>
-        /// Max Const Flow Attribute
+        /// Max Const Flow Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> MaxConstFlow { get; init; }
 
         /// <summary>
-        /// Min Const Temp Attribute
+        /// Min Const Temp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MinConstTemp { get; init; }
 
         /// <summary>
-        /// Max Const Temp Attribute
+        /// Max Const Temp Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> MaxConstTemp { get; init; }
 
         /// <summary>
-        /// Pump Status Attribute
+        /// Pump Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PumpStatusBitmap> PumpStatus { get; init; }
 
         /// <summary>
-        /// Effective Operation Mode Attribute
+        /// Effective Operation Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationModeEnum> EffectiveOperationMode { get; init; }
 
         /// <summary>
-        /// Effective Control Mode Attribute
+        /// Effective Control Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ControlModeEnum> EffectiveControlMode { get; init; }
 
         /// <summary>
-        /// Capacity Attribute
+        /// Capacity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<short?> Capacity { get; init; }
 
         /// <summary>
-        /// Speed Attribute
+        /// Speed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> Speed { get; init; }
 
         /// <summary>
-        /// Lifetime Running Hours Attribute
+        /// Lifetime Running Hours Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint?> LifetimeRunningHours { get; init; }
 
         /// <summary>
-        /// Power Attribute
+        /// Power Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> Power { get; init; }
 
         /// <summary>
-        /// Lifetime Energy Consumed Attribute
+        /// Lifetime Energy Consumed Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<uint?> LifetimeEnergyConsumed { get; init; }
 
         /// <summary>
-        /// Operation Mode Attribute
+        /// Operation Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<OperationModeEnum> OperationMode { get; init; }
 
         /// <summary>
-        /// Control Mode Attribute
+        /// Control Mode Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ControlModeEnum> ControlMode { get; init; }
         #endregion Attributes

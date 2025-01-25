@@ -167,17 +167,17 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// Preferred Extended Pan ID Attribute
+        /// Preferred Extended Pan ID Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte[]?> PreferredExtendedPanID { get; init; }
 
         /// <summary>
-        /// Thread Networks Attribute
+        /// Thread Networks Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ThreadNetwork[]> ThreadNetworks { get; init; }
 
         /// <summary>
-        /// Thread Network Table Size Attribute
+        /// Thread Network Table Size Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> ThreadNetworkTableSize { get; init; }
         #endregion Attributes

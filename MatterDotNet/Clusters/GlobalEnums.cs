@@ -14,22 +14,22 @@
 
 namespace MatterDotNet.Clusters
 {
-    /// <summary>
-    /// Atomic Request Type
-    /// </summary>
-    public enum AtomicRequestType : byte {
-        BeginWrite = 0x00,
-        CommitWrite = 0x01,
-        RollbackWrite = 0x02,
-    }
+        /// <summary>
+        /// Atomic Request Type
+        /// </summary>
+        public enum AtomicRequestType : byte {
+            BeginWrite = 0,
+            CommitWrite = 1,
+            RollbackWrite = 2,
+        }
 
-    /// <summary>
-    /// Three Level Auto
-    /// </summary>
-    public enum ThreeLevelAuto : byte {
-        Low = 0x00,
-        Medium = 0x01,
-        High = 0x02,
-        Automatic = 0x03,
-    }
+        /// <summary>
+        /// Three Level Auto
+        /// </summary>
+        public enum ThreeLevelAuto : byte {
+            Low = 0,
+            Medium = 1,
+            High = 2,
+            Automatic = 3,
+        }
 }

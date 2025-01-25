@@ -142,7 +142,7 @@ namespace MatterDotNet.Protocol.Parsers
                 writer.Write(value.Value);
             }
         }
-        public void WriteDecimal(long tagNumber, decimal? value, ushort max = ushort.MaxValue, ushort min = ushort.MinValue)
+        public void WriteUDecimal(long tagNumber, decimal? value, ushort max = ushort.MaxValue, ushort min = ushort.MinValue)
         {
             if (!value.HasValue)
                 WriteTag(tagNumber, ElementType.Null);
@@ -152,6 +152,18 @@ namespace MatterDotNet.Protocol.Parsers
                 val *= 100;
                 val += (ushort)Math.Round((value.Value - Math.Truncate(value.Value)) * 100M);
                 WriteUShort(tagNumber, val);
+            }
+        }
+        public void WriteDecimal(long tagNumber, decimal? value, ushort max = ushort.MaxValue, ushort min = ushort.MinValue)
+        {
+            if (!value.HasValue)
+                WriteTag(tagNumber, ElementType.Null);
+            else
+            {
+                short val = (short)Math.Truncate(value.Value);
+                val *= 100;
+                val += (short)Math.Round((value.Value - Math.Truncate(value.Value)) * 100M);
+                WriteShort(tagNumber, val);
             }
         }
         public void WriteInt(long tagNumber, int? value, int max = int.MaxValue, int min = int.MinValue)

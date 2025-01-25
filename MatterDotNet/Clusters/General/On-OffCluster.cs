@@ -146,7 +146,10 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Indicates a command is only accepted when in On state.
+            /// </summary>
             AcceptOnlyWhenOn = 0x01,
         }
         #endregion Enums
@@ -259,27 +262,27 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// On Off Attribute
+        /// On Off Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> OnOff { get; init; }
 
         /// <summary>
-        /// Global Scene Control Attribute
+        /// Global Scene Control Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> GlobalSceneControl { get; init; }
 
         /// <summary>
-        /// On Time Attribute
+        /// On Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> OnTime { get; init; }
 
         /// <summary>
-        /// Off Wait Time Attribute
+        /// Off Wait Time Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort> OffWaitTime { get; init; }
 
         /// <summary>
-        /// Start Up On Off Attribute
+        /// Start Up On Off Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<StartUpOnOffEnum?> StartUpOnOff { get; init; }
         #endregion Attributes

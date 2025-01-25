@@ -309,13 +309,34 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Sunday
+            /// </summary>
             Sunday = 0x01,
+            /// <summary>
+            /// Monday
+            /// </summary>
             Monday = 0x02,
+            /// <summary>
+            /// Tuesday
+            /// </summary>
             Tuesday = 0x04,
+            /// <summary>
+            /// Wednesday
+            /// </summary>
             Wednesday = 0x08,
+            /// <summary>
+            /// Thursday
+            /// </summary>
             Thursday = 0x10,
+            /// <summary>
+            /// Friday
+            /// </summary>
             Friday = 0x20,
+            /// <summary>
+            /// Saturday
+            /// </summary>
             Saturday = 0x40,
         }
         #endregion Enums
@@ -547,117 +568,117 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// State Attribute
+        /// State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<StateEnum?> State { get; init; }
 
         /// <summary>
-        /// Supply State Attribute
+        /// Supply State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SupplyStateEnum> SupplyState { get; init; }
 
         /// <summary>
-        /// Fault State Attribute
+        /// Fault State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<FaultStateEnum> FaultState { get; init; }
 
         /// <summary>
-        /// Charging Enabled Until Attribute
+        /// Charging Enabled Until Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> ChargingEnabledUntil { get; init; }
 
         /// <summary>
-        /// Discharging Enabled Until Attribute
+        /// Discharging Enabled Until Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> DischargingEnabledUntil { get; init; }
 
         /// <summary>
-        /// Circuit Capacity [mA] Attribute
+        /// Circuit Capacity [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> CircuitCapacity { get; init; }
 
         /// <summary>
-        /// Minimum Charge Current [mA] Attribute
+        /// Minimum Charge Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> MinimumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Maximum Charge Current [mA] Attribute
+        /// Maximum Charge Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> MaximumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Maximum Discharge Current [mA] Attribute
+        /// Maximum Discharge Current [mA] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long> MaximumDischargeCurrent { get; init; }
 
         /// <summary>
-        /// User Maximum Charge Current [mA] Attribute
+        /// User Maximum Charge Current [mA] Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<long> UserMaximumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Randomization Delay Window Attribute
+        /// Randomization Delay Window Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<TimeSpan> RandomizationDelayWindow { get; init; }
 
         /// <summary>
-        /// Next Charge Start Time Attribute
+        /// Next Charge Start Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> NextChargeStartTime { get; init; }
 
         /// <summary>
-        /// Next Charge Target Time Attribute
+        /// Next Charge Target Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> NextChargeTargetTime { get; init; }
 
         /// <summary>
-        /// Next Charge Required Energy [mWh] Attribute
+        /// Next Charge Required Energy [mWh] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> NextChargeRequiredEnergy { get; init; }
 
         /// <summary>
-        /// Next Charge Target SoC [%] Attribute
+        /// Next Charge Target SoC [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> NextChargeTargetSoC { get; init; }
 
         /// <summary>
-        /// Approximate EV Efficiency Attribute
+        /// Approximate EV Efficiency Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ushort?> ApproximateEVEfficiency { get; init; }
 
         /// <summary>
-        /// State Of Charge [%] Attribute
+        /// State Of Charge [%] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> StateOfCharge { get; init; }
 
         /// <summary>
-        /// Battery Capacity [mWh] Attribute
+        /// Battery Capacity [mWh] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> BatteryCapacity { get; init; }
 
         /// <summary>
-        /// Vehicle ID Attribute
+        /// Vehicle ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string?> VehicleID { get; init; }
 
         /// <summary>
-        /// Session ID Attribute
+        /// Session ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> SessionID { get; init; }
 
         /// <summary>
-        /// Session Duration Attribute
+        /// Session Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan?> SessionDuration { get; init; }
 
         /// <summary>
-        /// Session Energy Charged [mWh] Attribute
+        /// Session Energy Charged [mWh] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> SessionEnergyCharged { get; init; }
 
         /// <summary>
-        /// Session Energy Discharged [mWh] Attribute
+        /// Session Energy Discharged [mWh] Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<long?> SessionEnergyDischarged { get; init; }
         #endregion Attributes

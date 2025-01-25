@@ -183,27 +183,27 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Device Type List Attribute
+        /// Device Type List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DeviceType[]> DeviceTypeList { get; init; }
 
         /// <summary>
-        /// Server List Attribute
+        /// Server List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint[]> ServerList { get; init; }
 
         /// <summary>
-        /// Client List Attribute
+        /// Client List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint[]> ClientList { get; init; }
 
         /// <summary>
-        /// Parts List Attribute
+        /// Parts List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> PartsList { get; init; }
 
         /// <summary>
-        /// Tag List Attribute
+        /// Tag List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SemanticTag[]> TagList { get; init; }
         #endregion Attributes

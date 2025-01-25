@@ -154,13 +154,25 @@ namespace MatterDotNet.Protocol.Parsers
             return val;
         }
 
-        public decimal? GetDecimal(long tagNumber, bool nullable = false)
+        public decimal? GetUDecimal(long tagNumber, bool nullable = false)
         {
             if (!IsTag(tagNumber))
                 throw new InvalidDataException("Tag " + tagNumber + " not present");
             if (type == ElementType.Null && nullable)
                 return (decimal?)GetNull(tagNumber);
             ushort val = GetUShort(tagNumber, false)!.Value;
+            decimal ret = Math.Abs(val / 100);
+            ret += (val % 100) / 100M;
+            return ret;
+        }
+
+        public decimal? GetDecimal(long tagNumber, bool nullable = false)
+        {
+            if (!IsTag(tagNumber))
+                throw new InvalidDataException("Tag " + tagNumber + " not present");
+            if (type == ElementType.Null && nullable)
+                return (decimal?)GetNull(tagNumber);
+            short val = GetShort(tagNumber, false)!.Value;
             decimal ret = (int)(val / 100);
             ret += (val % 100) / 100M;
             return ret;

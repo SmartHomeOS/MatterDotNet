@@ -102,12 +102,12 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Available Endpoints Attribute
+        /// Available Endpoints Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> AvailableEndpoints { get; init; }
 
         /// <summary>
-        /// Active Endpoints Attribute
+        /// Active Endpoints Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> ActiveEndpoints { get; init; }
         #endregion Attributes

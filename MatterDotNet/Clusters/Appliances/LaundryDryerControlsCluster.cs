@@ -74,12 +74,12 @@ namespace MatterDotNet.Clusters.Appliances
 
         #region Attributes
         /// <summary>
-        /// Supported Dryness Levels Attribute
+        /// Supported Dryness Levels Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DrynessLevel[]> SupportedDrynessLevels { get; init; }
 
         /// <summary>
-        /// Selected Dryness Level Attribute
+        /// Selected Dryness Level Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<DrynessLevel?> SelectedDrynessLevel { get; init; }
         #endregion Attributes

@@ -51,7 +51,10 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Aggregators which support Fabric Synchronization may be commissioned.
+            /// </summary>
             FabricSynchronization = 0x0001,
         }
         #endregion Enums
@@ -134,7 +137,7 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Supported Device Categories Attribute
+        /// Supported Device Categories Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SupportedDeviceCategory> SupportedDeviceCategories { get; init; }
         #endregion Attributes

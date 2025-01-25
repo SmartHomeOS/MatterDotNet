@@ -325,47 +325,47 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Breadcrumb Attribute
+        /// Breadcrumb Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ulong> Breadcrumb { get; init; }
 
         /// <summary>
-        /// Basic Commissioning Info Attribute
+        /// Basic Commissioning Info Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BasicCommissioningInfoStruct> BasicCommissioningInfo { get; init; }
 
         /// <summary>
-        /// Regulatory Config Attribute
+        /// Regulatory Config Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RegulatoryLocationType> RegulatoryConfig { get; init; }
 
         /// <summary>
-        /// Location Capability Attribute
+        /// Location Capability Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<RegulatoryLocationType> LocationCapability { get; init; }
 
         /// <summary>
-        /// Supports Concurrent Connection Attribute
+        /// Supports Concurrent Connection Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> SupportsConcurrentConnection { get; init; }
 
         /// <summary>
-        /// TC Accepted Version Attribute
+        /// TC Accepted Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> TCAcceptedVersion { get; init; }
 
         /// <summary>
-        /// TC Min Required Version Attribute
+        /// TC Min Required Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> TCMinRequiredVersion { get; init; }
 
         /// <summary>
-        /// TC Acknowledgements Attribute
+        /// TC Acknowledgements Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> TCAcknowledgements { get; init; }
 
         /// <summary>
-        /// TC Acknowledgements Required Attribute
+        /// TC Acknowledgements Required Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> TCAcknowledgementsRequired { get; init; }
         #endregion Attributes

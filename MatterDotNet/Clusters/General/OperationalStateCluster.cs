@@ -216,32 +216,32 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Phase List Attribute
+        /// Phase List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]?> PhaseList { get; init; }
 
         /// <summary>
-        /// Current Phase Attribute
+        /// Current Phase Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentPhase { get; init; }
 
         /// <summary>
-        /// Countdown Time Attribute
+        /// Countdown Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan?> CountdownTime { get; init; }
 
         /// <summary>
-        /// Operational State List Attribute
+        /// Operational State List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationalStateStruct[]> OperationalStateList { get; init; }
 
         /// <summary>
-        /// Operational State Attribute
+        /// Operational State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationalStateEnum> OperationalStateAttribute { get; init; }
 
         /// <summary>
-        /// Operational Error Attribute
+        /// Operational Error Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ErrorStatePayload> OperationalError { get; init; }
         #endregion Attributes

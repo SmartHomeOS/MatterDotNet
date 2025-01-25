@@ -135,23 +135,62 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Power Cycle to transition the device to ActiveMode
+            /// </summary>
             PowerCycle = 0x0001,
+            /// <summary>
+            /// Settings menu on the device informs how to transition the device to ActiveMode
+            /// </summary>
             SettingsMenu = 0x0002,
+            /// <summary>
+            /// Custom Instruction on how to transition the device to ActiveMode
+            /// </summary>
             CustomInstruction = 0x0004,
+            /// <summary>
+            /// Device Manual informs how to transition the device to ActiveMode
+            /// </summary>
             DeviceManual = 0x0008,
+            /// <summary>
+            /// Actuate Sensor to transition the device to ActiveMode
+            /// </summary>
             ActuateSensor = 0x0010,
+            /// <summary>
+            /// Actuate Sensor for N seconds to transition the device to ActiveMode
+            /// </summary>
             ActuateSensorSeconds = 0x0020,
+            /// <summary>
+            /// Actuate Sensor N times to transition the device to ActiveMode
+            /// </summary>
             ActuateSensorTimes = 0x0040,
+            /// <summary>
+            /// Actuate Sensor until light blinks to transition the device to ActiveMode
+            /// </summary>
             ActuateSensorLightsBlink = 0x0080,
             ResetButton = 0x00100,
             ResetButtonLightsBlink = 0x00200,
             ResetButtonSeconds = 0x00400,
             ResetButtonTimes = 0x00800,
+            /// <summary>
+            /// Press Setup Button to transition the device to ActiveMode
+            /// </summary>
             SetupButton = 0x1000,
+            /// <summary>
+            /// Press Setup Button for N seconds to transition the device to ActiveMode
+            /// </summary>
             SetupButtonSeconds = 0x2000,
+            /// <summary>
+            /// Press Setup Button until light blinks to transition the device to ActiveMode
+            /// </summary>
             SetupButtonLightsBlink = 0x4000,
+            /// <summary>
+            /// Press Setup Button N times to transition the device to ActiveMode
+            /// </summary>
             SetupButtonTimes = 0x8000,
+            /// <summary>
+            /// Press the N Button to transition the device to ActiveMode
+            /// </summary>
             AppDefinedButton = 0x10000,
         }
         #endregion Enums
@@ -315,52 +354,52 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Idle Mode Duration Attribute
+        /// Idle Mode Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> IdleModeDuration { get; init; }
 
         /// <summary>
-        /// Active Mode Duration Attribute
+        /// Active Mode Duration Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> ActiveModeDuration { get; init; }
 
         /// <summary>
-        /// Active Mode Threshold Attribute
+        /// Active Mode Threshold Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ActiveModeThreshold { get; init; }
 
         /// <summary>
-        /// Registered Clients Attribute
+        /// Registered Clients Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MonitoringRegistration[]> RegisteredClients { get; init; }
 
         /// <summary>
-        /// ICD Counter Attribute
+        /// ICD Counter Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> ICDCounter { get; init; }
 
         /// <summary>
-        /// Clients Supported Per Fabric Attribute
+        /// Clients Supported Per Fabric Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ClientsSupportedPerFabric { get; init; }
 
         /// <summary>
-        /// User Active Mode Trigger Hint Attribute
+        /// User Active Mode Trigger Hint Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<UserActiveModeTrigger> UserActiveModeTriggerHint { get; init; }
 
         /// <summary>
-        /// User Active Mode Trigger Instruction Attribute
+        /// User Active Mode Trigger Instruction Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> UserActiveModeTriggerInstruction { get; init; }
 
         /// <summary>
-        /// Operating Mode Attribute
+        /// Operating Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperatingModeEnum> OperatingMode { get; init; }
 
         /// <summary>
-        /// Maximum Check In Back Off Attribute
+        /// Maximum Check In Back Off Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> MaximumCheckInBackOff { get; init; }
         #endregion Attributes

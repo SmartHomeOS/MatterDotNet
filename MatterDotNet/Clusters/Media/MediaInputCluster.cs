@@ -241,12 +241,12 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Input List Attribute
+        /// Input List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<InputInfo[]> InputList { get; init; }
 
         /// <summary>
-        /// Current Input Attribute
+        /// Current Input Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentInput { get; init; }
         #endregion Attributes

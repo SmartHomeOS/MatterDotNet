@@ -18,8 +18,8 @@ namespace Generator
     {
         public static string SanitizeName(string name, bool paramName = false, bool trimSuffix = true, string? ensureSuffix = null)
         {
-            if (name == "event")
-                name = "@event";
+            if (name == "Event")
+                name = "@Event";
             if (trimSuffix)
             {
                 if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
@@ -117,6 +117,10 @@ namespace Generator
                         break;
                     case "percent100ths":
                         ret.Append(" [%]");
+                        break;
+                    case "temperature":
+                    case "TemperatureDifference":
+                        ret.Append(" [°C]");
                         break;
                 }
             }

@@ -245,22 +245,22 @@ namespace MatterDotNet.Clusters.CHIP
 
         #region Attributes
         /// <summary>
-        /// Default OTA Providers Attribute
+        /// Default OTA Providers Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<ProviderLocation[]> DefaultOTAProviders { get; init; }
 
         /// <summary>
-        /// Update Possible Attribute
+        /// Update Possible Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> UpdatePossible { get; init; }
 
         /// <summary>
-        /// Update State Attribute
+        /// Update State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<UpdateStateEnum> UpdateState { get; init; }
 
         /// <summary>
-        /// Update State Progress Attribute
+        /// Update State Progress Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> UpdateStateProgress { get; init; }
         #endregion Attributes

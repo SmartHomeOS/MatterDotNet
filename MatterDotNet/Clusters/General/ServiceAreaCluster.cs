@@ -403,32 +403,32 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Supported Areas Attribute
+        /// Supported Areas Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Area[]> SupportedAreas { get; init; }
 
         /// <summary>
-        /// Supported Maps Attribute
+        /// Supported Maps Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<Map[]> SupportedMaps { get; init; }
 
         /// <summary>
-        /// Selected Areas Attribute
+        /// Selected Areas Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint[]> SelectedAreas { get; init; }
 
         /// <summary>
-        /// Current Area Attribute
+        /// Current Area Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> CurrentArea { get; init; }
 
         /// <summary>
-        /// Estimated End Time Attribute
+        /// Estimated End Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> EstimatedEndTime { get; init; }
 
         /// <summary>
-        /// Progress Attribute
+        /// Progress Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ProgressStruct[]> Progress { get; init; }
         #endregion Attributes

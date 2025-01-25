@@ -159,12 +159,12 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Device Directory Attribute
+        /// Device Directory Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EcosystemDevice[]> DeviceDirectory { get; init; }
 
         /// <summary>
-        /// Location Directory Attribute
+        /// Location Directory Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EcosystemLocation[]> LocationDirectory { get; init; }
         #endregion Attributes

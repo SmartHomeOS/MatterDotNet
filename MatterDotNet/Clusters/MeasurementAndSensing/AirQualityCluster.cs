@@ -121,7 +121,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Air Quality Attribute
+        /// Air Quality Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<AirQualityEnum> AirQualityAttribute { get; init; }
         #endregion Attributes

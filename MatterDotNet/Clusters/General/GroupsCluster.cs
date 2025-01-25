@@ -63,7 +63,7 @@ namespace MatterDotNet.Clusters.General
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             /// <summary>
             /// The ability to store a name for a group.
             /// </summary>
@@ -272,7 +272,7 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Name Support Attribute
+        /// Name Support Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NameSupportBitmap> NameSupport { get; init; }
         #endregion Attributes

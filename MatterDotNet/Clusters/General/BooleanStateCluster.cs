@@ -41,7 +41,7 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// State Value Attribute
+        /// State Value Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> StateValue { get; init; }
         #endregion Attributes

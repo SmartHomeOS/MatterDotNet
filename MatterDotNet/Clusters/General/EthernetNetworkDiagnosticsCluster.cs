@@ -170,47 +170,47 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// PHY Rate Attribute
+        /// PHY Rate Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PHYRateEnum?> PHYRate { get; init; }
 
         /// <summary>
-        /// Full Duplex Attribute
+        /// Full Duplex Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool?> FullDuplex { get; init; }
 
         /// <summary>
-        /// Packet Rx Count Attribute
+        /// Packet Rx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> PacketRxCount { get; init; }
 
         /// <summary>
-        /// Packet Tx Count Attribute
+        /// Packet Tx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> PacketTxCount { get; init; }
 
         /// <summary>
-        /// Tx Err Count Attribute
+        /// Tx Err Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> TxErrCount { get; init; }
 
         /// <summary>
-        /// Collision Count Attribute
+        /// Collision Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> CollisionCount { get; init; }
 
         /// <summary>
-        /// Overrun Count Attribute
+        /// Overrun Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> OverrunCount { get; init; }
 
         /// <summary>
-        /// Carrier Detect Attribute
+        /// Carrier Detect Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool?> CarrierDetect { get; init; }
 
         /// <summary>
-        /// Time Since Reset Attribute
+        /// Time Since Reset Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong> TimeSinceReset { get; init; }
         #endregion Attributes

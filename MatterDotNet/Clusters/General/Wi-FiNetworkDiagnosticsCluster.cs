@@ -239,67 +239,67 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// BSSID Attribute
+        /// BSSID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte[]?> BSSID { get; init; }
 
         /// <summary>
-        /// Security Type Attribute
+        /// Security Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SecurityTypeEnum?> SecurityType { get; init; }
 
         /// <summary>
-        /// WiFi Version Attribute
+        /// WiFi Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WiFiVersionEnum?> WiFiVersion { get; init; }
 
         /// <summary>
-        /// Channel Number Attribute
+        /// Channel Number Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> ChannelNumber { get; init; }
 
         /// <summary>
-        /// RSSI Attribute
+        /// RSSI Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<sbyte?> RSSI { get; init; }
 
         /// <summary>
-        /// Beacon Lost Count Attribute
+        /// Beacon Lost Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BeaconLostCount { get; init; }
 
         /// <summary>
-        /// Beacon Rx Count Attribute
+        /// Beacon Rx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BeaconRxCount { get; init; }
 
         /// <summary>
-        /// Packet Multicast Rx Count Attribute
+        /// Packet Multicast Rx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> PacketMulticastRxCount { get; init; }
 
         /// <summary>
-        /// Packet Multicast Tx Count Attribute
+        /// Packet Multicast Tx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> PacketMulticastTxCount { get; init; }
 
         /// <summary>
-        /// Packet Unicast Rx Count Attribute
+        /// Packet Unicast Rx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> PacketUnicastRxCount { get; init; }
 
         /// <summary>
-        /// Packet Unicast Tx Count Attribute
+        /// Packet Unicast Tx Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> PacketUnicastTxCount { get; init; }
 
         /// <summary>
-        /// Current Max Rate Attribute
+        /// Current Max Rate Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> CurrentMaxRate { get; init; }
 
         /// <summary>
-        /// Overrun Count Attribute
+        /// Overrun Count Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ulong?> OverrunCount { get; init; }
         #endregion Attributes

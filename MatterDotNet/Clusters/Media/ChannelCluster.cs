@@ -139,9 +139,18 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// The program is scheduled for recording.
+            /// </summary>
             Scheduled = 0x0001,
+            /// <summary>
+            /// The program series is scheduled for recording.
+            /// </summary>
             RecordSeries = 0x0002,
+            /// <summary>
+            /// The program is recorded and available to be played.
+            /// </summary>
             Recorded = 0x0004,
         }
         #endregion Enums
@@ -805,17 +814,17 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Channel List Attribute
+        /// Channel List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ChannelInfo[]> ChannelList { get; init; }
 
         /// <summary>
-        /// Lineup Attribute
+        /// Lineup Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<LineupInfo?> Lineup { get; init; }
 
         /// <summary>
-        /// Current Channel Attribute
+        /// Current Channel Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ChannelInfo?> CurrentChannel { get; init; }
         #endregion Attributes

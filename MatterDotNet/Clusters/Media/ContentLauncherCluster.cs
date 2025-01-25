@@ -114,6 +114,9 @@ namespace MatterDotNet.Clusters.Media
             /// Sport represents the categorical information of a sport; for example, football
             /// </summary>
             Sport = 0xA,
+            /// <summary>
+            /// SportsTeam represents the categorical information of a professional sports team; for example, "University of Washington Huskies"
+            /// </summary>
             SportsTeam = 0xB,
             /// <summary>
             /// The type of content requested. Supported types are "Movie", "MovieSeries", "TVSeries", "TVSeason", "TVEpisode", "Trailer", "SportsEvent", "LiveEvent", and "Video"
@@ -167,23 +170,77 @@ namespace MatterDotNet.Clusters.Media
         /// Characteristic
         /// </summary>
         public enum Characteristic : byte {
+            /// <summary>
+            /// Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.
+            /// </summary>
             ForcedSubtitles = 0x0,
+            /// <summary>
+            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
+            /// </summary>
             DescribesVideo = 0x1,
+            /// <summary>
+            /// Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].
+            /// </summary>
             EasyToRead = 0x2,
+            /// <summary>
+            /// A media characteristic that indicates that a track selection option includes frame-based content.
+            /// </summary>
             FrameBased = 0x3,
+            /// <summary>
+            /// Main media component(s) which is/are intended for presentation if no other information is provided
+            /// </summary>
             MainProgram = 0x4,
+            /// <summary>
+            /// A media characteristic that indicates that a track or media selection option contains original content.
+            /// </summary>
             OriginalContent = 0x5,
+            /// <summary>
+            /// A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.
+            /// </summary>
             VoiceOverTranslation = 0x6,
+            /// <summary>
+            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
+            /// </summary>
             Caption = 0x7,
+            /// <summary>
+            /// Textual transcriptions of spoken dialog.
+            /// </summary>
             Subtitle = 0x8,
+            /// <summary>
+            /// Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.
+            /// </summary>
             Alternate = 0x9,
+            /// <summary>
+            /// Media content component that is supplementary to a media content component of a different media component type.
+            /// </summary>
             Supplementary = 0xA,
+            /// <summary>
+            /// Experience that contains a commentary (e.g. director’s commentary) (typically audio)
+            /// </summary>
             Commentary = 0xB,
+            /// <summary>
+            /// Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)
+            /// </summary>
             DubbedTranslation = 0xC,
+            /// <summary>
+            /// Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component
+            /// </summary>
             Description = 0xD,
+            /// <summary>
+            /// Media component containing information intended to be processed by application specific elements.
+            /// </summary>
             Metadata = 0xE,
+            /// <summary>
+            /// Experience containing an element for improved intelligibility of the dialogue.
+            /// </summary>
             EnhancedAudioIntelligibility = 0xF,
+            /// <summary>
+            /// Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.
+            /// </summary>
             Emergency = 0x10,
+            /// <summary>
+            /// Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].
+            /// </summary>
             Karaoke = 0x11,
         }
 
@@ -195,8 +252,14 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
+            /// <summary>
+            /// Device supports Dynamic Adaptive Streaming over HTTP (DASH)
+            /// </summary>
             DASH = 0x0001,
+            /// <summary>
+            /// Device supports HTTP Live Streaming (HLS)
+            /// </summary>
             HLS = 0x0002,
         }
 
@@ -208,7 +271,7 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Nothing Set
             /// </summary>
-            None = 0,
+            None = 0x0,
             ContentSearch = 0x0001,
             URLPlayback = 0x0002,
             AdvancedSeek = 0x0004,
@@ -609,12 +672,12 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Accept Header Attribute
+        /// Accept Header Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]> AcceptHeader { get; init; }
 
         /// <summary>
-        /// Supported Streaming Protocols Attribute
+        /// Supported Streaming Protocols Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<SupportedProtocols> SupportedStreamingProtocols { get; init; }
         #endregion Attributes

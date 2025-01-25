@@ -74,9 +74,21 @@ namespace MatterDotNet.Clusters.Appliances
         /// Operational State
         /// </summary>
         public enum OperationalStateEnum : byte {
+            /// <summary>
+            /// The device is stopped
+            /// </summary>
             Stopped = 0,
+            /// <summary>
+            /// The device is operating
+            /// </summary>
             Running = 1,
+            /// <summary>
+            /// The device is paused during an operation
+            /// </summary>
             Paused = 2,
+            /// <summary>
+            /// The device is in an error state
+            /// </summary>
             Error = 3,
         }
 
@@ -84,9 +96,21 @@ namespace MatterDotNet.Clusters.Appliances
         /// Error State
         /// </summary>
         public enum ErrorState : byte {
+            /// <summary>
+            /// The device is not in an error state
+            /// </summary>
             NoError = 0,
+            /// <summary>
+            /// The device is unable to start or resume operation
+            /// </summary>
             UnableToStartOrResume = 1,
+            /// <summary>
+            /// The device was unable to complete the current operation
+            /// </summary>
             UnableToCompleteOperation = 2,
+            /// <summary>
+            /// The device cannot process the command in its current state
+            /// </summary>
             CommandInvalidInState = 3,
         }
         #endregion Enums
@@ -152,32 +176,32 @@ namespace MatterDotNet.Clusters.Appliances
 
         #region Attributes
         /// <summary>
-        /// Phase List Attribute
+        /// Phase List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]?> PhaseList { get; init; }
 
         /// <summary>
-        /// Current Phase Attribute
+        /// Current Phase Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> CurrentPhase { get; init; }
 
         /// <summary>
-        /// Countdown Time Attribute
+        /// Countdown Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSpan?> CountdownTime { get; init; }
 
         /// <summary>
-        /// Operational State List Attribute
+        /// Operational State List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<General.OperationalState.OperationalStateStruct[]> OperationalStateList { get; init; }
 
         /// <summary>
-        /// Operational State Attribute
+        /// Operational State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<OperationalStateEnum> OperationalState { get; init; }
 
         /// <summary>
-        /// Operational Error Attribute
+        /// Operational Error Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ErrorState> OperationalError { get; init; }
         #endregion Attributes

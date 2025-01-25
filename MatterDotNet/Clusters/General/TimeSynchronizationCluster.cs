@@ -72,7 +72,7 @@ namespace MatterDotNet.Clusters.General
                 }
             };
             LocalTime = new ReadAttribute<DateTime?>(cluster, endPoint, 7, true) {
-                Deserialize = x => (DateTime?)(dynamic?)x ?? DateTime.MaxValue
+                Deserialize = x => (DateTime?)(dynamic?)x ?? DateTime.MinValue
 
             };
             TimeZoneDatabase = new ReadAttribute<TimeZoneDatabaseEnum>(cluster, endPoint, 8) {
@@ -531,67 +531,67 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// UTC Time Attribute
+        /// UTC Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> UTCTime { get; init; }
 
         /// <summary>
-        /// Granularity Attribute
+        /// Granularity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<GranularityEnum> Granularity { get; init; }
 
         /// <summary>
-        /// Time Source Attribute
+        /// Time Source Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeSourceEnum> TimeSource { get; init; }
 
         /// <summary>
-        /// Trusted Time Source Attribute
+        /// Trusted Time Source Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TrustedTimeSourceStruct?> TrustedTimeSource { get; init; }
 
         /// <summary>
-        /// Default NTP Attribute
+        /// Default NTP Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string?> DefaultNTP { get; init; }
 
         /// <summary>
-        /// Time Zone Attribute
+        /// Time Zone Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeZoneStruct[]> TimeZone { get; init; }
 
         /// <summary>
-        /// DST Offset Attribute
+        /// DST Offset Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DSTOffsetStruct[]> DSTOffset { get; init; }
 
         /// <summary>
-        /// Local Time Attribute
+        /// Local Time Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<DateTime?> LocalTime { get; init; }
 
         /// <summary>
-        /// Time Zone Database Attribute
+        /// Time Zone Database Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<TimeZoneDatabaseEnum> TimeZoneDatabase { get; init; }
 
         /// <summary>
-        /// NTP Server Available Attribute
+        /// NTP Server Available Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> NTPServerAvailable { get; init; }
 
         /// <summary>
-        /// Time Zone List Max Size Attribute
+        /// Time Zone List Max Size Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> TimeZoneListMaxSize { get; init; }
 
         /// <summary>
-        /// DST Offset List Max Size Attribute
+        /// DST Offset List Max Size Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> DSTOffsetListMaxSize { get; init; }
 
         /// <summary>
-        /// Supports DNS Resolve Attribute
+        /// Supports DNS Resolve Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> SupportsDNSResolve { get; init; }
         #endregion Attributes

@@ -109,11 +109,29 @@ namespace MatterDotNet.Clusters.CHIP
         /// Product Finish
         /// </summary>
         public enum ProductFinish : byte {
+            /// <summary>
+            /// Product has some other finish not listed below.
+            /// </summary>
             Other = 0,
+            /// <summary>
+            /// Product has a matte finish.
+            /// </summary>
             Matte = 1,
+            /// <summary>
+            /// Product has a satin finish.
+            /// </summary>
             Satin = 2,
+            /// <summary>
+            /// Product has a polished or shiny finish.
+            /// </summary>
             Polished = 3,
+            /// <summary>
+            /// Product has a rugged finish.
+            /// </summary>
             Rugged = 4,
+            /// <summary>
+            /// Product has a fabric finish.
+            /// </summary>
             Fabric = 5,
         }
 
@@ -121,26 +139,89 @@ namespace MatterDotNet.Clusters.CHIP
         /// Color
         /// </summary>
         public enum Color : byte {
+            /// <summary>
+            /// Approximately RGB #000000.
+            /// </summary>
             Black = 0x0,
+            /// <summary>
+            /// Approximately RGB #000080.
+            /// </summary>
             Navy = 0x1,
+            /// <summary>
+            /// Approximately RGB #008000.
+            /// </summary>
             Green = 0x2,
+            /// <summary>
+            /// Approximately RGB #008080.
+            /// </summary>
             Teal = 0x3,
+            /// <summary>
+            /// Approximately RGB #800080.
+            /// </summary>
             Maroon = 0x4,
+            /// <summary>
+            /// Approximately RGB #800080.
+            /// </summary>
             Purple = 0x5,
+            /// <summary>
+            /// Approximately RGB #808000.
+            /// </summary>
             Olive = 0x6,
+            /// <summary>
+            /// Approximately RGB #808080.
+            /// </summary>
             Gray = 0x7,
+            /// <summary>
+            /// Approximately RGB #0000FF.
+            /// </summary>
             Blue = 0x8,
+            /// <summary>
+            /// Approximately RGB #00FF00.
+            /// </summary>
             Lime = 0x9,
+            /// <summary>
+            /// Approximately RGB #00FFFF.
+            /// </summary>
             Aqua = 0xA,
+            /// <summary>
+            /// Approximately RGB #FF0000.
+            /// </summary>
             Red = 0xB,
+            /// <summary>
+            /// Approximately RGB #FF00FF.
+            /// </summary>
             Fuchsia = 0xC,
+            /// <summary>
+            /// Approximately RGB #FFFF00.
+            /// </summary>
             Yellow = 0xD,
+            /// <summary>
+            /// Approximately RGB #FFFFFF.
+            /// </summary>
             White = 0xE,
+            /// <summary>
+            /// Typical hardware "Nickel" color.
+            /// </summary>
             Nickel = 0xF,
+            /// <summary>
+            /// Typical hardware "Chrome" color.
+            /// </summary>
             Chrome = 0x10,
+            /// <summary>
+            /// Typical hardware "Brass" color.
+            /// </summary>
             Brass = 0x11,
+            /// <summary>
+            /// Typical hardware "Copper" color.
+            /// </summary>
             Copper = 0x12,
+            /// <summary>
+            /// Typical hardware "Silver" color.
+            /// </summary>
             Silver = 0x13,
+            /// <summary>
+            /// Typical hardware "Gold" color.
+            /// </summary>
             Gold = 0x14,
         }
         #endregion Enums
@@ -225,87 +306,87 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Vendor Name Attribute
+        /// Vendor Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Vendor ID Attribute
+        /// Vendor ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Product Name Attribute
+        /// Product Name Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductName { get; init; }
 
         /// <summary>
-        /// Product ID Attribute
+        /// Product ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Node Label Attribute
+        /// Node Label Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<string> NodeLabel { get; init; }
 
         /// <summary>
-        /// Hardware Version Attribute
+        /// Hardware Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort> HardwareVersion { get; init; }
 
         /// <summary>
-        /// Hardware Version String Attribute
+        /// Hardware Version String Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> HardwareVersionString { get; init; }
 
         /// <summary>
-        /// Software Version Attribute
+        /// Software Version Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> SoftwareVersion { get; init; }
 
         /// <summary>
-        /// Software Version String Attribute
+        /// Software Version String Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> SoftwareVersionString { get; init; }
 
         /// <summary>
-        /// Manufacturing Date Attribute
+        /// Manufacturing Date Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ManufacturingDate { get; init; }
 
         /// <summary>
-        /// Part Number Attribute
+        /// Part Number Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> PartNumber { get; init; }
 
         /// <summary>
-        /// Product URL Attribute
+        /// Product URL Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductURL { get; init; }
 
         /// <summary>
-        /// Product Label Attribute
+        /// Product Label Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> ProductLabel { get; init; }
 
         /// <summary>
-        /// Serial Number Attribute
+        /// Serial Number Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> SerialNumber { get; init; }
 
         /// <summary>
-        /// Reachable Attribute
+        /// Reachable Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> Reachable { get; init; }
 
         /// <summary>
-        /// Unique ID Attribute
+        /// Unique ID Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> UniqueID { get; init; }
 
         /// <summary>
-        /// Product Appearance Attribute
+        /// Product Appearance Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ProductAppearanceStruct> ProductAppearance { get; init; }
         #endregion Attributes

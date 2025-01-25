@@ -122,22 +122,22 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Spin Speeds Attribute
+        /// Spin Speeds Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string[]> SpinSpeeds { get; init; }
 
         /// <summary>
-        /// Spin Speed Current Attribute
+        /// Spin Speed Current Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<byte?> SpinSpeedCurrent { get; init; }
 
         /// <summary>
-        /// Number Of Rinses Attribute
+        /// Number Of Rinses Attribute [Read/Write]
         /// </summary>
         public required ReadWriteAttribute<NumberOfRinsesEnum> NumberOfRinses { get; init; }
 
         /// <summary>
-        /// Supported Rinses Attribute
+        /// Supported Rinses Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<NumberOfRinsesEnum[]> SupportedRinses { get; init; }
         #endregion Attributes

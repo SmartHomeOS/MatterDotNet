@@ -1015,162 +1015,162 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Status Attribute
+        /// Status Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<PowerSourceStatus> Status { get; init; }
 
         /// <summary>
-        /// Order Attribute
+        /// Order Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> Order { get; init; }
 
         /// <summary>
-        /// Description Attribute
+        /// Description Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> Description { get; init; }
 
         /// <summary>
-        /// Wired Assessed Input Voltage Attribute
+        /// Wired Assessed Input Voltage Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> WiredAssessedInputVoltage { get; init; }
 
         /// <summary>
-        /// Wired Assessed Input Frequency Attribute
+        /// Wired Assessed Input Frequency Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort?> WiredAssessedInputFrequency { get; init; }
 
         /// <summary>
-        /// Wired Current Type Attribute
+        /// Wired Current Type Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WiredCurrentTypeEnum> WiredCurrentType { get; init; }
 
         /// <summary>
-        /// Wired Assessed Current Attribute
+        /// Wired Assessed Current Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> WiredAssessedCurrent { get; init; }
 
         /// <summary>
-        /// Wired Nominal Voltage Attribute
+        /// Wired Nominal Voltage Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> WiredNominalVoltage { get; init; }
 
         /// <summary>
-        /// Wired Maximum Current Attribute
+        /// Wired Maximum Current Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> WiredMaximumCurrent { get; init; }
 
         /// <summary>
-        /// Wired Present Attribute
+        /// Wired Present Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> WiredPresent { get; init; }
 
         /// <summary>
-        /// Active Wired Faults Attribute
+        /// Active Wired Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<WiredFault[]> ActiveWiredFaults { get; init; }
 
         /// <summary>
-        /// Bat Voltage Attribute
+        /// Bat Voltage Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BatVoltage { get; init; }
 
         /// <summary>
-        /// Bat Percent Remaining Attribute
+        /// Bat Percent Remaining Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte?> BatPercentRemaining { get; init; }
 
         /// <summary>
-        /// Bat Time Remaining Attribute
+        /// Bat Time Remaining Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BatTimeRemaining { get; init; }
 
         /// <summary>
-        /// Bat Charge Level Attribute
+        /// Bat Charge Level Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatChargeLevelEnum> BatChargeLevel { get; init; }
 
         /// <summary>
-        /// Bat Replacement Needed Attribute
+        /// Bat Replacement Needed Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> BatReplacementNeeded { get; init; }
 
         /// <summary>
-        /// Bat Replaceability Attribute
+        /// Bat Replaceability Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatReplaceabilityEnum> BatReplaceability { get; init; }
 
         /// <summary>
-        /// Bat Present Attribute
+        /// Bat Present Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> BatPresent { get; init; }
 
         /// <summary>
-        /// Active Bat Faults Attribute
+        /// Active Bat Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatFault[]> ActiveBatFaults { get; init; }
 
         /// <summary>
-        /// Bat Replacement Description Attribute
+        /// Bat Replacement Description Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> BatReplacementDescription { get; init; }
 
         /// <summary>
-        /// Bat Common Designation Attribute
+        /// Bat Common Designation Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatCommonDesignationEnum> BatCommonDesignation { get; init; }
 
         /// <summary>
-        /// Bat ANSI Designation Attribute
+        /// Bat ANSI Designation Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> BatANSIDesignation { get; init; }
 
         /// <summary>
-        /// Bat IEC Designation Attribute
+        /// Bat IEC Designation Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<string> BatIECDesignation { get; init; }
 
         /// <summary>
-        /// Bat Approved Chemistry Attribute
+        /// Bat Approved Chemistry Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatApprovedChemistryEnum> BatApprovedChemistry { get; init; }
 
         /// <summary>
-        /// Bat Capacity Attribute
+        /// Bat Capacity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint> BatCapacity { get; init; }
 
         /// <summary>
-        /// Bat Quantity Attribute
+        /// Bat Quantity Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> BatQuantity { get; init; }
 
         /// <summary>
-        /// Bat Charge State Attribute
+        /// Bat Charge State Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatChargeStateEnum> BatChargeState { get; init; }
 
         /// <summary>
-        /// Bat Time To Full Charge Attribute
+        /// Bat Time To Full Charge Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BatTimeToFullCharge { get; init; }
 
         /// <summary>
-        /// Bat Functional While Charging Attribute
+        /// Bat Functional While Charging Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<bool> BatFunctionalWhileCharging { get; init; }
 
         /// <summary>
-        /// Bat Charging Current Attribute
+        /// Bat Charging Current Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<uint?> BatChargingCurrent { get; init; }
 
         /// <summary>
-        /// Active Bat Charge Faults Attribute
+        /// Active Bat Charge Faults Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<BatChargeFault[]> ActiveBatChargeFaults { get; init; }
 
         /// <summary>
-        /// Endpoint List Attribute
+        /// Endpoint List Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ushort[]> EndpointList { get; init; }
         #endregion Attributes

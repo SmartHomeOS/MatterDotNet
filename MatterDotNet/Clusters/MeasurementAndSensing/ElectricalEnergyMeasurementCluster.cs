@@ -185,32 +185,32 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Accuracy Attribute
+        /// Accuracy Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<MeasurementAccuracy> Accuracy { get; init; }
 
         /// <summary>
-        /// Cumulative Energy Imported Attribute
+        /// Cumulative Energy Imported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EnergyMeasurement?> CumulativeEnergyImported { get; init; }
 
         /// <summary>
-        /// Cumulative Energy Exported Attribute
+        /// Cumulative Energy Exported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EnergyMeasurement?> CumulativeEnergyExported { get; init; }
 
         /// <summary>
-        /// Periodic Energy Imported Attribute
+        /// Periodic Energy Imported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EnergyMeasurement?> PeriodicEnergyImported { get; init; }
 
         /// <summary>
-        /// Periodic Energy Exported Attribute
+        /// Periodic Energy Exported Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<EnergyMeasurement?> PeriodicEnergyExported { get; init; }
 
         /// <summary>
-        /// Cumulative Energy Reset Attribute
+        /// Cumulative Energy Reset Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<CumulativeEnergyResetStruct?> CumulativeEnergyReset { get; init; }
         #endregion Attributes

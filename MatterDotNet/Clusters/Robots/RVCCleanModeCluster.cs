@@ -190,12 +190,12 @@ namespace MatterDotNet.Clusters.Robots
         }
 
         /// <summary>
-        /// Supported Modes Attribute
+        /// Supported Modes Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<ModeOption[]> SupportedModes { get; init; }
 
         /// <summary>
-        /// Current Mode Attribute
+        /// Current Mode Attribute [Read Only]
         /// </summary>
         public required ReadAttribute<byte> CurrentMode { get; init; }
         #endregion Attributes

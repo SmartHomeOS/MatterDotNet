@@ -33,9 +33,59 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.
         /// </summary>
-        public DemandResponseLoadControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public DemandResponseLoadControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DemandResponseLoadControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected DemandResponseLoadControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LoadControlPrograms = new ReadAttribute<LoadControlProgram[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    LoadControlProgram[] list = new LoadControlProgram[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new LoadControlProgram(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            NumberOfLoadControlPrograms = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 5
+
+            };
+            Events = new ReadAttribute<LoadControlEvent[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    LoadControlEvent[] list = new LoadControlEvent[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new LoadControlEvent(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ActiveEvents = new ReadAttribute<LoadControlEvent[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    LoadControlEvent[] list = new LoadControlEvent[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new LoadControlEvent(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            NumberOfEventsPerProgram = new ReadAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 10
+
+            };
+            NumberOfTransitions = new ReadAttribute<byte>(cluster, endPoint, 5) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 3
+
+            };
+            DefaultRandomStart = new ReadWriteAttribute<byte>(cluster, endPoint, 6) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x1E
+
+            };
+            DefaultRandomDuration = new ReadWriteAttribute<byte>(cluster, endPoint, 7) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -595,86 +645,44 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Get the Load Control Programs attribute
+        /// Load Control Programs Attribute
         /// </summary>
-        public async Task<LoadControlProgram[]> GetLoadControlPrograms(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            LoadControlProgram[] list = new LoadControlProgram[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new LoadControlProgram(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<LoadControlProgram[]> LoadControlPrograms { get; init; }
 
         /// <summary>
-        /// Get the Number Of Load Control Programs attribute
+        /// Number Of Load Control Programs Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfLoadControlPrograms(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 5;
-        }
+        public required ReadAttribute<byte> NumberOfLoadControlPrograms { get; init; }
 
         /// <summary>
-        /// Get the Events attribute
+        /// Events Attribute
         /// </summary>
-        public async Task<LoadControlEvent[]> GetEvents(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            LoadControlEvent[] list = new LoadControlEvent[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new LoadControlEvent(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<LoadControlEvent[]> Events { get; init; }
 
         /// <summary>
-        /// Get the Active Events attribute
+        /// Active Events Attribute
         /// </summary>
-        public async Task<LoadControlEvent[]> GetActiveEvents(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            LoadControlEvent[] list = new LoadControlEvent[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new LoadControlEvent(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<LoadControlEvent[]> ActiveEvents { get; init; }
 
         /// <summary>
-        /// Get the Number Of Events Per Program attribute
+        /// Number Of Events Per Program Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfEventsPerProgram(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 10;
-        }
+        public required ReadAttribute<byte> NumberOfEventsPerProgram { get; init; }
 
         /// <summary>
-        /// Get the Number Of Transitions attribute
+        /// Number Of Transitions Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfTransitions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 5) ?? 3;
-        }
+        public required ReadAttribute<byte> NumberOfTransitions { get; init; }
 
         /// <summary>
-        /// Get the Default Random Start attribute
+        /// Default Random Start Attribute
         /// </summary>
-        public async Task<byte> GetDefaultRandomStart(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 6) ?? 0x1E;
-        }
+        public required ReadWriteAttribute<byte> DefaultRandomStart { get; init; }
 
         /// <summary>
-        /// Set the Default Random Start attribute
+        /// Default Random Duration Attribute
         /// </summary>
-        public async Task SetDefaultRandomStart (SecureSession session, byte? value = 0x1E) {
-            await SetAttribute(session, 6, value);
-        }
-
-        /// <summary>
-        /// Get the Default Random Duration attribute
-        /// </summary>
-        public async Task<byte> GetDefaultRandomDuration(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 7) ?? 0;
-        }
-
-        /// <summary>
-        /// Set the Default Random Duration attribute
-        /// </summary>
-        public async Task SetDefaultRandomDuration (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 7, value);
-        }
+        public required ReadWriteAttribute<byte> DefaultRandomDuration { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

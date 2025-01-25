@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,35 +29,35 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing common languages, units of measurements, and numerical formatting standards. As such, Nodes that visually or audibly convey information need a mechanism by which they can be configured to use a user’s preferred language, units, etc
         /// </summary>
-        public LocalizationConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public LocalizationConfiguration(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LocalizationConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected LocalizationConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ActiveLocale = new ReadWriteAttribute<string>(cluster, endPoint, 0) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            SupportedLocales = new ReadAttribute<string[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    string[] list = new string[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetString(i, false, 254)!;
+                    return list;
+                }
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the Active Locale attribute
+        /// Active Locale Attribute
         /// </summary>
-        public async Task<string> GetActiveLocale(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadWriteAttribute<string> ActiveLocale { get; init; }
 
         /// <summary>
-        /// Set the Active Locale attribute
+        /// Supported Locales Attribute
         /// </summary>
-        public async Task SetActiveLocale (SecureSession session, string value) {
-            await SetAttribute(session, 0, value);
-        }
-
-        /// <summary>
-        /// Get the Supported Locales attribute
-        /// </summary>
-        public async Task<string[]> GetSupportedLocales(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            string[] list = new string[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false, 254)!;
-            return list;
-        }
+        public required ReadAttribute<string[]> SupportedLocales { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

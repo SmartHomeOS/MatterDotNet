@@ -32,9 +32,24 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
         /// </summary>
-        public ApplicationLauncher(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ApplicationLauncher(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ApplicationLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ApplicationLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CatalogList = new ReadAttribute<ushort[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            CurrentApp = new ReadAttribute<ApplicationEP?>(cluster, endPoint, 1, true) {
+                Deserialize = x => new ApplicationEP((object[])x!)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -255,22 +270,14 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Catalog List attribute
+        /// Catalog List Attribute
         /// </summary>
-        public async Task<ushort[]> GetCatalogList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> CatalogList { get; init; }
 
         /// <summary>
-        /// Get the Current App attribute
+        /// Current App Attribute
         /// </summary>
-        public async Task<ApplicationEP?> GetCurrentApp(SecureSession session) {
-            return new ApplicationEP((object[])(await GetAttribute(session, 1))!);
-        }
+        public required ReadAttribute<ApplicationEP?> CurrentApp { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Lighting
 {
@@ -28,16 +29,69 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Attributes and commands for configuring a lighting ballast.
         /// </summary>
-        public BallastConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public BallastConfiguration(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BallastConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected BallastConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            PhysicalMinLevel = new ReadAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x01
+
+            };
+            PhysicalMaxLevel = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0xFE
+
+            };
+            BallastStatus = new ReadAttribute<BallastStatusBitmap>(cluster, endPoint, 2) {
+                Deserialize = x => (BallastStatusBitmap)DeserializeEnum(x)!
+            };
+            MinLevel = new ReadWriteAttribute<byte>(cluster, endPoint, 16) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x01
+
+            };
+            MaxLevel = new ReadWriteAttribute<byte>(cluster, endPoint, 17) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0xFE
+
+            };
+            IntrinsicBallastFactor = new ReadWriteAttribute<byte?>(cluster, endPoint, 20, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            BallastFactorAdjustment = new ReadWriteAttribute<byte?>(cluster, endPoint, 21, true) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0xFF
+
+            };
+            LampQuantity = new ReadAttribute<byte>(cluster, endPoint, 32) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            LampType = new ReadWriteAttribute<string>(cluster, endPoint, 48) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            LampManufacturer = new ReadWriteAttribute<string>(cluster, endPoint, 49) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            LampRatedHours = new ReadWriteAttribute<uint?>(cluster, endPoint, 50, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0xFFFFFF
+
+            };
+            LampBurnHours = new ReadWriteAttribute<uint?>(cluster, endPoint, 51, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x000000
+
+            };
+            LampAlarmMode = new ReadWriteAttribute<LampAlarmModeBitmap>(cluster, endPoint, 52) {
+                Deserialize = x => (LampAlarmModeBitmap)DeserializeEnum(x)!
+            };
+            LampBurnHoursTripPoint = new ReadWriteAttribute<uint?>(cluster, endPoint, 53, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0xFFFFFF
+
+            };
+        }
 
         #region Enums
         /// <summary>
         /// Ballast Status
         /// </summary>
         [Flags]
-        public enum BallastStatus : byte {
+        public enum BallastStatusBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -56,7 +110,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// Lamp Alarm Mode
         /// </summary>
         [Flags]
-        public enum LampAlarmMode : byte {
+        public enum LampAlarmModeBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -70,172 +124,74 @@ namespace MatterDotNet.Clusters.Lighting
 
         #region Attributes
         /// <summary>
-        /// Get the Physical Min Level attribute
+        /// Physical Min Level Attribute
         /// </summary>
-        public async Task<byte> GetPhysicalMinLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 0) ?? 0x01;
-        }
+        public required ReadAttribute<byte> PhysicalMinLevel { get; init; }
 
         /// <summary>
-        /// Get the Physical Max Level attribute
+        /// Physical Max Level Attribute
         /// </summary>
-        public async Task<byte> GetPhysicalMaxLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0xFE;
-        }
+        public required ReadAttribute<byte> PhysicalMaxLevel { get; init; }
 
         /// <summary>
-        /// Get the Ballast Status attribute
+        /// Ballast Status Attribute
         /// </summary>
-        public async Task<BallastStatus> GetBallastStatus(SecureSession session) {
-            return (BallastStatus)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<BallastStatusBitmap> BallastStatus { get; init; }
 
         /// <summary>
-        /// Get the Min Level attribute
+        /// Min Level Attribute
         /// </summary>
-        public async Task<byte> GetMinLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 16) ?? 0x01;
-        }
+        public required ReadWriteAttribute<byte> MinLevel { get; init; }
 
         /// <summary>
-        /// Set the Min Level attribute
+        /// Max Level Attribute
         /// </summary>
-        public async Task SetMinLevel (SecureSession session, byte? value = 0x01) {
-            await SetAttribute(session, 16, value);
-        }
+        public required ReadWriteAttribute<byte> MaxLevel { get; init; }
 
         /// <summary>
-        /// Get the Max Level attribute
+        /// Intrinsic Ballast Factor Attribute
         /// </summary>
-        public async Task<byte> GetMaxLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 17) ?? 0xFE;
-        }
+        public required ReadWriteAttribute<byte?> IntrinsicBallastFactor { get; init; }
 
         /// <summary>
-        /// Set the Max Level attribute
+        /// Ballast Factor Adjustment Attribute
         /// </summary>
-        public async Task SetMaxLevel (SecureSession session, byte? value = 0xFE) {
-            await SetAttribute(session, 17, value);
-        }
+        public required ReadWriteAttribute<byte?> BallastFactorAdjustment { get; init; }
 
         /// <summary>
-        /// Get the Intrinsic Ballast Factor attribute
+        /// Lamp Quantity Attribute
         /// </summary>
-        public async Task<byte?> GetIntrinsicBallastFactor(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 20, true);
-        }
+        public required ReadAttribute<byte> LampQuantity { get; init; }
 
         /// <summary>
-        /// Set the Intrinsic Ballast Factor attribute
+        /// Lamp Type Attribute
         /// </summary>
-        public async Task SetIntrinsicBallastFactor (SecureSession session, byte? value) {
-            await SetAttribute(session, 20, value, true);
-        }
+        public required ReadWriteAttribute<string> LampType { get; init; }
 
         /// <summary>
-        /// Get the Ballast Factor Adjustment attribute
+        /// Lamp Manufacturer Attribute
         /// </summary>
-        public async Task<byte?> GetBallastFactorAdjustment(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 21, true) ?? 0xFF;
-        }
+        public required ReadWriteAttribute<string> LampManufacturer { get; init; }
 
         /// <summary>
-        /// Set the Ballast Factor Adjustment attribute
+        /// Lamp Rated Hours Attribute
         /// </summary>
-        public async Task SetBallastFactorAdjustment (SecureSession session, byte? value = 0xFF) {
-            await SetAttribute(session, 21, value, true);
-        }
+        public required ReadWriteAttribute<uint?> LampRatedHours { get; init; }
 
         /// <summary>
-        /// Get the Lamp Quantity attribute
+        /// Lamp Burn Hours Attribute
         /// </summary>
-        public async Task<byte> GetLampQuantity(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 32))!;
-        }
+        public required ReadWriteAttribute<uint?> LampBurnHours { get; init; }
 
         /// <summary>
-        /// Get the Lamp Type attribute
+        /// Lamp Alarm Mode Attribute
         /// </summary>
-        public async Task<string> GetLampType(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 48))!;
-        }
+        public required ReadWriteAttribute<LampAlarmModeBitmap> LampAlarmMode { get; init; }
 
         /// <summary>
-        /// Set the Lamp Type attribute
+        /// Lamp Burn Hours Trip Point Attribute
         /// </summary>
-        public async Task SetLampType (SecureSession session, string value) {
-            await SetAttribute(session, 48, value);
-        }
-
-        /// <summary>
-        /// Get the Lamp Manufacturer attribute
-        /// </summary>
-        public async Task<string> GetLampManufacturer(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 49))!;
-        }
-
-        /// <summary>
-        /// Set the Lamp Manufacturer attribute
-        /// </summary>
-        public async Task SetLampManufacturer (SecureSession session, string value) {
-            await SetAttribute(session, 49, value);
-        }
-
-        /// <summary>
-        /// Get the Lamp Rated Hours attribute
-        /// </summary>
-        public async Task<uint?> GetLampRatedHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 50, true) ?? 0xFFFFFF;
-        }
-
-        /// <summary>
-        /// Set the Lamp Rated Hours attribute
-        /// </summary>
-        public async Task SetLampRatedHours (SecureSession session, uint? value = 0xFFFFFF) {
-            await SetAttribute(session, 50, value, true);
-        }
-
-        /// <summary>
-        /// Get the Lamp Burn Hours attribute
-        /// </summary>
-        public async Task<uint?> GetLampBurnHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 51, true) ?? 0x000000;
-        }
-
-        /// <summary>
-        /// Set the Lamp Burn Hours attribute
-        /// </summary>
-        public async Task SetLampBurnHours (SecureSession session, uint? value = 0x000000) {
-            await SetAttribute(session, 51, value, true);
-        }
-
-        /// <summary>
-        /// Get the Lamp Alarm Mode attribute
-        /// </summary>
-        public async Task<LampAlarmMode> GetLampAlarmMode(SecureSession session) {
-            return (LampAlarmMode)await GetEnumAttribute(session, 52);
-        }
-
-        /// <summary>
-        /// Set the Lamp Alarm Mode attribute
-        /// </summary>
-        public async Task SetLampAlarmMode (SecureSession session, LampAlarmMode value) {
-            await SetAttribute(session, 52, value);
-        }
-
-        /// <summary>
-        /// Get the Lamp Burn Hours Trip Point attribute
-        /// </summary>
-        public async Task<uint?> GetLampBurnHoursTripPoint(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 53, true) ?? 0xFFFFFF;
-        }
-
-        /// <summary>
-        /// Set the Lamp Burn Hours Trip Point attribute
-        /// </summary>
-        public async Task SetLampBurnHoursTripPoint (SecureSession session, uint? value = 0xFFFFFF) {
-            await SetAttribute(session, 53, value, true);
-        }
+        public required ReadWriteAttribute<uint?> LampBurnHoursTripPoint { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

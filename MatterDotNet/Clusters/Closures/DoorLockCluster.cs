@@ -33,9 +33,174 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// An interface to a generic way to secure a door
         /// </summary>
-        public DoorLock(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public DoorLock(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DoorLock(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected DoorLock(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LockState = new ReadAttribute<LockStateEnum?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (LockStateEnum?)DeserializeEnum(x)
+            };
+            LockType = new ReadAttribute<LockTypeEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (LockTypeEnum)DeserializeEnum(x)!
+            };
+            ActuatorEnabled = new ReadAttribute<bool>(cluster, endPoint, 2) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            DoorState = new ReadAttribute<DoorStateEnum?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (DoorStateEnum?)DeserializeEnum(x)
+            };
+            DoorOpenEvents = new ReadWriteAttribute<uint>(cluster, endPoint, 4) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            DoorClosedEvents = new ReadWriteAttribute<uint>(cluster, endPoint, 5) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            OpenPeriod = new ReadWriteAttribute<ushort>(cluster, endPoint, 6) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            NumberOfTotalUsersSupported = new ReadAttribute<ushort>(cluster, endPoint, 23) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            NumberOfPINUsersSupported = new ReadAttribute<ushort>(cluster, endPoint, 24) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            NumberOfRFIDUsersSupported = new ReadAttribute<ushort>(cluster, endPoint, 25) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            NumberOfWeekDaySchedulesSupportedPerUser = new ReadAttribute<byte>(cluster, endPoint, 32) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfYearDaySchedulesSupportedPerUser = new ReadAttribute<byte>(cluster, endPoint, 33) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfHolidaySchedulesSupported = new ReadAttribute<byte>(cluster, endPoint, 34) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            MaxPINCodeLength = new ReadAttribute<byte>(cluster, endPoint, 35) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            MinPINCodeLength = new ReadAttribute<byte>(cluster, endPoint, 36) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            MaxRFIDCodeLength = new ReadAttribute<byte>(cluster, endPoint, 37) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            MinRFIDCodeLength = new ReadAttribute<byte>(cluster, endPoint, 38) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            CredentialRulesSupport = new ReadAttribute<CredentialRuleMask>(cluster, endPoint, 39) {
+                Deserialize = x => (CredentialRuleMask)DeserializeEnum(x)!
+            };
+            NumberOfCredentialsSupportedPerUser = new ReadAttribute<byte>(cluster, endPoint, 40) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            Language = new ReadWriteAttribute<string>(cluster, endPoint, 51) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            LEDSettings = new ReadWriteAttribute<byte>(cluster, endPoint, 52) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            AutoRelockTime = new ReadWriteAttribute<uint>(cluster, endPoint, 53) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            SoundVolume = new ReadWriteAttribute<byte>(cluster, endPoint, 54) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            OperatingMode = new ReadWriteAttribute<OperatingModeEnum>(cluster, endPoint, 55) {
+                Deserialize = x => (OperatingModeEnum)DeserializeEnum(x)!
+            };
+            SupportedOperatingModes = new ReadAttribute<SupportedOperatingModesBitmap>(cluster, endPoint, 56) {
+                Deserialize = x => (SupportedOperatingModesBitmap)DeserializeEnum(x)!
+            };
+            DefaultConfigurationRegister = new ReadAttribute<DefaultConfigurationRegisterBitmap>(cluster, endPoint, 57) {
+                Deserialize = x => (DefaultConfigurationRegisterBitmap)DeserializeEnum(x)!
+            };
+            EnableLocalProgramming = new ReadWriteAttribute<bool>(cluster, endPoint, 64) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            EnableOneTouchLocking = new ReadWriteAttribute<bool>(cluster, endPoint, 65) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            EnableInsideStatusLED = new ReadWriteAttribute<bool>(cluster, endPoint, 66) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            EnablePrivacyModeButton = new ReadWriteAttribute<bool>(cluster, endPoint, 67) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            LocalProgrammingFeatures = new ReadWriteAttribute<LocalProgrammingFeaturesBitmap>(cluster, endPoint, 68) {
+                Deserialize = x => (LocalProgrammingFeaturesBitmap)DeserializeEnum(x)!
+            };
+            WrongCodeEntryLimit = new ReadWriteAttribute<byte>(cluster, endPoint, 72) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            UserCodeTemporaryDisableTime = new ReadWriteAttribute<byte>(cluster, endPoint, 73) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            SendPINOverTheAir = new ReadWriteAttribute<bool>(cluster, endPoint, 80) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            RequirePINforRemoteOperation = new ReadWriteAttribute<bool>(cluster, endPoint, 81) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            ExpiringUserTimeout = new ReadWriteAttribute<ushort>(cluster, endPoint, 83) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            AliroReaderVerificationKey = new ReadAttribute<byte[]?>(cluster, endPoint, 296, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            AliroReaderGroupIdentifier = new ReadAttribute<byte[]?>(cluster, endPoint, 297, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            AliroReaderGroupSubIdentifier = new ReadAttribute<byte[]>(cluster, endPoint, 304) {
+                Deserialize = x => (byte[])(dynamic?)x!
+            };
+            AliroExpeditedTransactionSupportedProtocolVersions = new ReadAttribute<byte[][]>(cluster, endPoint, 305) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    byte[][] list = new byte[reader.Count][];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetBytes(i, false, 16)!;
+                    return list;
+                }
+            };
+            AliroGroupResolvingKey = new ReadAttribute<byte[]?>(cluster, endPoint, 306, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            AliroSupportedBLEUWBProtocolVersions = new ReadAttribute<byte[][]>(cluster, endPoint, 307) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    byte[][] list = new byte[reader.Count][];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetBytes(i, false, 16)!;
+                    return list;
+                }
+            };
+            AliroBLEAdvertisingVersion = new ReadAttribute<byte>(cluster, endPoint, 308) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            NumberOfAliroCredentialIssuerKeysSupported = new ReadAttribute<ushort>(cluster, endPoint, 309) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            NumberOfAliroEndpointKeysSupported = new ReadAttribute<ushort>(cluster, endPoint, 310) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -224,7 +389,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Door State
         /// </summary>
-        public enum DoorState : byte {
+        public enum DoorStateEnum : byte {
             /// <summary>
             /// Door state is open
             /// </summary>
@@ -368,7 +533,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Operating Mode
         /// </summary>
-        public enum OperatingMode : byte {
+        public enum OperatingModeEnum : byte {
             /// <summary>
             /// 
             /// </summary>
@@ -508,7 +673,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Lock State
         /// </summary>
-        public enum LockState : byte {
+        public enum LockStateEnum : byte {
             /// <summary>
             /// Lock state is not fully locked
             /// </summary>
@@ -530,7 +695,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Lock Type
         /// </summary>
-        public enum LockType : byte {
+        public enum LockTypeEnum : byte {
             /// <summary>
             /// Physical lock type is dead bolt
             /// </summary>
@@ -696,7 +861,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Credential Rules Support
         /// </summary>
         [Flags]
-        public enum CredentialRulesSupport : byte {
+        public enum CredentialRulesSupportBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -710,7 +875,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Supported Operating Modes
         /// </summary>
         [Flags]
-        public enum SupportedOperatingModes : ushort {
+        public enum SupportedOperatingModesBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -726,7 +891,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Default Configuration Register
         /// </summary>
         [Flags]
-        public enum DefaultConfigurationRegister : ushort {
+        public enum DefaultConfigurationRegisterBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -743,7 +908,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Local Programming Features
         /// </summary>
         [Flags]
-        public enum LocalProgrammingFeatures : byte {
+        public enum LocalProgrammingFeaturesBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -1082,7 +1247,7 @@ namespace MatterDotNet.Clusters.Closures
             public required byte HolidayIndex { get; set; }
             public required DateTime LocalStartTime { get; set; }
             public required DateTime LocalEndTime { get; set; }
-            public required OperatingMode OperatingMode { get; set; }
+            public required OperatingModeEnum OperatingMode { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, HolidayIndex);
@@ -1110,7 +1275,7 @@ namespace MatterDotNet.Clusters.Closures
             public required Status Status { get; set; }
             public DateTime? LocalStartTime { get; set; }
             public DateTime? LocalEndTime { get; set; }
-            public OperatingMode? OperatingMode { get; set; }
+            public OperatingModeEnum? OperatingMode { get; set; }
         }
 
         private record ClearHolidaySchedulePayload : TLVPayload {
@@ -1401,7 +1566,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Set Holiday Schedule
         /// </summary>
-        public async Task<bool> SetHolidaySchedule(SecureSession session, byte holidayIndex, DateTime localStartTime, DateTime localEndTime, OperatingMode operatingMode) {
+        public async Task<bool> SetHolidaySchedule(SecureSession session, byte holidayIndex, DateTime localStartTime, DateTime localEndTime, OperatingModeEnum operatingMode) {
             SetHolidaySchedulePayload requestFields = new SetHolidaySchedulePayload() {
                 HolidayIndex = holidayIndex,
                 LocalStartTime = localStartTime,
@@ -1427,7 +1592,7 @@ namespace MatterDotNet.Clusters.Closures
                 Status = (Status)(byte)GetField(resp, 1),
                 LocalStartTime = (DateTime?)GetOptionalField(resp, 2),
                 LocalEndTime = (DateTime?)GetOptionalField(resp, 3),
-                OperatingMode = (OperatingMode?)(byte?)GetOptionalField(resp, 4),
+                OperatingMode = (OperatingModeEnum?)(byte?)GetOptionalField(resp, 4),
             };
         }
 
@@ -1604,453 +1769,229 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Get the Lock State attribute
+        /// Lock State Attribute
         /// </summary>
-        public async Task<LockState?> GetLockState(SecureSession session) {
-            return (LockState?)await GetEnumAttribute(session, 0, true);
-        }
+        public required ReadAttribute<LockStateEnum?> LockState { get; init; }
 
         /// <summary>
-        /// Get the Lock Type attribute
+        /// Lock Type Attribute
         /// </summary>
-        public async Task<LockType> GetLockType(SecureSession session) {
-            return (LockType)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<LockTypeEnum> LockType { get; init; }
 
         /// <summary>
-        /// Get the Actuator Enabled attribute
+        /// Actuator Enabled Attribute
         /// </summary>
-        public async Task<bool> GetActuatorEnabled(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<bool> ActuatorEnabled { get; init; }
 
         /// <summary>
-        /// Get the Door State attribute
+        /// Door State Attribute
         /// </summary>
-        public async Task<DoorState?> GetDoorState(SecureSession session) {
-            return (DoorState?)await GetEnumAttribute(session, 3, true);
-        }
+        public required ReadAttribute<DoorStateEnum?> DoorState { get; init; }
 
         /// <summary>
-        /// Get the Door Open Events attribute
+        /// Door Open Events Attribute
         /// </summary>
-        public async Task<uint> GetDoorOpenEvents(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadWriteAttribute<uint> DoorOpenEvents { get; init; }
 
         /// <summary>
-        /// Set the Door Open Events attribute
+        /// Door Closed Events Attribute
         /// </summary>
-        public async Task SetDoorOpenEvents (SecureSession session, uint value) {
-            await SetAttribute(session, 4, value);
-        }
+        public required ReadWriteAttribute<uint> DoorClosedEvents { get; init; }
 
         /// <summary>
-        /// Get the Door Closed Events attribute
+        /// Open Period Attribute
         /// </summary>
-        public async Task<uint> GetDoorClosedEvents(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadWriteAttribute<ushort> OpenPeriod { get; init; }
 
         /// <summary>
-        /// Set the Door Closed Events attribute
+        /// Number Of Total Users Supported Attribute
         /// </summary>
-        public async Task SetDoorClosedEvents (SecureSession session, uint value) {
-            await SetAttribute(session, 5, value);
-        }
+        public required ReadAttribute<ushort> NumberOfTotalUsersSupported { get; init; }
 
         /// <summary>
-        /// Get the Open Period attribute
+        /// Number Of PIN Users Supported Attribute
         /// </summary>
-        public async Task<ushort> GetOpenPeriod(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<ushort> NumberOfPINUsersSupported { get; init; }
 
         /// <summary>
-        /// Set the Open Period attribute
+        /// Number Of RFID Users Supported Attribute
         /// </summary>
-        public async Task SetOpenPeriod (SecureSession session, ushort value) {
-            await SetAttribute(session, 6, value);
-        }
+        public required ReadAttribute<ushort> NumberOfRFIDUsersSupported { get; init; }
 
         /// <summary>
-        /// Get the Number Of Total Users Supported attribute
+        /// Number Of Week Day Schedules Supported Per User Attribute
         /// </summary>
-        public async Task<ushort> GetNumberOfTotalUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 23) ?? 0;
-        }
+        public required ReadAttribute<byte> NumberOfWeekDaySchedulesSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Get the Number Of PIN Users Supported attribute
+        /// Number Of Year Day Schedules Supported Per User Attribute
         /// </summary>
-        public async Task<ushort> GetNumberOfPINUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 24) ?? 0;
-        }
+        public required ReadAttribute<byte> NumberOfYearDaySchedulesSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Get the Number Of RFID Users Supported attribute
+        /// Number Of Holiday Schedules Supported Attribute
         /// </summary>
-        public async Task<ushort> GetNumberOfRFIDUsersSupported(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 25) ?? 0;
-        }
+        public required ReadAttribute<byte> NumberOfHolidaySchedulesSupported { get; init; }
 
         /// <summary>
-        /// Get the Number Of Week Day Schedules Supported Per User attribute
+        /// Max PIN Code Length Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfWeekDaySchedulesSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 32) ?? 0;
-        }
+        public required ReadAttribute<byte> MaxPINCodeLength { get; init; }
 
         /// <summary>
-        /// Get the Number Of Year Day Schedules Supported Per User attribute
+        /// Min PIN Code Length Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfYearDaySchedulesSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 33) ?? 0;
-        }
+        public required ReadAttribute<byte> MinPINCodeLength { get; init; }
 
         /// <summary>
-        /// Get the Number Of Holiday Schedules Supported attribute
+        /// Max RFID Code Length Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfHolidaySchedulesSupported(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 0;
-        }
+        public required ReadAttribute<byte> MaxRFIDCodeLength { get; init; }
 
         /// <summary>
-        /// Get the Max PIN Code Length attribute
+        /// Min RFID Code Length Attribute
         /// </summary>
-        public async Task<byte> GetMaxPINCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 35))!;
-        }
+        public required ReadAttribute<byte> MinRFIDCodeLength { get; init; }
 
         /// <summary>
-        /// Get the Min PIN Code Length attribute
+        /// Credential Rules Support Attribute
         /// </summary>
-        public async Task<byte> GetMinPINCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 36))!;
-        }
+        public required ReadAttribute<CredentialRuleMask> CredentialRulesSupport { get; init; }
 
         /// <summary>
-        /// Get the Max RFID Code Length attribute
+        /// Number Of Credentials Supported Per User Attribute
         /// </summary>
-        public async Task<byte> GetMaxRFIDCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 37))!;
-        }
+        public required ReadAttribute<byte> NumberOfCredentialsSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Get the Min RFID Code Length attribute
+        /// Language Attribute
         /// </summary>
-        public async Task<byte> GetMinRFIDCodeLength(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 38))!;
-        }
+        public required ReadWriteAttribute<string> Language { get; init; }
 
         /// <summary>
-        /// Get the Credential Rules Support attribute
+        /// LED Settings Attribute
         /// </summary>
-        public async Task<CredentialRuleMask> GetCredentialRulesSupport(SecureSession session) {
-            return (CredentialRuleMask)await GetEnumAttribute(session, 39);
-        }
+        public required ReadWriteAttribute<byte> LEDSettings { get; init; }
 
         /// <summary>
-        /// Get the Number Of Credentials Supported Per User attribute
+        /// Auto Relock Time Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfCredentialsSupportedPerUser(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 40) ?? 0;
-        }
+        public required ReadWriteAttribute<uint> AutoRelockTime { get; init; }
 
         /// <summary>
-        /// Get the Language attribute
+        /// Sound Volume Attribute
         /// </summary>
-        public async Task<string> GetLanguage(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 51))!;
-        }
+        public required ReadWriteAttribute<byte> SoundVolume { get; init; }
 
         /// <summary>
-        /// Set the Language attribute
+        /// Operating Mode Attribute
         /// </summary>
-        public async Task SetLanguage (SecureSession session, string value) {
-            await SetAttribute(session, 51, value);
-        }
+        public required ReadWriteAttribute<OperatingModeEnum> OperatingMode { get; init; }
 
         /// <summary>
-        /// Get the LED Settings attribute
+        /// Supported Operating Modes Attribute
         /// </summary>
-        public async Task<byte> GetLEDSettings(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 52) ?? 0;
-        }
+        public required ReadAttribute<SupportedOperatingModesBitmap> SupportedOperatingModes { get; init; }
 
         /// <summary>
-        /// Set the LED Settings attribute
+        /// Default Configuration Register Attribute
         /// </summary>
-        public async Task SetLEDSettings (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 52, value);
-        }
+        public required ReadAttribute<DefaultConfigurationRegisterBitmap> DefaultConfigurationRegister { get; init; }
 
         /// <summary>
-        /// Get the Auto Relock Time attribute
+        /// Enable Local Programming Attribute
         /// </summary>
-        public async Task<uint> GetAutoRelockTime(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 53))!;
-        }
+        public required ReadWriteAttribute<bool> EnableLocalProgramming { get; init; }
 
         /// <summary>
-        /// Set the Auto Relock Time attribute
+        /// Enable One Touch Locking Attribute
         /// </summary>
-        public async Task SetAutoRelockTime (SecureSession session, uint value) {
-            await SetAttribute(session, 53, value);
-        }
+        public required ReadWriteAttribute<bool> EnableOneTouchLocking { get; init; }
 
         /// <summary>
-        /// Get the Sound Volume attribute
+        /// Enable Inside Status LED Attribute
         /// </summary>
-        public async Task<byte> GetSoundVolume(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 54) ?? 0;
-        }
+        public required ReadWriteAttribute<bool> EnableInsideStatusLED { get; init; }
 
         /// <summary>
-        /// Set the Sound Volume attribute
+        /// Enable Privacy Mode Button Attribute
         /// </summary>
-        public async Task SetSoundVolume (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 54, value);
-        }
+        public required ReadWriteAttribute<bool> EnablePrivacyModeButton { get; init; }
 
         /// <summary>
-        /// Get the Operating Mode attribute
+        /// Local Programming Features Attribute
         /// </summary>
-        public async Task<OperatingMode> GetOperatingMode(SecureSession session) {
-            return (OperatingMode)await GetEnumAttribute(session, 55);
-        }
+        public required ReadWriteAttribute<LocalProgrammingFeaturesBitmap> LocalProgrammingFeatures { get; init; }
 
         /// <summary>
-        /// Set the Operating Mode attribute
+        /// Wrong Code Entry Limit Attribute
         /// </summary>
-        public async Task SetOperatingMode (SecureSession session, OperatingMode value) {
-            await SetAttribute(session, 55, value);
-        }
+        public required ReadWriteAttribute<byte> WrongCodeEntryLimit { get; init; }
 
         /// <summary>
-        /// Get the Supported Operating Modes attribute
+        /// User Code Temporary Disable Time Attribute
         /// </summary>
-        public async Task<SupportedOperatingModes> GetSupportedOperatingModes(SecureSession session) {
-            return (SupportedOperatingModes)await GetEnumAttribute(session, 56);
-        }
+        public required ReadWriteAttribute<byte> UserCodeTemporaryDisableTime { get; init; }
 
         /// <summary>
-        /// Get the Default Configuration Register attribute
+        /// Send PIN Over The Air Attribute
         /// </summary>
-        public async Task<DefaultConfigurationRegister> GetDefaultConfigurationRegister(SecureSession session) {
-            return (DefaultConfigurationRegister)await GetEnumAttribute(session, 57);
-        }
+        public required ReadWriteAttribute<bool> SendPINOverTheAir { get; init; }
 
         /// <summary>
-        /// Get the Enable Local Programming attribute
+        /// Require PI Nfor Remote Operation Attribute
         /// </summary>
-        public async Task<bool> GetEnableLocalProgramming(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 64) ?? true;
-        }
+        public required ReadWriteAttribute<bool> RequirePINforRemoteOperation { get; init; }
 
         /// <summary>
-        /// Set the Enable Local Programming attribute
+        /// Expiring User Timeout Attribute
         /// </summary>
-        public async Task SetEnableLocalProgramming (SecureSession session, bool? value = true) {
-            await SetAttribute(session, 64, value);
-        }
+        public required ReadWriteAttribute<ushort> ExpiringUserTimeout { get; init; }
 
         /// <summary>
-        /// Get the Enable One Touch Locking attribute
+        /// Aliro Reader Verification Key Attribute
         /// </summary>
-        public async Task<bool> GetEnableOneTouchLocking(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 65) ?? false;
-        }
+        public required ReadAttribute<byte[]?> AliroReaderVerificationKey { get; init; }
 
         /// <summary>
-        /// Set the Enable One Touch Locking attribute
+        /// Aliro Reader Group Identifier Attribute
         /// </summary>
-        public async Task SetEnableOneTouchLocking (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 65, value);
-        }
+        public required ReadAttribute<byte[]?> AliroReaderGroupIdentifier { get; init; }
 
         /// <summary>
-        /// Get the Enable Inside Status LED attribute
+        /// Aliro Reader Group Sub Identifier Attribute
         /// </summary>
-        public async Task<bool> GetEnableInsideStatusLED(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 66) ?? false;
-        }
+        public required ReadAttribute<byte[]> AliroReaderGroupSubIdentifier { get; init; }
 
         /// <summary>
-        /// Set the Enable Inside Status LED attribute
+        /// Aliro Expedited Transaction Supported Protocol Versions Attribute
         /// </summary>
-        public async Task SetEnableInsideStatusLED (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 66, value);
-        }
+        public required ReadAttribute<byte[][]> AliroExpeditedTransactionSupportedProtocolVersions { get; init; }
 
         /// <summary>
-        /// Get the Enable Privacy Mode Button attribute
+        /// Aliro Group Resolving Key Attribute
         /// </summary>
-        public async Task<bool> GetEnablePrivacyModeButton(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 67) ?? false;
-        }
+        public required ReadAttribute<byte[]?> AliroGroupResolvingKey { get; init; }
 
         /// <summary>
-        /// Set the Enable Privacy Mode Button attribute
+        /// Aliro Supported BLEUWB Protocol Versions Attribute
         /// </summary>
-        public async Task SetEnablePrivacyModeButton (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 67, value);
-        }
+        public required ReadAttribute<byte[][]> AliroSupportedBLEUWBProtocolVersions { get; init; }
 
         /// <summary>
-        /// Get the Local Programming Features attribute
+        /// Aliro BLE Advertising Version Attribute
         /// </summary>
-        public async Task<LocalProgrammingFeatures> GetLocalProgrammingFeatures(SecureSession session) {
-            return (LocalProgrammingFeatures)await GetEnumAttribute(session, 68);
-        }
+        public required ReadAttribute<byte> AliroBLEAdvertisingVersion { get; init; }
 
         /// <summary>
-        /// Set the Local Programming Features attribute
+        /// Number Of Aliro Credential Issuer Keys Supported Attribute
         /// </summary>
-        public async Task SetLocalProgrammingFeatures (SecureSession session, LocalProgrammingFeatures value) {
-            await SetAttribute(session, 68, value);
-        }
+        public required ReadAttribute<ushort> NumberOfAliroCredentialIssuerKeysSupported { get; init; }
 
         /// <summary>
-        /// Get the Wrong Code Entry Limit attribute
+        /// Number Of Aliro Endpoint Keys Supported Attribute
         /// </summary>
-        public async Task<byte> GetWrongCodeEntryLimit(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 72))!;
-        }
-
-        /// <summary>
-        /// Set the Wrong Code Entry Limit attribute
-        /// </summary>
-        public async Task SetWrongCodeEntryLimit (SecureSession session, byte value) {
-            await SetAttribute(session, 72, value);
-        }
-
-        /// <summary>
-        /// Get the User Code Temporary Disable Time attribute
-        /// </summary>
-        public async Task<byte> GetUserCodeTemporaryDisableTime(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 73))!;
-        }
-
-        /// <summary>
-        /// Set the User Code Temporary Disable Time attribute
-        /// </summary>
-        public async Task SetUserCodeTemporaryDisableTime (SecureSession session, byte value) {
-            await SetAttribute(session, 73, value);
-        }
-
-        /// <summary>
-        /// Get the Send PIN Over The Air attribute
-        /// </summary>
-        public async Task<bool> GetSendPINOverTheAir(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 80) ?? false;
-        }
-
-        /// <summary>
-        /// Set the Send PIN Over The Air attribute
-        /// </summary>
-        public async Task SetSendPINOverTheAir (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 80, value);
-        }
-
-        /// <summary>
-        /// Get the Require PI Nfor Remote Operation attribute
-        /// </summary>
-        public async Task<bool> GetRequirePINforRemoteOperation(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 81) ?? false;
-        }
-
-        /// <summary>
-        /// Set the Require PI Nfor Remote Operation attribute
-        /// </summary>
-        public async Task SetRequirePINforRemoteOperation (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 81, value);
-        }
-
-        /// <summary>
-        /// Get the Expiring User Timeout attribute
-        /// </summary>
-        public async Task<ushort> GetExpiringUserTimeout(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 83))!;
-        }
-
-        /// <summary>
-        /// Set the Expiring User Timeout attribute
-        /// </summary>
-        public async Task SetExpiringUserTimeout (SecureSession session, ushort value) {
-            await SetAttribute(session, 83, value);
-        }
-
-        /// <summary>
-        /// Get the Aliro Reader Verification Key attribute
-        /// </summary>
-        public async Task<byte[]?> GetAliroReaderVerificationKey(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 296, true);
-        }
-
-        /// <summary>
-        /// Get the Aliro Reader Group Identifier attribute
-        /// </summary>
-        public async Task<byte[]?> GetAliroReaderGroupIdentifier(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 297, true);
-        }
-
-        /// <summary>
-        /// Get the Aliro Reader Group Sub Identifier attribute
-        /// </summary>
-        public async Task<byte[]> GetAliroReaderGroupSubIdentifier(SecureSession session) {
-            return (byte[])(dynamic?)(await GetAttribute(session, 304))!;
-        }
-
-        /// <summary>
-        /// Get the Aliro Expedited Transaction Supported Protocol Versions attribute
-        /// </summary>
-        public async Task<byte[][]> GetAliroExpeditedTransactionSupportedProtocolVersions(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 305))!);
-            byte[][] list = new byte[reader.Count][];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false, 16)!;
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Aliro Group Resolving Key attribute
-        /// </summary>
-        public async Task<byte[]?> GetAliroGroupResolvingKey(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 306, true);
-        }
-
-        /// <summary>
-        /// Get the Aliro Supported BLEUWB Protocol Versions attribute
-        /// </summary>
-        public async Task<byte[][]> GetAliroSupportedBLEUWBProtocolVersions(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 307))!);
-            byte[][] list = new byte[reader.Count][];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false, 16)!;
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Aliro BLE Advertising Version attribute
-        /// </summary>
-        public async Task<byte> GetAliroBLEAdvertisingVersion(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 308))!;
-        }
-
-        /// <summary>
-        /// Get the Number Of Aliro Credential Issuer Keys Supported attribute
-        /// </summary>
-        public async Task<ushort> GetNumberOfAliroCredentialIssuerKeysSupported(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 309))!;
-        }
-
-        /// <summary>
-        /// Get the Number Of Aliro Endpoint Keys Supported attribute
-        /// </summary>
-        public async Task<ushort> GetNumberOfAliroEndpointKeysSupported(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 310))!;
-        }
+        public required ReadAttribute<ushort> NumberOfAliroEndpointKeysSupported { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

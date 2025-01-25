@@ -32,9 +32,267 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems
         /// </summary>
-        public ThreadNetworkDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ThreadNetworkDiagnostics(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThreadNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ThreadNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Channel = new ReadAttribute<ushort?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            RoutingRole = new ReadAttribute<RoutingRoleEnum?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (RoutingRoleEnum?)DeserializeEnum(x)
+            };
+            NetworkName = new ReadAttribute<string?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (string?)(dynamic?)x
+            };
+            PanId = new ReadAttribute<ushort?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            ExtendedPanId = new ReadAttribute<ulong?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            MeshLocalPrefix = new ReadAttribute<byte[]?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            OverrunCount = new ReadAttribute<ulong>(cluster, endPoint, 6) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            NeighborTable = new ReadAttribute<NeighborTableStruct[]>(cluster, endPoint, 7) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NeighborTableStruct[] list = new NeighborTableStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new NeighborTableStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            RouteTable = new ReadAttribute<RouteTableStruct[]>(cluster, endPoint, 8) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    RouteTableStruct[] list = new RouteTableStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new RouteTableStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            PartitionId = new ReadAttribute<uint?>(cluster, endPoint, 9, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            Weighting = new ReadAttribute<ushort?>(cluster, endPoint, 10, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            DataVersion = new ReadAttribute<ushort?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            StableDataVersion = new ReadAttribute<ushort?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            LeaderRouterId = new ReadAttribute<byte?>(cluster, endPoint, 13, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            DetachedRoleCount = new ReadAttribute<ushort>(cluster, endPoint, 14) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            ChildRoleCount = new ReadAttribute<ushort>(cluster, endPoint, 15) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            RouterRoleCount = new ReadAttribute<ushort>(cluster, endPoint, 16) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            LeaderRoleCount = new ReadAttribute<ushort>(cluster, endPoint, 17) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            AttachAttemptCount = new ReadAttribute<ushort>(cluster, endPoint, 18) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PartitionIdChangeCount = new ReadAttribute<ushort>(cluster, endPoint, 19) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            BetterPartitionAttachAttemptCount = new ReadAttribute<ushort>(cluster, endPoint, 20) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            ParentChangeCount = new ReadAttribute<ushort>(cluster, endPoint, 21) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            TxTotalCount = new ReadAttribute<uint>(cluster, endPoint, 22) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxUnicastCount = new ReadAttribute<uint>(cluster, endPoint, 23) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxBroadcastCount = new ReadAttribute<uint>(cluster, endPoint, 24) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxAckRequestedCount = new ReadAttribute<uint>(cluster, endPoint, 25) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxAckedCount = new ReadAttribute<uint>(cluster, endPoint, 26) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxNoAckRequestedCount = new ReadAttribute<uint>(cluster, endPoint, 27) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxDataCount = new ReadAttribute<uint>(cluster, endPoint, 28) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxDataPollCount = new ReadAttribute<uint>(cluster, endPoint, 29) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxBeaconCount = new ReadAttribute<uint>(cluster, endPoint, 30) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxBeaconRequestCount = new ReadAttribute<uint>(cluster, endPoint, 31) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxOtherCount = new ReadAttribute<uint>(cluster, endPoint, 32) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxRetryCount = new ReadAttribute<uint>(cluster, endPoint, 33) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxDirectMaxRetryExpiryCount = new ReadAttribute<uint>(cluster, endPoint, 34) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxIndirectMaxRetryExpiryCount = new ReadAttribute<uint>(cluster, endPoint, 35) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxErrCcaCount = new ReadAttribute<uint>(cluster, endPoint, 36) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxErrAbortCount = new ReadAttribute<uint>(cluster, endPoint, 37) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            TxErrBusyChannelCount = new ReadAttribute<uint>(cluster, endPoint, 38) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxTotalCount = new ReadAttribute<uint>(cluster, endPoint, 39) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxUnicastCount = new ReadAttribute<uint>(cluster, endPoint, 40) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxBroadcastCount = new ReadAttribute<uint>(cluster, endPoint, 41) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxDataCount = new ReadAttribute<uint>(cluster, endPoint, 42) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxDataPollCount = new ReadAttribute<uint>(cluster, endPoint, 43) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxBeaconCount = new ReadAttribute<uint>(cluster, endPoint, 44) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxBeaconRequestCount = new ReadAttribute<uint>(cluster, endPoint, 45) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxOtherCount = new ReadAttribute<uint>(cluster, endPoint, 46) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxAddressFilteredCount = new ReadAttribute<uint>(cluster, endPoint, 47) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxDestAddrFilteredCount = new ReadAttribute<uint>(cluster, endPoint, 48) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxDuplicatedCount = new ReadAttribute<uint>(cluster, endPoint, 49) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrNoFrameCount = new ReadAttribute<uint>(cluster, endPoint, 50) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrUnknownNeighborCount = new ReadAttribute<uint>(cluster, endPoint, 51) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrInvalidSrcAddrCount = new ReadAttribute<uint>(cluster, endPoint, 52) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrSecCount = new ReadAttribute<uint>(cluster, endPoint, 53) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrFcsCount = new ReadAttribute<uint>(cluster, endPoint, 54) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            RxErrOtherCount = new ReadAttribute<uint>(cluster, endPoint, 55) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            ActiveTimestamp = new ReadAttribute<ulong?>(cluster, endPoint, 56, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            PendingTimestamp = new ReadAttribute<ulong?>(cluster, endPoint, 57, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            Delay = new ReadAttribute<uint?>(cluster, endPoint, 58, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x0000
+
+            };
+            SecurityPolicy = new ReadAttribute<SecurityPolicyStruct?>(cluster, endPoint, 59, true) {
+                Deserialize = x => new SecurityPolicyStruct((object[])x!)
+            };
+            ChannelPage0Mask = new ReadAttribute<byte[]?>(cluster, endPoint, 60, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            OperationalDatasetComponents = new ReadAttribute<OperationalDatasetComponentsStruct?>(cluster, endPoint, 61, true) {
+                Deserialize = x => new OperationalDatasetComponentsStruct((object[])x!)
+            };
+            ActiveNetworkFaultsList = new ReadAttribute<NetworkFault[]>(cluster, endPoint, 62) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NetworkFault[] list = new NetworkFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (NetworkFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -85,7 +343,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Routing Role
         /// </summary>
-        public enum RoutingRole : byte {
+        public enum RoutingRoleEnum : byte {
             /// <summary>
             /// Unspecified routing role.
             /// </summary>
@@ -135,17 +393,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Neighbor Table
         /// </summary>
-        public record NeighborTable : TLVPayload {
+        public record NeighborTableStruct : TLVPayload {
             /// <summary>
             /// Neighbor Table
             /// </summary>
-            public NeighborTable() { }
+            public NeighborTableStruct() { }
 
             /// <summary>
             /// Neighbor Table
             /// </summary>
             [SetsRequiredMembers]
-            public NeighborTable(object[] fields) {
+            public NeighborTableStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ExtAddress = reader.GetULong(0)!.Value;
                 Age = reader.GetUInt(1)!.Value;
@@ -199,17 +457,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Route Table
         /// </summary>
-        public record RouteTable : TLVPayload {
+        public record RouteTableStruct : TLVPayload {
             /// <summary>
             /// Route Table
             /// </summary>
-            public RouteTable() { }
+            public RouteTableStruct() { }
 
             /// <summary>
             /// Route Table
             /// </summary>
             [SetsRequiredMembers]
-            public RouteTable(object[] fields) {
+            public RouteTableStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ExtAddress = reader.GetULong(0)!.Value;
                 Rloc16 = reader.GetUShort(1)!.Value;
@@ -251,17 +509,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Security Policy
         /// </summary>
-        public record SecurityPolicy : TLVPayload {
+        public record SecurityPolicyStruct : TLVPayload {
             /// <summary>
             /// Security Policy
             /// </summary>
-            public SecurityPolicy() { }
+            public SecurityPolicyStruct() { }
 
             /// <summary>
             /// Security Policy
             /// </summary>
             [SetsRequiredMembers]
-            public SecurityPolicy(object[] fields) {
+            public SecurityPolicyStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 RotationTime = reader.GetUShort(0)!.Value;
                 Flags = reader.GetUShort(1)!.Value;
@@ -279,17 +537,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Operational Dataset Components
         /// </summary>
-        public record OperationalDatasetComponents : TLVPayload {
+        public record OperationalDatasetComponentsStruct : TLVPayload {
             /// <summary>
             /// Operational Dataset Components
             /// </summary>
-            public OperationalDatasetComponents() { }
+            public OperationalDatasetComponentsStruct() { }
 
             /// <summary>
             /// Operational Dataset Components
             /// </summary>
             [SetsRequiredMembers]
-            public OperationalDatasetComponents(object[] fields) {
+            public OperationalDatasetComponentsStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ActiveTimestampPresent = reader.GetBool(0)!.Value;
                 PendingTimestampPresent = reader.GetBool(1)!.Value;
@@ -371,457 +629,319 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Channel attribute
+        /// Channel Attribute
         /// </summary>
-        public async Task<ushort?> GetChannel(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<ushort?> Channel { get; init; }
 
         /// <summary>
-        /// Get the Routing Role attribute
+        /// Routing Role Attribute
         /// </summary>
-        public async Task<RoutingRole?> GetRoutingRole(SecureSession session) {
-            return (RoutingRole?)await GetEnumAttribute(session, 1, true);
-        }
+        public required ReadAttribute<RoutingRoleEnum?> RoutingRole { get; init; }
 
         /// <summary>
-        /// Get the Network Name attribute
+        /// Network Name Attribute
         /// </summary>
-        public async Task<string?> GetNetworkName(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<string?> NetworkName { get; init; }
 
         /// <summary>
-        /// Get the Pan Id attribute
+        /// Pan Id Attribute
         /// </summary>
-        public async Task<ushort?> GetPanId(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3, true) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort?> PanId { get; init; }
 
         /// <summary>
-        /// Get the Extended Pan Id attribute
+        /// Extended Pan Id Attribute
         /// </summary>
-        public async Task<ulong?> GetExtendedPanId(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 4, true) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong?> ExtendedPanId { get; init; }
 
         /// <summary>
-        /// Get the Mesh Local Prefix attribute
+        /// Mesh Local Prefix Attribute
         /// </summary>
-        public async Task<byte[]?> GetMeshLocalPrefix(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<byte[]?> MeshLocalPrefix { get; init; }
 
         /// <summary>
-        /// Get the Overrun Count attribute
+        /// Overrun Count Attribute
         /// </summary>
-        public async Task<ulong> GetOverrunCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> OverrunCount { get; init; }
 
         /// <summary>
-        /// Get the Neighbor Table attribute
+        /// Neighbor Table Attribute
         /// </summary>
-        public async Task<NeighborTable[]> GetNeighborTable(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
-            NeighborTable[] list = new NeighborTable[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new NeighborTable(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<NeighborTableStruct[]> NeighborTable { get; init; }
 
         /// <summary>
-        /// Get the Route Table attribute
+        /// Route Table Attribute
         /// </summary>
-        public async Task<RouteTable[]> GetRouteTable(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
-            RouteTable[] list = new RouteTable[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new RouteTable(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<RouteTableStruct[]> RouteTable { get; init; }
 
         /// <summary>
-        /// Get the Partition Id attribute
+        /// Partition Id Attribute
         /// </summary>
-        public async Task<uint?> GetPartitionId(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9, true);
-        }
+        public required ReadAttribute<uint?> PartitionId { get; init; }
 
         /// <summary>
-        /// Get the Weighting attribute
+        /// Weighting Attribute
         /// </summary>
-        public async Task<ushort?> GetWeighting(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 10, true);
-        }
+        public required ReadAttribute<ushort?> Weighting { get; init; }
 
         /// <summary>
-        /// Get the Data Version attribute
+        /// Data Version Attribute
         /// </summary>
-        public async Task<ushort?> GetDataVersion(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 11, true);
-        }
+        public required ReadAttribute<ushort?> DataVersion { get; init; }
 
         /// <summary>
-        /// Get the Stable Data Version attribute
+        /// Stable Data Version Attribute
         /// </summary>
-        public async Task<ushort?> GetStableDataVersion(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 12, true);
-        }
+        public required ReadAttribute<ushort?> StableDataVersion { get; init; }
 
         /// <summary>
-        /// Get the Leader Router Id attribute
+        /// Leader Router Id Attribute
         /// </summary>
-        public async Task<byte?> GetLeaderRouterId(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 13, true);
-        }
+        public required ReadAttribute<byte?> LeaderRouterId { get; init; }
 
         /// <summary>
-        /// Get the Detached Role Count attribute
+        /// Detached Role Count Attribute
         /// </summary>
-        public async Task<ushort> GetDetachedRoleCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 14) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> DetachedRoleCount { get; init; }
 
         /// <summary>
-        /// Get the Child Role Count attribute
+        /// Child Role Count Attribute
         /// </summary>
-        public async Task<ushort> GetChildRoleCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 15) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> ChildRoleCount { get; init; }
 
         /// <summary>
-        /// Get the Router Role Count attribute
+        /// Router Role Count Attribute
         /// </summary>
-        public async Task<ushort> GetRouterRoleCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> RouterRoleCount { get; init; }
 
         /// <summary>
-        /// Get the Leader Role Count attribute
+        /// Leader Role Count Attribute
         /// </summary>
-        public async Task<ushort> GetLeaderRoleCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> LeaderRoleCount { get; init; }
 
         /// <summary>
-        /// Get the Attach Attempt Count attribute
+        /// Attach Attempt Count Attribute
         /// </summary>
-        public async Task<ushort> GetAttachAttemptCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 18) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> AttachAttemptCount { get; init; }
 
         /// <summary>
-        /// Get the Partition Id Change Count attribute
+        /// Partition Id Change Count Attribute
         /// </summary>
-        public async Task<ushort> GetPartitionIdChangeCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> PartitionIdChangeCount { get; init; }
 
         /// <summary>
-        /// Get the Better Partition Attach Attempt Count attribute
+        /// Better Partition Attach Attempt Count Attribute
         /// </summary>
-        public async Task<ushort> GetBetterPartitionAttachAttemptCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 20) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> BetterPartitionAttachAttemptCount { get; init; }
 
         /// <summary>
-        /// Get the Parent Change Count attribute
+        /// Parent Change Count Attribute
         /// </summary>
-        public async Task<ushort> GetParentChangeCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 21) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> ParentChangeCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Total Count attribute
+        /// Tx Total Count Attribute
         /// </summary>
-        public async Task<uint> GetTxTotalCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 22) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxTotalCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Unicast Count attribute
+        /// Tx Unicast Count Attribute
         /// </summary>
-        public async Task<uint> GetTxUnicastCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 23) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxUnicastCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Broadcast Count attribute
+        /// Tx Broadcast Count Attribute
         /// </summary>
-        public async Task<uint> GetTxBroadcastCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 24) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxBroadcastCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Ack Requested Count attribute
+        /// Tx Ack Requested Count Attribute
         /// </summary>
-        public async Task<uint> GetTxAckRequestedCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 25) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxAckRequestedCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Acked Count attribute
+        /// Tx Acked Count Attribute
         /// </summary>
-        public async Task<uint> GetTxAckedCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 26) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxAckedCount { get; init; }
 
         /// <summary>
-        /// Get the Tx No Ack Requested Count attribute
+        /// Tx No Ack Requested Count Attribute
         /// </summary>
-        public async Task<uint> GetTxNoAckRequestedCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 27) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxNoAckRequestedCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Data Count attribute
+        /// Tx Data Count Attribute
         /// </summary>
-        public async Task<uint> GetTxDataCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 28) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxDataCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Data Poll Count attribute
+        /// Tx Data Poll Count Attribute
         /// </summary>
-        public async Task<uint> GetTxDataPollCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 29) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxDataPollCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Beacon Count attribute
+        /// Tx Beacon Count Attribute
         /// </summary>
-        public async Task<uint> GetTxBeaconCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 30) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxBeaconCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Beacon Request Count attribute
+        /// Tx Beacon Request Count Attribute
         /// </summary>
-        public async Task<uint> GetTxBeaconRequestCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 31) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxBeaconRequestCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Other Count attribute
+        /// Tx Other Count Attribute
         /// </summary>
-        public async Task<uint> GetTxOtherCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 32) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxOtherCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Retry Count attribute
+        /// Tx Retry Count Attribute
         /// </summary>
-        public async Task<uint> GetTxRetryCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 33) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxRetryCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Direct Max Retry Expiry Count attribute
+        /// Tx Direct Max Retry Expiry Count Attribute
         /// </summary>
-        public async Task<uint> GetTxDirectMaxRetryExpiryCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 34) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxDirectMaxRetryExpiryCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Indirect Max Retry Expiry Count attribute
+        /// Tx Indirect Max Retry Expiry Count Attribute
         /// </summary>
-        public async Task<uint> GetTxIndirectMaxRetryExpiryCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 35) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxIndirectMaxRetryExpiryCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Err Cca Count attribute
+        /// Tx Err Cca Count Attribute
         /// </summary>
-        public async Task<uint> GetTxErrCcaCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 36) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxErrCcaCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Err Abort Count attribute
+        /// Tx Err Abort Count Attribute
         /// </summary>
-        public async Task<uint> GetTxErrAbortCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 37) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxErrAbortCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Err Busy Channel Count attribute
+        /// Tx Err Busy Channel Count Attribute
         /// </summary>
-        public async Task<uint> GetTxErrBusyChannelCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 38) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> TxErrBusyChannelCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Total Count attribute
+        /// Rx Total Count Attribute
         /// </summary>
-        public async Task<uint> GetRxTotalCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 39) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxTotalCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Unicast Count attribute
+        /// Rx Unicast Count Attribute
         /// </summary>
-        public async Task<uint> GetRxUnicastCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 40) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxUnicastCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Broadcast Count attribute
+        /// Rx Broadcast Count Attribute
         /// </summary>
-        public async Task<uint> GetRxBroadcastCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 41) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxBroadcastCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Data Count attribute
+        /// Rx Data Count Attribute
         /// </summary>
-        public async Task<uint> GetRxDataCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 42) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxDataCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Data Poll Count attribute
+        /// Rx Data Poll Count Attribute
         /// </summary>
-        public async Task<uint> GetRxDataPollCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 43) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxDataPollCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Beacon Count attribute
+        /// Rx Beacon Count Attribute
         /// </summary>
-        public async Task<uint> GetRxBeaconCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 44) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxBeaconCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Beacon Request Count attribute
+        /// Rx Beacon Request Count Attribute
         /// </summary>
-        public async Task<uint> GetRxBeaconRequestCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 45) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxBeaconRequestCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Other Count attribute
+        /// Rx Other Count Attribute
         /// </summary>
-        public async Task<uint> GetRxOtherCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 46) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxOtherCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Address Filtered Count attribute
+        /// Rx Address Filtered Count Attribute
         /// </summary>
-        public async Task<uint> GetRxAddressFilteredCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 47) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxAddressFilteredCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Dest Addr Filtered Count attribute
+        /// Rx Dest Addr Filtered Count Attribute
         /// </summary>
-        public async Task<uint> GetRxDestAddrFilteredCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 48) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxDestAddrFilteredCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Duplicated Count attribute
+        /// Rx Duplicated Count Attribute
         /// </summary>
-        public async Task<uint> GetRxDuplicatedCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 49) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxDuplicatedCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err No Frame Count attribute
+        /// Rx Err No Frame Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrNoFrameCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 50) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrNoFrameCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err Unknown Neighbor Count attribute
+        /// Rx Err Unknown Neighbor Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrUnknownNeighborCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 51) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrUnknownNeighborCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err Invalid Src Addr Count attribute
+        /// Rx Err Invalid Src Addr Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrInvalidSrcAddrCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 52) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrInvalidSrcAddrCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err Sec Count attribute
+        /// Rx Err Sec Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrSecCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 53) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrSecCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err Fcs Count attribute
+        /// Rx Err Fcs Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrFcsCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 54) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrFcsCount { get; init; }
 
         /// <summary>
-        /// Get the Rx Err Other Count attribute
+        /// Rx Err Other Count Attribute
         /// </summary>
-        public async Task<uint> GetRxErrOtherCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 55) ?? 0x0000;
-        }
+        public required ReadAttribute<uint> RxErrOtherCount { get; init; }
 
         /// <summary>
-        /// Get the Active Timestamp attribute
+        /// Active Timestamp Attribute
         /// </summary>
-        public async Task<ulong?> GetActiveTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 56, true) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong?> ActiveTimestamp { get; init; }
 
         /// <summary>
-        /// Get the Pending Timestamp attribute
+        /// Pending Timestamp Attribute
         /// </summary>
-        public async Task<ulong?> GetPendingTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 57, true) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong?> PendingTimestamp { get; init; }
 
         /// <summary>
-        /// Get the Delay attribute
+        /// Delay Attribute
         /// </summary>
-        public async Task<uint?> GetDelay(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 58, true) ?? 0x0000;
-        }
+        public required ReadAttribute<uint?> Delay { get; init; }
 
         /// <summary>
-        /// Get the Security Policy attribute
+        /// Security Policy Attribute
         /// </summary>
-        public async Task<SecurityPolicy?> GetSecurityPolicy(SecureSession session) {
-            return new SecurityPolicy((object[])(await GetAttribute(session, 59))!);
-        }
+        public required ReadAttribute<SecurityPolicyStruct?> SecurityPolicy { get; init; }
 
         /// <summary>
-        /// Get the Channel Page0 Mask attribute
+        /// Channel Page0 Mask Attribute
         /// </summary>
-        public async Task<byte[]?> GetChannelPage0Mask(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 60, true);
-        }
+        public required ReadAttribute<byte[]?> ChannelPage0Mask { get; init; }
 
         /// <summary>
-        /// Get the Operational Dataset Components attribute
+        /// Operational Dataset Components Attribute
         /// </summary>
-        public async Task<OperationalDatasetComponents?> GetOperationalDatasetComponents(SecureSession session) {
-            return new OperationalDatasetComponents((object[])(await GetAttribute(session, 61))!);
-        }
+        public required ReadAttribute<OperationalDatasetComponentsStruct?> OperationalDatasetComponents { get; init; }
 
         /// <summary>
-        /// Get the Active Network Faults List attribute
+        /// Active Network Faults List Attribute
         /// </summary>
-        public async Task<NetworkFault[]> GetActiveNetworkFaultsList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 62))!);
-            NetworkFault[] list = new NetworkFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (NetworkFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<NetworkFault[]> ActiveNetworkFaultsList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

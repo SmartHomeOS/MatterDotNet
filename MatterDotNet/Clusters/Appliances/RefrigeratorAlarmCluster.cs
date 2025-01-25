@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Appliances
 {
@@ -28,9 +29,21 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Attributes and commands for configuring the Refrigerator alarm.
         /// </summary>
-        public RefrigeratorAlarm(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public RefrigeratorAlarm(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected RefrigeratorAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected RefrigeratorAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Mask = new ReadAttribute<Alarm>(cluster, endPoint, 0) {
+                Deserialize = x => (Alarm)DeserializeEnum(x)!
+            };
+            State = new ReadAttribute<Alarm>(cluster, endPoint, 2) {
+                Deserialize = x => (Alarm)DeserializeEnum(x)!
+            };
+            Supported = new ReadAttribute<Alarm>(cluster, endPoint, 3) {
+                Deserialize = x => (Alarm)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -42,34 +55,25 @@ namespace MatterDotNet.Clusters.Appliances
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// The cabinet's door has been open for a vendor defined amount of time.
-            /// </summary>
             DoorOpen = 0x0001,
         }
         #endregion Enums
 
         #region Attributes
         /// <summary>
-        /// Get the Mask attribute
+        /// Mask Attribute
         /// </summary>
-        public async Task<Alarm> GetMask(SecureSession session) {
-            return (Alarm)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<Alarm> Mask { get; init; }
 
         /// <summary>
-        /// Get the State attribute
+        /// State Attribute
         /// </summary>
-        public async Task<Alarm> GetState(SecureSession session) {
-            return (Alarm)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<Alarm> State { get; init; }
 
         /// <summary>
-        /// Get the Supported attribute
+        /// Supported Attribute
         /// </summary>
-        public async Task<Alarm> GetSupported(SecureSession session) {
-            return (Alarm)await GetEnumAttribute(session, 3);
-        }
+        public required ReadAttribute<Alarm> Supported { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

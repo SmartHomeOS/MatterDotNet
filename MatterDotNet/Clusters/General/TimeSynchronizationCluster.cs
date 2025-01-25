@@ -33,9 +33,66 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Accurate time is required for a number of reasons, including scheduling, display and validating security materials.
         /// </summary>
-        public TimeSynchronization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public TimeSynchronization(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TimeSynchronization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected TimeSynchronization(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            UTCTime = new ReadAttribute<DateTime?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (DateTime?)(dynamic?)x
+            };
+            Granularity = new ReadAttribute<GranularityEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (GranularityEnum)DeserializeEnum(x)!
+            };
+            TimeSource = new ReadAttribute<TimeSourceEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (TimeSourceEnum)DeserializeEnum(x)!
+            };
+            TrustedTimeSource = new ReadAttribute<TrustedTimeSourceStruct?>(cluster, endPoint, 3, true) {
+                Deserialize = x => new TrustedTimeSourceStruct((object[])x!)
+            };
+            DefaultNTP = new ReadAttribute<string?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (string?)(dynamic?)x
+            };
+            TimeZone = new ReadAttribute<TimeZoneStruct[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    TimeZoneStruct[] list = new TimeZoneStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new TimeZoneStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            DSTOffset = new ReadAttribute<DSTOffsetStruct[]>(cluster, endPoint, 6) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    DSTOffsetStruct[] list = new DSTOffsetStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new DSTOffsetStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            LocalTime = new ReadAttribute<DateTime?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (DateTime?)(dynamic?)x ?? DateTime.MaxValue
+
+            };
+            TimeZoneDatabase = new ReadAttribute<TimeZoneDatabaseEnum>(cluster, endPoint, 8) {
+                Deserialize = x => (TimeZoneDatabaseEnum)DeserializeEnum(x)!
+            };
+            NTPServerAvailable = new ReadAttribute<bool>(cluster, endPoint, 9) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            TimeZoneListMaxSize = new ReadAttribute<byte>(cluster, endPoint, 10) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            DSTOffsetListMaxSize = new ReadAttribute<byte>(cluster, endPoint, 11) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            SupportsDNSResolve = new ReadAttribute<bool>(cluster, endPoint, 12) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -71,7 +128,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Granularity
         /// </summary>
-        public enum Granularity : byte {
+        public enum GranularityEnum : byte {
             /// <summary>
             /// This indicates that the node is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only.
             /// </summary>
@@ -97,7 +154,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Time Source
         /// </summary>
-        public enum TimeSource : byte {
+        public enum TimeSourceEnum : byte {
             /// <summary>
             /// Node is not currently synchronized with a UTC Time source.
             /// </summary>
@@ -171,7 +228,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Time Zone Database
         /// </summary>
-        public enum TimeZoneDatabase : byte {
+        public enum TimeZoneDatabaseEnum : byte {
             /// <summary>
             /// Node has a full list of the available time zones
             /// </summary>
@@ -191,17 +248,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Trusted Time Source
         /// </summary>
-        public record TrustedTimeSource : TLVPayload {
+        public record TrustedTimeSourceStruct : TLVPayload {
             /// <summary>
             /// Trusted Time Source
             /// </summary>
-            public TrustedTimeSource() { }
+            public TrustedTimeSourceStruct() { }
 
             /// <summary>
             /// Trusted Time Source
             /// </summary>
             [SetsRequiredMembers]
-            public TrustedTimeSource(object[] fields) {
+            public TrustedTimeSourceStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 FabricIndex = reader.GetByte(0)!.Value;
                 NodeID = reader.GetULong(1)!.Value;
@@ -250,17 +307,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Time Zone
         /// </summary>
-        public record TimeZone : TLVPayload {
+        public record TimeZoneStruct : TLVPayload {
             /// <summary>
             /// Time Zone
             /// </summary>
-            public TimeZone() { }
+            public TimeZoneStruct() { }
 
             /// <summary>
             /// Time Zone
             /// </summary>
             [SetsRequiredMembers]
-            public TimeZone(object[] fields) {
+            public TimeZoneStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Offset = reader.GetInt(0)!.Value;
                 ValidAt = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
@@ -282,17 +339,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// DST Offset
         /// </summary>
-        public record DSTOffset : TLVPayload {
+        public record DSTOffsetStruct : TLVPayload {
             /// <summary>
             /// DST Offset
             /// </summary>
-            public DSTOffset() { }
+            public DSTOffsetStruct() { }
 
             /// <summary>
             /// DST Offset
             /// </summary>
             [SetsRequiredMembers]
-            public DSTOffset(object[] fields) {
+            public DSTOffsetStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Offset = reader.GetInt(0)!.Value;
                 ValidStarting = TimeUtil.FromEpochUS(reader.GetULong(1))!.Value;
@@ -317,8 +374,8 @@ namespace MatterDotNet.Clusters.General
         #region Payloads
         private record SetUTCTimePayload : TLVPayload {
             public required DateTime UTCTime { get; set; }
-            public required Granularity Granularity { get; set; }
-            public TimeSource? TimeSource { get; set; }
+            public required GranularityEnum Granularity { get; set; }
+            public TimeSourceEnum? TimeSource { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteULong(0, TimeUtil.ToEpochUS(UTCTime));
@@ -342,7 +399,7 @@ namespace MatterDotNet.Clusters.General
         }
 
         private record SetTimeZonePayload : TLVPayload {
-            public required TimeZone[] TimeZone { get; set; }
+            public required TimeZoneStruct[] TimeZone { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
@@ -364,7 +421,7 @@ namespace MatterDotNet.Clusters.General
         }
 
         private record SetDSTOffsetPayload : TLVPayload {
-            public required DSTOffset[] DSTOffset { get; set; }
+            public required DSTOffsetStruct[] DSTOffset { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 {
@@ -392,7 +449,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set UTC Time
         /// </summary>
-        public async Task<bool> SetUTCTime(SecureSession session, DateTime uTCTime, Granularity granularity, TimeSource? timeSource) {
+        public async Task<bool> SetUTCTime(SecureSession session, DateTime uTCTime, GranularityEnum granularity, TimeSourceEnum? timeSource) {
             SetUTCTimePayload requestFields = new SetUTCTimePayload() {
                 UTCTime = uTCTime,
                 Granularity = granularity,
@@ -416,7 +473,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set Time Zone
         /// </summary>
-        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZone[] timeZone) {
+        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZoneStruct[] timeZone) {
             SetTimeZonePayload requestFields = new SetTimeZonePayload() {
                 TimeZone = timeZone,
             };
@@ -431,7 +488,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set DST Offset
         /// </summary>
-        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffset[] dSTOffset) {
+        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffsetStruct[] dSTOffset) {
             SetDSTOffsetPayload requestFields = new SetDSTOffsetPayload() {
                 DSTOffset = dSTOffset,
             };
@@ -474,103 +531,69 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the UTC Time attribute
+        /// UTC Time Attribute
         /// </summary>
-        public async Task<DateTime?> GetUTCTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<DateTime?> UTCTime { get; init; }
 
         /// <summary>
-        /// Get the Granularity attribute
+        /// Granularity Attribute
         /// </summary>
-        public async Task<Granularity> GetGranularity(SecureSession session) {
-            return (Granularity)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<GranularityEnum> Granularity { get; init; }
 
         /// <summary>
-        /// Get the Time Source attribute
+        /// Time Source Attribute
         /// </summary>
-        public async Task<TimeSource> GetTimeSource(SecureSession session) {
-            return (TimeSource)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<TimeSourceEnum> TimeSource { get; init; }
 
         /// <summary>
-        /// Get the Trusted Time Source attribute
+        /// Trusted Time Source Attribute
         /// </summary>
-        public async Task<TrustedTimeSource?> GetTrustedTimeSource(SecureSession session) {
-            return new TrustedTimeSource((object[])(await GetAttribute(session, 3))!);
-        }
+        public required ReadAttribute<TrustedTimeSourceStruct?> TrustedTimeSource { get; init; }
 
         /// <summary>
-        /// Get the Default NTP attribute
+        /// Default NTP Attribute
         /// </summary>
-        public async Task<string?> GetDefaultNTP(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<string?> DefaultNTP { get; init; }
 
         /// <summary>
-        /// Get the Time Zone attribute
+        /// Time Zone Attribute
         /// </summary>
-        public async Task<TimeZone[]> GetTimeZone(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            TimeZone[] list = new TimeZone[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new TimeZone(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<TimeZoneStruct[]> TimeZone { get; init; }
 
         /// <summary>
-        /// Get the DST Offset attribute
+        /// DST Offset Attribute
         /// </summary>
-        public async Task<DSTOffset[]> GetDSTOffset(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
-            DSTOffset[] list = new DSTOffset[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new DSTOffset(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<DSTOffsetStruct[]> DSTOffset { get; init; }
 
         /// <summary>
-        /// Get the Local Time attribute
+        /// Local Time Attribute
         /// </summary>
-        public async Task<DateTime?> GetLocalTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 7, true) ?? DateTime.MaxValue;
-        }
+        public required ReadAttribute<DateTime?> LocalTime { get; init; }
 
         /// <summary>
-        /// Get the Time Zone Database attribute
+        /// Time Zone Database Attribute
         /// </summary>
-        public async Task<TimeZoneDatabase> GetTimeZoneDatabase(SecureSession session) {
-            return (TimeZoneDatabase)await GetEnumAttribute(session, 8);
-        }
+        public required ReadAttribute<TimeZoneDatabaseEnum> TimeZoneDatabase { get; init; }
 
         /// <summary>
-        /// Get the NTP Server Available attribute
+        /// NTP Server Available Attribute
         /// </summary>
-        public async Task<bool> GetNTPServerAvailable(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 9) ?? false;
-        }
+        public required ReadAttribute<bool> NTPServerAvailable { get; init; }
 
         /// <summary>
-        /// Get the Time Zone List Max Size attribute
+        /// Time Zone List Max Size Attribute
         /// </summary>
-        public async Task<byte> GetTimeZoneListMaxSize(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 10))!;
-        }
+        public required ReadAttribute<byte> TimeZoneListMaxSize { get; init; }
 
         /// <summary>
-        /// Get the DST Offset List Max Size attribute
+        /// DST Offset List Max Size Attribute
         /// </summary>
-        public async Task<byte> GetDSTOffsetListMaxSize(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 11))!;
-        }
+        public required ReadAttribute<byte> DSTOffsetListMaxSize { get; init; }
 
         /// <summary>
-        /// Get the Supports DNS Resolve attribute
+        /// Supports DNS Resolve Attribute
         /// </summary>
-        public async Task<bool> GetSupportsDNSResolve(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 12) ?? false;
-        }
+        public required ReadAttribute<bool> SupportsDNSResolve { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

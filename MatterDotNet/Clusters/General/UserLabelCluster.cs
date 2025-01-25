@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,28 +29,27 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
         /// </summary>
-        public UserLabel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public UserLabel(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected UserLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected UserLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LabelList = new ReadWriteAttribute<FixedLabel.Label[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    FixedLabel.Label[] list = new FixedLabel.Label[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new FixedLabel.Label(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the Label List attribute
+        /// Label List Attribute
         /// </summary>
-        public async Task<FixedLabel.Label[]> GetLabelList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            FixedLabel.Label[] list = new FixedLabel.Label[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new FixedLabel.Label(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Set the Label List attribute
-        /// </summary>
-        public async Task SetLabelList (SecureSession session, FixedLabel.Label[] value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<FixedLabel.Label[]> LabelList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

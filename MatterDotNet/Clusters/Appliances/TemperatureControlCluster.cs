@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Appliances
 {
@@ -31,9 +32,36 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Attributes and commands for configuring the temperature control, and reporting temperature.
         /// </summary>
-        public TemperatureControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public TemperatureControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TemperatureControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected TemperatureControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            TemperatureSetpoint = new ReadAttribute<short>(cluster, endPoint, 0) {
+                Deserialize = x => (short)(dynamic?)x!
+            };
+            MinTemperature = new ReadAttribute<short>(cluster, endPoint, 1) {
+                Deserialize = x => (short)(dynamic?)x!
+            };
+            MaxTemperature = new ReadAttribute<short>(cluster, endPoint, 2) {
+                Deserialize = x => (short)(dynamic?)x!
+            };
+            Step = new ReadAttribute<short>(cluster, endPoint, 3) {
+                Deserialize = x => (short)(dynamic?)x!
+            };
+            SelectedTemperatureLevel = new ReadAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            SupportedTemperatureLevels = new ReadAttribute<string[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    string[] list = new string[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetString(i, false)!;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -108,50 +136,34 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Get the Temperature Setpoint attribute
+        /// Temperature Setpoint Attribute
         /// </summary>
-        public async Task<short> GetTemperatureSetpoint(SecureSession session) {
-            return (short)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<short> TemperatureSetpoint { get; init; }
 
         /// <summary>
-        /// Get the Min Temperature attribute
+        /// Min Temperature Attribute
         /// </summary>
-        public async Task<short> GetMinTemperature(SecureSession session) {
-            return (short)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<short> MinTemperature { get; init; }
 
         /// <summary>
-        /// Get the Max Temperature attribute
+        /// Max Temperature Attribute
         /// </summary>
-        public async Task<short> GetMaxTemperature(SecureSession session) {
-            return (short)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<short> MaxTemperature { get; init; }
 
         /// <summary>
-        /// Get the Step attribute
+        /// Step Attribute
         /// </summary>
-        public async Task<short> GetStep(SecureSession session) {
-            return (short)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<short> Step { get; init; }
 
         /// <summary>
-        /// Get the Selected Temperature Level attribute
+        /// Selected Temperature Level Attribute
         /// </summary>
-        public async Task<byte> GetSelectedTemperatureLevel(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadAttribute<byte> SelectedTemperatureLevel { get; init; }
 
         /// <summary>
-        /// Get the Supported Temperature Levels attribute
+        /// Supported Temperature Levels Attribute
         /// </summary>
-        public async Task<string[]> GetSupportedTemperatureLevels(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            string[] list = new string[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false)!;
-            return list;
-        }
+        public required ReadAttribute<string[]> SupportedTemperatureLevels { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

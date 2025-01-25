@@ -31,9 +31,30 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.
         /// </summary>
-        public ElectricalEnergyMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ElectricalEnergyMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ElectricalEnergyMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ElectricalEnergyMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Accuracy = new ReadAttribute<MeasurementAccuracy>(cluster, endPoint, 0) {
+                Deserialize = x => (MeasurementAccuracy)(dynamic?)x!
+            };
+            CumulativeEnergyImported = new ReadAttribute<EnergyMeasurement?>(cluster, endPoint, 1, true) {
+                Deserialize = x => new EnergyMeasurement((object[])x!)
+            };
+            CumulativeEnergyExported = new ReadAttribute<EnergyMeasurement?>(cluster, endPoint, 2, true) {
+                Deserialize = x => new EnergyMeasurement((object[])x!)
+            };
+            PeriodicEnergyImported = new ReadAttribute<EnergyMeasurement?>(cluster, endPoint, 3, true) {
+                Deserialize = x => new EnergyMeasurement((object[])x!)
+            };
+            PeriodicEnergyExported = new ReadAttribute<EnergyMeasurement?>(cluster, endPoint, 4, true) {
+                Deserialize = x => new EnergyMeasurement((object[])x!)
+            };
+            CumulativeEnergyReset = new ReadAttribute<CumulativeEnergyResetStruct?>(cluster, endPoint, 5, true) {
+                Deserialize = x => new CumulativeEnergyResetStruct((object[])x!)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -64,17 +85,17 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Cumulative Energy Reset
         /// </summary>
-        public record CumulativeEnergyReset : TLVPayload {
+        public record CumulativeEnergyResetStruct : TLVPayload {
             /// <summary>
             /// Cumulative Energy Reset
             /// </summary>
-            public CumulativeEnergyReset() { }
+            public CumulativeEnergyResetStruct() { }
 
             /// <summary>
             /// Cumulative Energy Reset
             /// </summary>
             [SetsRequiredMembers]
-            public CumulativeEnergyReset(object[] fields) {
+            public CumulativeEnergyResetStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ImportedResetTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(0, true));
                 ExportedResetTimestamp = TimeUtil.FromEpochSeconds(reader.GetUInt(1, true));
@@ -164,46 +185,34 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Accuracy attribute
+        /// Accuracy Attribute
         /// </summary>
-        public async Task<MeasurementAccuracy> GetAccuracy(SecureSession session) {
-            return (MeasurementAccuracy)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<MeasurementAccuracy> Accuracy { get; init; }
 
         /// <summary>
-        /// Get the Cumulative Energy Imported attribute
+        /// Cumulative Energy Imported Attribute
         /// </summary>
-        public async Task<EnergyMeasurement?> GetCumulativeEnergyImported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 1))!);
-        }
+        public required ReadAttribute<EnergyMeasurement?> CumulativeEnergyImported { get; init; }
 
         /// <summary>
-        /// Get the Cumulative Energy Exported attribute
+        /// Cumulative Energy Exported Attribute
         /// </summary>
-        public async Task<EnergyMeasurement?> GetCumulativeEnergyExported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 2))!);
-        }
+        public required ReadAttribute<EnergyMeasurement?> CumulativeEnergyExported { get; init; }
 
         /// <summary>
-        /// Get the Periodic Energy Imported attribute
+        /// Periodic Energy Imported Attribute
         /// </summary>
-        public async Task<EnergyMeasurement?> GetPeriodicEnergyImported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 3))!);
-        }
+        public required ReadAttribute<EnergyMeasurement?> PeriodicEnergyImported { get; init; }
 
         /// <summary>
-        /// Get the Periodic Energy Exported attribute
+        /// Periodic Energy Exported Attribute
         /// </summary>
-        public async Task<EnergyMeasurement?> GetPeriodicEnergyExported(SecureSession session) {
-            return new EnergyMeasurement((object[])(await GetAttribute(session, 4))!);
-        }
+        public required ReadAttribute<EnergyMeasurement?> PeriodicEnergyExported { get; init; }
 
         /// <summary>
-        /// Get the Cumulative Energy Reset attribute
+        /// Cumulative Energy Reset Attribute
         /// </summary>
-        public async Task<CumulativeEnergyReset?> GetCumulativeEnergyReset(SecureSession session) {
-            return new CumulativeEnergyReset((object[])(await GetAttribute(session, 5))!);
-        }
+        public required ReadAttribute<CumulativeEnergyResetStruct?> CumulativeEnergyReset { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

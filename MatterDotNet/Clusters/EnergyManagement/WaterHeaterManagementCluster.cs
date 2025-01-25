@@ -33,9 +33,33 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management.
         /// </summary>
-        public WaterHeaterManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WaterHeaterManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WaterHeaterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WaterHeaterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            HeaterTypes = new ReadAttribute<WaterHeaterHeatSource>(cluster, endPoint, 0) {
+                Deserialize = x => (WaterHeaterHeatSource)DeserializeEnum(x)!
+            };
+            HeatDemand = new ReadAttribute<WaterHeaterHeatSource>(cluster, endPoint, 1) {
+                Deserialize = x => (WaterHeaterHeatSource)DeserializeEnum(x)!
+            };
+            TankVolume = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            EstimatedHeatRequired = new ReadAttribute<long>(cluster, endPoint, 3) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            TankPercentage = new ReadAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            BoostState = new ReadAttribute<BoostStateEnum>(cluster, endPoint, 5) {
+                Deserialize = x => (BoostStateEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -56,7 +80,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Boost State
         /// </summary>
-        public enum BoostState : byte {
+        public enum BoostStateEnum : byte {
             /// <summary>
             /// Boost is not currently active
             /// </summary>
@@ -76,25 +100,10 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Immersion Heating Element 1
-            /// </summary>
             ImmersionElement1 = 0x01,
-            /// <summary>
-            /// Immersion Heating Element 2
-            /// </summary>
             ImmersionElement2 = 0x02,
-            /// <summary>
-            /// Heat pump Heating
-            /// </summary>
             HeatPump = 0x04,
-            /// <summary>
-            /// Boiler Heating (e.g. Gas or Oil)
-            /// </summary>
             Boiler = 0x08,
-            /// <summary>
-            /// Other Heating
-            /// </summary>
             Other = 0x10,
         }
         #endregion Enums
@@ -201,46 +210,34 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Get the Heater Types attribute
+        /// Heater Types Attribute
         /// </summary>
-        public async Task<WaterHeaterHeatSource> GetHeaterTypes(SecureSession session) {
-            return (WaterHeaterHeatSource)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<WaterHeaterHeatSource> HeaterTypes { get; init; }
 
         /// <summary>
-        /// Get the Heat Demand attribute
+        /// Heat Demand Attribute
         /// </summary>
-        public async Task<WaterHeaterHeatSource> GetHeatDemand(SecureSession session) {
-            return (WaterHeaterHeatSource)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<WaterHeaterHeatSource> HeatDemand { get; init; }
 
         /// <summary>
-        /// Get the Tank Volume attribute
+        /// Tank Volume Attribute
         /// </summary>
-        public async Task<ushort> GetTankVolume(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0;
-        }
+        public required ReadAttribute<ushort> TankVolume { get; init; }
 
         /// <summary>
-        /// Get the Estimated Heat Required [mWh] attribute
+        /// Estimated Heat Required [mWh] Attribute
         /// </summary>
-        public async Task<long> GetEstimatedHeatRequired(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 3) ?? 0;
-        }
+        public required ReadAttribute<long> EstimatedHeatRequired { get; init; }
 
         /// <summary>
-        /// Get the Tank Percentage [%] attribute
+        /// Tank Percentage [%] Attribute
         /// </summary>
-        public async Task<byte> GetTankPercentage(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 0;
-        }
+        public required ReadAttribute<byte> TankPercentage { get; init; }
 
         /// <summary>
-        /// Get the Boost State attribute
+        /// Boost State Attribute
         /// </summary>
-        public async Task<BoostState> GetBoostState(SecureSession session) {
-            return (BoostState)await GetEnumAttribute(session, 5);
-        }
+        public required ReadAttribute<BoostStateEnum> BoostState { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

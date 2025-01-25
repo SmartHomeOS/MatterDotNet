@@ -31,9 +31,93 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// This cluster provides a mechanism for querying data about electrical power as measured by the server.
         /// </summary>
-        public ElectricalPowerMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ElectricalPowerMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ElectricalPowerMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ElectricalPowerMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            PowerMode = new ReadAttribute<PowerModeEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (PowerModeEnum)DeserializeEnum(x)!
+            };
+            NumberOfMeasurementTypes = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            Accuracy = new ReadAttribute<MeasurementAccuracy[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    MeasurementAccuracy[] list = new MeasurementAccuracy[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new MeasurementAccuracy(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Ranges = new ReadAttribute<MeasurementRange[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    MeasurementRange[] list = new MeasurementRange[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new MeasurementRange(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Voltage = new ReadAttribute<long?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ActiveCurrent = new ReadAttribute<long?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ReactiveCurrent = new ReadAttribute<long?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ApparentCurrent = new ReadAttribute<long?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ActivePower = new ReadAttribute<long?>(cluster, endPoint, 8, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ReactivePower = new ReadAttribute<long?>(cluster, endPoint, 9, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            ApparentPower = new ReadAttribute<long?>(cluster, endPoint, 10, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            RMSVoltage = new ReadAttribute<long?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            RMSCurrent = new ReadAttribute<long?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            RMSPower = new ReadAttribute<long?>(cluster, endPoint, 13, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            Frequency = new ReadAttribute<long?>(cluster, endPoint, 14, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            HarmonicCurrents = new ReadAttribute<HarmonicMeasurement[]?>(cluster, endPoint, 15, true) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            HarmonicPhases = new ReadAttribute<HarmonicMeasurement[]?>(cluster, endPoint, 16, true) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            PowerFactor = new ReadAttribute<long?>(cluster, endPoint, 17, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            NeutralCurrent = new ReadAttribute<long?>(cluster, endPoint, 18, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -66,7 +150,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Power Mode
         /// </summary>
-        public enum PowerMode : byte {
+        public enum PowerModeEnum : byte {
             /// <summary>
             /// 
             /// </summary>
@@ -198,153 +282,99 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Power Mode attribute
+        /// Power Mode Attribute
         /// </summary>
-        public async Task<PowerMode> GetPowerMode(SecureSession session) {
-            return (PowerMode)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<PowerModeEnum> PowerMode { get; init; }
 
         /// <summary>
-        /// Get the Number Of Measurement Types attribute
+        /// Number Of Measurement Types Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfMeasurementTypes(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte> NumberOfMeasurementTypes { get; init; }
 
         /// <summary>
-        /// Get the Accuracy attribute
+        /// Accuracy Attribute
         /// </summary>
-        public async Task<MeasurementAccuracy[]> GetAccuracy(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            MeasurementAccuracy[] list = new MeasurementAccuracy[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new MeasurementAccuracy(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<MeasurementAccuracy[]> Accuracy { get; init; }
 
         /// <summary>
-        /// Get the Ranges attribute
+        /// Ranges Attribute
         /// </summary>
-        public async Task<MeasurementRange[]> GetRanges(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            MeasurementRange[] list = new MeasurementRange[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new MeasurementRange(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<MeasurementRange[]> Ranges { get; init; }
 
         /// <summary>
-        /// Get the Voltage [mV] attribute
+        /// Voltage [mV] Attribute
         /// </summary>
-        public async Task<long?> GetVoltage(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<long?> Voltage { get; init; }
 
         /// <summary>
-        /// Get the Active Current [mA] attribute
+        /// Active Current [mA] Attribute
         /// </summary>
-        public async Task<long?> GetActiveCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<long?> ActiveCurrent { get; init; }
 
         /// <summary>
-        /// Get the Reactive Current [mA] attribute
+        /// Reactive Current [mA] Attribute
         /// </summary>
-        public async Task<long?> GetReactiveCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<long?> ReactiveCurrent { get; init; }
 
         /// <summary>
-        /// Get the Apparent Current [mA] attribute
+        /// Apparent Current [mA] Attribute
         /// </summary>
-        public async Task<long?> GetApparentCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 7, true);
-        }
+        public required ReadAttribute<long?> ApparentCurrent { get; init; }
 
         /// <summary>
-        /// Get the Active Power [mW] attribute
+        /// Active Power [mW] Attribute
         /// </summary>
-        public async Task<long?> GetActivePower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 8, true);
-        }
+        public required ReadAttribute<long?> ActivePower { get; init; }
 
         /// <summary>
-        /// Get the Reactive Power [mW] attribute
+        /// Reactive Power [mW] Attribute
         /// </summary>
-        public async Task<long?> GetReactivePower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 9, true);
-        }
+        public required ReadAttribute<long?> ReactivePower { get; init; }
 
         /// <summary>
-        /// Get the Apparent Power [mW] attribute
+        /// Apparent Power [mW] Attribute
         /// </summary>
-        public async Task<long?> GetApparentPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 10, true);
-        }
+        public required ReadAttribute<long?> ApparentPower { get; init; }
 
         /// <summary>
-        /// Get the RMS Voltage [mV] attribute
+        /// RMS Voltage [mV] Attribute
         /// </summary>
-        public async Task<long?> GetRMSVoltage(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 11, true);
-        }
+        public required ReadAttribute<long?> RMSVoltage { get; init; }
 
         /// <summary>
-        /// Get the RMS Current [mA] attribute
+        /// RMS Current [mA] Attribute
         /// </summary>
-        public async Task<long?> GetRMSCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 12, true);
-        }
+        public required ReadAttribute<long?> RMSCurrent { get; init; }
 
         /// <summary>
-        /// Get the RMS Power [mW] attribute
+        /// RMS Power [mW] Attribute
         /// </summary>
-        public async Task<long?> GetRMSPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 13, true);
-        }
+        public required ReadAttribute<long?> RMSPower { get; init; }
 
         /// <summary>
-        /// Get the Frequency attribute
+        /// Frequency Attribute
         /// </summary>
-        public async Task<long?> GetFrequency(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 14, true);
-        }
+        public required ReadAttribute<long?> Frequency { get; init; }
 
         /// <summary>
-        /// Get the Harmonic Currents attribute
+        /// Harmonic Currents Attribute
         /// </summary>
-        public async Task<HarmonicMeasurement[]?> GetHarmonicCurrents(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 15))!);
-            HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<HarmonicMeasurement[]?> HarmonicCurrents { get; init; }
 
         /// <summary>
-        /// Get the Harmonic Phases attribute
+        /// Harmonic Phases Attribute
         /// </summary>
-        public async Task<HarmonicMeasurement[]?> GetHarmonicPhases(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 16))!);
-            HarmonicMeasurement[] list = new HarmonicMeasurement[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new HarmonicMeasurement(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<HarmonicMeasurement[]?> HarmonicPhases { get; init; }
 
         /// <summary>
-        /// Get the Power Factor attribute
+        /// Power Factor Attribute
         /// </summary>
-        public async Task<long?> GetPowerFactor(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 17, true);
-        }
+        public required ReadAttribute<long?> PowerFactor { get; init; }
 
         /// <summary>
-        /// Get the Neutral Current [mA] attribute
+        /// Neutral Current [mA] Attribute
         /// </summary>
-        public async Task<long?> GetNeutralCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 18, true);
-        }
+        public required ReadAttribute<long?> NeutralCurrent { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

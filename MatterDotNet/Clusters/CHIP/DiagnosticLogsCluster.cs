@@ -18,6 +18,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.CHIP
 {
@@ -32,9 +33,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
         /// </summary>
-        public DiagnosticLogs(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public DiagnosticLogs(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DiagnosticLogs(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected DiagnosticLogs(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+        }
 
         #region Enums
         /// <summary>

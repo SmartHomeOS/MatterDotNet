@@ -33,9 +33,28 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for scene configuration and manipulation.
         /// </summary>
-        public ScenesManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ScenesManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ScenesManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ScenesManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LastConfiguredBy = new ReadAttribute<ulong?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+            SceneTableSize = new ReadAttribute<ushort>(cluster, endPoint, 1) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 16
+
+            };
+            FabricSceneInfo = new ReadAttribute<SceneInfo[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    SceneInfo[] list = new SceneInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new SceneInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -58,9 +77,6 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Copy all scenes in the scene table
-            /// </summary>
             CopyAllScenes = 0x01,
         }
         #endregion Enums
@@ -544,29 +560,19 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Last Configured By attribute
+        /// Last Configured By Attribute
         /// </summary>
-        public async Task<ulong?> GetLastConfiguredBy(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<ulong?> LastConfiguredBy { get; init; }
 
         /// <summary>
-        /// Get the Scene Table Size attribute
+        /// Scene Table Size Attribute
         /// </summary>
-        public async Task<ushort> GetSceneTableSize(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 16;
-        }
+        public required ReadAttribute<ushort> SceneTableSize { get; init; }
 
         /// <summary>
-        /// Get the Fabric Scene Info attribute
+        /// Fabric Scene Info Attribute
         /// </summary>
-        public async Task<SceneInfo[]> GetFabricSceneInfo(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            SceneInfo[] list = new SceneInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new SceneInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<SceneInfo[]> FabricSceneInfo { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

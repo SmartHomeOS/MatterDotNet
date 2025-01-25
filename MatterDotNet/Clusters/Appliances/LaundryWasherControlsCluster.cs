@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Appliances
 {
@@ -28,9 +29,36 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.
         /// </summary>
-        public LaundryWasherControls(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public LaundryWasherControls(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LaundryWasherControls(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected LaundryWasherControls(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SpinSpeeds = new ReadAttribute<string[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    string[] list = new string[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetString(i, false)!;
+                    return list;
+                }
+            };
+            SpinSpeedCurrent = new ReadWriteAttribute<byte?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            NumberOfRinses = new ReadWriteAttribute<NumberOfRinsesEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (NumberOfRinsesEnum)DeserializeEnum(x)!
+            };
+            SupportedRinses = new ReadAttribute<NumberOfRinsesEnum[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NumberOfRinsesEnum[] list = new NumberOfRinsesEnum[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (NumberOfRinsesEnum)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -51,7 +79,7 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Number Of Rinses
         /// </summary>
-        public enum NumberOfRinses : byte {
+        public enum NumberOfRinsesEnum : byte {
             /// <summary>
             /// This laundry washer mode does not perform rinse cycles
             /// </summary>
@@ -94,54 +122,24 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Get the Spin Speeds attribute
+        /// Spin Speeds Attribute
         /// </summary>
-        public async Task<string[]> GetSpinSpeeds(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            string[] list = new string[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false)!;
-            return list;
-        }
+        public required ReadAttribute<string[]> SpinSpeeds { get; init; }
 
         /// <summary>
-        /// Get the Spin Speed Current attribute
+        /// Spin Speed Current Attribute
         /// </summary>
-        public async Task<byte?> GetSpinSpeedCurrent(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadWriteAttribute<byte?> SpinSpeedCurrent { get; init; }
 
         /// <summary>
-        /// Set the Spin Speed Current attribute
+        /// Number Of Rinses Attribute
         /// </summary>
-        public async Task SetSpinSpeedCurrent (SecureSession session, byte? value) {
-            await SetAttribute(session, 1, value, true);
-        }
+        public required ReadWriteAttribute<NumberOfRinsesEnum> NumberOfRinses { get; init; }
 
         /// <summary>
-        /// Get the Number Of Rinses attribute
+        /// Supported Rinses Attribute
         /// </summary>
-        public async Task<NumberOfRinses> GetNumberOfRinses(SecureSession session) {
-            return (NumberOfRinses)await GetEnumAttribute(session, 2);
-        }
-
-        /// <summary>
-        /// Set the Number Of Rinses attribute
-        /// </summary>
-        public async Task SetNumberOfRinses (SecureSession session, NumberOfRinses value) {
-            await SetAttribute(session, 2, value);
-        }
-
-        /// <summary>
-        /// Get the Supported Rinses attribute
-        /// </summary>
-        public async Task<NumberOfRinses[]> GetSupportedRinses(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            NumberOfRinses[] list = new NumberOfRinses[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (NumberOfRinses)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<NumberOfRinsesEnum[]> SupportedRinses { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

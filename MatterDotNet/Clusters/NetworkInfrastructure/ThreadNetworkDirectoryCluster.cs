@@ -32,9 +32,27 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Manages the names and credentials of Thread networks visible to the user.
         /// </summary>
-        public ThreadNetworkDirectory(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ThreadNetworkDirectory(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThreadNetworkDirectory(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ThreadNetworkDirectory(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            PreferredExtendedPanID = new ReadWriteAttribute<byte[]?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            ThreadNetworks = new ReadAttribute<ThreadNetwork[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ThreadNetwork[] list = new ThreadNetwork[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ThreadNetwork(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ThreadNetworkTableSize = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+        }
 
         #region Records
         /// <summary>
@@ -149,36 +167,19 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// Get the Preferred Extended Pan ID attribute
+        /// Preferred Extended Pan ID Attribute
         /// </summary>
-        public async Task<byte[]?> GetPreferredExtendedPanID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadWriteAttribute<byte[]?> PreferredExtendedPanID { get; init; }
 
         /// <summary>
-        /// Set the Preferred Extended Pan ID attribute
+        /// Thread Networks Attribute
         /// </summary>
-        public async Task SetPreferredExtendedPanID (SecureSession session, byte[]? value) {
-            await SetAttribute(session, 0, value, true);
-        }
+        public required ReadAttribute<ThreadNetwork[]> ThreadNetworks { get; init; }
 
         /// <summary>
-        /// Get the Thread Networks attribute
+        /// Thread Network Table Size Attribute
         /// </summary>
-        public async Task<ThreadNetwork[]> GetThreadNetworks(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            ThreadNetwork[] list = new ThreadNetwork[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ThreadNetwork(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Thread Network Table Size attribute
-        /// </summary>
-        public async Task<byte> GetThreadNetworkTableSize(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<byte> ThreadNetworkTableSize { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

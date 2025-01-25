@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Lighting
 {
@@ -31,9 +32,144 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Attributes and commands for controlling the color properties of a color-capable light.
         /// </summary>
-        public ColorControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ColorControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ColorControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ColorControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CurrentHue = new ReadAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+            CurrentSaturation = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+            RemainingTime = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            CurrentX = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x616B
+
+            };
+            CurrentY = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x607D
+
+            };
+            DriftCompensation = new ReadAttribute<DriftCompensationEnum>(cluster, endPoint, 5) {
+                Deserialize = x => (DriftCompensationEnum)DeserializeEnum(x)!
+            };
+            CompensationText = new ReadAttribute<string>(cluster, endPoint, 6) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ColorTemperatureMireds = new ReadAttribute<ushort>(cluster, endPoint, 7) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x00FA
+
+            };
+            ColorMode = new ReadAttribute<ColorModeEnum>(cluster, endPoint, 8) {
+                Deserialize = x => (ColorModeEnum)DeserializeEnum(x)!
+            };
+            Options = new ReadWriteAttribute<OptionsBitmap>(cluster, endPoint, 15) {
+                Deserialize = x => (OptionsBitmap)DeserializeEnum(x)!
+            };
+            NumberOfPrimaries = new ReadAttribute<byte?>(cluster, endPoint, 16, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary1X = new ReadAttribute<ushort>(cluster, endPoint, 17) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary1Y = new ReadAttribute<ushort>(cluster, endPoint, 18) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary1Intensity = new ReadAttribute<byte?>(cluster, endPoint, 19, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary2X = new ReadAttribute<ushort>(cluster, endPoint, 21) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary2Y = new ReadAttribute<ushort>(cluster, endPoint, 22) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary2Intensity = new ReadAttribute<byte?>(cluster, endPoint, 23, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary3X = new ReadAttribute<ushort>(cluster, endPoint, 25) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary3Y = new ReadAttribute<ushort>(cluster, endPoint, 26) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary3Intensity = new ReadAttribute<byte?>(cluster, endPoint, 27, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary4X = new ReadAttribute<ushort>(cluster, endPoint, 32) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary4Y = new ReadAttribute<ushort>(cluster, endPoint, 33) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary4Intensity = new ReadAttribute<byte?>(cluster, endPoint, 34, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary5X = new ReadAttribute<ushort>(cluster, endPoint, 36) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary5Y = new ReadAttribute<ushort>(cluster, endPoint, 37) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary5Intensity = new ReadAttribute<byte?>(cluster, endPoint, 38, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Primary6X = new ReadAttribute<ushort>(cluster, endPoint, 40) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary6Y = new ReadAttribute<ushort>(cluster, endPoint, 41) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            Primary6Intensity = new ReadAttribute<byte?>(cluster, endPoint, 42, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            WhitePointX = new ReadWriteAttribute<ushort>(cluster, endPoint, 48) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            WhitePointY = new ReadWriteAttribute<ushort>(cluster, endPoint, 49) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointRX = new ReadWriteAttribute<ushort>(cluster, endPoint, 50) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointRY = new ReadWriteAttribute<ushort>(cluster, endPoint, 51) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointRIntensity = new ReadWriteAttribute<byte?>(cluster, endPoint, 52, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            ColorPointGX = new ReadWriteAttribute<ushort>(cluster, endPoint, 54) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointGY = new ReadWriteAttribute<ushort>(cluster, endPoint, 55) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointGIntensity = new ReadWriteAttribute<byte?>(cluster, endPoint, 56, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            ColorPointBX = new ReadWriteAttribute<ushort>(cluster, endPoint, 58) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointBY = new ReadWriteAttribute<ushort>(cluster, endPoint, 59) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ColorPointBIntensity = new ReadWriteAttribute<byte?>(cluster, endPoint, 60, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            CoupleColorTempToLevelMinMireds = new ReadAttribute<ushort>(cluster, endPoint, 16397) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            StartUpColorTemperatureMireds = new ReadWriteAttribute<ushort?>(cluster, endPoint, 16400, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -120,7 +256,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Color Mode
         /// </summary>
-        public enum ColorMode : byte {
+        public enum ColorModeEnum : byte {
             /// <summary>
             /// The current hue and saturation attributes determine the color.
             /// </summary>
@@ -178,7 +314,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Drift Compensation
         /// </summary>
-        public enum DriftCompensation : byte {
+        public enum DriftCompensationEnum : byte {
             /// <summary>
             /// There is no compensation.
             /// </summary>
@@ -224,25 +360,10 @@ namespace MatterDotNet.Clusters.Lighting
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Supports color specification via hue/saturation.
-            /// </summary>
             HueSaturation = 0x0001,
-            /// <summary>
-            /// Enhanced hue is supported.
-            /// </summary>
             EnhancedHue = 0x0002,
-            /// <summary>
-            /// Color loop is supported.
-            /// </summary>
             ColorLoop = 0x0004,
-            /// <summary>
-            /// Supports color specification via XY.
-            /// </summary>
             XY = 0x0008,
-            /// <summary>
-            /// Supports color specification via color temperature.
-            /// </summary>
             ColorTemperature = 0x0010,
         }
 
@@ -255,21 +376,9 @@ namespace MatterDotNet.Clusters.Lighting
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Device adheres to the associated action field.
-            /// </summary>
             UpdateAction = 0x01,
-            /// <summary>
-            /// Device updates the associated direction attribute.
-            /// </summary>
             UpdateDirection = 0x02,
-            /// <summary>
-            /// Device updates the associated time attribute.
-            /// </summary>
             UpdateTime = 0x04,
-            /// <summary>
-            /// Device updates the associated start hue attribute.
-            /// </summary>
             UpdateStartHue = 0x08,
         }
 
@@ -277,7 +386,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// Options
         /// </summary>
         [Flags]
-        public enum Options : byte {
+        public enum OptionsBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -294,8 +403,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required byte Hue { get; set; }
             public required Direction Direction { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Hue);
@@ -310,8 +419,8 @@ namespace MatterDotNet.Clusters.Lighting
         private record MoveHuePayload : TLVPayload {
             public required MoveMode MoveMode { get; set; }
             public required byte Rate { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)MoveMode);
@@ -326,8 +435,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required StepMode StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required byte TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)StepMode);
@@ -342,8 +451,8 @@ namespace MatterDotNet.Clusters.Lighting
         private record MoveToSaturationPayload : TLVPayload {
             public required byte Saturation { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Saturation);
@@ -357,8 +466,8 @@ namespace MatterDotNet.Clusters.Lighting
         private record MoveSaturationPayload : TLVPayload {
             public required MoveMode MoveMode { get; set; }
             public required byte Rate { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)MoveMode);
@@ -373,8 +482,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required StepMode StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required byte TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)StepMode);
@@ -390,8 +499,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required byte Hue { get; set; }
             public required byte Saturation { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Hue);
@@ -407,8 +516,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required ushort ColorX { get; set; }
             public required ushort ColorY { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, ColorX);
@@ -423,8 +532,8 @@ namespace MatterDotNet.Clusters.Lighting
         private record MoveColorPayload : TLVPayload {
             public required short RateX { get; set; }
             public required short RateY { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteShort(0, RateX);
@@ -439,8 +548,8 @@ namespace MatterDotNet.Clusters.Lighting
             public required short StepX { get; set; }
             public required short StepY { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteShort(0, StepX);
@@ -455,8 +564,8 @@ namespace MatterDotNet.Clusters.Lighting
         private record MoveToColorTemperaturePayload : TLVPayload {
             public required ushort ColorTemperatureMireds { get; set; }
             public required ushort TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, ColorTemperatureMireds);
@@ -472,7 +581,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Hue
         /// </summary>
-        public async Task<bool> MoveToHue(SecureSession session, byte hue, Direction direction, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToHue(SecureSession session, byte hue, Direction direction, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToHuePayload requestFields = new MoveToHuePayload() {
                 Hue = hue,
                 Direction = direction,
@@ -487,7 +596,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move Hue
         /// </summary>
-        public async Task<bool> MoveHue(SecureSession session, MoveMode moveMode, byte rate, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveHue(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveHuePayload requestFields = new MoveHuePayload() {
                 MoveMode = moveMode,
                 Rate = rate,
@@ -501,7 +610,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Step Hue
         /// </summary>
-        public async Task<bool> StepHue(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> StepHue(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StepHuePayload requestFields = new StepHuePayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -516,7 +625,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Saturation
         /// </summary>
-        public async Task<bool> MoveToSaturation(SecureSession session, byte saturation, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToSaturation(SecureSession session, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToSaturationPayload requestFields = new MoveToSaturationPayload() {
                 Saturation = saturation,
                 TransitionTime = transitionTime,
@@ -530,7 +639,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move Saturation
         /// </summary>
-        public async Task<bool> MoveSaturation(SecureSession session, MoveMode moveMode, byte rate, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveSaturation(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveSaturationPayload requestFields = new MoveSaturationPayload() {
                 MoveMode = moveMode,
                 Rate = rate,
@@ -544,7 +653,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Step Saturation
         /// </summary>
-        public async Task<bool> StepSaturation(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> StepSaturation(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StepSaturationPayload requestFields = new StepSaturationPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -559,7 +668,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Hue And Saturation
         /// </summary>
-        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte hue, byte saturation, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte hue, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToHueAndSaturationPayload requestFields = new MoveToHueAndSaturationPayload() {
                 Hue = hue,
                 Saturation = saturation,
@@ -574,7 +683,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Color
         /// </summary>
-        public async Task<bool> MoveToColor(SecureSession session, ushort colorX, ushort colorY, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToColor(SecureSession session, ushort colorX, ushort colorY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToColorPayload requestFields = new MoveToColorPayload() {
                 ColorX = colorX,
                 ColorY = colorY,
@@ -589,7 +698,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move Color
         /// </summary>
-        public async Task<bool> MoveColor(SecureSession session, short rateX, short rateY, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveColor(SecureSession session, short rateX, short rateY, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveColorPayload requestFields = new MoveColorPayload() {
                 RateX = rateX,
                 RateY = rateY,
@@ -603,7 +712,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Step Color
         /// </summary>
-        public async Task<bool> StepColor(SecureSession session, short stepX, short stepY, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> StepColor(SecureSession session, short stepX, short stepY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StepColorPayload requestFields = new StepColorPayload() {
                 StepX = stepX,
                 StepY = stepY,
@@ -618,7 +727,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Color Temperature
         /// </summary>
-        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort colorTemperatureMireds, ushort transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort colorTemperatureMireds, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToColorTemperaturePayload requestFields = new MoveToColorTemperaturePayload() {
                 ColorTemperatureMireds = colorTemperatureMireds,
                 TransitionTime = transitionTime,
@@ -653,389 +762,214 @@ namespace MatterDotNet.Clusters.Lighting
         }
 
         /// <summary>
-        /// Get the Current Hue attribute
+        /// Current Hue Attribute
         /// </summary>
-        public async Task<byte> GetCurrentHue(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 0) ?? 0x00;
-        }
+        public required ReadAttribute<byte> CurrentHue { get; init; }
 
         /// <summary>
-        /// Get the Current Saturation attribute
+        /// Current Saturation Attribute
         /// </summary>
-        public async Task<byte> GetCurrentSaturation(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0x00;
-        }
+        public required ReadAttribute<byte> CurrentSaturation { get; init; }
 
         /// <summary>
-        /// Get the Remaining Time attribute
+        /// Remaining Time Attribute
         /// </summary>
-        public async Task<ushort> GetRemainingTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> RemainingTime { get; init; }
 
         /// <summary>
-        /// Get the CurrentX attribute
+        /// CurrentX Attribute
         /// </summary>
-        public async Task<ushort> GetCurrentX(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 0x616B;
-        }
+        public required ReadAttribute<ushort> CurrentX { get; init; }
 
         /// <summary>
-        /// Get the CurrentY attribute
+        /// CurrentY Attribute
         /// </summary>
-        public async Task<ushort> GetCurrentY(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 0x607D;
-        }
+        public required ReadAttribute<ushort> CurrentY { get; init; }
 
         /// <summary>
-        /// Get the Drift Compensation attribute
+        /// Drift Compensation Attribute
         /// </summary>
-        public async Task<DriftCompensation> GetDriftCompensation(SecureSession session) {
-            return (DriftCompensation)await GetEnumAttribute(session, 5);
-        }
+        public required ReadAttribute<DriftCompensationEnum> DriftCompensation { get; init; }
 
         /// <summary>
-        /// Get the Compensation Text attribute
+        /// Compensation Text Attribute
         /// </summary>
-        public async Task<string> GetCompensationText(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<string> CompensationText { get; init; }
 
         /// <summary>
-        /// Get the Color Temperature Mireds attribute
+        /// Color Temperature Mireds Attribute
         /// </summary>
-        public async Task<ushort> GetColorTemperatureMireds(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0x00FA;
-        }
+        public required ReadAttribute<ushort> ColorTemperatureMireds { get; init; }
 
         /// <summary>
-        /// Get the Color Mode attribute
+        /// Color Mode Attribute
         /// </summary>
-        public async Task<ColorMode> GetColorMode(SecureSession session) {
-            return (ColorMode)await GetEnumAttribute(session, 8);
-        }
+        public required ReadAttribute<ColorModeEnum> ColorMode { get; init; }
 
         /// <summary>
-        /// Get the Options attribute
+        /// Options Attribute
         /// </summary>
-        public async Task<Options> GetOptions(SecureSession session) {
-            return (Options)await GetEnumAttribute(session, 15);
-        }
+        public required ReadWriteAttribute<OptionsBitmap> Options { get; init; }
 
         /// <summary>
-        /// Set the Options attribute
+        /// Number Of Primaries Attribute
         /// </summary>
-        public async Task SetOptions (SecureSession session, Options value) {
-            await SetAttribute(session, 15, value);
-        }
+        public required ReadAttribute<byte?> NumberOfPrimaries { get; init; }
 
         /// <summary>
-        /// Get the Number Of Primaries attribute
+        /// Primary1X Attribute
         /// </summary>
-        public async Task<byte?> GetNumberOfPrimaries(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 16, true);
-        }
+        public required ReadAttribute<ushort> Primary1X { get; init; }
 
         /// <summary>
-        /// Get the Primary1X attribute
+        /// Primary1Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary1X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 17))!;
-        }
+        public required ReadAttribute<ushort> Primary1Y { get; init; }
 
         /// <summary>
-        /// Get the Primary1Y attribute
+        /// Primary1 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary1Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 18))!;
-        }
+        public required ReadAttribute<byte?> Primary1Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary1 Intensity attribute
+        /// Primary2X Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary1Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 19, true);
-        }
+        public required ReadAttribute<ushort> Primary2X { get; init; }
 
         /// <summary>
-        /// Get the Primary2X attribute
+        /// Primary2Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary2X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 21))!;
-        }
+        public required ReadAttribute<ushort> Primary2Y { get; init; }
 
         /// <summary>
-        /// Get the Primary2Y attribute
+        /// Primary2 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary2Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 22))!;
-        }
+        public required ReadAttribute<byte?> Primary2Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary2 Intensity attribute
+        /// Primary3X Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary2Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 23, true);
-        }
+        public required ReadAttribute<ushort> Primary3X { get; init; }
 
         /// <summary>
-        /// Get the Primary3X attribute
+        /// Primary3Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary3X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 25))!;
-        }
+        public required ReadAttribute<ushort> Primary3Y { get; init; }
 
         /// <summary>
-        /// Get the Primary3Y attribute
+        /// Primary3 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary3Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 26))!;
-        }
+        public required ReadAttribute<byte?> Primary3Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary3 Intensity attribute
+        /// Primary4X Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary3Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 27, true);
-        }
+        public required ReadAttribute<ushort> Primary4X { get; init; }
 
         /// <summary>
-        /// Get the Primary4X attribute
+        /// Primary4Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary4X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 32))!;
-        }
+        public required ReadAttribute<ushort> Primary4Y { get; init; }
 
         /// <summary>
-        /// Get the Primary4Y attribute
+        /// Primary4 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary4Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 33))!;
-        }
+        public required ReadAttribute<byte?> Primary4Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary4 Intensity attribute
+        /// Primary5X Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary4Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 34, true);
-        }
+        public required ReadAttribute<ushort> Primary5X { get; init; }
 
         /// <summary>
-        /// Get the Primary5X attribute
+        /// Primary5Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary5X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 36))!;
-        }
+        public required ReadAttribute<ushort> Primary5Y { get; init; }
 
         /// <summary>
-        /// Get the Primary5Y attribute
+        /// Primary5 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary5Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 37))!;
-        }
+        public required ReadAttribute<byte?> Primary5Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary5 Intensity attribute
+        /// Primary6X Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary5Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 38, true);
-        }
+        public required ReadAttribute<ushort> Primary6X { get; init; }
 
         /// <summary>
-        /// Get the Primary6X attribute
+        /// Primary6Y Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary6X(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 40))!;
-        }
+        public required ReadAttribute<ushort> Primary6Y { get; init; }
 
         /// <summary>
-        /// Get the Primary6Y attribute
+        /// Primary6 Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetPrimary6Y(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 41))!;
-        }
+        public required ReadAttribute<byte?> Primary6Intensity { get; init; }
 
         /// <summary>
-        /// Get the Primary6 Intensity attribute
+        /// White PointX Attribute
         /// </summary>
-        public async Task<byte?> GetPrimary6Intensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 42, true);
-        }
+        public required ReadWriteAttribute<ushort> WhitePointX { get; init; }
 
         /// <summary>
-        /// Get the White PointX attribute
+        /// White PointY Attribute
         /// </summary>
-        public async Task<ushort> GetWhitePointX(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 48))!;
-        }
+        public required ReadWriteAttribute<ushort> WhitePointY { get; init; }
 
         /// <summary>
-        /// Set the White PointX attribute
+        /// Color Point RX Attribute
         /// </summary>
-        public async Task SetWhitePointX (SecureSession session, ushort value) {
-            await SetAttribute(session, 48, value);
-        }
+        public required ReadWriteAttribute<ushort> ColorPointRX { get; init; }
 
         /// <summary>
-        /// Get the White PointY attribute
+        /// Color Point RY Attribute
         /// </summary>
-        public async Task<ushort> GetWhitePointY(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 49))!;
-        }
+        public required ReadWriteAttribute<ushort> ColorPointRY { get; init; }
 
         /// <summary>
-        /// Set the White PointY attribute
+        /// Color Point R Intensity Attribute
         /// </summary>
-        public async Task SetWhitePointY (SecureSession session, ushort value) {
-            await SetAttribute(session, 49, value);
-        }
+        public required ReadWriteAttribute<byte?> ColorPointRIntensity { get; init; }
 
         /// <summary>
-        /// Get the Color Point RX attribute
+        /// Color Point GX Attribute
         /// </summary>
-        public async Task<ushort> GetColorPointRX(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 50))!;
-        }
+        public required ReadWriteAttribute<ushort> ColorPointGX { get; init; }
 
         /// <summary>
-        /// Set the Color Point RX attribute
+        /// Color Point GY Attribute
         /// </summary>
-        public async Task SetColorPointRX (SecureSession session, ushort value) {
-            await SetAttribute(session, 50, value);
-        }
+        public required ReadWriteAttribute<ushort> ColorPointGY { get; init; }
 
         /// <summary>
-        /// Get the Color Point RY attribute
+        /// Color Point G Intensity Attribute
         /// </summary>
-        public async Task<ushort> GetColorPointRY(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 51))!;
-        }
+        public required ReadWriteAttribute<byte?> ColorPointGIntensity { get; init; }
 
         /// <summary>
-        /// Set the Color Point RY attribute
+        /// Color Point BX Attribute
         /// </summary>
-        public async Task SetColorPointRY (SecureSession session, ushort value) {
-            await SetAttribute(session, 51, value);
-        }
+        public required ReadWriteAttribute<ushort> ColorPointBX { get; init; }
 
         /// <summary>
-        /// Get the Color Point R Intensity attribute
+        /// Color Point BY Attribute
         /// </summary>
-        public async Task<byte?> GetColorPointRIntensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 52, true);
-        }
+        public required ReadWriteAttribute<ushort> ColorPointBY { get; init; }
 
         /// <summary>
-        /// Set the Color Point R Intensity attribute
+        /// Color Point B Intensity Attribute
         /// </summary>
-        public async Task SetColorPointRIntensity (SecureSession session, byte? value) {
-            await SetAttribute(session, 52, value, true);
-        }
+        public required ReadWriteAttribute<byte?> ColorPointBIntensity { get; init; }
 
         /// <summary>
-        /// Get the Color Point GX attribute
+        /// Couple Color Temp To Level Min Mireds Attribute
         /// </summary>
-        public async Task<ushort> GetColorPointGX(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 54))!;
-        }
+        public required ReadAttribute<ushort> CoupleColorTempToLevelMinMireds { get; init; }
 
         /// <summary>
-        /// Set the Color Point GX attribute
+        /// Start Up Color Temperature Mireds Attribute
         /// </summary>
-        public async Task SetColorPointGX (SecureSession session, ushort value) {
-            await SetAttribute(session, 54, value);
-        }
-
-        /// <summary>
-        /// Get the Color Point GY attribute
-        /// </summary>
-        public async Task<ushort> GetColorPointGY(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 55))!;
-        }
-
-        /// <summary>
-        /// Set the Color Point GY attribute
-        /// </summary>
-        public async Task SetColorPointGY (SecureSession session, ushort value) {
-            await SetAttribute(session, 55, value);
-        }
-
-        /// <summary>
-        /// Get the Color Point G Intensity attribute
-        /// </summary>
-        public async Task<byte?> GetColorPointGIntensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 56, true);
-        }
-
-        /// <summary>
-        /// Set the Color Point G Intensity attribute
-        /// </summary>
-        public async Task SetColorPointGIntensity (SecureSession session, byte? value) {
-            await SetAttribute(session, 56, value, true);
-        }
-
-        /// <summary>
-        /// Get the Color Point BX attribute
-        /// </summary>
-        public async Task<ushort> GetColorPointBX(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 58))!;
-        }
-
-        /// <summary>
-        /// Set the Color Point BX attribute
-        /// </summary>
-        public async Task SetColorPointBX (SecureSession session, ushort value) {
-            await SetAttribute(session, 58, value);
-        }
-
-        /// <summary>
-        /// Get the Color Point BY attribute
-        /// </summary>
-        public async Task<ushort> GetColorPointBY(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 59))!;
-        }
-
-        /// <summary>
-        /// Set the Color Point BY attribute
-        /// </summary>
-        public async Task SetColorPointBY (SecureSession session, ushort value) {
-            await SetAttribute(session, 59, value);
-        }
-
-        /// <summary>
-        /// Get the Color Point B Intensity attribute
-        /// </summary>
-        public async Task<byte?> GetColorPointBIntensity(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 60, true);
-        }
-
-        /// <summary>
-        /// Set the Color Point B Intensity attribute
-        /// </summary>
-        public async Task SetColorPointBIntensity (SecureSession session, byte? value) {
-            await SetAttribute(session, 60, value, true);
-        }
-
-        /// <summary>
-        /// Get the Couple Color Temp To Level Min Mireds attribute
-        /// </summary>
-        public async Task<ushort> GetCoupleColorTempToLevelMinMireds(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 16397))!;
-        }
-
-        /// <summary>
-        /// Get the Start Up Color Temperature Mireds attribute
-        /// </summary>
-        public async Task<ushort?> GetStartUpColorTemperatureMireds(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16400, true);
-        }
-
-        /// <summary>
-        /// Set the Start Up Color Temperature Mireds attribute
-        /// </summary>
-        public async Task SetStartUpColorTemperatureMireds (SecureSession session, ushort? value) {
-            await SetAttribute(session, 16400, value, true);
-        }
+        public required ReadWriteAttribute<ushort?> StartUpColorTemperatureMireds { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

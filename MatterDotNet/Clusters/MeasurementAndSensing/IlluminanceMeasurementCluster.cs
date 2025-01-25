@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,15 +29,34 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
         /// </summary>
-        public IlluminanceMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public IlluminanceMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected IlluminanceMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected IlluminanceMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MeasuredValue = new ReadAttribute<ushort?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            MinMeasuredValue = new ReadAttribute<ushort?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MaxMeasuredValue = new ReadAttribute<ushort?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            Tolerance = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            LightSensorType = new ReadAttribute<LightSensorTypeEnum?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (LightSensorTypeEnum?)DeserializeEnum(x)
+            };
+        }
 
         #region Enums
         /// <summary>
         /// Light Sensor Type
         /// </summary>
-        public enum LightSensorType : byte {
+        public enum LightSensorTypeEnum : byte {
             /// <summary>
             /// Indicates photodiode sensor type
             /// </summary>
@@ -50,39 +70,29 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
 
         #region Attributes
         /// <summary>
-        /// Get the Measured Value attribute
+        /// Measured Value Attribute
         /// </summary>
-        public async Task<ushort?> GetMeasuredValue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0, true) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Min Measured Value attribute
+        /// Min Measured Value Attribute
         /// </summary>
-        public async Task<ushort?> GetMinMeasuredValue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<ushort?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Max Measured Value attribute
+        /// Max Measured Value Attribute
         /// </summary>
-        public async Task<ushort?> GetMaxMeasuredValue(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<ushort?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Tolerance attribute
+        /// Tolerance Attribute
         /// </summary>
-        public async Task<ushort> GetTolerance(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<ushort> Tolerance { get; init; }
 
         /// <summary>
-        /// Get the Light Sensor Type attribute
+        /// Light Sensor Type Attribute
         /// </summary>
-        public async Task<LightSensorType?> GetLightSensorType(SecureSession session) {
-            return (LightSensorType?)await GetEnumAttribute(session, 4, true);
-        }
+        public required ReadAttribute<LightSensorTypeEnum?> LightSensorType { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

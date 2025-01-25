@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -31,9 +32,51 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// This cluster provides an interface for observing and managing the state of smoke and CO alarms.
         /// </summary>
-        public SmokeCOAlarm(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public SmokeCOAlarm(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected SmokeCOAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected SmokeCOAlarm(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ExpressedState = new ReadAttribute<ExpressedStateEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (ExpressedStateEnum)DeserializeEnum(x)!
+            };
+            SmokeState = new ReadAttribute<AlarmState>(cluster, endPoint, 1) {
+                Deserialize = x => (AlarmState)DeserializeEnum(x)!
+            };
+            COState = new ReadAttribute<AlarmState>(cluster, endPoint, 2) {
+                Deserialize = x => (AlarmState)DeserializeEnum(x)!
+            };
+            BatteryAlert = new ReadAttribute<AlarmState>(cluster, endPoint, 3) {
+                Deserialize = x => (AlarmState)DeserializeEnum(x)!
+            };
+            DeviceMuted = new ReadAttribute<MuteState>(cluster, endPoint, 4) {
+                Deserialize = x => (MuteState)DeserializeEnum(x)!
+            };
+            TestInProgress = new ReadAttribute<bool>(cluster, endPoint, 5) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            HardwareFaultAlert = new ReadAttribute<bool>(cluster, endPoint, 6) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            EndOfServiceAlert = new ReadAttribute<EndOfService>(cluster, endPoint, 7) {
+                Deserialize = x => (EndOfService)DeserializeEnum(x)!
+            };
+            InterconnectSmokeAlarm = new ReadAttribute<AlarmState>(cluster, endPoint, 8) {
+                Deserialize = x => (AlarmState)DeserializeEnum(x)!
+            };
+            InterconnectCOAlarm = new ReadAttribute<AlarmState>(cluster, endPoint, 9) {
+                Deserialize = x => (AlarmState)DeserializeEnum(x)!
+            };
+            ContaminationState = new ReadAttribute<ContaminationStateEnum>(cluster, endPoint, 10) {
+                Deserialize = x => (ContaminationStateEnum)DeserializeEnum(x)!
+            };
+            SmokeSensitivityLevel = new ReadWriteAttribute<Sensitivity>(cluster, endPoint, 11) {
+                Deserialize = x => (Sensitivity)DeserializeEnum(x)!
+            };
+            ExpiryDate = new ReadAttribute<DateTime>(cluster, endPoint, 12) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)!.Value
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -90,7 +133,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Expressed State
         /// </summary>
-        public enum ExpressedState : byte {
+        public enum ExpressedStateEnum : byte {
             /// <summary>
             /// Nominal state, the device is not alarming
             /// </summary>
@@ -160,7 +203,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Contamination State
         /// </summary>
-        public enum ContaminationState : byte {
+        public enum ContaminationStateEnum : byte {
             /// <summary>
             /// Nominal state, the sensor is not contaminated
             /// </summary>
@@ -216,102 +259,69 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Expressed State attribute
+        /// Expressed State Attribute
         /// </summary>
-        public async Task<ExpressedState> GetExpressedState(SecureSession session) {
-            return (ExpressedState)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<ExpressedStateEnum> ExpressedState { get; init; }
 
         /// <summary>
-        /// Get the Smoke State attribute
+        /// Smoke State Attribute
         /// </summary>
-        public async Task<AlarmState> GetSmokeState(SecureSession session) {
-            return (AlarmState)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<AlarmState> SmokeState { get; init; }
 
         /// <summary>
-        /// Get the CO State attribute
+        /// CO State Attribute
         /// </summary>
-        public async Task<AlarmState> GetCOState(SecureSession session) {
-            return (AlarmState)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<AlarmState> COState { get; init; }
 
         /// <summary>
-        /// Get the Battery Alert attribute
+        /// Battery Alert Attribute
         /// </summary>
-        public async Task<AlarmState> GetBatteryAlert(SecureSession session) {
-            return (AlarmState)await GetEnumAttribute(session, 3);
-        }
+        public required ReadAttribute<AlarmState> BatteryAlert { get; init; }
 
         /// <summary>
-        /// Get the Device Muted attribute
+        /// Device Muted Attribute
         /// </summary>
-        public async Task<MuteState> GetDeviceMuted(SecureSession session) {
-            return (MuteState)await GetEnumAttribute(session, 4);
-        }
+        public required ReadAttribute<MuteState> DeviceMuted { get; init; }
 
         /// <summary>
-        /// Get the Test In Progress attribute
+        /// Test In Progress Attribute
         /// </summary>
-        public async Task<bool> GetTestInProgress(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadAttribute<bool> TestInProgress { get; init; }
 
         /// <summary>
-        /// Get the Hardware Fault Alert attribute
+        /// Hardware Fault Alert Attribute
         /// </summary>
-        public async Task<bool> GetHardwareFaultAlert(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<bool> HardwareFaultAlert { get; init; }
 
         /// <summary>
-        /// Get the End Of Service Alert attribute
+        /// End Of Service Alert Attribute
         /// </summary>
-        public async Task<EndOfService> GetEndOfServiceAlert(SecureSession session) {
-            return (EndOfService)await GetEnumAttribute(session, 7);
-        }
+        public required ReadAttribute<EndOfService> EndOfServiceAlert { get; init; }
 
         /// <summary>
-        /// Get the Interconnect Smoke Alarm attribute
+        /// Interconnect Smoke Alarm Attribute
         /// </summary>
-        public async Task<AlarmState> GetInterconnectSmokeAlarm(SecureSession session) {
-            return (AlarmState)await GetEnumAttribute(session, 8);
-        }
+        public required ReadAttribute<AlarmState> InterconnectSmokeAlarm { get; init; }
 
         /// <summary>
-        /// Get the Interconnect CO Alarm attribute
+        /// Interconnect CO Alarm Attribute
         /// </summary>
-        public async Task<AlarmState> GetInterconnectCOAlarm(SecureSession session) {
-            return (AlarmState)await GetEnumAttribute(session, 9);
-        }
+        public required ReadAttribute<AlarmState> InterconnectCOAlarm { get; init; }
 
         /// <summary>
-        /// Get the Contamination State attribute
+        /// Contamination State Attribute
         /// </summary>
-        public async Task<ContaminationState> GetContaminationState(SecureSession session) {
-            return (ContaminationState)await GetEnumAttribute(session, 10);
-        }
+        public required ReadAttribute<ContaminationStateEnum> ContaminationState { get; init; }
 
         /// <summary>
-        /// Get the Smoke Sensitivity Level attribute
+        /// Smoke Sensitivity Level Attribute
         /// </summary>
-        public async Task<Sensitivity> GetSmokeSensitivityLevel(SecureSession session) {
-            return (Sensitivity)await GetEnumAttribute(session, 11);
-        }
+        public required ReadWriteAttribute<Sensitivity> SmokeSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Set the Smoke Sensitivity Level attribute
+        /// Expiry Date Attribute
         /// </summary>
-        public async Task SetSmokeSensitivityLevel (SecureSession session, Sensitivity value) {
-            await SetAttribute(session, 11, value);
-        }
-
-        /// <summary>
-        /// Get the Expiry Date attribute
-        /// </summary>
-        public async Task<DateTime> GetExpiryDate(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)(await GetAttribute(session, 12)))!.Value;
-        }
+        public required ReadAttribute<DateTime> ExpiryDate { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

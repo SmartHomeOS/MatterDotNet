@@ -18,6 +18,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -32,9 +33,15 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for group configuration and manipulation.
         /// </summary>
-        public Groups(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Groups(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Groups(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Groups(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            NameSupport = new ReadAttribute<NameSupportBitmap>(cluster, endPoint, 0) {
+                Deserialize = x => (NameSupportBitmap)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -52,7 +59,7 @@ namespace MatterDotNet.Clusters.General
         /// Name Support
         /// </summary>
         [Flags]
-        public enum NameSupport : byte {
+        public enum NameSupportBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -265,11 +272,9 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Name Support attribute
+        /// Name Support Attribute
         /// </summary>
-        public async Task<NameSupport> GetNameSupport(SecureSession session) {
-            return (NameSupport)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<NameSupportBitmap> NameSupport { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

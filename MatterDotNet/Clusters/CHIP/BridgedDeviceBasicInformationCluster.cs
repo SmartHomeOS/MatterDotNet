@@ -32,9 +32,66 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user, such as the vendor name, the model name, or user-assigned name.
         /// </summary>
-        public BridgedDeviceBasicInformation(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public BridgedDeviceBasicInformation(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BridgedDeviceBasicInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected BridgedDeviceBasicInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            VendorName = new ReadAttribute<string>(cluster, endPoint, 1) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            VendorID = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ProductName = new ReadAttribute<string>(cluster, endPoint, 3) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductID = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            NodeLabel = new ReadWriteAttribute<string>(cluster, endPoint, 5) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            HardwareVersion = new ReadAttribute<ushort>(cluster, endPoint, 7) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            HardwareVersionString = new ReadAttribute<string>(cluster, endPoint, 8) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            SoftwareVersion = new ReadAttribute<uint>(cluster, endPoint, 9) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0
+
+            };
+            SoftwareVersionString = new ReadAttribute<string>(cluster, endPoint, 16) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ManufacturingDate = new ReadAttribute<string>(cluster, endPoint, 17) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            PartNumber = new ReadAttribute<string>(cluster, endPoint, 18) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductURL = new ReadAttribute<string>(cluster, endPoint, 19) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductLabel = new ReadAttribute<string>(cluster, endPoint, 20) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            SerialNumber = new ReadAttribute<string>(cluster, endPoint, 21) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            Reachable = new ReadAttribute<bool>(cluster, endPoint, 23) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            UniqueID = new ReadAttribute<string>(cluster, endPoint, 24) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductAppearance = new ReadAttribute<ProductAppearanceStruct>(cluster, endPoint, 32) {
+                Deserialize = x => new ProductAppearanceStruct((object[])x!)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -92,17 +149,17 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Product Appearance
         /// </summary>
-        public record ProductAppearance : TLVPayload {
+        public record ProductAppearanceStruct : TLVPayload {
             /// <summary>
             /// Product Appearance
             /// </summary>
-            public ProductAppearance() { }
+            public ProductAppearanceStruct() { }
 
             /// <summary>
             /// Product Appearance
             /// </summary>
             [SetsRequiredMembers]
-            public ProductAppearance(object[] fields) {
+            public ProductAppearanceStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Finish = (ProductFinish)reader.GetUShort(0)!.Value;
                 PrimaryColor = (Color)reader.GetUShort(1)!.Value;
@@ -168,130 +225,89 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Get the Vendor Name attribute
+        /// Vendor Name Attribute
         /// </summary>
-        public async Task<string> GetVendorName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Get the Vendor ID attribute
+        /// Vendor ID Attribute
         /// </summary>
-        public async Task<ushort> GetVendorID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Get the Product Name attribute
+        /// Product Name Attribute
         /// </summary>
-        public async Task<string> GetProductName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<string> ProductName { get; init; }
 
         /// <summary>
-        /// Get the Product ID attribute
+        /// Product ID Attribute
         /// </summary>
-        public async Task<ushort> GetProductID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Get the Node Label attribute
+        /// Node Label Attribute
         /// </summary>
-        public async Task<string> GetNodeLabel(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadWriteAttribute<string> NodeLabel { get; init; }
 
         /// <summary>
-        /// Set the Node Label attribute
+        /// Hardware Version Attribute
         /// </summary>
-        public async Task SetNodeLabel (SecureSession session, string value) {
-            await SetAttribute(session, 5, value);
-        }
+        public required ReadAttribute<ushort> HardwareVersion { get; init; }
 
         /// <summary>
-        /// Get the Hardware Version attribute
+        /// Hardware Version String Attribute
         /// </summary>
-        public async Task<ushort> GetHardwareVersion(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0;
-        }
+        public required ReadAttribute<string> HardwareVersionString { get; init; }
 
         /// <summary>
-        /// Get the Hardware Version String attribute
+        /// Software Version Attribute
         /// </summary>
-        public async Task<string> GetHardwareVersionString(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<uint> SoftwareVersion { get; init; }
 
         /// <summary>
-        /// Get the Software Version attribute
+        /// Software Version String Attribute
         /// </summary>
-        public async Task<uint> GetSoftwareVersion(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9) ?? 0;
-        }
+        public required ReadAttribute<string> SoftwareVersionString { get; init; }
 
         /// <summary>
-        /// Get the Software Version String attribute
+        /// Manufacturing Date Attribute
         /// </summary>
-        public async Task<string> GetSoftwareVersionString(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 16))!;
-        }
+        public required ReadAttribute<string> ManufacturingDate { get; init; }
 
         /// <summary>
-        /// Get the Manufacturing Date attribute
+        /// Part Number Attribute
         /// </summary>
-        public async Task<string> GetManufacturingDate(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 17))!;
-        }
+        public required ReadAttribute<string> PartNumber { get; init; }
 
         /// <summary>
-        /// Get the Part Number attribute
+        /// Product URL Attribute
         /// </summary>
-        public async Task<string> GetPartNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 18))!;
-        }
+        public required ReadAttribute<string> ProductURL { get; init; }
 
         /// <summary>
-        /// Get the Product URL attribute
+        /// Product Label Attribute
         /// </summary>
-        public async Task<string> GetProductURL(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 19))!;
-        }
+        public required ReadAttribute<string> ProductLabel { get; init; }
 
         /// <summary>
-        /// Get the Product Label attribute
+        /// Serial Number Attribute
         /// </summary>
-        public async Task<string> GetProductLabel(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 20))!;
-        }
+        public required ReadAttribute<string> SerialNumber { get; init; }
 
         /// <summary>
-        /// Get the Serial Number attribute
+        /// Reachable Attribute
         /// </summary>
-        public async Task<string> GetSerialNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 21))!;
-        }
+        public required ReadAttribute<bool> Reachable { get; init; }
 
         /// <summary>
-        /// Get the Reachable attribute
+        /// Unique ID Attribute
         /// </summary>
-        public async Task<bool> GetReachable(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 23) ?? true;
-        }
+        public required ReadAttribute<string> UniqueID { get; init; }
 
         /// <summary>
-        /// Get the Unique ID attribute
+        /// Product Appearance Attribute
         /// </summary>
-        public async Task<string> GetUniqueID(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 24))!;
-        }
-
-        /// <summary>
-        /// Get the Product Appearance attribute
-        /// </summary>
-        public async Task<ProductAppearance> GetProductAppearance(SecureSession session) {
-            return new ProductAppearance((object[])(await GetAttribute(session, 32))!);
-        }
+        public required ReadAttribute<ProductAppearanceStruct> ProductAppearance { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

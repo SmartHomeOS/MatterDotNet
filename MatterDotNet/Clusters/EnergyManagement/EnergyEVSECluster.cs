@@ -33,9 +33,89 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.
         /// </summary>
-        public EnergyEVSE(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public EnergyEVSE(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EnergyEVSE(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected EnergyEVSE(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            State = new ReadAttribute<StateEnum?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (StateEnum?)DeserializeEnum(x)
+            };
+            SupplyState = new ReadAttribute<SupplyStateEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (SupplyStateEnum)DeserializeEnum(x)!
+            };
+            FaultState = new ReadAttribute<FaultStateEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (FaultStateEnum)DeserializeEnum(x)!
+            };
+            ChargingEnabledUntil = new ReadAttribute<DateTime?>(cluster, endPoint, 3, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x) ?? TimeUtil.EPOCH
+
+            };
+            DischargingEnabledUntil = new ReadAttribute<DateTime?>(cluster, endPoint, 4, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x) ?? TimeUtil.EPOCH
+
+            };
+            CircuitCapacity = new ReadAttribute<long>(cluster, endPoint, 5) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            MinimumChargeCurrent = new ReadAttribute<long>(cluster, endPoint, 6) {
+                Deserialize = x => (long?)(dynamic?)x ?? 6000
+
+            };
+            MaximumChargeCurrent = new ReadAttribute<long>(cluster, endPoint, 7) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            MaximumDischargeCurrent = new ReadAttribute<long>(cluster, endPoint, 8) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            UserMaximumChargeCurrent = new ReadWriteAttribute<long>(cluster, endPoint, 9) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            RandomizationDelayWindow = new ReadWriteAttribute<TimeSpan>(cluster, endPoint, 10) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x ?? TimeSpan.FromSeconds(600)
+
+            };
+            NextChargeStartTime = new ReadAttribute<DateTime?>(cluster, endPoint, 35, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)
+            };
+            NextChargeTargetTime = new ReadAttribute<DateTime?>(cluster, endPoint, 36, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)
+            };
+            NextChargeRequiredEnergy = new ReadAttribute<long?>(cluster, endPoint, 37, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            NextChargeTargetSoC = new ReadAttribute<byte?>(cluster, endPoint, 38, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            ApproximateEVEfficiency = new ReadWriteAttribute<ushort?>(cluster, endPoint, 39, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            StateOfCharge = new ReadAttribute<byte?>(cluster, endPoint, 48, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            BatteryCapacity = new ReadAttribute<long?>(cluster, endPoint, 49, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            VehicleID = new ReadAttribute<string?>(cluster, endPoint, 50, true) {
+                Deserialize = x => (string?)(dynamic?)x
+            };
+            SessionID = new ReadAttribute<uint?>(cluster, endPoint, 64, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            SessionDuration = new ReadAttribute<TimeSpan?>(cluster, endPoint, 65, true) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x
+            };
+            SessionEnergyCharged = new ReadAttribute<long?>(cluster, endPoint, 66, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+            SessionEnergyDischarged = new ReadAttribute<long?>(cluster, endPoint, 67, true) {
+                Deserialize = x => (long?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -68,7 +148,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// State
         /// </summary>
-        public enum State : byte {
+        public enum StateEnum : byte {
             /// <summary>
             /// The EV is not plugged in.
             /// </summary>
@@ -102,7 +182,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Supply State
         /// </summary>
-        public enum SupplyState : byte {
+        public enum SupplyStateEnum : byte {
             /// <summary>
             /// The EV is not currently allowed to charge or discharge
             /// </summary>
@@ -132,7 +212,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Fault State
         /// </summary>
-        public enum FaultState : byte {
+        public enum FaultStateEnum : byte {
             /// <summary>
             /// The EVSE is not in an error state.
             /// </summary>
@@ -230,33 +310,12 @@ namespace MatterDotNet.Clusters.EnergyManagement
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Sunday
-            /// </summary>
             Sunday = 0x01,
-            /// <summary>
-            /// Monday
-            /// </summary>
             Monday = 0x02,
-            /// <summary>
-            /// Tuesday
-            /// </summary>
             Tuesday = 0x04,
-            /// <summary>
-            /// Wednesday
-            /// </summary>
             Wednesday = 0x08,
-            /// <summary>
-            /// Thursday
-            /// </summary>
             Thursday = 0x10,
-            /// <summary>
-            /// Friday
-            /// </summary>
             Friday = 0x20,
-            /// <summary>
-            /// Saturday
-            /// </summary>
             Saturday = 0x40,
         }
         #endregion Enums
@@ -488,186 +547,119 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Get the State attribute
+        /// State Attribute
         /// </summary>
-        public async Task<State?> GetState(SecureSession session) {
-            return (State?)await GetEnumAttribute(session, 0, true);
-        }
+        public required ReadAttribute<StateEnum?> State { get; init; }
 
         /// <summary>
-        /// Get the Supply State attribute
+        /// Supply State Attribute
         /// </summary>
-        public async Task<SupplyState> GetSupplyState(SecureSession session) {
-            return (SupplyState)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<SupplyStateEnum> SupplyState { get; init; }
 
         /// <summary>
-        /// Get the Fault State attribute
+        /// Fault State Attribute
         /// </summary>
-        public async Task<FaultState> GetFaultState(SecureSession session) {
-            return (FaultState)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<FaultStateEnum> FaultState { get; init; }
 
         /// <summary>
-        /// Get the Charging Enabled Until attribute
+        /// Charging Enabled Until Attribute
         /// </summary>
-        public async Task<DateTime?> GetChargingEnabledUntil(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 3)) ?? TimeUtil.EPOCH;
-        }
+        public required ReadAttribute<DateTime?> ChargingEnabledUntil { get; init; }
 
         /// <summary>
-        /// Get the Discharging Enabled Until attribute
+        /// Discharging Enabled Until Attribute
         /// </summary>
-        public async Task<DateTime?> GetDischargingEnabledUntil(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4)) ?? TimeUtil.EPOCH;
-        }
+        public required ReadAttribute<DateTime?> DischargingEnabledUntil { get; init; }
 
         /// <summary>
-        /// Get the Circuit Capacity [mA] attribute
+        /// Circuit Capacity [mA] Attribute
         /// </summary>
-        public async Task<long> GetCircuitCapacity(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 5) ?? 0;
-        }
+        public required ReadAttribute<long> CircuitCapacity { get; init; }
 
         /// <summary>
-        /// Get the Minimum Charge Current [mA] attribute
+        /// Minimum Charge Current [mA] Attribute
         /// </summary>
-        public async Task<long> GetMinimumChargeCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 6) ?? 6000;
-        }
+        public required ReadAttribute<long> MinimumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Get the Maximum Charge Current [mA] attribute
+        /// Maximum Charge Current [mA] Attribute
         /// </summary>
-        public async Task<long> GetMaximumChargeCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 7) ?? 0;
-        }
+        public required ReadAttribute<long> MaximumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Get the Maximum Discharge Current [mA] attribute
+        /// Maximum Discharge Current [mA] Attribute
         /// </summary>
-        public async Task<long> GetMaximumDischargeCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 8) ?? 0;
-        }
+        public required ReadAttribute<long> MaximumDischargeCurrent { get; init; }
 
         /// <summary>
-        /// Get the User Maximum Charge Current [mA] attribute
+        /// User Maximum Charge Current [mA] Attribute
         /// </summary>
-        public async Task<long> GetUserMaximumChargeCurrent(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 9) ?? 0;
-        }
+        public required ReadWriteAttribute<long> UserMaximumChargeCurrent { get; init; }
 
         /// <summary>
-        /// Set the User Maximum Charge Current attribute
+        /// Randomization Delay Window Attribute
         /// </summary>
-        public async Task SetUserMaximumChargeCurrent (SecureSession session, long? value = 0) {
-            await SetAttribute(session, 9, value);
-        }
+        public required ReadWriteAttribute<TimeSpan> RandomizationDelayWindow { get; init; }
 
         /// <summary>
-        /// Get the Randomization Delay Window attribute
+        /// Next Charge Start Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetRandomizationDelayWindow(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 10) ?? TimeSpan.FromSeconds(600);
-        }
+        public required ReadAttribute<DateTime?> NextChargeStartTime { get; init; }
 
         /// <summary>
-        /// Set the Randomization Delay Window attribute
+        /// Next Charge Target Time Attribute
         /// </summary>
-        public async Task SetRandomizationDelayWindow (SecureSession session, TimeSpan? value) {
-            await SetAttribute(session, 10, value ?? TimeSpan.FromSeconds(600));
-        }
+        public required ReadAttribute<DateTime?> NextChargeTargetTime { get; init; }
 
         /// <summary>
-        /// Get the Next Charge Start Time attribute
+        /// Next Charge Required Energy [mWh] Attribute
         /// </summary>
-        public async Task<DateTime?> GetNextChargeStartTime(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 35));
-        }
+        public required ReadAttribute<long?> NextChargeRequiredEnergy { get; init; }
 
         /// <summary>
-        /// Get the Next Charge Target Time attribute
+        /// Next Charge Target SoC [%] Attribute
         /// </summary>
-        public async Task<DateTime?> GetNextChargeTargetTime(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 36));
-        }
+        public required ReadAttribute<byte?> NextChargeTargetSoC { get; init; }
 
         /// <summary>
-        /// Get the Next Charge Required Energy [mWh] attribute
+        /// Approximate EV Efficiency Attribute
         /// </summary>
-        public async Task<long?> GetNextChargeRequiredEnergy(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 37, true);
-        }
+        public required ReadWriteAttribute<ushort?> ApproximateEVEfficiency { get; init; }
 
         /// <summary>
-        /// Get the Next Charge Target SoC [%] attribute
+        /// State Of Charge [%] Attribute
         /// </summary>
-        public async Task<byte?> GetNextChargeTargetSoC(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 38, true);
-        }
+        public required ReadAttribute<byte?> StateOfCharge { get; init; }
 
         /// <summary>
-        /// Get the Approximate EV Efficiency attribute
+        /// Battery Capacity [mWh] Attribute
         /// </summary>
-        public async Task<ushort?> GetApproximateEVEfficiency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 39, true);
-        }
+        public required ReadAttribute<long?> BatteryCapacity { get; init; }
 
         /// <summary>
-        /// Set the Approximate EV Efficiency attribute
+        /// Vehicle ID Attribute
         /// </summary>
-        public async Task SetApproximateEVEfficiency (SecureSession session, ushort? value) {
-            await SetAttribute(session, 39, value, true);
-        }
+        public required ReadAttribute<string?> VehicleID { get; init; }
 
         /// <summary>
-        /// Get the State Of Charge [%] attribute
+        /// Session ID Attribute
         /// </summary>
-        public async Task<byte?> GetStateOfCharge(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 48, true);
-        }
+        public required ReadAttribute<uint?> SessionID { get; init; }
 
         /// <summary>
-        /// Get the Battery Capacity [mWh] attribute
+        /// Session Duration Attribute
         /// </summary>
-        public async Task<long?> GetBatteryCapacity(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 49, true);
-        }
+        public required ReadAttribute<TimeSpan?> SessionDuration { get; init; }
 
         /// <summary>
-        /// Get the Vehicle ID attribute
+        /// Session Energy Charged [mWh] Attribute
         /// </summary>
-        public async Task<string?> GetVehicleID(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 50, true);
-        }
+        public required ReadAttribute<long?> SessionEnergyCharged { get; init; }
 
         /// <summary>
-        /// Get the Session ID attribute
+        /// Session Energy Discharged [mWh] Attribute
         /// </summary>
-        public async Task<uint?> GetSessionID(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 64, true);
-        }
-
-        /// <summary>
-        /// Get the Session Duration attribute
-        /// </summary>
-        public async Task<TimeSpan?> GetSessionDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 65, true);
-        }
-
-        /// <summary>
-        /// Get the Session Energy Charged [mWh] attribute
-        /// </summary>
-        public async Task<long?> GetSessionEnergyCharged(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 66, true);
-        }
-
-        /// <summary>
-        /// Get the Session Energy Discharged [mWh] attribute
-        /// </summary>
-        public async Task<long?> GetSessionEnergyDischarged(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 67, true);
-        }
+        public required ReadAttribute<long?> SessionEnergyDischarged { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

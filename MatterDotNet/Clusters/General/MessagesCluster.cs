@@ -33,9 +33,30 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster provides an interface for passing messages to be presented by a device.
         /// </summary>
-        public Messages(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Messages(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Messages(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Messages(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MessagesAttribute = new ReadAttribute<Message[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Message[] list = new Message[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Message(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ActiveMessageIDs = new ReadAttribute<byte[][]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    byte[][] list = new byte[reader.Count][];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetBytes(i, false, 8)!;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -106,25 +127,10 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Message requires confirmation from user
-            /// </summary>
             ConfirmationRequired = 0x01,
-            /// <summary>
-            /// Message requires response from user
-            /// </summary>
             ResponseRequired = 0x02,
-            /// <summary>
-            /// Message supports reply message from user
-            /// </summary>
             ReplyMessage = 0x04,
-            /// <summary>
-            /// Message has already been confirmed
-            /// </summary>
             MessageConfirmed = 0x08,
-            /// <summary>
-            /// Message required PIN/password protection
-            /// </summary>
             MessageProtected = 0x10,
         }
         #endregion Enums
@@ -322,26 +328,14 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Messages attribute
+        /// Messages Attribute
         /// </summary>
-        public async Task<Message[]> GetMessages(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Message[] list = new Message[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Message(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Message[]> MessagesAttribute { get; init; }
 
         /// <summary>
-        /// Get the Active Message I Ds attribute
+        /// Active Message I Ds Attribute
         /// </summary>
-        public async Task<byte[][]> GetActiveMessageIDs(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            byte[][] list = new byte[reader.Count][];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false, 8)!;
-            return list;
-        }
+        public required ReadAttribute<byte[][]> ActiveMessageIDs { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -32,9 +32,25 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
         /// </summary>
-        public TargetNavigator(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public TargetNavigator(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TargetNavigator(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected TargetNavigator(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            TargetList = new ReadAttribute<TargetInfo[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    TargetInfo[] list = new TargetInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new TargetInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentTarget = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -129,22 +145,14 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Get the Target List attribute
+        /// Target List Attribute
         /// </summary>
-        public async Task<TargetInfo[]> GetTargetList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            TargetInfo[] list = new TargetInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new TargetInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<TargetInfo[]> TargetList { get; init; }
 
         /// <summary>
-        /// Get the Current Target attribute
+        /// Current Target Attribute
         /// </summary>
-        public async Task<byte> GetCurrentTarget(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0;
-        }
+        public required ReadAttribute<byte> CurrentTarget { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

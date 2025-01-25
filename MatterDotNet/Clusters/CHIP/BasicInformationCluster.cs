@@ -30,9 +30,86 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// This cluster provides attributes and events for determining basic information about Nodes, which supports both Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number, which apply to the whole Node. Also allows setting user device information such as location.
         /// </summary>
-        public BasicInformation(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public BasicInformation(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BasicInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected BasicInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            DataModelRevision = new ReadAttribute<ushort>(cluster, endPoint, 0) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            VendorName = new ReadAttribute<string>(cluster, endPoint, 1) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            VendorID = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            ProductName = new ReadAttribute<string>(cluster, endPoint, 3) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductID = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            NodeLabel = new ReadWriteAttribute<string>(cluster, endPoint, 5) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            Location = new ReadWriteAttribute<string>(cluster, endPoint, 6) {
+                Deserialize = x => (string?)(dynamic?)x ?? "xx"
+
+            };
+            HardwareVersion = new ReadAttribute<ushort>(cluster, endPoint, 7) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            HardwareVersionString = new ReadAttribute<string>(cluster, endPoint, 8) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            SoftwareVersion = new ReadAttribute<uint>(cluster, endPoint, 9) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0
+
+            };
+            SoftwareVersionString = new ReadAttribute<string>(cluster, endPoint, 16) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ManufacturingDate = new ReadAttribute<string>(cluster, endPoint, 17) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            PartNumber = new ReadAttribute<string>(cluster, endPoint, 18) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductURL = new ReadAttribute<string>(cluster, endPoint, 19) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductLabel = new ReadAttribute<string>(cluster, endPoint, 20) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            SerialNumber = new ReadAttribute<string>(cluster, endPoint, 21) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            LocalConfigDisabled = new ReadWriteAttribute<bool>(cluster, endPoint, 22) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            Reachable = new ReadAttribute<bool>(cluster, endPoint, 23) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            UniqueID = new ReadAttribute<string>(cluster, endPoint, 24) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            CapabilityMinima = new ReadAttribute<CapabilityMinimaStruct>(cluster, endPoint, 25) {
+                Deserialize = x => new CapabilityMinimaStruct((object[])x!)
+            };
+            ProductAppearance = new ReadAttribute<ProductAppearanceStruct>(cluster, endPoint, 32) {
+                Deserialize = x => new ProductAppearanceStruct((object[])x!)
+            };
+            SpecificationVersion = new ReadAttribute<uint>(cluster, endPoint, 33) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            MaxPathsPerInvoke = new ReadAttribute<ushort>(cluster, endPoint, 34) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -160,17 +237,17 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Capability Minima
         /// </summary>
-        public record CapabilityMinima : TLVPayload {
+        public record CapabilityMinimaStruct : TLVPayload {
             /// <summary>
             /// Capability Minima
             /// </summary>
-            public CapabilityMinima() { }
+            public CapabilityMinimaStruct() { }
 
             /// <summary>
             /// Capability Minima
             /// </summary>
             [SetsRequiredMembers]
-            public CapabilityMinima(object[] fields) {
+            public CapabilityMinimaStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 CaseSessionsPerFabric = reader.GetUShort(0)!.Value;
                 SubscriptionsPerFabric = reader.GetUShort(1)!.Value;
@@ -188,17 +265,17 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Product Appearance
         /// </summary>
-        public record ProductAppearance : TLVPayload {
+        public record ProductAppearanceStruct : TLVPayload {
             /// <summary>
             /// Product Appearance
             /// </summary>
-            public ProductAppearance() { }
+            public ProductAppearanceStruct() { }
 
             /// <summary>
             /// Product Appearance
             /// </summary>
             [SetsRequiredMembers]
-            public ProductAppearance(object[] fields) {
+            public ProductAppearanceStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 Finish = (ProductFinish)reader.GetUShort(0)!.Value;
                 PrimaryColor = (Color)reader.GetUShort(1)!.Value;
@@ -216,186 +293,119 @@ namespace MatterDotNet.Clusters.CHIP
 
         #region Attributes
         /// <summary>
-        /// Get the Data Model Revision attribute
+        /// Data Model Revision Attribute
         /// </summary>
-        public async Task<ushort> GetDataModelRevision(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<ushort> DataModelRevision { get; init; }
 
         /// <summary>
-        /// Get the Vendor Name attribute
+        /// Vendor Name Attribute
         /// </summary>
-        public async Task<string> GetVendorName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Get the Vendor ID attribute
+        /// Vendor ID Attribute
         /// </summary>
-        public async Task<ushort> GetVendorID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Get the Product Name attribute
+        /// Product Name Attribute
         /// </summary>
-        public async Task<string> GetProductName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<string> ProductName { get; init; }
 
         /// <summary>
-        /// Get the Product ID attribute
+        /// Product ID Attribute
         /// </summary>
-        public async Task<ushort> GetProductID(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Get the Node Label attribute
+        /// Node Label Attribute
         /// </summary>
-        public async Task<string> GetNodeLabel(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadWriteAttribute<string> NodeLabel { get; init; }
 
         /// <summary>
-        /// Set the Node Label attribute
+        /// Location Attribute
         /// </summary>
-        public async Task SetNodeLabel (SecureSession session, string value) {
-            await SetAttribute(session, 5, value);
-        }
+        public required ReadWriteAttribute<string> Location { get; init; }
 
         /// <summary>
-        /// Get the Location attribute
+        /// Hardware Version Attribute
         /// </summary>
-        public async Task<string> GetLocation(SecureSession session) {
-            return (string?)(dynamic?)await GetAttribute(session, 6) ?? "xx";
-        }
+        public required ReadAttribute<ushort> HardwareVersion { get; init; }
 
         /// <summary>
-        /// Set the Location attribute
+        /// Hardware Version String Attribute
         /// </summary>
-        public async Task SetLocation (SecureSession session, string? value = "xx") {
-            await SetAttribute(session, 6, value);
-        }
+        public required ReadAttribute<string> HardwareVersionString { get; init; }
 
         /// <summary>
-        /// Get the Hardware Version attribute
+        /// Software Version Attribute
         /// </summary>
-        public async Task<ushort> GetHardwareVersion(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0;
-        }
+        public required ReadAttribute<uint> SoftwareVersion { get; init; }
 
         /// <summary>
-        /// Get the Hardware Version String attribute
+        /// Software Version String Attribute
         /// </summary>
-        public async Task<string> GetHardwareVersionString(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<string> SoftwareVersionString { get; init; }
 
         /// <summary>
-        /// Get the Software Version attribute
+        /// Manufacturing Date Attribute
         /// </summary>
-        public async Task<uint> GetSoftwareVersion(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9) ?? 0;
-        }
+        public required ReadAttribute<string> ManufacturingDate { get; init; }
 
         /// <summary>
-        /// Get the Software Version String attribute
+        /// Part Number Attribute
         /// </summary>
-        public async Task<string> GetSoftwareVersionString(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 16))!;
-        }
+        public required ReadAttribute<string> PartNumber { get; init; }
 
         /// <summary>
-        /// Get the Manufacturing Date attribute
+        /// Product URL Attribute
         /// </summary>
-        public async Task<string> GetManufacturingDate(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 17))!;
-        }
+        public required ReadAttribute<string> ProductURL { get; init; }
 
         /// <summary>
-        /// Get the Part Number attribute
+        /// Product Label Attribute
         /// </summary>
-        public async Task<string> GetPartNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 18))!;
-        }
+        public required ReadAttribute<string> ProductLabel { get; init; }
 
         /// <summary>
-        /// Get the Product URL attribute
+        /// Serial Number Attribute
         /// </summary>
-        public async Task<string> GetProductURL(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 19))!;
-        }
+        public required ReadAttribute<string> SerialNumber { get; init; }
 
         /// <summary>
-        /// Get the Product Label attribute
+        /// Local Config Disabled Attribute
         /// </summary>
-        public async Task<string> GetProductLabel(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 20))!;
-        }
+        public required ReadWriteAttribute<bool> LocalConfigDisabled { get; init; }
 
         /// <summary>
-        /// Get the Serial Number attribute
+        /// Reachable Attribute
         /// </summary>
-        public async Task<string> GetSerialNumber(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 21))!;
-        }
+        public required ReadAttribute<bool> Reachable { get; init; }
 
         /// <summary>
-        /// Get the Local Config Disabled attribute
+        /// Unique ID Attribute
         /// </summary>
-        public async Task<bool> GetLocalConfigDisabled(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 22) ?? false;
-        }
+        public required ReadAttribute<string> UniqueID { get; init; }
 
         /// <summary>
-        /// Set the Local Config Disabled attribute
+        /// Capability Minima Attribute
         /// </summary>
-        public async Task SetLocalConfigDisabled (SecureSession session, bool? value = false) {
-            await SetAttribute(session, 22, value);
-        }
+        public required ReadAttribute<CapabilityMinimaStruct> CapabilityMinima { get; init; }
 
         /// <summary>
-        /// Get the Reachable attribute
+        /// Product Appearance Attribute
         /// </summary>
-        public async Task<bool> GetReachable(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 23) ?? true;
-        }
+        public required ReadAttribute<ProductAppearanceStruct> ProductAppearance { get; init; }
 
         /// <summary>
-        /// Get the Unique ID attribute
+        /// Specification Version Attribute
         /// </summary>
-        public async Task<string> GetUniqueID(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 24))!;
-        }
+        public required ReadAttribute<uint> SpecificationVersion { get; init; }
 
         /// <summary>
-        /// Get the Capability Minima attribute
+        /// Max Paths Per Invoke Attribute
         /// </summary>
-        public async Task<CapabilityMinima> GetCapabilityMinima(SecureSession session) {
-            return new CapabilityMinima((object[])(await GetAttribute(session, 25))!);
-        }
-
-        /// <summary>
-        /// Get the Product Appearance attribute
-        /// </summary>
-        public async Task<ProductAppearance> GetProductAppearance(SecureSession session) {
-            return new ProductAppearance((object[])(await GetAttribute(session, 32))!);
-        }
-
-        /// <summary>
-        /// Get the Specification Version attribute
-        /// </summary>
-        public async Task<uint> GetSpecificationVersion(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 33))!;
-        }
-
-        /// <summary>
-        /// Get the Max Paths Per Invoke attribute
-        /// </summary>
-        public async Task<ushort> GetMaxPathsPerInvoke(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 34))!;
-        }
+        public required ReadAttribute<ushort> MaxPathsPerInvoke { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

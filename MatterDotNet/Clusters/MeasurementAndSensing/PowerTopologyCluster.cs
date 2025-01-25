@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,9 +29,30 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints.
         /// </summary>
-        public PowerTopology(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PowerTopology(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerTopology(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PowerTopology(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            AvailableEndpoints = new ReadAttribute<ushort[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            ActiveEndpoints = new ReadAttribute<ushort[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -80,26 +102,14 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Available Endpoints attribute
+        /// Available Endpoints Attribute
         /// </summary>
-        public async Task<ushort[]> GetAvailableEndpoints(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> AvailableEndpoints { get; init; }
 
         /// <summary>
-        /// Get the Active Endpoints attribute
+        /// Active Endpoints Attribute
         /// </summary>
-        public async Task<ushort[]> GetActiveEndpoints(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> ActiveEndpoints { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,36 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster is used to configure a boolean sensor.
         /// </summary>
-        public BooleanStateConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public BooleanStateConfiguration(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BooleanStateConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected BooleanStateConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CurrentSensitivityLevel = new ReadWriteAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            SupportedSensitivityLevels = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            DefaultSensitivityLevel = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            AlarmsActive = new ReadAttribute<AlarmMode>(cluster, endPoint, 3) {
+                Deserialize = x => (AlarmMode)DeserializeEnum(x)!
+            };
+            AlarmsSuppressed = new ReadAttribute<AlarmMode>(cluster, endPoint, 4) {
+                Deserialize = x => (AlarmMode)DeserializeEnum(x)!
+            };
+            AlarmsEnabled = new ReadAttribute<AlarmMode>(cluster, endPoint, 5) {
+                Deserialize = x => (AlarmMode)DeserializeEnum(x)!
+            };
+            AlarmsSupported = new ReadAttribute<AlarmMode>(cluster, endPoint, 6) {
+                Deserialize = x => (AlarmMode)DeserializeEnum(x)!
+            };
+            SensorFault = new ReadAttribute<SensorFaultBitmap>(cluster, endPoint, 7) {
+                Deserialize = x => (SensorFaultBitmap)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -68,13 +96,7 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Visual alarming
-            /// </summary>
             Visual = 0x01,
-            /// <summary>
-            /// Audible alarming
-            /// </summary>
             Audible = 0x02,
         }
 
@@ -82,7 +104,7 @@ namespace MatterDotNet.Clusters.General
         /// Sensor Fault
         /// </summary>
         [Flags]
-        public enum SensorFault : ushort {
+        public enum SensorFaultBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -161,67 +183,44 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Current Sensitivity Level attribute
+        /// Current Sensitivity Level Attribute
         /// </summary>
-        public async Task<byte> GetCurrentSensitivityLevel(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadWriteAttribute<byte> CurrentSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Set the Current Sensitivity Level attribute
+        /// Supported Sensitivity Levels Attribute
         /// </summary>
-        public async Task SetCurrentSensitivityLevel (SecureSession session, byte value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadAttribute<byte> SupportedSensitivityLevels { get; init; }
 
         /// <summary>
-        /// Get the Supported Sensitivity Levels attribute
+        /// Default Sensitivity Level Attribute
         /// </summary>
-        public async Task<byte> GetSupportedSensitivityLevels(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte> DefaultSensitivityLevel { get; init; }
 
         /// <summary>
-        /// Get the Default Sensitivity Level attribute
+        /// Alarms Active Attribute
         /// </summary>
-        public async Task<byte> GetDefaultSensitivityLevel(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<AlarmMode> AlarmsActive { get; init; }
 
         /// <summary>
-        /// Get the Alarms Active attribute
+        /// Alarms Suppressed Attribute
         /// </summary>
-        public async Task<AlarmMode> GetAlarmsActive(SecureSession session) {
-            return (AlarmMode)await GetEnumAttribute(session, 3);
-        }
+        public required ReadAttribute<AlarmMode> AlarmsSuppressed { get; init; }
 
         /// <summary>
-        /// Get the Alarms Suppressed attribute
+        /// Alarms Enabled Attribute
         /// </summary>
-        public async Task<AlarmMode> GetAlarmsSuppressed(SecureSession session) {
-            return (AlarmMode)await GetEnumAttribute(session, 4);
-        }
+        public required ReadAttribute<AlarmMode> AlarmsEnabled { get; init; }
 
         /// <summary>
-        /// Get the Alarms Enabled attribute
+        /// Alarms Supported Attribute
         /// </summary>
-        public async Task<AlarmMode> GetAlarmsEnabled(SecureSession session) {
-            return (AlarmMode)await GetEnumAttribute(session, 5);
-        }
+        public required ReadAttribute<AlarmMode> AlarmsSupported { get; init; }
 
         /// <summary>
-        /// Get the Alarms Supported attribute
+        /// Sensor Fault Attribute
         /// </summary>
-        public async Task<AlarmMode> GetAlarmsSupported(SecureSession session) {
-            return (AlarmMode)await GetEnumAttribute(session, 6);
-        }
-
-        /// <summary>
-        /// Get the Sensor Fault attribute
-        /// </summary>
-        public async Task<SensorFault> GetSensorFault(SecureSession session) {
-            return (SensorFault)await GetEnumAttribute(session, 7);
-        }
+        public required ReadAttribute<SensorFaultBitmap> SensorFault { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

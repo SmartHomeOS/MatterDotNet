@@ -32,9 +32,48 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics.
         /// </summary>
-        public OperationalCredentials(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public OperationalCredentials(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OperationalCredentials(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected OperationalCredentials(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            NOCs = new ReadAttribute<NOC[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NOC[] list = new NOC[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new NOC(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Fabrics = new ReadAttribute<FabricDescriptor[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    FabricDescriptor[] list = new FabricDescriptor[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new FabricDescriptor(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SupportedFabrics = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            CommissionedFabrics = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            TrustedRootCertificates = new ReadAttribute<byte[][]>(cluster, endPoint, 4) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    byte[][] list = new byte[reader.Count][];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetBytes(i, false)!;
+                    return list;
+                }
+            };
+            CurrentFabricIndex = new ReadAttribute<byte>(cluster, endPoint, 5) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -422,58 +461,34 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the NO Cs attribute
+        /// NO Cs Attribute
         /// </summary>
-        public async Task<NOC[]> GetNOCs(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            NOC[] list = new NOC[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new NOC(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<NOC[]> NOCs { get; init; }
 
         /// <summary>
-        /// Get the Fabrics attribute
+        /// Fabrics Attribute
         /// </summary>
-        public async Task<FabricDescriptor[]> GetFabrics(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            FabricDescriptor[] list = new FabricDescriptor[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new FabricDescriptor(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<FabricDescriptor[]> Fabrics { get; init; }
 
         /// <summary>
-        /// Get the Supported Fabrics attribute
+        /// Supported Fabrics Attribute
         /// </summary>
-        public async Task<byte> GetSupportedFabrics(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<byte> SupportedFabrics { get; init; }
 
         /// <summary>
-        /// Get the Commissioned Fabrics attribute
+        /// Commissioned Fabrics Attribute
         /// </summary>
-        public async Task<byte> GetCommissionedFabrics(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<byte> CommissionedFabrics { get; init; }
 
         /// <summary>
-        /// Get the Trusted Root Certificates attribute
+        /// Trusted Root Certificates Attribute
         /// </summary>
-        public async Task<byte[][]> GetTrustedRootCertificates(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 4))!);
-            byte[][] list = new byte[reader.Count][];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetBytes(i, false)!;
-            return list;
-        }
+        public required ReadAttribute<byte[][]> TrustedRootCertificates { get; init; }
 
         /// <summary>
-        /// Get the Current Fabric Index attribute
+        /// Current Fabric Index Attribute
         /// </summary>
-        public async Task<byte> GetCurrentFabricIndex(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadAttribute<byte> CurrentFabricIndex { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -32,9 +32,48 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster is used for managing the content control (including &quot;parental control&quot;) settings on a media device such as a TV, or Set-top Box.
         /// </summary>
-        public ContentControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ContentControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ContentControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ContentControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Enabled = new ReadAttribute<bool>(cluster, endPoint, 0) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            OnDemandRatings = new ReadAttribute<RatingName[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    RatingName[] list = new RatingName[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new RatingName(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            OnDemandRatingThreshold = new ReadAttribute<string>(cluster, endPoint, 2) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ScheduledContentRatings = new ReadAttribute<RatingName[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    RatingName[] list = new RatingName[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new RatingName(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ScheduledContentRatingThreshold = new ReadAttribute<string>(cluster, endPoint, 4) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ScreenDailyTime = new ReadAttribute<TimeSpan>(cluster, endPoint, 5) {
+                Deserialize = x => (TimeSpan)(dynamic?)x!
+            };
+            RemainingScreenTime = new ReadAttribute<TimeSpan>(cluster, endPoint, 6) {
+                Deserialize = x => (TimeSpan)(dynamic?)x!
+            };
+            BlockUnrated = new ReadAttribute<bool>(cluster, endPoint, 7) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -283,68 +322,44 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Enabled attribute
+        /// Enabled Attribute
         /// </summary>
-        public async Task<bool> GetEnabled(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<bool> Enabled { get; init; }
 
         /// <summary>
-        /// Get the On Demand Ratings attribute
+        /// On Demand Ratings Attribute
         /// </summary>
-        public async Task<RatingName[]> GetOnDemandRatings(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            RatingName[] list = new RatingName[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new RatingName(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<RatingName[]> OnDemandRatings { get; init; }
 
         /// <summary>
-        /// Get the On Demand Rating Threshold attribute
+        /// On Demand Rating Threshold Attribute
         /// </summary>
-        public async Task<string> GetOnDemandRatingThreshold(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<string> OnDemandRatingThreshold { get; init; }
 
         /// <summary>
-        /// Get the Scheduled Content Ratings attribute
+        /// Scheduled Content Ratings Attribute
         /// </summary>
-        public async Task<RatingName[]> GetScheduledContentRatings(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            RatingName[] list = new RatingName[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new RatingName(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<RatingName[]> ScheduledContentRatings { get; init; }
 
         /// <summary>
-        /// Get the Scheduled Content Rating Threshold attribute
+        /// Scheduled Content Rating Threshold Attribute
         /// </summary>
-        public async Task<string> GetScheduledContentRatingThreshold(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadAttribute<string> ScheduledContentRatingThreshold { get; init; }
 
         /// <summary>
-        /// Get the Screen Daily Time attribute
+        /// Screen Daily Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetScreenDailyTime(SecureSession session) {
-            return (TimeSpan)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadAttribute<TimeSpan> ScreenDailyTime { get; init; }
 
         /// <summary>
-        /// Get the Remaining Screen Time attribute
+        /// Remaining Screen Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetRemainingScreenTime(SecureSession session) {
-            return (TimeSpan)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<TimeSpan> RemainingScreenTime { get; init; }
 
         /// <summary>
-        /// Get the Block Unrated attribute
+        /// Block Unrated Attribute
         /// </summary>
-        public async Task<bool> GetBlockUnrated(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 7))!;
-        }
+        public required ReadAttribute<bool> BlockUnrated { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

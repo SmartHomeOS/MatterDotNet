@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.HVAC
 {
@@ -28,15 +29,27 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
         /// </summary>
-        public ThermostatUserInterfaceConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ThermostatUserInterfaceConfiguration(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThermostatUserInterfaceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ThermostatUserInterfaceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            TemperatureDisplayMode = new ReadWriteAttribute<TemperatureDisplayModeEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (TemperatureDisplayModeEnum)DeserializeEnum(x)!
+            };
+            KeypadLockout = new ReadWriteAttribute<KeypadLockoutEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (KeypadLockoutEnum)DeserializeEnum(x)!
+            };
+            ScheduleProgrammingVisibility = new ReadWriteAttribute<ScheduleProgrammingVisibilityEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (ScheduleProgrammingVisibilityEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
         /// Keypad Lockout
         /// </summary>
-        public enum KeypadLockout : byte {
+        public enum KeypadLockoutEnum : byte {
             /// <summary>
             /// All functionality available to the user
             /// </summary>
@@ -66,7 +79,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Schedule Programming Visibility
         /// </summary>
-        public enum ScheduleProgrammingVisibility : byte {
+        public enum ScheduleProgrammingVisibilityEnum : byte {
             /// <summary>
             /// Local schedule programming functionality is enabled at the thermostat
             /// </summary>
@@ -80,7 +93,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Temperature Display Mode
         /// </summary>
-        public enum TemperatureDisplayMode : byte {
+        public enum TemperatureDisplayModeEnum : byte {
             /// <summary>
             /// Temperature displayed in °C
             /// </summary>
@@ -94,46 +107,19 @@ namespace MatterDotNet.Clusters.HVAC
 
         #region Attributes
         /// <summary>
-        /// Get the Temperature Display Mode attribute
+        /// Temperature Display Mode Attribute
         /// </summary>
-        public async Task<TemperatureDisplayMode> GetTemperatureDisplayMode(SecureSession session) {
-            return (TemperatureDisplayMode)await GetEnumAttribute(session, 0);
-        }
+        public required ReadWriteAttribute<TemperatureDisplayModeEnum> TemperatureDisplayMode { get; init; }
 
         /// <summary>
-        /// Set the Temperature Display Mode attribute
+        /// Keypad Lockout Attribute
         /// </summary>
-        public async Task SetTemperatureDisplayMode (SecureSession session, TemperatureDisplayMode value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<KeypadLockoutEnum> KeypadLockout { get; init; }
 
         /// <summary>
-        /// Get the Keypad Lockout attribute
+        /// Schedule Programming Visibility Attribute
         /// </summary>
-        public async Task<KeypadLockout> GetKeypadLockout(SecureSession session) {
-            return (KeypadLockout)await GetEnumAttribute(session, 1);
-        }
-
-        /// <summary>
-        /// Set the Keypad Lockout attribute
-        /// </summary>
-        public async Task SetKeypadLockout (SecureSession session, KeypadLockout value) {
-            await SetAttribute(session, 1, value);
-        }
-
-        /// <summary>
-        /// Get the Schedule Programming Visibility attribute
-        /// </summary>
-        public async Task<ScheduleProgrammingVisibility> GetScheduleProgrammingVisibility(SecureSession session) {
-            return (ScheduleProgrammingVisibility)await GetEnumAttribute(session, 2);
-        }
-
-        /// <summary>
-        /// Set the Schedule Programming Visibility attribute
-        /// </summary>
-        public async Task SetScheduleProgrammingVisibility (SecureSession session, ScheduleProgrammingVisibility value) {
-            await SetAttribute(session, 2, value);
-        }
+        public required ReadWriteAttribute<ScheduleProgrammingVisibilityEnum> ScheduleProgrammingVisibility { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

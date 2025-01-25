@@ -33,9 +33,60 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.
         /// </summary>
-        public MediaPlayback(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public MediaPlayback(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MediaPlayback(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected MediaPlayback(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CurrentState = new ReadAttribute<PlaybackState>(cluster, endPoint, 0) {
+                Deserialize = x => (PlaybackState)DeserializeEnum(x)!
+            };
+            StartTime = new ReadAttribute<DateTime?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (DateTime?)(dynamic?)x ?? TimeUtil.EPOCH
+
+            };
+            Duration = new ReadAttribute<ulong?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0
+
+            };
+            SampledPosition = new ReadAttribute<PlaybackPosition?>(cluster, endPoint, 3, true) {
+                Deserialize = x => new PlaybackPosition((object[])x!)
+            };
+            PlaybackSpeed = new ReadAttribute<float>(cluster, endPoint, 4) {
+                Deserialize = x => (float?)(dynamic?)x ?? 0
+
+            };
+            SeekRangeEnd = new ReadAttribute<ulong?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+            SeekRangeStart = new ReadAttribute<ulong?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+            ActiveAudioTrack = new ReadAttribute<Track?>(cluster, endPoint, 7, true) {
+                Deserialize = x => new Track((object[])x!)
+            };
+            AvailableAudioTracks = new ReadAttribute<Track[]?>(cluster, endPoint, 8, true) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Track[] list = new Track[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Track(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ActiveTextTrack = new ReadAttribute<Track?>(cluster, endPoint, 9, true) {
+                Deserialize = x => new Track((object[])x!)
+            };
+            AvailableTextTracks = new ReadAttribute<Track[]?>(cluster, endPoint, 10, true) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Track[] list = new Track[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Track(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -577,89 +628,59 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Current State attribute
+        /// Current State Attribute
         /// </summary>
-        public async Task<PlaybackState> GetCurrentState(SecureSession session) {
-            return (PlaybackState)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<PlaybackState> CurrentState { get; init; }
 
         /// <summary>
-        /// Get the Start Time attribute
+        /// Start Time Attribute
         /// </summary>
-        public async Task<DateTime?> GetStartTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 1, true) ?? TimeUtil.EPOCH;
-        }
+        public required ReadAttribute<DateTime?> StartTime { get; init; }
 
         /// <summary>
-        /// Get the Duration attribute
+        /// Duration Attribute
         /// </summary>
-        public async Task<ulong?> GetDuration(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2, true) ?? 0;
-        }
+        public required ReadAttribute<ulong?> Duration { get; init; }
 
         /// <summary>
-        /// Get the Sampled Position attribute
+        /// Sampled Position Attribute
         /// </summary>
-        public async Task<PlaybackPosition?> GetSampledPosition(SecureSession session) {
-            return new PlaybackPosition((object[])(await GetAttribute(session, 3))!);
-        }
+        public required ReadAttribute<PlaybackPosition?> SampledPosition { get; init; }
 
         /// <summary>
-        /// Get the Playback Speed attribute
+        /// Playback Speed Attribute
         /// </summary>
-        public async Task<float> GetPlaybackSpeed(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 4) ?? 0;
-        }
+        public required ReadAttribute<float> PlaybackSpeed { get; init; }
 
         /// <summary>
-        /// Get the Seek Range End attribute
+        /// Seek Range End Attribute
         /// </summary>
-        public async Task<ulong?> GetSeekRangeEnd(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<ulong?> SeekRangeEnd { get; init; }
 
         /// <summary>
-        /// Get the Seek Range Start attribute
+        /// Seek Range Start Attribute
         /// </summary>
-        public async Task<ulong?> GetSeekRangeStart(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<ulong?> SeekRangeStart { get; init; }
 
         /// <summary>
-        /// Get the Active Audio Track attribute
+        /// Active Audio Track Attribute
         /// </summary>
-        public async Task<Track?> GetActiveAudioTrack(SecureSession session) {
-            return new Track((object[])(await GetAttribute(session, 7))!);
-        }
+        public required ReadAttribute<Track?> ActiveAudioTrack { get; init; }
 
         /// <summary>
-        /// Get the Available Audio Tracks attribute
+        /// Available Audio Tracks Attribute
         /// </summary>
-        public async Task<Track[]?> GetAvailableAudioTracks(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
-            Track[] list = new Track[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Track(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Track[]?> AvailableAudioTracks { get; init; }
 
         /// <summary>
-        /// Get the Active Text Track attribute
+        /// Active Text Track Attribute
         /// </summary>
-        public async Task<Track?> GetActiveTextTrack(SecureSession session) {
-            return new Track((object[])(await GetAttribute(session, 9))!);
-        }
+        public required ReadAttribute<Track?> ActiveTextTrack { get; init; }
 
         /// <summary>
-        /// Get the Available Text Tracks attribute
+        /// Available Text Tracks Attribute
         /// </summary>
-        public async Task<Track[]?> GetAvailableTextTracks(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
-            Track[] list = new Track[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Track(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Track[]?> AvailableTextTracks { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

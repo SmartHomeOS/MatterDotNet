@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Media
 {
@@ -31,9 +32,12 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.
         /// </summary>
-        public KeypadInput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public KeypadInput(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected KeypadInput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected KeypadInput(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+        }
 
         #region Enums
         /// <summary>

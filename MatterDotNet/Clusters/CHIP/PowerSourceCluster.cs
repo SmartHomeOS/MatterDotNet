@@ -30,9 +30,132 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.
         /// </summary>
-        public PowerSource(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PowerSource(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerSource(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PowerSource(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Status = new ReadAttribute<PowerSourceStatus>(cluster, endPoint, 0) {
+                Deserialize = x => (PowerSourceStatus)DeserializeEnum(x)!
+            };
+            Order = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            Description = new ReadAttribute<string>(cluster, endPoint, 2) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            WiredAssessedInputVoltage = new ReadAttribute<uint?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            WiredAssessedInputFrequency = new ReadAttribute<ushort?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            WiredCurrentType = new ReadAttribute<WiredCurrentTypeEnum>(cluster, endPoint, 5) {
+                Deserialize = x => (WiredCurrentTypeEnum)DeserializeEnum(x)!
+            };
+            WiredAssessedCurrent = new ReadAttribute<uint?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            WiredNominalVoltage = new ReadAttribute<uint>(cluster, endPoint, 7) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            WiredMaximumCurrent = new ReadAttribute<uint>(cluster, endPoint, 8) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            WiredPresent = new ReadAttribute<bool>(cluster, endPoint, 9) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            ActiveWiredFaults = new ReadAttribute<WiredFault[]>(cluster, endPoint, 10) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    WiredFault[] list = new WiredFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (WiredFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            BatVoltage = new ReadAttribute<uint?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            BatPercentRemaining = new ReadAttribute<byte?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            BatTimeRemaining = new ReadAttribute<uint?>(cluster, endPoint, 13, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            BatChargeLevel = new ReadAttribute<BatChargeLevelEnum>(cluster, endPoint, 14) {
+                Deserialize = x => (BatChargeLevelEnum)DeserializeEnum(x)!
+            };
+            BatReplacementNeeded = new ReadAttribute<bool>(cluster, endPoint, 15) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            BatReplaceability = new ReadAttribute<BatReplaceabilityEnum>(cluster, endPoint, 16) {
+                Deserialize = x => (BatReplaceabilityEnum)DeserializeEnum(x)!
+            };
+            BatPresent = new ReadAttribute<bool>(cluster, endPoint, 17) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            ActiveBatFaults = new ReadAttribute<BatFault[]>(cluster, endPoint, 18) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    BatFault[] list = new BatFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (BatFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            BatReplacementDescription = new ReadAttribute<string>(cluster, endPoint, 19) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            BatCommonDesignation = new ReadAttribute<BatCommonDesignationEnum>(cluster, endPoint, 20) {
+                Deserialize = x => (BatCommonDesignationEnum)DeserializeEnum(x)!
+            };
+            BatANSIDesignation = new ReadAttribute<string>(cluster, endPoint, 21) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            BatIECDesignation = new ReadAttribute<string>(cluster, endPoint, 22) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            BatApprovedChemistry = new ReadAttribute<BatApprovedChemistryEnum>(cluster, endPoint, 23) {
+                Deserialize = x => (BatApprovedChemistryEnum)DeserializeEnum(x)!
+            };
+            BatCapacity = new ReadAttribute<uint>(cluster, endPoint, 24) {
+                Deserialize = x => (uint)(dynamic?)x!
+            };
+            BatQuantity = new ReadAttribute<byte>(cluster, endPoint, 25) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            BatChargeState = new ReadAttribute<BatChargeStateEnum>(cluster, endPoint, 26) {
+                Deserialize = x => (BatChargeStateEnum)DeserializeEnum(x)!
+            };
+            BatTimeToFullCharge = new ReadAttribute<uint?>(cluster, endPoint, 27, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            BatFunctionalWhileCharging = new ReadAttribute<bool>(cluster, endPoint, 28) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            BatChargingCurrent = new ReadAttribute<uint?>(cluster, endPoint, 29, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            ActiveBatChargeFaults = new ReadAttribute<BatChargeFault[]>(cluster, endPoint, 30) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    BatChargeFault[] list = new BatChargeFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (BatChargeFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            EndpointList = new ReadAttribute<ushort[]>(cluster, endPoint, 31) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -169,7 +292,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Wired Current Type
         /// </summary>
-        public enum WiredCurrentType : byte {
+        public enum WiredCurrentTypeEnum : byte {
             /// <summary>
             /// Indicates AC current
             /// </summary>
@@ -183,7 +306,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Bat Charge Level
         /// </summary>
-        public enum BatChargeLevel : byte {
+        public enum BatChargeLevelEnum : byte {
             /// <summary>
             /// Charge level is nominal
             /// </summary>
@@ -201,7 +324,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Bat Replaceability
         /// </summary>
-        public enum BatReplaceability : byte {
+        public enum BatReplaceabilityEnum : byte {
             /// <summary>
             /// The replaceability is unspecified or unknown.
             /// </summary>
@@ -223,7 +346,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Bat Charge State
         /// </summary>
-        public enum BatChargeState : byte {
+        public enum BatChargeStateEnum : byte {
             /// <summary>
             /// Unable to determine the charging state
             /// </summary>
@@ -245,7 +368,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Bat Common Designation
         /// </summary>
-        public enum BatCommonDesignation : ushort {
+        public enum BatCommonDesignationEnum : ushort {
             /// <summary>
             /// Common type is unknown or unspecified
             /// </summary>
@@ -575,7 +698,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Bat Approved Chemistry
         /// </summary>
-        public enum BatApprovedChemistry : ushort {
+        public enum BatApprovedChemistryEnum : ushort {
             /// <summary>
             /// Cell chemistry is unspecified or unknown
             /// </summary>
@@ -892,244 +1015,164 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Get the Status attribute
+        /// Status Attribute
         /// </summary>
-        public async Task<PowerSourceStatus> GetStatus(SecureSession session) {
-            return (PowerSourceStatus)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<PowerSourceStatus> Status { get; init; }
 
         /// <summary>
-        /// Get the Order attribute
+        /// Order Attribute
         /// </summary>
-        public async Task<byte> GetOrder(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte> Order { get; init; }
 
         /// <summary>
-        /// Get the Description attribute
+        /// Description Attribute
         /// </summary>
-        public async Task<string> GetDescription(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<string> Description { get; init; }
 
         /// <summary>
-        /// Get the Wired Assessed Input Voltage attribute
+        /// Wired Assessed Input Voltage Attribute
         /// </summary>
-        public async Task<uint?> GetWiredAssessedInputVoltage(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<uint?> WiredAssessedInputVoltage { get; init; }
 
         /// <summary>
-        /// Get the Wired Assessed Input Frequency attribute
+        /// Wired Assessed Input Frequency Attribute
         /// </summary>
-        public async Task<ushort?> GetWiredAssessedInputFrequency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<ushort?> WiredAssessedInputFrequency { get; init; }
 
         /// <summary>
-        /// Get the Wired Current Type attribute
+        /// Wired Current Type Attribute
         /// </summary>
-        public async Task<WiredCurrentType> GetWiredCurrentType(SecureSession session) {
-            return (WiredCurrentType)await GetEnumAttribute(session, 5);
-        }
+        public required ReadAttribute<WiredCurrentTypeEnum> WiredCurrentType { get; init; }
 
         /// <summary>
-        /// Get the Wired Assessed Current attribute
+        /// Wired Assessed Current Attribute
         /// </summary>
-        public async Task<uint?> GetWiredAssessedCurrent(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<uint?> WiredAssessedCurrent { get; init; }
 
         /// <summary>
-        /// Get the Wired Nominal Voltage attribute
+        /// Wired Nominal Voltage Attribute
         /// </summary>
-        public async Task<uint> GetWiredNominalVoltage(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 7))!;
-        }
+        public required ReadAttribute<uint> WiredNominalVoltage { get; init; }
 
         /// <summary>
-        /// Get the Wired Maximum Current attribute
+        /// Wired Maximum Current Attribute
         /// </summary>
-        public async Task<uint> GetWiredMaximumCurrent(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<uint> WiredMaximumCurrent { get; init; }
 
         /// <summary>
-        /// Get the Wired Present attribute
+        /// Wired Present Attribute
         /// </summary>
-        public async Task<bool> GetWiredPresent(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 9))!;
-        }
+        public required ReadAttribute<bool> WiredPresent { get; init; }
 
         /// <summary>
-        /// Get the Active Wired Faults attribute
+        /// Active Wired Faults Attribute
         /// </summary>
-        public async Task<WiredFault[]> GetActiveWiredFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 10))!);
-            WiredFault[] list = new WiredFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (WiredFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<WiredFault[]> ActiveWiredFaults { get; init; }
 
         /// <summary>
-        /// Get the Bat Voltage attribute
+        /// Bat Voltage Attribute
         /// </summary>
-        public async Task<uint?> GetBatVoltage(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 11, true);
-        }
+        public required ReadAttribute<uint?> BatVoltage { get; init; }
 
         /// <summary>
-        /// Get the Bat Percent Remaining attribute
+        /// Bat Percent Remaining Attribute
         /// </summary>
-        public async Task<byte?> GetBatPercentRemaining(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 12, true);
-        }
+        public required ReadAttribute<byte?> BatPercentRemaining { get; init; }
 
         /// <summary>
-        /// Get the Bat Time Remaining attribute
+        /// Bat Time Remaining Attribute
         /// </summary>
-        public async Task<uint?> GetBatTimeRemaining(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 13, true);
-        }
+        public required ReadAttribute<uint?> BatTimeRemaining { get; init; }
 
         /// <summary>
-        /// Get the Bat Charge Level attribute
+        /// Bat Charge Level Attribute
         /// </summary>
-        public async Task<BatChargeLevel> GetBatChargeLevel(SecureSession session) {
-            return (BatChargeLevel)await GetEnumAttribute(session, 14);
-        }
+        public required ReadAttribute<BatChargeLevelEnum> BatChargeLevel { get; init; }
 
         /// <summary>
-        /// Get the Bat Replacement Needed attribute
+        /// Bat Replacement Needed Attribute
         /// </summary>
-        public async Task<bool> GetBatReplacementNeeded(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 15))!;
-        }
+        public required ReadAttribute<bool> BatReplacementNeeded { get; init; }
 
         /// <summary>
-        /// Get the Bat Replaceability attribute
+        /// Bat Replaceability Attribute
         /// </summary>
-        public async Task<BatReplaceability> GetBatReplaceability(SecureSession session) {
-            return (BatReplaceability)await GetEnumAttribute(session, 16);
-        }
+        public required ReadAttribute<BatReplaceabilityEnum> BatReplaceability { get; init; }
 
         /// <summary>
-        /// Get the Bat Present attribute
+        /// Bat Present Attribute
         /// </summary>
-        public async Task<bool> GetBatPresent(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 17))!;
-        }
+        public required ReadAttribute<bool> BatPresent { get; init; }
 
         /// <summary>
-        /// Get the Active Bat Faults attribute
+        /// Active Bat Faults Attribute
         /// </summary>
-        public async Task<BatFault[]> GetActiveBatFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 18))!);
-            BatFault[] list = new BatFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (BatFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<BatFault[]> ActiveBatFaults { get; init; }
 
         /// <summary>
-        /// Get the Bat Replacement Description attribute
+        /// Bat Replacement Description Attribute
         /// </summary>
-        public async Task<string> GetBatReplacementDescription(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 19))!;
-        }
+        public required ReadAttribute<string> BatReplacementDescription { get; init; }
 
         /// <summary>
-        /// Get the Bat Common Designation attribute
+        /// Bat Common Designation Attribute
         /// </summary>
-        public async Task<BatCommonDesignation> GetBatCommonDesignation(SecureSession session) {
-            return (BatCommonDesignation)await GetEnumAttribute(session, 20);
-        }
+        public required ReadAttribute<BatCommonDesignationEnum> BatCommonDesignation { get; init; }
 
         /// <summary>
-        /// Get the Bat ANSI Designation attribute
+        /// Bat ANSI Designation Attribute
         /// </summary>
-        public async Task<string> GetBatANSIDesignation(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 21))!;
-        }
+        public required ReadAttribute<string> BatANSIDesignation { get; init; }
 
         /// <summary>
-        /// Get the Bat IEC Designation attribute
+        /// Bat IEC Designation Attribute
         /// </summary>
-        public async Task<string> GetBatIECDesignation(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 22))!;
-        }
+        public required ReadAttribute<string> BatIECDesignation { get; init; }
 
         /// <summary>
-        /// Get the Bat Approved Chemistry attribute
+        /// Bat Approved Chemistry Attribute
         /// </summary>
-        public async Task<BatApprovedChemistry> GetBatApprovedChemistry(SecureSession session) {
-            return (BatApprovedChemistry)await GetEnumAttribute(session, 23);
-        }
+        public required ReadAttribute<BatApprovedChemistryEnum> BatApprovedChemistry { get; init; }
 
         /// <summary>
-        /// Get the Bat Capacity attribute
+        /// Bat Capacity Attribute
         /// </summary>
-        public async Task<uint> GetBatCapacity(SecureSession session) {
-            return (uint)(dynamic?)(await GetAttribute(session, 24))!;
-        }
+        public required ReadAttribute<uint> BatCapacity { get; init; }
 
         /// <summary>
-        /// Get the Bat Quantity attribute
+        /// Bat Quantity Attribute
         /// </summary>
-        public async Task<byte> GetBatQuantity(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 25))!;
-        }
+        public required ReadAttribute<byte> BatQuantity { get; init; }
 
         /// <summary>
-        /// Get the Bat Charge State attribute
+        /// Bat Charge State Attribute
         /// </summary>
-        public async Task<BatChargeState> GetBatChargeState(SecureSession session) {
-            return (BatChargeState)await GetEnumAttribute(session, 26);
-        }
+        public required ReadAttribute<BatChargeStateEnum> BatChargeState { get; init; }
 
         /// <summary>
-        /// Get the Bat Time To Full Charge attribute
+        /// Bat Time To Full Charge Attribute
         /// </summary>
-        public async Task<uint?> GetBatTimeToFullCharge(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 27, true);
-        }
+        public required ReadAttribute<uint?> BatTimeToFullCharge { get; init; }
 
         /// <summary>
-        /// Get the Bat Functional While Charging attribute
+        /// Bat Functional While Charging Attribute
         /// </summary>
-        public async Task<bool> GetBatFunctionalWhileCharging(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 28))!;
-        }
+        public required ReadAttribute<bool> BatFunctionalWhileCharging { get; init; }
 
         /// <summary>
-        /// Get the Bat Charging Current attribute
+        /// Bat Charging Current Attribute
         /// </summary>
-        public async Task<uint?> GetBatChargingCurrent(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 29, true);
-        }
+        public required ReadAttribute<uint?> BatChargingCurrent { get; init; }
 
         /// <summary>
-        /// Get the Active Bat Charge Faults attribute
+        /// Active Bat Charge Faults Attribute
         /// </summary>
-        public async Task<BatChargeFault[]> GetActiveBatChargeFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 30))!);
-            BatChargeFault[] list = new BatChargeFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (BatChargeFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<BatChargeFault[]> ActiveBatChargeFaults { get; init; }
 
         /// <summary>
-        /// Get the Endpoint List attribute
+        /// Endpoint List Attribute
         /// </summary>
-        public async Task<ushort[]> GetEndpointList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 31))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> EndpointList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

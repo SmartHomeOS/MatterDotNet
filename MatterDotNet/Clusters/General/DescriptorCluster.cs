@@ -30,9 +30,57 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters.
         /// </summary>
-        public Descriptor(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Descriptor(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Descriptor(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Descriptor(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            DeviceTypeList = new ReadAttribute<DeviceType[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    DeviceType[] list = new DeviceType[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new DeviceType(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ServerList = new ReadAttribute<uint[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    uint[] list = new uint[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUInt(i)!.Value;
+                    return list;
+                }
+            };
+            ClientList = new ReadAttribute<uint[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    uint[] list = new uint[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUInt(i)!.Value;
+                    return list;
+                }
+            };
+            PartsList = new ReadAttribute<ushort[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            TagList = new ReadAttribute<SemanticTag[]>(cluster, endPoint, 4) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    SemanticTag[] list = new SemanticTag[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new SemanticTag(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -135,59 +183,29 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Device Type List attribute
+        /// Device Type List Attribute
         /// </summary>
-        public async Task<DeviceType[]> GetDeviceTypeList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            DeviceType[] list = new DeviceType[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new DeviceType(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<DeviceType[]> DeviceTypeList { get; init; }
 
         /// <summary>
-        /// Get the Server List attribute
+        /// Server List Attribute
         /// </summary>
-        public async Task<uint[]> GetServerList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            uint[] list = new uint[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUInt(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<uint[]> ServerList { get; init; }
 
         /// <summary>
-        /// Get the Client List attribute
+        /// Client List Attribute
         /// </summary>
-        public async Task<uint[]> GetClientList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            uint[] list = new uint[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUInt(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<uint[]> ClientList { get; init; }
 
         /// <summary>
-        /// Get the Parts List attribute
+        /// Parts List Attribute
         /// </summary>
-        public async Task<ushort[]> GetPartsList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> PartsList { get; init; }
 
         /// <summary>
-        /// Get the Tag List attribute
+        /// Tag List Attribute
         /// </summary>
-        public async Task<SemanticTag[]> GetTagList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 4))!);
-            SemanticTag[] list = new SemanticTag[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new SemanticTag(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<SemanticTag[]> TagList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

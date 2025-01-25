@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.NetworkInfrastructure
 {
@@ -31,9 +32,31 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Manage the Thread network of Thread Border Router
         /// </summary>
-        public ThreadBorderRouterManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ThreadBorderRouterManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ThreadBorderRouterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ThreadBorderRouterManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            BorderRouterName = new ReadAttribute<string>(cluster, endPoint, 0) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            BorderAgentID = new ReadAttribute<byte[]>(cluster, endPoint, 1) {
+                Deserialize = x => (byte[])(dynamic?)x!
+            };
+            ThreadVersion = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            InterfaceEnabled = new ReadAttribute<bool>(cluster, endPoint, 3) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            ActiveDatasetTimestamp = new ReadAttribute<ulong?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+            PendingDatasetTimestamp = new ReadAttribute<ulong?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -130,46 +153,34 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// Get the Border Router Name attribute
+        /// Border Router Name Attribute
         /// </summary>
-        public async Task<string> GetBorderRouterName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<string> BorderRouterName { get; init; }
 
         /// <summary>
-        /// Get the Border Agent ID attribute
+        /// Border Agent ID Attribute
         /// </summary>
-        public async Task<byte[]> GetBorderAgentID(SecureSession session) {
-            return (byte[])(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte[]> BorderAgentID { get; init; }
 
         /// <summary>
-        /// Get the Thread Version attribute
+        /// Thread Version Attribute
         /// </summary>
-        public async Task<ushort> GetThreadVersion(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<ushort> ThreadVersion { get; init; }
 
         /// <summary>
-        /// Get the Interface Enabled attribute
+        /// Interface Enabled Attribute
         /// </summary>
-        public async Task<bool> GetInterfaceEnabled(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 3) ?? false;
-        }
+        public required ReadAttribute<bool> InterfaceEnabled { get; init; }
 
         /// <summary>
-        /// Get the Active Dataset Timestamp attribute
+        /// Active Dataset Timestamp Attribute
         /// </summary>
-        public async Task<ulong?> GetActiveDatasetTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<ulong?> ActiveDatasetTimestamp { get; init; }
 
         /// <summary>
-        /// Get the Pending Dataset Timestamp attribute
+        /// Pending Dataset Timestamp Attribute
         /// </summary>
-        public async Task<ulong?> GetPendingDatasetTimestamp(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<ulong?> PendingDatasetTimestamp { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

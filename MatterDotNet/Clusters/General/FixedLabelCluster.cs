@@ -30,9 +30,21 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read onlylabels.
         /// </summary>
-        public FixedLabel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public FixedLabel(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected FixedLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected FixedLabel(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LabelList = new ReadAttribute<Label[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Label[] list = new Label[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Label(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Records
         /// <summary>
@@ -66,15 +78,9 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Label List attribute
+        /// Label List Attribute
         /// </summary>
-        public async Task<Label[]> GetLabelList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Label[] list = new Label[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Label(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Label[]> LabelList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

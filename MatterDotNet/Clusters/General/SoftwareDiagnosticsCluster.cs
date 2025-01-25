@@ -32,9 +32,33 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public SoftwareDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public SoftwareDiagnostics(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected SoftwareDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected SoftwareDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ThreadMetrics = new ReadAttribute<ThreadMetricsStruct[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ThreadMetricsStruct[] list = new ThreadMetricsStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ThreadMetricsStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentHeapFree = new ReadAttribute<ulong>(cluster, endPoint, 1) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            CurrentHeapUsed = new ReadAttribute<ulong>(cluster, endPoint, 2) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            CurrentHeapHighWatermark = new ReadAttribute<ulong>(cluster, endPoint, 3) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -53,17 +77,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Thread Metrics
         /// </summary>
-        public record ThreadMetrics : TLVPayload {
+        public record ThreadMetricsStruct : TLVPayload {
             /// <summary>
             /// Thread Metrics
             /// </summary>
-            public ThreadMetrics() { }
+            public ThreadMetricsStruct() { }
 
             /// <summary>
             /// Thread Metrics
             /// </summary>
             [SetsRequiredMembers]
-            public ThreadMetrics(object[] fields) {
+            public ThreadMetricsStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ID = reader.GetULong(0)!.Value;
                 Name = reader.GetString(1, true, 8);
@@ -128,36 +152,24 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Thread Metrics attribute
+        /// Thread Metrics Attribute
         /// </summary>
-        public async Task<ThreadMetrics[]> GetThreadMetrics(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ThreadMetrics[] list = new ThreadMetrics[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ThreadMetrics(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ThreadMetricsStruct[]> ThreadMetrics { get; init; }
 
         /// <summary>
-        /// Get the Current Heap Free attribute
+        /// Current Heap Free Attribute
         /// </summary>
-        public async Task<ulong> GetCurrentHeapFree(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> CurrentHeapFree { get; init; }
 
         /// <summary>
-        /// Get the Current Heap Used attribute
+        /// Current Heap Used Attribute
         /// </summary>
-        public async Task<ulong> GetCurrentHeapUsed(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> CurrentHeapUsed { get; init; }
 
         /// <summary>
-        /// Get the Current Heap High Watermark attribute
+        /// Current Heap High Watermark Attribute
         /// </summary>
-        public async Task<ulong> GetCurrentHeapHighWatermark(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 3) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> CurrentHeapHighWatermark { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

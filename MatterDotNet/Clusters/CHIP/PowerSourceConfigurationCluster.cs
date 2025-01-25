@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.CHIP
 {
@@ -28,21 +29,27 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// This cluster is used to describe the configuration and capabilities of a Device's power system.
         /// </summary>
-        public PowerSourceConfiguration(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PowerSourceConfiguration(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PowerSourceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PowerSourceConfiguration(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Sources = new ReadAttribute<ushort[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the Sources attribute
+        /// Sources Attribute
         /// </summary>
-        public async Task<ushort[]> GetSources(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> Sources { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

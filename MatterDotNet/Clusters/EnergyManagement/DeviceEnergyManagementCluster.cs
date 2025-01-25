@@ -33,9 +33,39 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA).
         /// </summary>
-        public DeviceEnergyManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public DeviceEnergyManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DeviceEnergyManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected DeviceEnergyManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ESAType = new ReadAttribute<ESATypeEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (ESATypeEnum)DeserializeEnum(x)!
+            };
+            ESACanGenerate = new ReadAttribute<bool>(cluster, endPoint, 1) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            ESAState = new ReadAttribute<ESAStateEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (ESAStateEnum)DeserializeEnum(x)!
+            };
+            AbsMinPower = new ReadAttribute<long>(cluster, endPoint, 3) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            AbsMaxPower = new ReadAttribute<long>(cluster, endPoint, 4) {
+                Deserialize = x => (long?)(dynamic?)x ?? 0
+
+            };
+            PowerAdjustmentCapability = new ReadAttribute<PowerAdjustCapability?>(cluster, endPoint, 5, true) {
+                Deserialize = x => new PowerAdjustCapability((object[])x!)
+            };
+            Forecast = new ReadAttribute<ForecastStruct?>(cluster, endPoint, 6, true) {
+                Deserialize = x => new ForecastStruct((object[])x!)
+            };
+            OptOutState = new ReadAttribute<OptOutStateEnum>(cluster, endPoint, 7) {
+                Deserialize = x => (OptOutStateEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -98,7 +128,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// ESA Type
         /// </summary>
-        public enum ESAType : byte {
+        public enum ESATypeEnum : byte {
             /// <summary>
             /// EV Supply Equipment
             /// </summary>
@@ -164,7 +194,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// ESA State
         /// </summary>
-        public enum ESAState : byte {
+        public enum ESAStateEnum : byte {
             /// <summary>
             /// The ESA is not available to the EMS (e.g. start-up, maintenance mode)
             /// </summary>
@@ -248,7 +278,7 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Opt Out State
         /// </summary>
-        public enum OptOutState : byte {
+        public enum OptOutStateEnum : byte {
             /// <summary>
             /// The user has not opted out of either local or grid optimizations
             /// </summary>
@@ -402,17 +432,17 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Forecast
         /// </summary>
-        public record Forecast : TLVPayload {
+        public record ForecastStruct : TLVPayload {
             /// <summary>
             /// Forecast
             /// </summary>
-            public Forecast() { }
+            public ForecastStruct() { }
 
             /// <summary>
             /// Forecast
             /// </summary>
             [SetsRequiredMembers]
-            public Forecast(object[] fields) {
+            public ForecastStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ForecastID = reader.GetUInt(0)!.Value;
                 ActiveSlotNumber = reader.GetUShort(1, true);
@@ -822,60 +852,44 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Get the ESA Type attribute
+        /// ESA Type Attribute
         /// </summary>
-        public async Task<ESAType> GetESAType(SecureSession session) {
-            return (ESAType)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<ESATypeEnum> ESAType { get; init; }
 
         /// <summary>
-        /// Get the ESA Can Generate attribute
+        /// ESA Can Generate Attribute
         /// </summary>
-        public async Task<bool> GetESACanGenerate(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 1) ?? false;
-        }
+        public required ReadAttribute<bool> ESACanGenerate { get; init; }
 
         /// <summary>
-        /// Get the ESA State attribute
+        /// ESA State Attribute
         /// </summary>
-        public async Task<ESAState> GetESAState(SecureSession session) {
-            return (ESAState)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<ESAStateEnum> ESAState { get; init; }
 
         /// <summary>
-        /// Get the Abs Min Power [mW] attribute
+        /// Abs Min Power [mW] Attribute
         /// </summary>
-        public async Task<long> GetAbsMinPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 3) ?? 0;
-        }
+        public required ReadAttribute<long> AbsMinPower { get; init; }
 
         /// <summary>
-        /// Get the Abs Max Power [mW] attribute
+        /// Abs Max Power [mW] Attribute
         /// </summary>
-        public async Task<long> GetAbsMaxPower(SecureSession session) {
-            return (long?)(dynamic?)await GetAttribute(session, 4) ?? 0;
-        }
+        public required ReadAttribute<long> AbsMaxPower { get; init; }
 
         /// <summary>
-        /// Get the Power Adjustment Capability attribute
+        /// Power Adjustment Capability Attribute
         /// </summary>
-        public async Task<PowerAdjustCapability?> GetPowerAdjustmentCapability(SecureSession session) {
-            return new PowerAdjustCapability((object[])(await GetAttribute(session, 5))!);
-        }
+        public required ReadAttribute<PowerAdjustCapability?> PowerAdjustmentCapability { get; init; }
 
         /// <summary>
-        /// Get the Forecast attribute
+        /// Forecast Attribute
         /// </summary>
-        public async Task<Forecast?> GetForecast(SecureSession session) {
-            return new Forecast((object[])(await GetAttribute(session, 6))!);
-        }
+        public required ReadAttribute<ForecastStruct?> Forecast { get; init; }
 
         /// <summary>
-        /// Get the Opt Out State attribute
+        /// Opt Out State Attribute
         /// </summary>
-        public async Task<OptOutState> GetOptOutState(SecureSession session) {
-            return (OptOutState)await GetEnumAttribute(session, 7);
-        }
+        public required ReadAttribute<OptOutStateEnum> OptOutState { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

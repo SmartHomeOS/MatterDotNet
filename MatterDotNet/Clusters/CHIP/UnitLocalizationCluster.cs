@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.CHIP
 {
@@ -28,9 +29,15 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for the units in which values are conveyed in communication to a user. As such, Nodes that visually or audibly convey measurable values to the user need a mechanism by which they can be configured to use a user’s preferred unit.
         /// </summary>
-        public UnitLocalization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public UnitLocalization(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected UnitLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected UnitLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            TemperatureUnit = new ReadWriteAttribute<TempUnit>(cluster, endPoint, 0) {
+                Deserialize = x => (TempUnit)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -86,18 +93,9 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Get the Temperature Unit attribute
+        /// Temperature Unit Attribute
         /// </summary>
-        public async Task<TempUnit> GetTemperatureUnit(SecureSession session) {
-            return (TempUnit)await GetEnumAttribute(session, 0);
-        }
-
-        /// <summary>
-        /// Set the Temperature Unit attribute
-        /// </summary>
-        public async Task SetTemperatureUnit (SecureSession session, TempUnit value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<TempUnit> TemperatureUnit { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

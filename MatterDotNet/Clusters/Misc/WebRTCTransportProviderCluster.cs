@@ -32,9 +32,21 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC.
         /// </summary>
-        public WebRTCTransportProvider(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WebRTCTransportProvider(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WebRTCTransportProvider(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WebRTCTransportProvider(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CurrentSessions = new ReadAttribute<WebRTCSession[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    WebRTCSession[] list = new WebRTCSession[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new WebRTCSession(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -376,15 +388,9 @@ namespace MatterDotNet.Clusters.Misc
 
         #region Attributes
         /// <summary>
-        /// Get the Current Sessions attribute
+        /// Current Sessions Attribute
         /// </summary>
-        public async Task<WebRTCSession[]> GetCurrentSessions(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            WebRTCSession[] list = new WebRTCSession[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new WebRTCSession(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<WebRTCSession[]> CurrentSessions { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

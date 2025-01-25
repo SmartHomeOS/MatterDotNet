@@ -16,6 +16,7 @@ using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -30,9 +31,45 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public EthernetNetworkDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public EthernetNetworkDiagnostics(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EthernetNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected EthernetNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            PHYRate = new ReadAttribute<PHYRateEnum?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (PHYRateEnum?)DeserializeEnum(x)
+            };
+            FullDuplex = new ReadAttribute<bool?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (bool?)(dynamic?)x
+            };
+            PacketRxCount = new ReadAttribute<ulong>(cluster, endPoint, 2) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            PacketTxCount = new ReadAttribute<ulong>(cluster, endPoint, 3) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            TxErrCount = new ReadAttribute<ulong>(cluster, endPoint, 4) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            CollisionCount = new ReadAttribute<ulong>(cluster, endPoint, 5) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            OverrunCount = new ReadAttribute<ulong>(cluster, endPoint, 6) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            CarrierDetect = new ReadAttribute<bool?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (bool?)(dynamic?)x
+            };
+            TimeSinceReset = new ReadAttribute<ulong>(cluster, endPoint, 8) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -53,7 +90,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// PHY Rate
         /// </summary>
-        public enum PHYRate : byte {
+        public enum PHYRateEnum : byte {
             /// <summary>
             /// PHY rate is 10Mbps
             /// </summary>
@@ -133,67 +170,49 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the PHY Rate attribute
+        /// PHY Rate Attribute
         /// </summary>
-        public async Task<PHYRate?> GetPHYRate(SecureSession session) {
-            return (PHYRate?)await GetEnumAttribute(session, 0, true);
-        }
+        public required ReadAttribute<PHYRateEnum?> PHYRate { get; init; }
 
         /// <summary>
-        /// Get the Full Duplex attribute
+        /// Full Duplex Attribute
         /// </summary>
-        public async Task<bool?> GetFullDuplex(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<bool?> FullDuplex { get; init; }
 
         /// <summary>
-        /// Get the Packet Rx Count attribute
+        /// Packet Rx Count Attribute
         /// </summary>
-        public async Task<ulong> GetPacketRxCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> PacketRxCount { get; init; }
 
         /// <summary>
-        /// Get the Packet Tx Count attribute
+        /// Packet Tx Count Attribute
         /// </summary>
-        public async Task<ulong> GetPacketTxCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 3) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> PacketTxCount { get; init; }
 
         /// <summary>
-        /// Get the Tx Err Count attribute
+        /// Tx Err Count Attribute
         /// </summary>
-        public async Task<ulong> GetTxErrCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 4) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> TxErrCount { get; init; }
 
         /// <summary>
-        /// Get the Collision Count attribute
+        /// Collision Count Attribute
         /// </summary>
-        public async Task<ulong> GetCollisionCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 5) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> CollisionCount { get; init; }
 
         /// <summary>
-        /// Get the Overrun Count attribute
+        /// Overrun Count Attribute
         /// </summary>
-        public async Task<ulong> GetOverrunCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> OverrunCount { get; init; }
 
         /// <summary>
-        /// Get the Carrier Detect attribute
+        /// Carrier Detect Attribute
         /// </summary>
-        public async Task<bool?> GetCarrierDetect(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 7, true);
-        }
+        public required ReadAttribute<bool?> CarrierDetect { get; init; }
 
         /// <summary>
-        /// Get the Time Since Reset attribute
+        /// Time Since Reset Attribute
         /// </summary>
-        public async Task<ulong> GetTimeSinceReset(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 8) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> TimeSinceReset { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

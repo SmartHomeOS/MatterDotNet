@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.CHIP
 {
@@ -28,9 +29,23 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.
         /// </summary>
-        public Switch(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Switch(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Switch(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Switch(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            NumberOfPositions = new ReadAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 2
+
+            };
+            CurrentPosition = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            MultiPressMax = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 2
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -88,25 +103,19 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Get the Number Of Positions attribute
+        /// Number Of Positions Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfPositions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 0) ?? 2;
-        }
+        public required ReadAttribute<byte> NumberOfPositions { get; init; }
 
         /// <summary>
-        /// Get the Current Position attribute
+        /// Current Position Attribute
         /// </summary>
-        public async Task<byte> GetCurrentPosition(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte> CurrentPosition { get; init; }
 
         /// <summary>
-        /// Get the Multi Press Max attribute
+        /// Multi Press Max Attribute
         /// </summary>
-        public async Task<byte> GetMultiPressMax(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 2;
-        }
+        public required ReadAttribute<byte> MultiPressMax { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

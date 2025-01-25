@@ -32,9 +32,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Provides an interface for providing OTA software updates
         /// </summary>
-        public OTASoftwareUpdateProvider(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public OTASoftwareUpdateProvider(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OTASoftwareUpdateProvider(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected OTASoftwareUpdateProvider(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+        }
 
         #region Enums
         /// <summary>
@@ -99,7 +102,40 @@ namespace MatterDotNet.Clusters.CHIP
             VendorSpecific = 3,
         }
 
+        /// <summary>
+        /// Announcement Reason
+        /// </summary>
+        public enum AnnouncementReason : byte {
+            SimpleAnnouncement = 0,
+            UpdateAvailable = 1,
+            UrgentUpdateAvailable = 2,
+        }
 
+        /// <summary>
+        /// Update State
+        /// </summary>
+        public enum UpdateState : byte {
+            Unknown = 0,
+            Idle = 1,
+            Querying = 2,
+            DelayedOnQuery = 3,
+            Downloading = 4,
+            Applying = 5,
+            DelayedOnApply = 6,
+            RollingBack = 7,
+            DelayedOnUserConsent = 8,
+        }
+
+        /// <summary>
+        /// Change Reason
+        /// </summary>
+        public enum ChangeReason : byte {
+            Unknown = 0,
+            Success = 1,
+            Failure = 2,
+            TimeOut = 3,
+            DelayByProvider = 4,
+        }
         #endregion Enums
 
         #region Records

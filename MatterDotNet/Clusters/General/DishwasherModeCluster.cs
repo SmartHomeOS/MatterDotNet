@@ -18,6 +18,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -32,9 +33,30 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for selecting a mode from a list of supported options.
         /// </summary>
-        public DishwasherMode(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public DishwasherMode(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected DishwasherMode(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected DishwasherMode(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SupportedModes = new ReadAttribute<ModeOption[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ModeOption[] list = new ModeOption[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ModeOption(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentMode = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            StartUpMode = new ReadWriteAttribute<byte?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OnMode = new ReadWriteAttribute<byte?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -167,50 +189,24 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Supported Modes attribute
+        /// Supported Modes Attribute
         /// </summary>
-        public async Task<ModeOption[]> GetSupportedModes(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ModeOption[] list = new ModeOption[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ModeOption(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ModeOption[]> SupportedModes { get; init; }
 
         /// <summary>
-        /// Get the Current Mode attribute
+        /// Current Mode Attribute
         /// </summary>
-        public async Task<byte> GetCurrentMode(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte> CurrentMode { get; init; }
 
         /// <summary>
-        /// Get the Start Up Mode attribute
+        /// Start Up Mode Attribute
         /// </summary>
-        public async Task<byte?> GetStartUpMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadWriteAttribute<byte?> StartUpMode { get; init; }
 
         /// <summary>
-        /// Set the Start Up Mode attribute
+        /// On Mode Attribute
         /// </summary>
-        public async Task SetStartUpMode (SecureSession session, byte? value) {
-            await SetAttribute(session, 2, value, true);
-        }
-
-        /// <summary>
-        /// Get the On Mode attribute
-        /// </summary>
-        public async Task<byte?> GetOnMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3, true);
-        }
-
-        /// <summary>
-        /// Set the On Mode attribute
-        /// </summary>
-        public async Task SetOnMode (SecureSession session, byte? value) {
-            await SetAttribute(session, 3, value, true);
-        }
+        public required ReadWriteAttribute<byte?> OnMode { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

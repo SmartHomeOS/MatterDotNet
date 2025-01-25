@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.HVAC
 {
@@ -31,9 +32,53 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// An interface for controlling a fan in a heating/cooling system.
         /// </summary>
-        public FanControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public FanControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected FanControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected FanControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            FanMode = new ReadWriteAttribute<FanModeEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (FanModeEnum)DeserializeEnum(x)!
+            };
+            FanModeSequence = new ReadAttribute<FanModeSequenceEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (FanModeSequenceEnum)DeserializeEnum(x)!
+            };
+            PercentSetting = new ReadWriteAttribute<byte?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            PercentCurrent = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            SpeedMax = new ReadAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 1
+
+            };
+            SpeedSetting = new ReadWriteAttribute<byte?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            SpeedCurrent = new ReadAttribute<byte>(cluster, endPoint, 6) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            RockSupport = new ReadAttribute<Rock>(cluster, endPoint, 7) {
+                Deserialize = x => (Rock)DeserializeEnum(x)!
+            };
+            RockSetting = new ReadWriteAttribute<Rock>(cluster, endPoint, 8) {
+                Deserialize = x => (Rock)DeserializeEnum(x)!
+            };
+            WindSupport = new ReadAttribute<Wind>(cluster, endPoint, 9) {
+                Deserialize = x => (Wind)DeserializeEnum(x)!
+            };
+            WindSetting = new ReadWriteAttribute<Wind>(cluster, endPoint, 10) {
+                Deserialize = x => (Wind)DeserializeEnum(x)!
+            };
+            AirflowDirection = new ReadWriteAttribute<AirflowDirectionEnum>(cluster, endPoint, 11) {
+                Deserialize = x => (AirflowDirectionEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -70,7 +115,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Fan Mode
         /// </summary>
-        public enum FanMode : byte {
+        public enum FanModeEnum : byte {
             /// <summary>
             /// Fan is off
             /// </summary>
@@ -104,7 +149,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Fan Mode Sequence
         /// </summary>
-        public enum FanModeSequence : byte {
+        public enum FanModeSequenceEnum : byte {
             /// <summary>
             /// Fan is capable of off, low, medium and high modes
             /// </summary>
@@ -148,7 +193,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Airflow Direction
         /// </summary>
-        public enum AirflowDirection : byte {
+        public enum AirflowDirectionEnum : byte {
             /// <summary>
             /// Airflow is in the forward direction
             /// </summary>
@@ -168,17 +213,8 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Indicate rock left to right
-            /// </summary>
             RockLeftRight = 0x01,
-            /// <summary>
-            /// Indicate rock up and down
-            /// </summary>
             RockUpDown = 0x02,
-            /// <summary>
-            /// Indicate rock around
-            /// </summary>
             RockRound = 0x04,
         }
 
@@ -191,13 +227,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Indicate sleep wind
-            /// </summary>
             SleepWind = 0x01,
-            /// <summary>
-            /// Indicate natural wind
-            /// </summary>
             NaturalWind = 0x02,
         }
         #endregion Enums
@@ -257,130 +287,64 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Get the Fan Mode attribute
+        /// Fan Mode Attribute
         /// </summary>
-        public async Task<FanMode> GetFanMode(SecureSession session) {
-            return (FanMode)await GetEnumAttribute(session, 0);
-        }
+        public required ReadWriteAttribute<FanModeEnum> FanMode { get; init; }
 
         /// <summary>
-        /// Set the Fan Mode attribute
+        /// Fan Mode Sequence Attribute
         /// </summary>
-        public async Task SetFanMode (SecureSession session, FanMode value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadAttribute<FanModeSequenceEnum> FanModeSequence { get; init; }
 
         /// <summary>
-        /// Get the Fan Mode Sequence attribute
+        /// Percent Setting [%] Attribute
         /// </summary>
-        public async Task<FanModeSequence> GetFanModeSequence(SecureSession session) {
-            return (FanModeSequence)await GetEnumAttribute(session, 1);
-        }
+        public required ReadWriteAttribute<byte?> PercentSetting { get; init; }
 
         /// <summary>
-        /// Get the Percent Setting [%] attribute
+        /// Percent Current [%] Attribute
         /// </summary>
-        public async Task<byte?> GetPercentSetting(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2, true) ?? 0;
-        }
+        public required ReadAttribute<byte> PercentCurrent { get; init; }
 
         /// <summary>
-        /// Set the Percent Setting attribute
+        /// Speed Max Attribute
         /// </summary>
-        public async Task SetPercentSetting (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 2, value, true);
-        }
+        public required ReadAttribute<byte> SpeedMax { get; init; }
 
         /// <summary>
-        /// Get the Percent Current [%] attribute
+        /// Speed Setting Attribute
         /// </summary>
-        public async Task<byte> GetPercentCurrent(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3) ?? 0;
-        }
+        public required ReadWriteAttribute<byte?> SpeedSetting { get; init; }
 
         /// <summary>
-        /// Get the Speed Max attribute
+        /// Speed Current Attribute
         /// </summary>
-        public async Task<byte> GetSpeedMax(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 1;
-        }
+        public required ReadAttribute<byte> SpeedCurrent { get; init; }
 
         /// <summary>
-        /// Get the Speed Setting attribute
+        /// Rock Support Attribute
         /// </summary>
-        public async Task<byte?> GetSpeedSetting(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 5, true) ?? 0;
-        }
+        public required ReadAttribute<Rock> RockSupport { get; init; }
 
         /// <summary>
-        /// Set the Speed Setting attribute
+        /// Rock Setting Attribute
         /// </summary>
-        public async Task SetSpeedSetting (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 5, value, true);
-        }
+        public required ReadWriteAttribute<Rock> RockSetting { get; init; }
 
         /// <summary>
-        /// Get the Speed Current attribute
+        /// Wind Support Attribute
         /// </summary>
-        public async Task<byte> GetSpeedCurrent(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 6) ?? 0;
-        }
+        public required ReadAttribute<Wind> WindSupport { get; init; }
 
         /// <summary>
-        /// Get the Rock Support attribute
+        /// Wind Setting Attribute
         /// </summary>
-        public async Task<Rock> GetRockSupport(SecureSession session) {
-            return (Rock)await GetEnumAttribute(session, 7);
-        }
+        public required ReadWriteAttribute<Wind> WindSetting { get; init; }
 
         /// <summary>
-        /// Get the Rock Setting attribute
+        /// Airflow Direction Attribute
         /// </summary>
-        public async Task<Rock> GetRockSetting(SecureSession session) {
-            return (Rock)await GetEnumAttribute(session, 8);
-        }
-
-        /// <summary>
-        /// Set the Rock Setting attribute
-        /// </summary>
-        public async Task SetRockSetting (SecureSession session, Rock value) {
-            await SetAttribute(session, 8, value);
-        }
-
-        /// <summary>
-        /// Get the Wind Support attribute
-        /// </summary>
-        public async Task<Wind> GetWindSupport(SecureSession session) {
-            return (Wind)await GetEnumAttribute(session, 9);
-        }
-
-        /// <summary>
-        /// Get the Wind Setting attribute
-        /// </summary>
-        public async Task<Wind> GetWindSetting(SecureSession session) {
-            return (Wind)await GetEnumAttribute(session, 10);
-        }
-
-        /// <summary>
-        /// Set the Wind Setting attribute
-        /// </summary>
-        public async Task SetWindSetting (SecureSession session, Wind value) {
-            await SetAttribute(session, 10, value);
-        }
-
-        /// <summary>
-        /// Get the Airflow Direction attribute
-        /// </summary>
-        public async Task<AirflowDirection> GetAirflowDirection(SecureSession session) {
-            return (AirflowDirection)await GetEnumAttribute(session, 11);
-        }
-
-        /// <summary>
-        /// Set the Airflow Direction attribute
-        /// </summary>
-        public async Task SetAirflowDirection (SecureSession session, AirflowDirection value) {
-            await SetAttribute(session, 11, value);
-        }
+        public required ReadWriteAttribute<AirflowDirectionEnum> AirflowDirection { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

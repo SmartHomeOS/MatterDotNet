@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Closures
 {
@@ -31,9 +32,86 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Provides an interface for controlling and adjusting automatic window coverings. 
         /// </summary>
-        public WindowCovering(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WindowCovering(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WindowCovering(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WindowCovering(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Type = new ReadAttribute<TypeEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (TypeEnum)DeserializeEnum(x)!
+            };
+            PhysicalClosedLimitLift = new ReadAttribute<ushort>(cluster, endPoint, 1) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PhysicalClosedLimitTilt = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            CurrentPositionLift = new ReadAttribute<ushort?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            CurrentPositionTilt = new ReadAttribute<ushort?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            NumberOfActuationsLift = new ReadAttribute<ushort>(cluster, endPoint, 5) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            NumberOfActuationsTilt = new ReadAttribute<ushort>(cluster, endPoint, 6) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            ConfigStatus = new ReadAttribute<ConfigStatusBitmap>(cluster, endPoint, 7) {
+                Deserialize = x => (ConfigStatusBitmap)DeserializeEnum(x)!
+            };
+            CurrentPositionLiftPercentage = new ReadAttribute<byte?>(cluster, endPoint, 8, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            CurrentPositionTiltPercentage = new ReadAttribute<byte?>(cluster, endPoint, 9, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OperationalStatus = new ReadAttribute<OperationalStatusBitmap>(cluster, endPoint, 10) {
+                Deserialize = x => (OperationalStatusBitmap)DeserializeEnum(x)!
+            };
+            TargetPositionLiftPercent = new ReadAttribute<decimal?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
+            };
+            TargetPositionTiltPercent = new ReadAttribute<decimal?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
+            };
+            EndProductType = new ReadAttribute<EndProductTypeEnum>(cluster, endPoint, 13) {
+                Deserialize = x => (EndProductTypeEnum)DeserializeEnum(x)!
+            };
+            CurrentPositionLiftPercent = new ReadAttribute<decimal?>(cluster, endPoint, 14, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
+            };
+            CurrentPositionTiltPercent = new ReadAttribute<decimal?>(cluster, endPoint, 15, true) {
+                Deserialize = x => (decimal?)(dynamic?)x
+            };
+            InstalledOpenLimitLift = new ReadAttribute<ushort>(cluster, endPoint, 16) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            InstalledClosedLimitLift = new ReadAttribute<ushort>(cluster, endPoint, 17) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0xFFFF
+
+            };
+            InstalledOpenLimitTilt = new ReadAttribute<ushort>(cluster, endPoint, 18) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            InstalledClosedLimitTilt = new ReadAttribute<ushort>(cluster, endPoint, 19) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0xFFFF
+
+            };
+            Mode = new ReadWriteAttribute<ModeBitmap>(cluster, endPoint, 23) {
+                Deserialize = x => (ModeBitmap)DeserializeEnum(x)!
+            };
+            SafetyStatus = new ReadAttribute<SafetyStatusBitmap>(cluster, endPoint, 26) {
+                Deserialize = x => (SafetyStatusBitmap)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -66,7 +144,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Type
         /// </summary>
-        public enum Type : byte {
+        public enum TypeEnum : byte {
             /// <summary>
             /// RollerShade
             /// </summary>
@@ -100,7 +178,7 @@ namespace MatterDotNet.Clusters.Closures
             /// </summary>
             TiltBlindTiltOnly = 0x7,
             /// <summary>
-            /// Tilt Blind - Lift &amp; Tilt
+            /// Tilt Blind - Lift & Tilt
             /// </summary>
             TiltBlindLiftAndTilt = 0x8,
             /// <summary>
@@ -116,7 +194,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// End Product Type
         /// </summary>
-        public enum EndProductType : byte {
+        public enum EndProductTypeEnum : byte {
             /// <summary>
             /// Simple Roller Shade
             /// </summary>
@@ -223,7 +301,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Mode
         /// </summary>
         [Flags]
-        public enum Mode : byte {
+        public enum ModeBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -250,7 +328,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Operational Status
         /// </summary>
         [Flags]
-        public enum OperationalStatus : byte {
+        public enum OperationalStatusBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -273,7 +351,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Config Status
         /// </summary>
         [Flags]
-        public enum ConfigStatus : byte {
+        public enum ConfigStatusBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -312,7 +390,7 @@ namespace MatterDotNet.Clusters.Closures
         /// Safety Status
         /// </summary>
         [Flags]
-        public enum SafetyStatus : ushort {
+        public enum SafetyStatusBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -499,165 +577,114 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Get the Type attribute
+        /// Type Attribute
         /// </summary>
-        public async Task<Type> GetType(SecureSession session) {
-            return (Type)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<TypeEnum> Type { get; init; }
 
         /// <summary>
-        /// Get the Physical Closed Limit Lift attribute
+        /// Physical Closed Limit Lift Attribute
         /// </summary>
-        public async Task<ushort> GetPhysicalClosedLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> PhysicalClosedLimitLift { get; init; }
 
         /// <summary>
-        /// Get the Physical Closed Limit Tilt attribute
+        /// Physical Closed Limit Tilt Attribute
         /// </summary>
-        public async Task<ushort> GetPhysicalClosedLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> PhysicalClosedLimitTilt { get; init; }
 
         /// <summary>
-        /// Get the Current Position Lift attribute
+        /// Current Position Lift Attribute
         /// </summary>
-        public async Task<ushort?> GetCurrentPositionLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<ushort?> CurrentPositionLift { get; init; }
 
         /// <summary>
-        /// Get the Current Position Tilt attribute
+        /// Current Position Tilt Attribute
         /// </summary>
-        public async Task<ushort?> GetCurrentPositionTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<ushort?> CurrentPositionTilt { get; init; }
 
         /// <summary>
-        /// Get the Number Of Actuations Lift attribute
+        /// Number Of Actuations Lift Attribute
         /// </summary>
-        public async Task<ushort> GetNumberOfActuationsLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 5) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> NumberOfActuationsLift { get; init; }
 
         /// <summary>
-        /// Get the Number Of Actuations Tilt attribute
+        /// Number Of Actuations Tilt Attribute
         /// </summary>
-        public async Task<ushort> GetNumberOfActuationsTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> NumberOfActuationsTilt { get; init; }
 
         /// <summary>
-        /// Get the Config Status attribute
+        /// Config Status Attribute
         /// </summary>
-        public async Task<ConfigStatus> GetConfigStatus(SecureSession session) {
-            return (ConfigStatus)await GetEnumAttribute(session, 7);
-        }
+        public required ReadAttribute<ConfigStatusBitmap> ConfigStatus { get; init; }
 
         /// <summary>
-        /// Get the Current Position Lift Percentage [%] attribute
+        /// Current Position Lift Percentage [%] Attribute
         /// </summary>
-        public async Task<byte?> GetCurrentPositionLiftPercentage(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 8, true);
-        }
+        public required ReadAttribute<byte?> CurrentPositionLiftPercentage { get; init; }
 
         /// <summary>
-        /// Get the Current Position Tilt Percentage [%] attribute
+        /// Current Position Tilt Percentage [%] Attribute
         /// </summary>
-        public async Task<byte?> GetCurrentPositionTiltPercentage(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 9, true);
-        }
+        public required ReadAttribute<byte?> CurrentPositionTiltPercentage { get; init; }
 
         /// <summary>
-        /// Get the Operational Status attribute
+        /// Operational Status Attribute
         /// </summary>
-        public async Task<OperationalStatus> GetOperationalStatus(SecureSession session) {
-            return (OperationalStatus)await GetEnumAttribute(session, 10);
-        }
+        public required ReadAttribute<OperationalStatusBitmap> OperationalStatus { get; init; }
 
         /// <summary>
-        /// Get the Target Position Lift Percent100ths [%] attribute
+        /// Target Position Lift Percent100ths [%] Attribute
         /// </summary>
-        public async Task<decimal?> GetTargetPositionLiftPercent100ths(SecureSession session) {
-            return (decimal?)(dynamic?)await GetAttribute(session, 11, true);
-        }
+        public required ReadAttribute<decimal?> TargetPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Get the Target Position Tilt Percent100ths [%] attribute
+        /// Target Position Tilt Percent100ths [%] Attribute
         /// </summary>
-        public async Task<decimal?> GetTargetPositionTiltPercent100ths(SecureSession session) {
-            return (decimal?)(dynamic?)await GetAttribute(session, 12, true);
-        }
+        public required ReadAttribute<decimal?> TargetPositionTiltPercent { get; init; }
 
         /// <summary>
-        /// Get the End Product Type attribute
+        /// End Product Type Attribute
         /// </summary>
-        public async Task<EndProductType> GetEndProductType(SecureSession session) {
-            return (EndProductType)await GetEnumAttribute(session, 13);
-        }
+        public required ReadAttribute<EndProductTypeEnum> EndProductType { get; init; }
 
         /// <summary>
-        /// Get the Current Position Lift Percent100ths [%] attribute
+        /// Current Position Lift Percent100ths [%] Attribute
         /// </summary>
-        public async Task<decimal?> GetCurrentPositionLiftPercent100ths(SecureSession session) {
-            return (decimal?)(dynamic?)await GetAttribute(session, 14, true);
-        }
+        public required ReadAttribute<decimal?> CurrentPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Get the Current Position Tilt Percent100ths [%] attribute
+        /// Current Position Tilt Percent100ths [%] Attribute
         /// </summary>
-        public async Task<decimal?> GetCurrentPositionTiltPercent100ths(SecureSession session) {
-            return (decimal?)(dynamic?)await GetAttribute(session, 15, true);
-        }
+        public required ReadAttribute<decimal?> CurrentPositionTiltPercent { get; init; }
 
         /// <summary>
-        /// Get the Installed Open Limit Lift attribute
+        /// Installed Open Limit Lift Attribute
         /// </summary>
-        public async Task<ushort> GetInstalledOpenLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> InstalledOpenLimitLift { get; init; }
 
         /// <summary>
-        /// Get the Installed Closed Limit Lift attribute
+        /// Installed Closed Limit Lift Attribute
         /// </summary>
-        public async Task<ushort> GetInstalledClosedLimitLift(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0xFFFF;
-        }
+        public required ReadAttribute<ushort> InstalledClosedLimitLift { get; init; }
 
         /// <summary>
-        /// Get the Installed Open Limit Tilt attribute
+        /// Installed Open Limit Tilt Attribute
         /// </summary>
-        public async Task<ushort> GetInstalledOpenLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 18) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> InstalledOpenLimitTilt { get; init; }
 
         /// <summary>
-        /// Get the Installed Closed Limit Tilt attribute
+        /// Installed Closed Limit Tilt Attribute
         /// </summary>
-        public async Task<ushort> GetInstalledClosedLimitTilt(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 0xFFFF;
-        }
+        public required ReadAttribute<ushort> InstalledClosedLimitTilt { get; init; }
 
         /// <summary>
-        /// Get the Mode attribute
+        /// Mode Attribute
         /// </summary>
-        public async Task<Mode> GetMode(SecureSession session) {
-            return (Mode)await GetEnumAttribute(session, 23);
-        }
+        public required ReadWriteAttribute<ModeBitmap> Mode { get; init; }
 
         /// <summary>
-        /// Set the Mode attribute
+        /// Safety Status Attribute
         /// </summary>
-        public async Task SetMode (SecureSession session, Mode value) {
-            await SetAttribute(session, 23, value);
-        }
-
-        /// <summary>
-        /// Get the Safety Status attribute
-        /// </summary>
-        public async Task<SafetyStatus> GetSafetyStatus(SecureSession session) {
-            return (SafetyStatus)await GetEnumAttribute(session, 26);
-        }
+        public required ReadAttribute<SafetyStatusBitmap> SafetyStatus { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -32,9 +32,42 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster is used to manage global aspects of the Commissioning flow.
         /// </summary>
-        public GeneralCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public GeneralCommissioning(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GeneralCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected GeneralCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Breadcrumb = new ReadWriteAttribute<ulong>(cluster, endPoint, 0) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            BasicCommissioningInfo = new ReadAttribute<BasicCommissioningInfoStruct>(cluster, endPoint, 1) {
+                Deserialize = x => new BasicCommissioningInfoStruct((object[])x!)
+            };
+            RegulatoryConfig = new ReadAttribute<RegulatoryLocationType>(cluster, endPoint, 2) {
+                Deserialize = x => (RegulatoryLocationType)DeserializeEnum(x)!
+            };
+            LocationCapability = new ReadAttribute<RegulatoryLocationType>(cluster, endPoint, 3) {
+                Deserialize = x => (RegulatoryLocationType)DeserializeEnum(x)!
+            };
+            SupportsConcurrentConnection = new ReadAttribute<bool>(cluster, endPoint, 4) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            TCAcceptedVersion = new ReadAttribute<ushort>(cluster, endPoint, 5) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            TCMinRequiredVersion = new ReadAttribute<ushort>(cluster, endPoint, 6) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            TCAcknowledgements = new ReadAttribute<ushort>(cluster, endPoint, 7) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            TCAcknowledgementsRequired = new ReadAttribute<bool>(cluster, endPoint, 8) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -109,17 +142,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Basic Commissioning Info
         /// </summary>
-        public record BasicCommissioningInfo : TLVPayload {
+        public record BasicCommissioningInfoStruct : TLVPayload {
             /// <summary>
             /// Basic Commissioning Info
             /// </summary>
-            public BasicCommissioningInfo() { }
+            public BasicCommissioningInfoStruct() { }
 
             /// <summary>
             /// Basic Commissioning Info
             /// </summary>
             [SetsRequiredMembers]
-            public BasicCommissioningInfo(object[] fields) {
+            public BasicCommissioningInfoStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 FailSafeExpiryLengthSeconds = reader.GetUShort(0)!.Value;
                 MaxCumulativeFailsafeSeconds = reader.GetUShort(1)!.Value;
@@ -292,74 +325,49 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Breadcrumb attribute
+        /// Breadcrumb Attribute
         /// </summary>
-        public async Task<ulong> GetBreadcrumb(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 0) ?? 0x0000000000000000;
-        }
+        public required ReadWriteAttribute<ulong> Breadcrumb { get; init; }
 
         /// <summary>
-        /// Set the Breadcrumb attribute
+        /// Basic Commissioning Info Attribute
         /// </summary>
-        public async Task SetBreadcrumb (SecureSession session, ulong? value = 0x0000000000000000) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadAttribute<BasicCommissioningInfoStruct> BasicCommissioningInfo { get; init; }
 
         /// <summary>
-        /// Get the Basic Commissioning Info attribute
+        /// Regulatory Config Attribute
         /// </summary>
-        public async Task<BasicCommissioningInfo> GetBasicCommissioningInfo(SecureSession session) {
-            return new BasicCommissioningInfo((object[])(await GetAttribute(session, 1))!);
-        }
+        public required ReadAttribute<RegulatoryLocationType> RegulatoryConfig { get; init; }
 
         /// <summary>
-        /// Get the Regulatory Config attribute
+        /// Location Capability Attribute
         /// </summary>
-        public async Task<RegulatoryLocationType> GetRegulatoryConfig(SecureSession session) {
-            return (RegulatoryLocationType)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<RegulatoryLocationType> LocationCapability { get; init; }
 
         /// <summary>
-        /// Get the Location Capability attribute
+        /// Supports Concurrent Connection Attribute
         /// </summary>
-        public async Task<RegulatoryLocationType> GetLocationCapability(SecureSession session) {
-            return (RegulatoryLocationType)await GetEnumAttribute(session, 3);
-        }
+        public required ReadAttribute<bool> SupportsConcurrentConnection { get; init; }
 
         /// <summary>
-        /// Get the Supports Concurrent Connection attribute
+        /// TC Accepted Version Attribute
         /// </summary>
-        public async Task<bool> GetSupportsConcurrentConnection(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 4) ?? true;
-        }
+        public required ReadAttribute<ushort> TCAcceptedVersion { get; init; }
 
         /// <summary>
-        /// Get the TC Accepted Version attribute
+        /// TC Min Required Version Attribute
         /// </summary>
-        public async Task<ushort> GetTCAcceptedVersion(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 5))!;
-        }
+        public required ReadAttribute<ushort> TCMinRequiredVersion { get; init; }
 
         /// <summary>
-        /// Get the TC Min Required Version attribute
+        /// TC Acknowledgements Attribute
         /// </summary>
-        public async Task<ushort> GetTCMinRequiredVersion(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<ushort> TCAcknowledgements { get; init; }
 
         /// <summary>
-        /// Get the TC Acknowledgements attribute
+        /// TC Acknowledgements Required Attribute
         /// </summary>
-        public async Task<ushort> GetTCAcknowledgements(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7) ?? 0x0000;
-        }
-
-        /// <summary>
-        /// Get the TC Acknowledgements Required attribute
-        /// </summary>
-        public async Task<bool> GetTCAcknowledgementsRequired(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<bool> TCAcknowledgementsRequired { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

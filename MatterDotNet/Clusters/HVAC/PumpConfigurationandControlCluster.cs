@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.HVAC
 {
@@ -28,9 +29,83 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// An interface for configuring and controlling pumps.
         /// </summary>
-        public PumpConfigurationandControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PumpConfigurationandControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PumpConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PumpConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MaxPressure = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MaxSpeed = new ReadAttribute<ushort?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MaxFlow = new ReadAttribute<ushort?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MinConstPressure = new ReadAttribute<short?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MaxConstPressure = new ReadAttribute<short?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MinCompPressure = new ReadAttribute<short?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MaxCompPressure = new ReadAttribute<short?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MinConstSpeed = new ReadAttribute<ushort?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MaxConstSpeed = new ReadAttribute<ushort?>(cluster, endPoint, 8, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MinConstFlow = new ReadAttribute<ushort?>(cluster, endPoint, 9, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MaxConstFlow = new ReadAttribute<ushort?>(cluster, endPoint, 10, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            MinConstTemp = new ReadAttribute<short?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MaxConstTemp = new ReadAttribute<short?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            PumpStatus = new ReadAttribute<PumpStatusBitmap>(cluster, endPoint, 16) {
+                Deserialize = x => (PumpStatusBitmap)DeserializeEnum(x)!
+            };
+            EffectiveOperationMode = new ReadAttribute<OperationModeEnum>(cluster, endPoint, 17) {
+                Deserialize = x => (OperationModeEnum)DeserializeEnum(x)!
+            };
+            EffectiveControlMode = new ReadAttribute<ControlModeEnum>(cluster, endPoint, 18) {
+                Deserialize = x => (ControlModeEnum)DeserializeEnum(x)!
+            };
+            Capacity = new ReadAttribute<short?>(cluster, endPoint, 19, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            Speed = new ReadAttribute<ushort?>(cluster, endPoint, 20, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            LifetimeRunningHours = new ReadWriteAttribute<uint?>(cluster, endPoint, 21, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x000000
+
+            };
+            Power = new ReadAttribute<uint?>(cluster, endPoint, 22, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            LifetimeEnergyConsumed = new ReadWriteAttribute<uint?>(cluster, endPoint, 23, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            OperationMode = new ReadWriteAttribute<OperationModeEnum>(cluster, endPoint, 32) {
+                Deserialize = x => (OperationModeEnum)DeserializeEnum(x)!
+            };
+            ControlMode = new ReadWriteAttribute<ControlModeEnum>(cluster, endPoint, 33) {
+                Deserialize = x => (ControlModeEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -71,7 +146,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Operation Mode
         /// </summary>
-        public enum OperationMode : byte {
+        public enum OperationModeEnum : byte {
             /// <summary>
             /// The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.
             /// </summary>
@@ -93,7 +168,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Control Mode
         /// </summary>
-        public enum ControlMode : byte {
+        public enum ControlModeEnum : byte {
             /// <summary>
             /// The pump is running at a constant speed.
             /// </summary>
@@ -124,7 +199,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// Pump Status
         /// </summary>
         [Flags]
-        public enum PumpStatus : ushort {
+        public enum PumpStatusBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -188,193 +263,119 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Get the Max Pressure attribute
+        /// Max Pressure Attribute
         /// </summary>
-        public async Task<short?> GetMaxPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<short?> MaxPressure { get; init; }
 
         /// <summary>
-        /// Get the Max Speed attribute
+        /// Max Speed Attribute
         /// </summary>
-        public async Task<ushort?> GetMaxSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<ushort?> MaxSpeed { get; init; }
 
         /// <summary>
-        /// Get the Max Flow attribute
+        /// Max Flow Attribute
         /// </summary>
-        public async Task<ushort?> GetMaxFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<ushort?> MaxFlow { get; init; }
 
         /// <summary>
-        /// Get the Min Const Pressure attribute
+        /// Min Const Pressure Attribute
         /// </summary>
-        public async Task<short?> GetMinConstPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<short?> MinConstPressure { get; init; }
 
         /// <summary>
-        /// Get the Max Const Pressure attribute
+        /// Max Const Pressure Attribute
         /// </summary>
-        public async Task<short?> GetMaxConstPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<short?> MaxConstPressure { get; init; }
 
         /// <summary>
-        /// Get the Min Comp Pressure attribute
+        /// Min Comp Pressure Attribute
         /// </summary>
-        public async Task<short?> GetMinCompPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<short?> MinCompPressure { get; init; }
 
         /// <summary>
-        /// Get the Max Comp Pressure attribute
+        /// Max Comp Pressure Attribute
         /// </summary>
-        public async Task<short?> GetMaxCompPressure(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<short?> MaxCompPressure { get; init; }
 
         /// <summary>
-        /// Get the Min Const Speed attribute
+        /// Min Const Speed Attribute
         /// </summary>
-        public async Task<ushort?> GetMinConstSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 7, true);
-        }
+        public required ReadAttribute<ushort?> MinConstSpeed { get; init; }
 
         /// <summary>
-        /// Get the Max Const Speed attribute
+        /// Max Const Speed Attribute
         /// </summary>
-        public async Task<ushort?> GetMaxConstSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 8, true);
-        }
+        public required ReadAttribute<ushort?> MaxConstSpeed { get; init; }
 
         /// <summary>
-        /// Get the Min Const Flow attribute
+        /// Min Const Flow Attribute
         /// </summary>
-        public async Task<ushort?> GetMinConstFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 9, true);
-        }
+        public required ReadAttribute<ushort?> MinConstFlow { get; init; }
 
         /// <summary>
-        /// Get the Max Const Flow attribute
+        /// Max Const Flow Attribute
         /// </summary>
-        public async Task<ushort?> GetMaxConstFlow(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 10, true);
-        }
+        public required ReadAttribute<ushort?> MaxConstFlow { get; init; }
 
         /// <summary>
-        /// Get the Min Const Temp attribute
+        /// Min Const Temp Attribute
         /// </summary>
-        public async Task<short?> GetMinConstTemp(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 11, true);
-        }
+        public required ReadAttribute<short?> MinConstTemp { get; init; }
 
         /// <summary>
-        /// Get the Max Const Temp attribute
+        /// Max Const Temp Attribute
         /// </summary>
-        public async Task<short?> GetMaxConstTemp(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 12, true);
-        }
+        public required ReadAttribute<short?> MaxConstTemp { get; init; }
 
         /// <summary>
-        /// Get the Pump Status attribute
+        /// Pump Status Attribute
         /// </summary>
-        public async Task<PumpStatus> GetPumpStatus(SecureSession session) {
-            return (PumpStatus)await GetEnumAttribute(session, 16);
-        }
+        public required ReadAttribute<PumpStatusBitmap> PumpStatus { get; init; }
 
         /// <summary>
-        /// Get the Effective Operation Mode attribute
+        /// Effective Operation Mode Attribute
         /// </summary>
-        public async Task<OperationMode> GetEffectiveOperationMode(SecureSession session) {
-            return (OperationMode)await GetEnumAttribute(session, 17);
-        }
+        public required ReadAttribute<OperationModeEnum> EffectiveOperationMode { get; init; }
 
         /// <summary>
-        /// Get the Effective Control Mode attribute
+        /// Effective Control Mode Attribute
         /// </summary>
-        public async Task<ControlMode> GetEffectiveControlMode(SecureSession session) {
-            return (ControlMode)await GetEnumAttribute(session, 18);
-        }
+        public required ReadAttribute<ControlModeEnum> EffectiveControlMode { get; init; }
 
         /// <summary>
-        /// Get the Capacity attribute
+        /// Capacity Attribute
         /// </summary>
-        public async Task<short?> GetCapacity(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 19, true);
-        }
+        public required ReadAttribute<short?> Capacity { get; init; }
 
         /// <summary>
-        /// Get the Speed attribute
+        /// Speed Attribute
         /// </summary>
-        public async Task<ushort?> GetSpeed(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 20, true);
-        }
+        public required ReadAttribute<ushort?> Speed { get; init; }
 
         /// <summary>
-        /// Get the Lifetime Running Hours attribute
+        /// Lifetime Running Hours Attribute
         /// </summary>
-        public async Task<uint?> GetLifetimeRunningHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 21, true) ?? 0x000000;
-        }
+        public required ReadWriteAttribute<uint?> LifetimeRunningHours { get; init; }
 
         /// <summary>
-        /// Set the Lifetime Running Hours attribute
+        /// Power Attribute
         /// </summary>
-        public async Task SetLifetimeRunningHours (SecureSession session, uint? value = 0x000000) {
-            await SetAttribute(session, 21, value, true);
-        }
+        public required ReadAttribute<uint?> Power { get; init; }
 
         /// <summary>
-        /// Get the Power attribute
+        /// Lifetime Energy Consumed Attribute
         /// </summary>
-        public async Task<uint?> GetPower(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 22, true);
-        }
+        public required ReadWriteAttribute<uint?> LifetimeEnergyConsumed { get; init; }
 
         /// <summary>
-        /// Get the Lifetime Energy Consumed attribute
+        /// Operation Mode Attribute
         /// </summary>
-        public async Task<uint?> GetLifetimeEnergyConsumed(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 23, true) ?? 0x00000000;
-        }
+        public required ReadWriteAttribute<OperationModeEnum> OperationMode { get; init; }
 
         /// <summary>
-        /// Set the Lifetime Energy Consumed attribute
+        /// Control Mode Attribute
         /// </summary>
-        public async Task SetLifetimeEnergyConsumed (SecureSession session, uint? value = 0x00000000) {
-            await SetAttribute(session, 23, value, true);
-        }
-
-        /// <summary>
-        /// Get the Operation Mode attribute
-        /// </summary>
-        public async Task<OperationMode> GetOperationMode(SecureSession session) {
-            return (OperationMode)await GetEnumAttribute(session, 32);
-        }
-
-        /// <summary>
-        /// Set the Operation Mode attribute
-        /// </summary>
-        public async Task SetOperationMode (SecureSession session, OperationMode value) {
-            await SetAttribute(session, 32, value);
-        }
-
-        /// <summary>
-        /// Get the Control Mode attribute
-        /// </summary>
-        public async Task<ControlMode> GetControlMode(SecureSession session) {
-            return (ControlMode)await GetEnumAttribute(session, 33);
-        }
-
-        /// <summary>
-        /// Set the Control Mode attribute
-        /// </summary>
-        public async Task SetControlMode (SecureSession session, ControlMode value) {
-            await SetAttribute(session, 33, value);
-        }
+        public required ReadWriteAttribute<ControlModeEnum> ControlMode { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

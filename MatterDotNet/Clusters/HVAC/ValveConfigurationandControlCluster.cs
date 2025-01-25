@@ -18,6 +18,7 @@ using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using MatterDotNet.Util;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.HVAC
 {
@@ -32,9 +33,46 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// This cluster is used to configure a valve.
         /// </summary>
-        public ValveConfigurationandControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ValveConfigurationandControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ValveConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ValveConfigurationandControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            OpenDuration = new ReadAttribute<TimeSpan?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x
+            };
+            DefaultOpenDuration = new ReadWriteAttribute<TimeSpan?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x
+            };
+            AutoCloseTime = new ReadAttribute<DateTime?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (DateTime?)(dynamic?)x
+            };
+            RemainingDuration = new ReadAttribute<TimeSpan?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x
+            };
+            CurrentState = new ReadAttribute<ValveState?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (ValveState?)DeserializeEnum(x)
+            };
+            TargetState = new ReadAttribute<ValveState?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (ValveState?)DeserializeEnum(x)
+            };
+            CurrentLevel = new ReadAttribute<byte?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            TargetLevel = new ReadAttribute<byte?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            DefaultOpenLevel = new ReadWriteAttribute<byte>(cluster, endPoint, 8) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 100
+
+            };
+            ValveFault = new ReadAttribute<ValveFaultBitmap>(cluster, endPoint, 9) {
+                Deserialize = x => (ValveFaultBitmap)DeserializeEnum(x)!
+            };
+            LevelStep = new ReadAttribute<byte>(cluster, endPoint, 10) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -81,7 +119,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// Valve Fault
         /// </summary>
         [Flags]
-        public enum ValveFault : ushort {
+        public enum ValveFaultBitmap : ushort {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -173,95 +211,59 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Get the Open Duration attribute
+        /// Open Duration Attribute
         /// </summary>
-        public async Task<TimeSpan?> GetOpenDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<TimeSpan?> OpenDuration { get; init; }
 
         /// <summary>
-        /// Get the Default Open Duration attribute
+        /// Default Open Duration Attribute
         /// </summary>
-        public async Task<TimeSpan?> GetDefaultOpenDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadWriteAttribute<TimeSpan?> DefaultOpenDuration { get; init; }
 
         /// <summary>
-        /// Set the Default Open Duration attribute
+        /// Auto Close Time Attribute
         /// </summary>
-        public async Task SetDefaultOpenDuration (SecureSession session, TimeSpan? value) {
-            await SetAttribute(session, 1, value, true);
-        }
+        public required ReadAttribute<DateTime?> AutoCloseTime { get; init; }
 
         /// <summary>
-        /// Get the Auto Close Time attribute
+        /// Remaining Duration Attribute
         /// </summary>
-        public async Task<DateTime?> GetAutoCloseTime(SecureSession session) {
-            return (DateTime?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<TimeSpan?> RemainingDuration { get; init; }
 
         /// <summary>
-        /// Get the Remaining Duration attribute
+        /// Current State Attribute
         /// </summary>
-        public async Task<TimeSpan?> GetRemainingDuration(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<ValveState?> CurrentState { get; init; }
 
         /// <summary>
-        /// Get the Current State attribute
+        /// Target State Attribute
         /// </summary>
-        public async Task<ValveState?> GetCurrentState(SecureSession session) {
-            return (ValveState?)await GetEnumAttribute(session, 4, true);
-        }
+        public required ReadAttribute<ValveState?> TargetState { get; init; }
 
         /// <summary>
-        /// Get the Target State attribute
+        /// Current Level [%] Attribute
         /// </summary>
-        public async Task<ValveState?> GetTargetState(SecureSession session) {
-            return (ValveState?)await GetEnumAttribute(session, 5, true);
-        }
+        public required ReadAttribute<byte?> CurrentLevel { get; init; }
 
         /// <summary>
-        /// Get the Current Level [%] attribute
+        /// Target Level [%] Attribute
         /// </summary>
-        public async Task<byte?> GetCurrentLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<byte?> TargetLevel { get; init; }
 
         /// <summary>
-        /// Get the Target Level [%] attribute
+        /// Default Open Level [%] Attribute
         /// </summary>
-        public async Task<byte?> GetTargetLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 7, true);
-        }
+        public required ReadWriteAttribute<byte> DefaultOpenLevel { get; init; }
 
         /// <summary>
-        /// Get the Default Open Level [%] attribute
+        /// Valve Fault Attribute
         /// </summary>
-        public async Task<byte> GetDefaultOpenLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 8) ?? 100;
-        }
+        public required ReadAttribute<ValveFaultBitmap> ValveFault { get; init; }
 
         /// <summary>
-        /// Set the Default Open Level attribute
+        /// Level Step Attribute
         /// </summary>
-        public async Task SetDefaultOpenLevel (SecureSession session, byte? value = 100) {
-            await SetAttribute(session, 8, value);
-        }
-
-        /// <summary>
-        /// Get the Valve Fault attribute
-        /// </summary>
-        public async Task<ValveFault> GetValveFault(SecureSession session) {
-            return (ValveFault)await GetEnumAttribute(session, 9);
-        }
-
-        /// <summary>
-        /// Get the Level Step attribute
-        /// </summary>
-        public async Task<byte> GetLevelStep(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 10))!;
-        }
+        public required ReadAttribute<byte> LevelStep { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

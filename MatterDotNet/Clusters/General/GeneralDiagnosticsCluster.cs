@@ -34,9 +34,66 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public GeneralDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public GeneralDiagnostics(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected GeneralDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected GeneralDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            NetworkInterfaces = new ReadAttribute<NetworkInterface[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NetworkInterface[] list = new NetworkInterface[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new NetworkInterface(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            RebootCount = new ReadAttribute<ushort>(cluster, endPoint, 1) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            UpTime = new ReadAttribute<ulong>(cluster, endPoint, 2) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            TotalOperationalHours = new ReadAttribute<uint>(cluster, endPoint, 3) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            BootReason = new ReadAttribute<BootReasonEnum>(cluster, endPoint, 4) {
+                Deserialize = x => (BootReasonEnum)DeserializeEnum(x)!
+            };
+            ActiveHardwareFaults = new ReadAttribute<HardwareFault[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    HardwareFault[] list = new HardwareFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (HardwareFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            ActiveRadioFaults = new ReadAttribute<RadioFault[]>(cluster, endPoint, 6) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    RadioFault[] list = new RadioFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (RadioFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            ActiveNetworkFaults = new ReadAttribute<NetworkFault[]>(cluster, endPoint, 7) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NetworkFault[] list = new NetworkFault[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (NetworkFault)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            TestEventTriggersEnabled = new ReadAttribute<bool>(cluster, endPoint, 8) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -159,7 +216,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Boot Reason
         /// </summary>
-        public enum BootReason : byte {
+        public enum BootReasonEnum : byte {
             /// <summary>
             /// The Node is unable to identify the Power-On reason as one of the other provided enumeration values.
             /// </summary>
@@ -395,83 +452,49 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Network Interfaces attribute
+        /// Network Interfaces Attribute
         /// </summary>
-        public async Task<NetworkInterface[]> GetNetworkInterfaces(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            NetworkInterface[] list = new NetworkInterface[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new NetworkInterface(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<NetworkInterface[]> NetworkInterfaces { get; init; }
 
         /// <summary>
-        /// Get the Reboot Count attribute
+        /// Reboot Count Attribute
         /// </summary>
-        public async Task<ushort> GetRebootCount(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> RebootCount { get; init; }
 
         /// <summary>
-        /// Get the Up Time attribute
+        /// Up Time Attribute
         /// </summary>
-        public async Task<ulong> GetUpTime(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 2) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong> UpTime { get; init; }
 
         /// <summary>
-        /// Get the Total Operational Hours attribute
+        /// Total Operational Hours Attribute
         /// </summary>
-        public async Task<uint> GetTotalOperationalHours(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 3) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint> TotalOperationalHours { get; init; }
 
         /// <summary>
-        /// Get the Boot Reason attribute
+        /// Boot Reason Attribute
         /// </summary>
-        public async Task<BootReason> GetBootReason(SecureSession session) {
-            return (BootReason)await GetEnumAttribute(session, 4);
-        }
+        public required ReadAttribute<BootReasonEnum> BootReason { get; init; }
 
         /// <summary>
-        /// Get the Active Hardware Faults attribute
+        /// Active Hardware Faults Attribute
         /// </summary>
-        public async Task<HardwareFault[]> GetActiveHardwareFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            HardwareFault[] list = new HardwareFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (HardwareFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<HardwareFault[]> ActiveHardwareFaults { get; init; }
 
         /// <summary>
-        /// Get the Active Radio Faults attribute
+        /// Active Radio Faults Attribute
         /// </summary>
-        public async Task<RadioFault[]> GetActiveRadioFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
-            RadioFault[] list = new RadioFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (RadioFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<RadioFault[]> ActiveRadioFaults { get; init; }
 
         /// <summary>
-        /// Get the Active Network Faults attribute
+        /// Active Network Faults Attribute
         /// </summary>
-        public async Task<NetworkFault[]> GetActiveNetworkFaults(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
-            NetworkFault[] list = new NetworkFault[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (NetworkFault)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<NetworkFault[]> ActiveNetworkFaults { get; init; }
 
         /// <summary>
-        /// Get the Test Event Triggers Enabled attribute
+        /// Test Event Triggers Enabled Attribute
         /// </summary>
-        public async Task<bool> GetTestEventTriggersEnabled(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<bool> TestEventTriggersEnabled { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

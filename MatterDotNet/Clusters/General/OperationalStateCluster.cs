@@ -32,9 +32,42 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.
         /// </summary>
-        public OperationalState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public OperationalState(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected OperationalState(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            PhaseList = new ReadAttribute<string[]?>(cluster, endPoint, 0, true) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    string[] list = new string[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetString(i, false)!;
+                    return list;
+                }
+            };
+            CurrentPhase = new ReadAttribute<byte?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            CountdownTime = new ReadAttribute<TimeSpan?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x
+            };
+            OperationalStateList = new ReadAttribute<OperationalStateStruct[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    OperationalStateStruct[] list = new OperationalStateStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new OperationalStateStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            OperationalStateAttribute = new ReadAttribute<OperationalStateEnum>(cluster, endPoint, 4) {
+                Deserialize = x => (OperationalStateEnum)DeserializeEnum(x)!
+            };
+            OperationalError = new ReadAttribute<ErrorStatePayload>(cluster, endPoint, 5) {
+                Deserialize = x => new ErrorStatePayload((object[])x!)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -51,10 +84,10 @@ namespace MatterDotNet.Clusters.General
         /// Error State
         /// </summary>
         public enum ErrorStateEnum : byte {
-            NoError = 0x00,
-            UnableToStartOrResume = 0x01,
-            UnableToCompleteOperation = 0x02,
-            CommandInvalidInState = 0x03,
+            NoError = 0,
+            UnableToStartOrResume = 1,
+            UnableToCompleteOperation = 2,
+            CommandInvalidInState = 3,
         }
         #endregion Enums
 
@@ -62,17 +95,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Operational State
         /// </summary>
-        public record OperationalStatePayload : TLVPayload {
+        public record OperationalStateStruct : TLVPayload {
             /// <summary>
             /// Operational State
             /// </summary>
-            public OperationalStatePayload() { }
+            public OperationalStateStruct() { }
 
             /// <summary>
             /// Operational State
             /// </summary>
             [SetsRequiredMembers]
-            public OperationalStatePayload(object[] fields) {
+            public OperationalStateStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 OperationalStateID = reader.GetByte(0)!.Value;
                 OperationalStateLabel = reader.GetString(1, true, 64);
@@ -183,54 +216,34 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Phase List attribute
+        /// Phase List Attribute
         /// </summary>
-        public async Task<string[]?> GetPhaseList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            string[] list = new string[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false)!;
-            return list;
-        }
+        public required ReadAttribute<string[]?> PhaseList { get; init; }
 
         /// <summary>
-        /// Get the Current Phase attribute
+        /// Current Phase Attribute
         /// </summary>
-        public async Task<byte?> GetCurrentPhase(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<byte?> CurrentPhase { get; init; }
 
         /// <summary>
-        /// Get the Countdown Time attribute
+        /// Countdown Time Attribute
         /// </summary>
-        public async Task<TimeSpan?> GetCountdownTime(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<TimeSpan?> CountdownTime { get; init; }
 
         /// <summary>
-        /// Get the Operational State List attribute
+        /// Operational State List Attribute
         /// </summary>
-        public async Task<OperationalStatePayload[]> GetOperationalStateList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            OperationalStatePayload[] list = new OperationalStatePayload[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new OperationalStatePayload(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<OperationalStateStruct[]> OperationalStateList { get; init; }
 
         /// <summary>
-        /// Get the Operational State attribute
+        /// Operational State Attribute
         /// </summary>
-        public async Task<OperationalStateEnum> GetOperationalState(SecureSession session) {
-            return (OperationalStateEnum)await GetEnumAttribute(session, 4);
-        }
+        public required ReadAttribute<OperationalStateEnum> OperationalStateAttribute { get; init; }
 
         /// <summary>
-        /// Get the Operational Error attribute
+        /// Operational Error Attribute
         /// </summary>
-        public async Task<ErrorStatePayload> GetOperationalError(SecureSession session) {
-            return new ErrorStatePayload((object[])(await GetAttribute(session, 5))!);
-        }
+        public required ReadAttribute<ErrorStatePayload> OperationalError { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

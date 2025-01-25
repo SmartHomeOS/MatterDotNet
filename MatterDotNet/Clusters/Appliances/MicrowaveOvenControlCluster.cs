@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Appliances
 {
@@ -31,9 +32,50 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Attributes and commands for configuring the microwave oven control, and reporting cooking stats.
         /// </summary>
-        public MicrowaveOvenControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public MicrowaveOvenControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MicrowaveOvenControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected MicrowaveOvenControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CookTime = new ReadAttribute<TimeSpan>(cluster, endPoint, 0) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x ?? TimeSpan.FromSeconds(30)
+
+            };
+            MaxCookTime = new ReadAttribute<TimeSpan>(cluster, endPoint, 1) {
+                Deserialize = x => (TimeSpan)(dynamic?)x!
+            };
+            PowerSetting = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 100
+
+            };
+            MinPower = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 10
+
+            };
+            MaxPower = new ReadAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 100
+
+            };
+            PowerStep = new ReadAttribute<byte>(cluster, endPoint, 5) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 10
+
+            };
+            SupportedWatts = new ReadAttribute<ushort[]>(cluster, endPoint, 6) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            SelectedWattIndex = new ReadAttribute<byte>(cluster, endPoint, 7) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            WattRating = new ReadAttribute<ushort>(cluster, endPoint, 8) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -140,71 +182,49 @@ namespace MatterDotNet.Clusters.Appliances
         }
 
         /// <summary>
-        /// Get the Cook Time attribute
+        /// Cook Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetCookTime(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 0) ?? TimeSpan.FromSeconds(30);
-        }
+        public required ReadAttribute<TimeSpan> CookTime { get; init; }
 
         /// <summary>
-        /// Get the Max Cook Time attribute
+        /// Max Cook Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetMaxCookTime(SecureSession session) {
-            return (TimeSpan)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<TimeSpan> MaxCookTime { get; init; }
 
         /// <summary>
-        /// Get the Power Setting attribute
+        /// Power Setting Attribute
         /// </summary>
-        public async Task<byte> GetPowerSetting(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 100;
-        }
+        public required ReadAttribute<byte> PowerSetting { get; init; }
 
         /// <summary>
-        /// Get the Min Power attribute
+        /// Min Power Attribute
         /// </summary>
-        public async Task<byte> GetMinPower(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3) ?? 10;
-        }
+        public required ReadAttribute<byte> MinPower { get; init; }
 
         /// <summary>
-        /// Get the Max Power attribute
+        /// Max Power Attribute
         /// </summary>
-        public async Task<byte> GetMaxPower(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 4) ?? 100;
-        }
+        public required ReadAttribute<byte> MaxPower { get; init; }
 
         /// <summary>
-        /// Get the Power Step attribute
+        /// Power Step Attribute
         /// </summary>
-        public async Task<byte> GetPowerStep(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 5) ?? 10;
-        }
+        public required ReadAttribute<byte> PowerStep { get; init; }
 
         /// <summary>
-        /// Get the Supported Watts attribute
+        /// Supported Watts Attribute
         /// </summary>
-        public async Task<ushort[]> GetSupportedWatts(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> SupportedWatts { get; init; }
 
         /// <summary>
-        /// Get the Selected Watt Index attribute
+        /// Selected Watt Index Attribute
         /// </summary>
-        public async Task<byte> GetSelectedWattIndex(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 7))!;
-        }
+        public required ReadAttribute<byte> SelectedWattIndex { get; init; }
 
         /// <summary>
-        /// Get the Watt Rating attribute
+        /// Watt Rating Attribute
         /// </summary>
-        public async Task<ushort> GetWattRating(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<ushort> WattRating { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

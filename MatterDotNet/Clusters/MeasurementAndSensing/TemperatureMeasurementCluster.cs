@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,40 +29,48 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
         /// </summary>
-        public TemperatureMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public TemperatureMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TemperatureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected TemperatureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MinMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (short?)(dynamic?)x ?? short.MinValue
+
+            };
+            MaxMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (short?)(dynamic?)x ?? short.MinValue
+
+            };
+            Tolerance = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the Measured Value attribute
+        /// Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<short?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Min Measured Value attribute
+        /// Min Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMinMeasuredValue(SecureSession session)
-        {
-            return (short?)(dynamic?)await GetAttribute(session, 1, true) ?? short.MinValue;
-        }
+        public required ReadAttribute<short?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Max Measured Value attribute
+        /// Max Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMaxMeasuredValue(SecureSession session)
-        {
-            return (short?)(dynamic?)await GetAttribute(session, 2, true) ?? short.MinValue;
-        }
+        public required ReadAttribute<short?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Tolerance attribute
+        /// Tolerance Attribute
         /// </summary>
-        public async Task<ushort> GetTolerance(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 0;
-        }
+        public required ReadAttribute<ushort> Tolerance { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

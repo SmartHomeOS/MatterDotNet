@@ -30,9 +30,21 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
         /// </summary>
-        public Binding(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Binding(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Binding(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Binding(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            BindingAttribute = new ReadWriteAttribute<Target[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Target[] list = new Target[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Target(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Records
         /// <summary>
@@ -76,22 +88,9 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Binding attribute
+        /// Binding Attribute
         /// </summary>
-        public async Task<Target[]> GetBinding(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Target[] list = new Target[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Target(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Set the Binding attribute
-        /// </summary>
-        public async Task SetBinding (SecureSession session, Target[] value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<Target[]> BindingAttribute { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -30,9 +30,63 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.
         /// </summary>
-        public OccupancySensing(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public OccupancySensing(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OccupancySensing(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected OccupancySensing(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Occupancy = new ReadAttribute<OccupancyBitmap>(cluster, endPoint, 0) {
+                Deserialize = x => (OccupancyBitmap)DeserializeEnum(x)!
+            };
+            OccupancySensorType = new ReadAttribute<OccupancySensorTypeEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (OccupancySensorTypeEnum)DeserializeEnum(x)!
+            };
+            OccupancySensorTypeBitmapAttribute = new ReadAttribute<OccupancySensorTypeBitmap>(cluster, endPoint, 2) {
+                Deserialize = x => (OccupancySensorTypeBitmap)DeserializeEnum(x)!
+            };
+            HoldTime = new ReadWriteAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+            HoldTimeLimits = new ReadAttribute<HoldTimeLimitsStruct>(cluster, endPoint, 4) {
+                Deserialize = x => new HoldTimeLimitsStruct((object[])x!)
+            };
+            PIROccupiedToUnoccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 16) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PIRUnoccupiedToOccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 17) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PIRUnoccupiedToOccupiedThreshold = new ReadWriteAttribute<byte>(cluster, endPoint, 18) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x01
+
+            };
+            UltrasonicOccupiedToUnoccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 32) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            UltrasonicUnoccupiedToOccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 33) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            UltrasonicUnoccupiedToOccupiedThreshold = new ReadWriteAttribute<byte>(cluster, endPoint, 34) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x01
+
+            };
+            PhysicalContactOccupiedToUnoccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 48) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PhysicalContactUnoccupiedToOccupiedDelay = new ReadWriteAttribute<ushort>(cluster, endPoint, 49) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            PhysicalContactUnoccupiedToOccupiedThreshold = new ReadWriteAttribute<byte>(cluster, endPoint, 50) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x01
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -77,7 +131,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Occupancy Sensor Type
         /// </summary>
-        public enum OccupancySensorType : byte {
+        public enum OccupancySensorTypeEnum : byte {
             /// <summary>
             /// Indicates a passive infrared sensor.
             /// </summary>
@@ -100,7 +154,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// Occupancy
         /// </summary>
         [Flags]
-        public enum Occupancy : byte {
+        public enum OccupancyBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -139,17 +193,17 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Hold Time Limits
         /// </summary>
-        public record HoldTimeLimits : TLVPayload {
+        public record HoldTimeLimitsStruct : TLVPayload {
             /// <summary>
             /// Hold Time Limits
             /// </summary>
-            public HoldTimeLimits() { }
+            public HoldTimeLimitsStruct() { }
 
             /// <summary>
             /// Hold Time Limits
             /// </summary>
             [SetsRequiredMembers]
-            public HoldTimeLimits(object[] fields) {
+            public HoldTimeLimitsStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 HoldTimeMin = reader.GetUShort(0)!.Value;
                 HoldTimeMax = reader.GetUShort(1)!.Value;
@@ -191,172 +245,74 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Occupancy attribute
+        /// Occupancy Attribute
         /// </summary>
-        public async Task<Occupancy> GetOccupancy(SecureSession session) {
-            return (Occupancy)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<OccupancyBitmap> Occupancy { get; init; }
 
         /// <summary>
-        /// Get the Occupancy Sensor Type attribute
+        /// Occupancy Sensor Type Attribute
         /// </summary>
-        public async Task<OccupancySensorType> GetOccupancySensorType(SecureSession session) {
-            return (OccupancySensorType)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<OccupancySensorTypeEnum> OccupancySensorType { get; init; }
 
         /// <summary>
-        /// Get the Occupancy Sensor Type attribute
+        /// Occupancy Sensor Type Attribute
         /// </summary>
-        public async Task<OccupancySensorTypeBitmap> GetOccupancySensorTypeBitmap(SecureSession session) {
-            return (OccupancySensorTypeBitmap)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<OccupancySensorTypeBitmap> OccupancySensorTypeBitmapAttribute { get; init; }
 
         /// <summary>
-        /// Get the Hold Time attribute
+        /// Hold Time Attribute
         /// </summary>
-        public async Task<ushort> GetHoldTime(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadWriteAttribute<ushort> HoldTime { get; init; }
 
         /// <summary>
-        /// Set the Hold Time attribute
+        /// Hold Time Limits Attribute
         /// </summary>
-        public async Task SetHoldTime (SecureSession session, ushort value) {
-            await SetAttribute(session, 3, value);
-        }
+        public required ReadAttribute<HoldTimeLimitsStruct> HoldTimeLimits { get; init; }
 
         /// <summary>
-        /// Get the Hold Time Limits attribute
+        /// PIR Occupied To Unoccupied Delay Attribute
         /// </summary>
-        public async Task<HoldTimeLimits> GetHoldTimeLimits(SecureSession session) {
-            return new HoldTimeLimits((object[])(await GetAttribute(session, 4))!);
-        }
+        public required ReadWriteAttribute<ushort> PIROccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// Get the PIR Occupied To Unoccupied Delay attribute
+        /// PIR Unoccupied To Occupied Delay Attribute
         /// </summary>
-        public async Task<ushort> GetPIROccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
-        }
+        public required ReadWriteAttribute<ushort> PIRUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// Set the PIR Occupied To Unoccupied Delay attribute
+        /// PIR Unoccupied To Occupied Threshold Attribute
         /// </summary>
-        public async Task SetPIROccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 16, value);
-        }
+        public required ReadWriteAttribute<byte> PIRUnoccupiedToOccupiedThreshold { get; init; }
 
         /// <summary>
-        /// Get the PIR Unoccupied To Occupied Delay attribute
+        /// Ultrasonic Occupied To Unoccupied Delay Attribute
         /// </summary>
-        public async Task<ushort> GetPIRUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 17) ?? 0x0000;
-        }
+        public required ReadWriteAttribute<ushort> UltrasonicOccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// Set the PIR Unoccupied To Occupied Delay attribute
+        /// Ultrasonic Unoccupied To Occupied Delay Attribute
         /// </summary>
-        public async Task SetPIRUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 17, value);
-        }
+        public required ReadWriteAttribute<ushort> UltrasonicUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// Get the PIR Unoccupied To Occupied Threshold attribute
+        /// Ultrasonic Unoccupied To Occupied Threshold Attribute
         /// </summary>
-        public async Task<byte> GetPIRUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 18) ?? 0x01;
-        }
+        public required ReadWriteAttribute<byte> UltrasonicUnoccupiedToOccupiedThreshold { get; init; }
 
         /// <summary>
-        /// Set the PIR Unoccupied To Occupied Threshold attribute
+        /// Physical Contact Occupied To Unoccupied Delay Attribute
         /// </summary>
-        public async Task SetPIRUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
-            await SetAttribute(session, 18, value);
-        }
+        public required ReadWriteAttribute<ushort> PhysicalContactOccupiedToUnoccupiedDelay { get; init; }
 
         /// <summary>
-        /// Get the Ultrasonic Occupied To Unoccupied Delay attribute
+        /// Physical Contact Unoccupied To Occupied Delay Attribute
         /// </summary>
-        public async Task<ushort> GetUltrasonicOccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 32) ?? 0x0000;
-        }
+        public required ReadWriteAttribute<ushort> PhysicalContactUnoccupiedToOccupiedDelay { get; init; }
 
         /// <summary>
-        /// Set the Ultrasonic Occupied To Unoccupied Delay attribute
+        /// Physical Contact Unoccupied To Occupied Threshold Attribute
         /// </summary>
-        public async Task SetUltrasonicOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 32, value);
-        }
-
-        /// <summary>
-        /// Get the Ultrasonic Unoccupied To Occupied Delay attribute
-        /// </summary>
-        public async Task<ushort> GetUltrasonicUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 33) ?? 0x0000;
-        }
-
-        /// <summary>
-        /// Set the Ultrasonic Unoccupied To Occupied Delay attribute
-        /// </summary>
-        public async Task SetUltrasonicUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 33, value);
-        }
-
-        /// <summary>
-        /// Get the Ultrasonic Unoccupied To Occupied Threshold attribute
-        /// </summary>
-        public async Task<byte> GetUltrasonicUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 0x01;
-        }
-
-        /// <summary>
-        /// Set the Ultrasonic Unoccupied To Occupied Threshold attribute
-        /// </summary>
-        public async Task SetUltrasonicUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
-            await SetAttribute(session, 34, value);
-        }
-
-        /// <summary>
-        /// Get the Physical Contact Occupied To Unoccupied Delay attribute
-        /// </summary>
-        public async Task<ushort> GetPhysicalContactOccupiedToUnoccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 48) ?? 0x0000;
-        }
-
-        /// <summary>
-        /// Set the Physical Contact Occupied To Unoccupied Delay attribute
-        /// </summary>
-        public async Task SetPhysicalContactOccupiedToUnoccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 48, value);
-        }
-
-        /// <summary>
-        /// Get the Physical Contact Unoccupied To Occupied Delay attribute
-        /// </summary>
-        public async Task<ushort> GetPhysicalContactUnoccupiedToOccupiedDelay(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 49) ?? 0x0000;
-        }
-
-        /// <summary>
-        /// Set the Physical Contact Unoccupied To Occupied Delay attribute
-        /// </summary>
-        public async Task SetPhysicalContactUnoccupiedToOccupiedDelay (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 49, value);
-        }
-
-        /// <summary>
-        /// Get the Physical Contact Unoccupied To Occupied Threshold attribute
-        /// </summary>
-        public async Task<byte> GetPhysicalContactUnoccupiedToOccupiedThreshold(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 50) ?? 0x01;
-        }
-
-        /// <summary>
-        /// Set the Physical Contact Unoccupied To Occupied Threshold attribute
-        /// </summary>
-        public async Task SetPhysicalContactUnoccupiedToOccupiedThreshold (SecureSession session, byte? value = 0x01) {
-            await SetAttribute(session, 50, value);
-        }
+        public required ReadWriteAttribute<byte> PhysicalContactUnoccupiedToOccupiedThreshold { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

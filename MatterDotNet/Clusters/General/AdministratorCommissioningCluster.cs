@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,21 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Commands to trigger a Node to allow a new Administrator to commission it.
         /// </summary>
-        public AdministratorCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public AdministratorCommissioning(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AdministratorCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected AdministratorCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            WindowStatus = new ReadAttribute<CommissioningWindowStatus>(cluster, endPoint, 0) {
+                Deserialize = x => (CommissioningWindowStatus)DeserializeEnum(x)!
+            };
+            AdminFabricIndex = new ReadAttribute<byte?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            AdminVendorId = new ReadAttribute<ushort?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -162,25 +175,19 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Window Status attribute
+        /// Window Status Attribute
         /// </summary>
-        public async Task<CommissioningWindowStatus> GetWindowStatus(SecureSession session) {
-            return (CommissioningWindowStatus)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<CommissioningWindowStatus> WindowStatus { get; init; }
 
         /// <summary>
-        /// Get the Admin Fabric Index attribute
+        /// Admin Fabric Index Attribute
         /// </summary>
-        public async Task<byte?> GetAdminFabricIndex(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<byte?> AdminFabricIndex { get; init; }
 
         /// <summary>
-        /// Get the Admin Vendor Id attribute
+        /// Admin Vendor Id Attribute
         /// </summary>
-        public async Task<ushort?> GetAdminVendorId(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<ushort?> AdminVendorId { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

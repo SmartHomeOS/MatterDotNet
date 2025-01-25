@@ -16,6 +16,7 @@ using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -30,9 +31,60 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
         /// </summary>
-        public WiFiNetworkDiagnostics(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WiFiNetworkDiagnostics(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WiFiNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WiFiNetworkDiagnostics(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            BSSID = new ReadAttribute<byte[]?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            SecurityType = new ReadAttribute<SecurityTypeEnum?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (SecurityTypeEnum?)DeserializeEnum(x)
+            };
+            WiFiVersion = new ReadAttribute<WiFiVersionEnum?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (WiFiVersionEnum?)DeserializeEnum(x)
+            };
+            ChannelNumber = new ReadAttribute<ushort?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            RSSI = new ReadAttribute<sbyte?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (sbyte?)(dynamic?)x
+            };
+            BeaconLostCount = new ReadAttribute<uint?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            BeaconRxCount = new ReadAttribute<uint?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            PacketMulticastRxCount = new ReadAttribute<uint?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            PacketMulticastTxCount = new ReadAttribute<uint?>(cluster, endPoint, 8, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            PacketUnicastRxCount = new ReadAttribute<uint?>(cluster, endPoint, 9, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            PacketUnicastTxCount = new ReadAttribute<uint?>(cluster, endPoint, 10, true) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0x00000000
+
+            };
+            CurrentMaxRate = new ReadAttribute<ulong?>(cluster, endPoint, 11, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+            OverrunCount = new ReadAttribute<ulong?>(cluster, endPoint, 12, true) {
+                Deserialize = x => (ulong?)(dynamic?)x ?? 0x0000000000000000
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -53,7 +105,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Security Type
         /// </summary>
-        public enum SecurityType : byte {
+        public enum SecurityTypeEnum : byte {
             /// <summary>
             /// Indicate the usage of an unspecified Wi-Fi security type
             /// </summary>
@@ -83,7 +135,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// WiFi Version
         /// </summary>
-        public enum WiFiVersion : byte {
+        public enum WiFiVersionEnum : byte {
             /// <summary>
             /// Indicate the network interface is currently using 802.11a against the wireless access point.
             /// </summary>
@@ -187,95 +239,69 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the BSSID attribute
+        /// BSSID Attribute
         /// </summary>
-        public async Task<byte[]?> GetBSSID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<byte[]?> BSSID { get; init; }
 
         /// <summary>
-        /// Get the Security Type attribute
+        /// Security Type Attribute
         /// </summary>
-        public async Task<SecurityType?> GetSecurityType(SecureSession session) {
-            return (SecurityType?)await GetEnumAttribute(session, 1, true);
-        }
+        public required ReadAttribute<SecurityTypeEnum?> SecurityType { get; init; }
 
         /// <summary>
-        /// Get the WiFi Version attribute
+        /// WiFi Version Attribute
         /// </summary>
-        public async Task<WiFiVersion?> GetWiFiVersion(SecureSession session) {
-            return (WiFiVersion?)await GetEnumAttribute(session, 2, true);
-        }
+        public required ReadAttribute<WiFiVersionEnum?> WiFiVersion { get; init; }
 
         /// <summary>
-        /// Get the Channel Number attribute
+        /// Channel Number Attribute
         /// </summary>
-        public async Task<ushort?> GetChannelNumber(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3, true) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort?> ChannelNumber { get; init; }
 
         /// <summary>
-        /// Get the RSSI attribute
+        /// RSSI Attribute
         /// </summary>
-        public async Task<sbyte?> GetRSSI(SecureSession session) {
-            return (sbyte?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadAttribute<sbyte?> RSSI { get; init; }
 
         /// <summary>
-        /// Get the Beacon Lost Count attribute
+        /// Beacon Lost Count Attribute
         /// </summary>
-        public async Task<uint?> GetBeaconLostCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 5, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> BeaconLostCount { get; init; }
 
         /// <summary>
-        /// Get the Beacon Rx Count attribute
+        /// Beacon Rx Count Attribute
         /// </summary>
-        public async Task<uint?> GetBeaconRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 6, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> BeaconRxCount { get; init; }
 
         /// <summary>
-        /// Get the Packet Multicast Rx Count attribute
+        /// Packet Multicast Rx Count Attribute
         /// </summary>
-        public async Task<uint?> GetPacketMulticastRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 7, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> PacketMulticastRxCount { get; init; }
 
         /// <summary>
-        /// Get the Packet Multicast Tx Count attribute
+        /// Packet Multicast Tx Count Attribute
         /// </summary>
-        public async Task<uint?> GetPacketMulticastTxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 8, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> PacketMulticastTxCount { get; init; }
 
         /// <summary>
-        /// Get the Packet Unicast Rx Count attribute
+        /// Packet Unicast Rx Count Attribute
         /// </summary>
-        public async Task<uint?> GetPacketUnicastRxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> PacketUnicastRxCount { get; init; }
 
         /// <summary>
-        /// Get the Packet Unicast Tx Count attribute
+        /// Packet Unicast Tx Count Attribute
         /// </summary>
-        public async Task<uint?> GetPacketUnicastTxCount(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 10, true) ?? 0x00000000;
-        }
+        public required ReadAttribute<uint?> PacketUnicastTxCount { get; init; }
 
         /// <summary>
-        /// Get the Current Max Rate attribute
+        /// Current Max Rate Attribute
         /// </summary>
-        public async Task<ulong?> GetCurrentMaxRate(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 11, true) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong?> CurrentMaxRate { get; init; }
 
         /// <summary>
-        /// Get the Overrun Count attribute
+        /// Overrun Count Attribute
         /// </summary>
-        public async Task<ulong?> GetOverrunCount(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 12, true) ?? 0x0000000000000000;
-        }
+        public required ReadAttribute<ulong?> OverrunCount { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

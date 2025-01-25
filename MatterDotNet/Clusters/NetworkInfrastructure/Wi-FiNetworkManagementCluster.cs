@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.NetworkInfrastructure
 {
@@ -31,9 +32,18 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Functionality to retrieve operational information about a managed Wi-Fi network.
         /// </summary>
-        public WiFiNetworkManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WiFiNetworkManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WiFiNetworkManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WiFiNetworkManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SSID = new ReadAttribute<byte[]?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            PassphraseSurrogate = new ReadAttribute<ulong?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (ulong?)(dynamic?)x
+            };
+        }
 
         #region Payloads
         /// <summary>
@@ -60,18 +70,14 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
 
         #region Attributes
         /// <summary>
-        /// Get the SSID attribute
+        /// SSID Attribute
         /// </summary>
-        public async Task<byte[]?> GetSSID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<byte[]?> SSID { get; init; }
 
         /// <summary>
-        /// Get the Passphrase Surrogate attribute
+        /// Passphrase Surrogate Attribute
         /// </summary>
-        public async Task<ulong?> GetPassphraseSurrogate(SecureSession session) {
-            return (ulong?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<ulong?> PassphraseSurrogate { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

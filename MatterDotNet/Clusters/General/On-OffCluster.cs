@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,31 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for switching devices between 'On' and 'Off' states.
         /// </summary>
-        public On_Off(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public On_Off(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected On_Off(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected On_Off(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            OnOff = new ReadAttribute<bool>(cluster, endPoint, 0) {
+                Deserialize = x => (bool?)(dynamic?)x ?? false
+
+            };
+            GlobalSceneControl = new ReadAttribute<bool>(cluster, endPoint, 16384) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            OnTime = new ReadWriteAttribute<ushort>(cluster, endPoint, 16385) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            OffWaitTime = new ReadWriteAttribute<ushort>(cluster, endPoint, 16386) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            StartUpOnOff = new ReadWriteAttribute<StartUpOnOffEnum?>(cluster, endPoint, 16387, true) {
+                Deserialize = x => (StartUpOnOffEnum?)DeserializeEnum(x)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -58,7 +81,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Start Up On Off
         /// </summary>
-        public enum StartUpOnOff : byte {
+        public enum StartUpOnOffEnum : byte {
             /// <summary>
             /// Set the OnOff attribute to FALSE
             /// </summary>
@@ -124,9 +147,6 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Indicates a command is only accepted when in On state.
-            /// </summary>
             AcceptOnlyWhenOn = 0x01,
         }
         #endregion Enums
@@ -239,60 +259,29 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the On Off attribute
+        /// On Off Attribute
         /// </summary>
-        public async Task<bool> GetOnOff(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 0) ?? false;
-        }
+        public required ReadAttribute<bool> OnOff { get; init; }
 
         /// <summary>
-        /// Get the Global Scene Control attribute
+        /// Global Scene Control Attribute
         /// </summary>
-        public async Task<bool> GetGlobalSceneControl(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 16384) ?? true;
-        }
+        public required ReadAttribute<bool> GlobalSceneControl { get; init; }
 
         /// <summary>
-        /// Get the On Time attribute
+        /// On Time Attribute
         /// </summary>
-        public async Task<ushort> GetOnTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16385) ?? 0;
-        }
+        public required ReadWriteAttribute<ushort> OnTime { get; init; }
 
         /// <summary>
-        /// Set the On Time attribute
+        /// Off Wait Time Attribute
         /// </summary>
-        public async Task SetOnTime (SecureSession session, ushort? value = 0) {
-            await SetAttribute(session, 16385, value);
-        }
+        public required ReadWriteAttribute<ushort> OffWaitTime { get; init; }
 
         /// <summary>
-        /// Get the Off Wait Time attribute
+        /// Start Up On Off Attribute
         /// </summary>
-        public async Task<ushort> GetOffWaitTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16386) ?? 0;
-        }
-
-        /// <summary>
-        /// Set the Off Wait Time attribute
-        /// </summary>
-        public async Task SetOffWaitTime (SecureSession session, ushort? value = 0) {
-            await SetAttribute(session, 16386, value);
-        }
-
-        /// <summary>
-        /// Get the Start Up On Off attribute
-        /// </summary>
-        public async Task<StartUpOnOff?> GetStartUpOnOff(SecureSession session) {
-            return (StartUpOnOff?)await GetEnumAttribute(session, 16387, true);
-        }
-
-        /// <summary>
-        /// Set the Start Up On Off attribute
-        /// </summary>
-        public async Task SetStartUpOnOff (SecureSession session, StartUpOnOff? value) {
-            await SetAttribute(session, 16387, value, true);
-        }
+        public required ReadWriteAttribute<StartUpOnOffEnum?> StartUpOnOff { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

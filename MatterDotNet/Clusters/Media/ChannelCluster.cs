@@ -33,9 +33,29 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for controlling the current Channel on a device.
         /// </summary>
-        public Channel(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Channel(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Channel(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Channel(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ChannelList = new ReadAttribute<ChannelInfo[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ChannelInfo[] list = new ChannelInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ChannelInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Lineup = new ReadAttribute<LineupInfo?>(cluster, endPoint, 1, true) {
+                Deserialize = x => new LineupInfo((object[])x!)
+
+            };
+            CurrentChannel = new ReadAttribute<ChannelInfo?>(cluster, endPoint, 2, true) {
+                Deserialize = x => new ChannelInfo((object[])x!)
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -120,17 +140,8 @@ namespace MatterDotNet.Clusters.Media
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// The program is scheduled for recording.
-            /// </summary>
             Scheduled = 0x0001,
-            /// <summary>
-            /// The program series is scheduled for recording.
-            /// </summary>
             RecordSeries = 0x0002,
-            /// <summary>
-            /// The program is recorded and available to be played.
-            /// </summary>
             Recorded = 0x0004,
         }
         #endregion Enums
@@ -794,29 +805,19 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Channel List attribute
+        /// Channel List Attribute
         /// </summary>
-        public async Task<ChannelInfo[]> GetChannelList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ChannelInfo[] list = new ChannelInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ChannelInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ChannelInfo[]> ChannelList { get; init; }
 
         /// <summary>
-        /// Get the Lineup attribute
+        /// Lineup Attribute
         /// </summary>
-        public async Task<LineupInfo?> GetLineup(SecureSession session) {
-            return new LineupInfo((object[])(await GetAttribute(session, 1))!);
-        }
+        public required ReadAttribute<LineupInfo?> Lineup { get; init; }
 
         /// <summary>
-        /// Get the Current Channel attribute
+        /// Current Channel Attribute
         /// </summary>
-        public async Task<ChannelInfo?> GetCurrentChannel(SecureSession session) {
-            return new ChannelInfo((object[])(await GetAttribute(session, 2))!);
-        }
+        public required ReadAttribute<ChannelInfo?> CurrentChannel { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

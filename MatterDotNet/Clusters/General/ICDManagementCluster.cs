@@ -32,9 +32,54 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Allows servers to ensure that listed clients are notified when a server is available for communication.
         /// </summary>
-        public ICDManagement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ICDManagement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ICDManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ICDManagement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            IdleModeDuration = new ReadAttribute<uint>(cluster, endPoint, 0) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 1
+
+            };
+            ActiveModeDuration = new ReadAttribute<uint>(cluster, endPoint, 1) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 300
+
+            };
+            ActiveModeThreshold = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 300
+
+            };
+            RegisteredClients = new ReadAttribute<MonitoringRegistration[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    MonitoringRegistration[] list = new MonitoringRegistration[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new MonitoringRegistration(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ICDCounter = new ReadAttribute<uint>(cluster, endPoint, 4) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 0
+
+            };
+            ClientsSupportedPerFabric = new ReadAttribute<ushort>(cluster, endPoint, 5) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 1
+
+            };
+            UserActiveModeTriggerHint = new ReadAttribute<UserActiveModeTrigger>(cluster, endPoint, 6) {
+                Deserialize = x => (UserActiveModeTrigger)DeserializeEnum(x)!
+            };
+            UserActiveModeTriggerInstruction = new ReadAttribute<string>(cluster, endPoint, 7) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            OperatingMode = new ReadAttribute<OperatingModeEnum>(cluster, endPoint, 8) {
+                Deserialize = x => (OperatingModeEnum)DeserializeEnum(x)!
+            };
+            MaximumCheckInBackOff = new ReadAttribute<uint>(cluster, endPoint, 9) {
+                Deserialize = x => (uint?)(dynamic?)x ?? 1
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -71,7 +116,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Operating Mode
         /// </summary>
-        public enum OperatingMode : byte {
+        public enum OperatingModeEnum : byte {
             /// <summary>
             /// ICD is operating as a Short Idle Time ICD.
             /// </summary>
@@ -91,61 +136,22 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Power Cycle to transition the device to ActiveMode
-            /// </summary>
             PowerCycle = 0x0001,
-            /// <summary>
-            /// Settings menu on the device informs how to transition the device to ActiveMode
-            /// </summary>
             SettingsMenu = 0x0002,
-            /// <summary>
-            /// Custom Instruction on how to transition the device to ActiveMode
-            /// </summary>
             CustomInstruction = 0x0004,
-            /// <summary>
-            /// Device Manual informs how to transition the device to ActiveMode
-            /// </summary>
             DeviceManual = 0x0008,
-            /// <summary>
-            /// Actuate Sensor to transition the device to ActiveMode
-            /// </summary>
             ActuateSensor = 0x0010,
-            /// <summary>
-            /// Actuate Sensor for N seconds to transition the device to ActiveMode
-            /// </summary>
             ActuateSensorSeconds = 0x0020,
-            /// <summary>
-            /// Actuate Sensor N times to transition the device to ActiveMode
-            /// </summary>
             ActuateSensorTimes = 0x0040,
-            /// <summary>
-            /// Actuate Sensor until light blinks to transition the device to ActiveMode
-            /// </summary>
             ActuateSensorLightsBlink = 0x0080,
             ResetButton = 0x00100,
             ResetButtonLightsBlink = 0x00200,
             ResetButtonSeconds = 0x00400,
             ResetButtonTimes = 0x00800,
-            /// <summary>
-            /// Press Setup Button to transition the device to ActiveMode
-            /// </summary>
             SetupButton = 0x1000,
-            /// <summary>
-            /// Press Setup Button for N seconds to transition the device to ActiveMode
-            /// </summary>
             SetupButtonSeconds = 0x2000,
-            /// <summary>
-            /// Press Setup Button until light blinks to transition the device to ActiveMode
-            /// </summary>
             SetupButtonLightsBlink = 0x4000,
-            /// <summary>
-            /// Press Setup Button N times to transition the device to ActiveMode
-            /// </summary>
             SetupButtonTimes = 0x8000,
-            /// <summary>
-            /// Press the N Button to transition the device to ActiveMode
-            /// </summary>
             AppDefinedButton = 0x10000,
         }
         #endregion Enums
@@ -309,78 +315,54 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Idle Mode Duration attribute
+        /// Idle Mode Duration Attribute
         /// </summary>
-        public async Task<uint> GetIdleModeDuration(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 0) ?? 1;
-        }
+        public required ReadAttribute<uint> IdleModeDuration { get; init; }
 
         /// <summary>
-        /// Get the Active Mode Duration attribute
+        /// Active Mode Duration Attribute
         /// </summary>
-        public async Task<uint> GetActiveModeDuration(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 1) ?? 300;
-        }
+        public required ReadAttribute<uint> ActiveModeDuration { get; init; }
 
         /// <summary>
-        /// Get the Active Mode Threshold attribute
+        /// Active Mode Threshold Attribute
         /// </summary>
-        public async Task<ushort> GetActiveModeThreshold(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 300;
-        }
+        public required ReadAttribute<ushort> ActiveModeThreshold { get; init; }
 
         /// <summary>
-        /// Get the Registered Clients attribute
+        /// Registered Clients Attribute
         /// </summary>
-        public async Task<MonitoringRegistration[]> GetRegisteredClients(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            MonitoringRegistration[] list = new MonitoringRegistration[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new MonitoringRegistration(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<MonitoringRegistration[]> RegisteredClients { get; init; }
 
         /// <summary>
-        /// Get the ICD Counter attribute
+        /// ICD Counter Attribute
         /// </summary>
-        public async Task<uint> GetICDCounter(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 4) ?? 0;
-        }
+        public required ReadAttribute<uint> ICDCounter { get; init; }
 
         /// <summary>
-        /// Get the Clients Supported Per Fabric attribute
+        /// Clients Supported Per Fabric Attribute
         /// </summary>
-        public async Task<ushort> GetClientsSupportedPerFabric(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 5) ?? 1;
-        }
+        public required ReadAttribute<ushort> ClientsSupportedPerFabric { get; init; }
 
         /// <summary>
-        /// Get the User Active Mode Trigger Hint attribute
+        /// User Active Mode Trigger Hint Attribute
         /// </summary>
-        public async Task<UserActiveModeTrigger> GetUserActiveModeTriggerHint(SecureSession session) {
-            return (UserActiveModeTrigger)await GetEnumAttribute(session, 6);
-        }
+        public required ReadAttribute<UserActiveModeTrigger> UserActiveModeTriggerHint { get; init; }
 
         /// <summary>
-        /// Get the User Active Mode Trigger Instruction attribute
+        /// User Active Mode Trigger Instruction Attribute
         /// </summary>
-        public async Task<string> GetUserActiveModeTriggerInstruction(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 7))!;
-        }
+        public required ReadAttribute<string> UserActiveModeTriggerInstruction { get; init; }
 
         /// <summary>
-        /// Get the Operating Mode attribute
+        /// Operating Mode Attribute
         /// </summary>
-        public async Task<OperatingMode> GetOperatingMode(SecureSession session) {
-            return (OperatingMode)await GetEnumAttribute(session, 8);
-        }
+        public required ReadAttribute<OperatingModeEnum> OperatingMode { get; init; }
 
         /// <summary>
-        /// Get the Maximum Check In Back Off attribute
+        /// Maximum Check In Back Off Attribute
         /// </summary>
-        public async Task<uint> GetMaximumCheckInBackOff(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 9) ?? 1;
-        }
+        public required ReadAttribute<uint> MaximumCheckInBackOff { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

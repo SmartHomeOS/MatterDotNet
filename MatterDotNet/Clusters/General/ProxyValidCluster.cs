@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,9 +29,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Cluster to control Proxy Valid
         /// </summary>
-        public ProxyValid(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ProxyValid(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ProxyValid(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ProxyValid(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+        }
 
 
         /// <inheritdoc />

@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,62 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.'
         /// </summary>
-        public LevelControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public LevelControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LevelControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected LevelControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            CurrentLevel = new ReadAttribute<byte?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+            RemainingTime = new ReadAttribute<ushort>(cluster, endPoint, 1) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            MinLevel = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+            MaxLevel = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0xFE
+
+            };
+            CurrentFrequency = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            MinFrequency = new ReadAttribute<ushort>(cluster, endPoint, 5) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            MaxFrequency = new ReadAttribute<ushort>(cluster, endPoint, 6) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            OnOffTransitionTime = new ReadWriteAttribute<ushort>(cluster, endPoint, 16) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
+
+            };
+            OnLevel = new ReadWriteAttribute<byte?>(cluster, endPoint, 17, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OnTransitionTime = new ReadWriteAttribute<ushort?>(cluster, endPoint, 18, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            OffTransitionTime = new ReadWriteAttribute<ushort?>(cluster, endPoint, 19, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            DefaultMoveRate = new ReadWriteAttribute<byte?>(cluster, endPoint, 20, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            Options = new ReadWriteAttribute<OptionsBitmap>(cluster, endPoint, 15) {
+                Deserialize = x => (OptionsBitmap)DeserializeEnum(x)!
+            };
+            StartUpCurrentLevel = new ReadWriteAttribute<byte?>(cluster, endPoint, 16384, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -87,7 +141,7 @@ namespace MatterDotNet.Clusters.General
         /// Options
         /// </summary>
         [Flags]
-        public enum Options : byte {
+        public enum OptionsBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -107,8 +161,8 @@ namespace MatterDotNet.Clusters.General
         private record MoveToLevelPayload : TLVPayload {
             public required byte Level { get; set; }
             public required ushort? TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Level);
@@ -122,8 +176,8 @@ namespace MatterDotNet.Clusters.General
         private record MovePayload : TLVPayload {
             public required MoveMode MoveMode { get; set; }
             public required byte? Rate { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)MoveMode);
@@ -138,8 +192,8 @@ namespace MatterDotNet.Clusters.General
             public required StepMode StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required ushort? TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)StepMode);
@@ -152,8 +206,8 @@ namespace MatterDotNet.Clusters.General
         }
 
         private record StopPayload : TLVPayload {
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, (uint)OptionsMask);
@@ -165,8 +219,8 @@ namespace MatterDotNet.Clusters.General
         private record MoveToLevelWithOnOffPayload : TLVPayload {
             public required byte Level { get; set; }
             public required ushort? TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteByte(0, Level);
@@ -180,8 +234,8 @@ namespace MatterDotNet.Clusters.General
         private record MoveWithOnOffPayload : TLVPayload {
             public required MoveMode MoveMode { get; set; }
             public required byte? Rate { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)MoveMode);
@@ -196,8 +250,8 @@ namespace MatterDotNet.Clusters.General
             public required StepMode StepMode { get; set; }
             public required byte StepSize { get; set; }
             public required ushort? TransitionTime { get; set; }
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUShort(0, (ushort)StepMode);
@@ -210,8 +264,8 @@ namespace MatterDotNet.Clusters.General
         }
 
         private record StopWithOnOffPayload : TLVPayload {
-            public required Options OptionsMask { get; set; }
-            public required Options OptionsOverride { get; set; }
+            public required OptionsBitmap OptionsMask { get; set; }
+            public required OptionsBitmap OptionsOverride { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
                 writer.WriteUInt(0, (uint)OptionsMask);
@@ -234,7 +288,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Move To Level
         /// </summary>
-        public async Task<bool> MoveToLevel(SecureSession session, byte level, ushort? transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToLevel(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToLevelPayload requestFields = new MoveToLevelPayload() {
                 Level = level,
                 TransitionTime = transitionTime,
@@ -248,7 +302,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Move
         /// </summary>
-        public async Task<bool> Move(SecureSession session, MoveMode moveMode, byte? rate, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> Move(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MovePayload requestFields = new MovePayload() {
                 MoveMode = moveMode,
                 Rate = rate,
@@ -262,7 +316,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Step
         /// </summary>
-        public async Task<bool> Step(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> Step(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StepPayload requestFields = new StepPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -277,7 +331,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Stop
         /// </summary>
-        public async Task<bool> Stop(SecureSession session, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> Stop(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StopPayload requestFields = new StopPayload() {
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
@@ -289,7 +343,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Move To Level With On Off
         /// </summary>
-        public async Task<bool> MoveToLevelWithOnOff(SecureSession session, byte level, ushort? transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveToLevelWithOnOff(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveToLevelWithOnOffPayload requestFields = new MoveToLevelWithOnOffPayload() {
                 Level = level,
                 TransitionTime = transitionTime,
@@ -303,7 +357,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Move With On Off
         /// </summary>
-        public async Task<bool> MoveWithOnOff(SecureSession session, MoveMode moveMode, byte? rate, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> MoveWithOnOff(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             MoveWithOnOffPayload requestFields = new MoveWithOnOffPayload() {
                 MoveMode = moveMode,
                 Rate = rate,
@@ -317,7 +371,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Step With On Off
         /// </summary>
-        public async Task<bool> StepWithOnOff(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> StepWithOnOff(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StepWithOnOffPayload requestFields = new StepWithOnOffPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -332,7 +386,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Stop With On Off
         /// </summary>
-        public async Task<bool> StopWithOnOff(SecureSession session, Options optionsMask, Options optionsOverride) {
+        public async Task<bool> StopWithOnOff(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
             StopWithOnOffPayload requestFields = new StopWithOnOffPayload() {
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
@@ -376,151 +430,74 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Current Level attribute
+        /// Current Level Attribute
         /// </summary>
-        public async Task<byte?> GetCurrentLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 0, true) ?? 0x00;
-        }
+        public required ReadAttribute<byte?> CurrentLevel { get; init; }
 
         /// <summary>
-        /// Get the Remaining Time attribute
+        /// Remaining Time Attribute
         /// </summary>
-        public async Task<ushort> GetRemainingTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> RemainingTime { get; init; }
 
         /// <summary>
-        /// Get the Min Level attribute
+        /// Min Level Attribute
         /// </summary>
-        public async Task<byte> GetMinLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 2) ?? 0x00;
-        }
+        public required ReadAttribute<byte> MinLevel { get; init; }
 
         /// <summary>
-        /// Get the Max Level attribute
+        /// Max Level Attribute
         /// </summary>
-        public async Task<byte> GetMaxLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3) ?? 0xFE;
-        }
+        public required ReadAttribute<byte> MaxLevel { get; init; }
 
         /// <summary>
-        /// Get the Current Frequency attribute
+        /// Current Frequency Attribute
         /// </summary>
-        public async Task<ushort> GetCurrentFrequency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> CurrentFrequency { get; init; }
 
         /// <summary>
-        /// Get the Min Frequency attribute
+        /// Min Frequency Attribute
         /// </summary>
-        public async Task<ushort> GetMinFrequency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 5) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> MinFrequency { get; init; }
 
         /// <summary>
-        /// Get the Max Frequency attribute
+        /// Max Frequency Attribute
         /// </summary>
-        public async Task<ushort> GetMaxFrequency(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 6) ?? 0x0000;
-        }
+        public required ReadAttribute<ushort> MaxFrequency { get; init; }
 
         /// <summary>
-        /// Get the On Off Transition Time attribute
+        /// On Off Transition Time Attribute
         /// </summary>
-        public async Task<ushort> GetOnOffTransitionTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 16) ?? 0x0000;
-        }
+        public required ReadWriteAttribute<ushort> OnOffTransitionTime { get; init; }
 
         /// <summary>
-        /// Set the On Off Transition Time attribute
+        /// On Level Attribute
         /// </summary>
-        public async Task SetOnOffTransitionTime (SecureSession session, ushort? value = 0x0000) {
-            await SetAttribute(session, 16, value);
-        }
+        public required ReadWriteAttribute<byte?> OnLevel { get; init; }
 
         /// <summary>
-        /// Get the On Level attribute
+        /// On Transition Time Attribute
         /// </summary>
-        public async Task<byte?> GetOnLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 17, true);
-        }
+        public required ReadWriteAttribute<ushort?> OnTransitionTime { get; init; }
 
         /// <summary>
-        /// Set the On Level attribute
+        /// Off Transition Time Attribute
         /// </summary>
-        public async Task SetOnLevel (SecureSession session, byte? value) {
-            await SetAttribute(session, 17, value, true);
-        }
+        public required ReadWriteAttribute<ushort?> OffTransitionTime { get; init; }
 
         /// <summary>
-        /// Get the On Transition Time attribute
+        /// Default Move Rate Attribute
         /// </summary>
-        public async Task<ushort?> GetOnTransitionTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 18, true);
-        }
+        public required ReadWriteAttribute<byte?> DefaultMoveRate { get; init; }
 
         /// <summary>
-        /// Set the On Transition Time attribute
+        /// Options Attribute
         /// </summary>
-        public async Task SetOnTransitionTime (SecureSession session, ushort? value) {
-            await SetAttribute(session, 18, value, true);
-        }
+        public required ReadWriteAttribute<OptionsBitmap> Options { get; init; }
 
         /// <summary>
-        /// Get the Off Transition Time attribute
+        /// Start Up Current Level Attribute
         /// </summary>
-        public async Task<ushort?> GetOffTransitionTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19, true);
-        }
-
-        /// <summary>
-        /// Set the Off Transition Time attribute
-        /// </summary>
-        public async Task SetOffTransitionTime (SecureSession session, ushort? value) {
-            await SetAttribute(session, 19, value, true);
-        }
-
-        /// <summary>
-        /// Get the Default Move Rate attribute
-        /// </summary>
-        public async Task<byte?> GetDefaultMoveRate(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 20, true);
-        }
-
-        /// <summary>
-        /// Set the Default Move Rate attribute
-        /// </summary>
-        public async Task SetDefaultMoveRate (SecureSession session, byte? value) {
-            await SetAttribute(session, 20, value, true);
-        }
-
-        /// <summary>
-        /// Get the Options attribute
-        /// </summary>
-        public async Task<Options> GetOptions(SecureSession session) {
-            return (Options)await GetEnumAttribute(session, 15);
-        }
-
-        /// <summary>
-        /// Set the Options attribute
-        /// </summary>
-        public async Task SetOptions (SecureSession session, Options value) {
-            await SetAttribute(session, 15, value);
-        }
-
-        /// <summary>
-        /// Get the Start Up Current Level attribute
-        /// </summary>
-        public async Task<byte?> GetStartUpCurrentLevel(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 16384, true);
-        }
-
-        /// <summary>
-        /// Set the Start Up Current Level attribute
-        /// </summary>
-        public async Task SetStartUpCurrentLevel (SecureSession session, byte? value) {
-            await SetAttribute(session, 16384, value, true);
-        }
+        public required ReadWriteAttribute<byte?> StartUpCurrentLevel { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

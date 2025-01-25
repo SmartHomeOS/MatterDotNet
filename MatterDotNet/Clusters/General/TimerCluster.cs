@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,21 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster supports creating a simple timer functionality.
         /// </summary>
-        public Timer(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Timer(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Timer(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Timer(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SetTime = new ReadAttribute<TimeSpan>(cluster, endPoint, 0) {
+                Deserialize = x => (TimeSpan)(dynamic?)x!
+            };
+            TimeRemaining = new ReadAttribute<TimeSpan>(cluster, endPoint, 1) {
+                Deserialize = x => (TimeSpan)(dynamic?)x!
+            };
+            TimerState = new ReadAttribute<TimerStatus>(cluster, endPoint, 2) {
+                Deserialize = x => (TimerStatus)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -153,25 +166,19 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Set Time attribute
+        /// Set Time Attribute
         /// </summary>
-        public async Task<TimeSpan> GetSetTime(SecureSession session) {
-            return (TimeSpan)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<TimeSpan> SetTime { get; init; }
 
         /// <summary>
-        /// Get the Time Remaining attribute
+        /// Time Remaining Attribute
         /// </summary>
-        public async Task<TimeSpan> GetTimeRemaining(SecureSession session) {
-            return (TimeSpan)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<TimeSpan> TimeRemaining { get; init; }
 
         /// <summary>
-        /// Get the Timer State attribute
+        /// Timer State Attribute
         /// </summary>
-        public async Task<TimerStatus> GetTimerState(SecureSession session) {
-            return (TimerStatus)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<TimerStatus> TimerState { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

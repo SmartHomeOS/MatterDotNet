@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Media
 {
@@ -28,9 +29,44 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.
         /// </summary>
-        public ApplicationBasic(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ApplicationBasic(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ApplicationBasic(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ApplicationBasic(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            VendorName = new ReadAttribute<string>(cluster, endPoint, 0) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            VendorID = new ReadAttribute<ushort>(cluster, endPoint, 1) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0
+
+            };
+            ApplicationName = new ReadAttribute<string>(cluster, endPoint, 2) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            ProductID = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0
+
+            };
+            Application = new ReadAttribute<ApplicationLauncher.Application>(cluster, endPoint, 4) {
+                Deserialize = x => (ApplicationLauncher.Application)(dynamic?)x!
+            };
+            Status = new ReadAttribute<ApplicationStatus>(cluster, endPoint, 5) {
+                Deserialize = x => (ApplicationStatus)DeserializeEnum(x)!
+            };
+            ApplicationVersion = new ReadAttribute<string>(cluster, endPoint, 6) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            AllowedVendorList = new ReadAttribute<ushort[]>(cluster, endPoint, 7) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ushort[] list = new ushort[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -58,64 +94,44 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Get the Vendor Name attribute
+        /// Vendor Name Attribute
         /// </summary>
-        public async Task<string> GetVendorName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<string> VendorName { get; init; }
 
         /// <summary>
-        /// Get the Vendor ID attribute
+        /// Vendor ID Attribute
         /// </summary>
-        public async Task<ushort> GetVendorID(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1) ?? 0x0;
-        }
+        public required ReadAttribute<ushort> VendorID { get; init; }
 
         /// <summary>
-        /// Get the Application Name attribute
+        /// Application Name Attribute
         /// </summary>
-        public async Task<string> GetApplicationName(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<string> ApplicationName { get; init; }
 
         /// <summary>
-        /// Get the Product ID attribute
+        /// Product ID Attribute
         /// </summary>
-        public async Task<ushort> GetProductID(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 0x0;
-        }
+        public required ReadAttribute<ushort> ProductID { get; init; }
 
         /// <summary>
-        /// Get the Application attribute
+        /// Application Attribute
         /// </summary>
-        public async Task<ApplicationLauncher.Application> GetApplication(SecureSession session) {
-            return new ApplicationLauncher.Application((object[])(await GetAttribute(session, 4))!);
-        }
+        public required ReadAttribute<ApplicationLauncher.Application> Application { get; init; }
 
         /// <summary>
-        /// Get the Status attribute
+        /// Status Attribute
         /// </summary>
-        public async Task<ApplicationStatus> GetStatus(SecureSession session) {
-            return (ApplicationStatus)await GetEnumAttribute(session, 5);
-        }
+        public required ReadAttribute<ApplicationStatus> Status { get; init; }
 
         /// <summary>
-        /// Get the Application Version attribute
+        /// Application Version Attribute
         /// </summary>
-        public async Task<string> GetApplicationVersion(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 6))!;
-        }
+        public required ReadAttribute<string> ApplicationVersion { get; init; }
 
         /// <summary>
-        /// Get the Allowed Vendor List attribute
+        /// Allowed Vendor List Attribute
         /// </summary>
-        public async Task<ushort[]> GetAllowedVendorList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 7))!);
-            ushort[] list = new ushort[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ushort[]> AllowedVendorList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

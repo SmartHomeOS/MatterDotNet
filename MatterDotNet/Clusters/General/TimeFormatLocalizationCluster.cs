@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,9 +29,27 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Nodes should be expected to be deployed to any and all regions of the world. These global regions may have differing preferences for how dates and times are conveyed. As such, Nodes that visually or audibly convey time information need a mechanism by which they can be configured to use a user’s preferred format.
         /// </summary>
-        public TimeFormatLocalization(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public TimeFormatLocalization(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected TimeFormatLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected TimeFormatLocalization(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            HourFormat = new ReadWriteAttribute<HourFormatEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (HourFormatEnum)DeserializeEnum(x)!
+            };
+            ActiveCalendarType = new ReadWriteAttribute<CalendarType>(cluster, endPoint, 1) {
+                Deserialize = x => (CalendarType)DeserializeEnum(x)!
+            };
+            SupportedCalendarTypes = new ReadAttribute<CalendarType[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    CalendarType[] list = new CalendarType[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (CalendarType)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -47,7 +66,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Hour Format
         /// </summary>
-        public enum HourFormat : byte {
+        public enum HourFormatEnum : byte {
             /// <summary>
             /// Time conveyed with a 12-hour clock
             /// </summary>
@@ -144,43 +163,19 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Hour Format attribute
+        /// Hour Format Attribute
         /// </summary>
-        public async Task<HourFormat> GetHourFormat(SecureSession session) {
-            return (HourFormat)await GetEnumAttribute(session, 0);
-        }
+        public required ReadWriteAttribute<HourFormatEnum> HourFormat { get; init; }
 
         /// <summary>
-        /// Set the Hour Format attribute
+        /// Active Calendar Type Attribute
         /// </summary>
-        public async Task SetHourFormat (SecureSession session, HourFormat value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<CalendarType> ActiveCalendarType { get; init; }
 
         /// <summary>
-        /// Get the Active Calendar Type attribute
+        /// Supported Calendar Types Attribute
         /// </summary>
-        public async Task<CalendarType> GetActiveCalendarType(SecureSession session) {
-            return (CalendarType)await GetEnumAttribute(session, 1);
-        }
-
-        /// <summary>
-        /// Set the Active Calendar Type attribute
-        /// </summary>
-        public async Task SetActiveCalendarType (SecureSession session, CalendarType value) {
-            await SetAttribute(session, 1, value);
-        }
-
-        /// <summary>
-        /// Get the Supported Calendar Types attribute
-        /// </summary>
-        public async Task<CalendarType[]> GetSupportedCalendarTypes(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            CalendarType[] list = new CalendarType[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (CalendarType)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<CalendarType[]> SupportedCalendarTypes { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

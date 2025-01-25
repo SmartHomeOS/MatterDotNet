@@ -32,9 +32,29 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell.
         /// </summary>
-        public Chime(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Chime(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Chime(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Chime(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            InstalledChimeSounds = new ReadAttribute<ChimeSound[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ChimeSound[] list = new ChimeSound[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ChimeSound(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ActiveChimeID = new ReadWriteAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            Enabled = new ReadWriteAttribute<bool>(cluster, endPoint, 2) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+        }
 
         #region Records
         /// <summary>
@@ -81,43 +101,19 @@ namespace MatterDotNet.Clusters.Misc
 
         #region Attributes
         /// <summary>
-        /// Get the Installed Chime Sounds attribute
+        /// Installed Chime Sounds Attribute
         /// </summary>
-        public async Task<ChimeSound[]> GetInstalledChimeSounds(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ChimeSound[] list = new ChimeSound[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ChimeSound(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ChimeSound[]> InstalledChimeSounds { get; init; }
 
         /// <summary>
-        /// Get the Active Chime ID attribute
+        /// Active Chime ID Attribute
         /// </summary>
-        public async Task<byte> GetActiveChimeID(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0;
-        }
+        public required ReadWriteAttribute<byte> ActiveChimeID { get; init; }
 
         /// <summary>
-        /// Set the Active Chime ID attribute
+        /// Enabled Attribute
         /// </summary>
-        public async Task SetActiveChimeID (SecureSession session, byte? value = 0) {
-            await SetAttribute(session, 1, value);
-        }
-
-        /// <summary>
-        /// Get the Enabled attribute
-        /// </summary>
-        public async Task<bool> GetEnabled(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 2) ?? true;
-        }
-
-        /// <summary>
-        /// Set the Enabled attribute
-        /// </summary>
-        public async Task SetEnabled (SecureSession session, bool? value = true) {
-            await SetAttribute(session, 2, value);
-        }
+        public required ReadWriteAttribute<bool> Enabled { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

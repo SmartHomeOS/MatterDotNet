@@ -30,9 +30,45 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// This cluster provides an interface to specify preferences for how devices should consume energy.
         /// </summary>
-        public EnergyPreference(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public EnergyPreference(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EnergyPreference(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected EnergyPreference(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            EnergyBalances = new ReadAttribute<Balance[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Balance[] list = new Balance[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Balance(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentEnergyBalance = new ReadWriteAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            EnergyPriorities = new ReadAttribute<EnergyPriority[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    EnergyPriority[] list = new EnergyPriority[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (EnergyPriority)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            LowPowerModeSensitivities = new ReadAttribute<Balance[]>(cluster, endPoint, 3) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Balance[] list = new Balance[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Balance(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentLowPowerModeSensitivity = new ReadWriteAttribute<byte>(cluster, endPoint, 4) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -127,65 +163,29 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         /// <summary>
-        /// Get the Energy Balances attribute
+        /// Energy Balances Attribute
         /// </summary>
-        public async Task<Balance[]> GetEnergyBalances(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Balance[] list = new Balance[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Balance(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Balance[]> EnergyBalances { get; init; }
 
         /// <summary>
-        /// Get the Current Energy Balance attribute
+        /// Current Energy Balance Attribute
         /// </summary>
-        public async Task<byte> GetCurrentEnergyBalance(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadWriteAttribute<byte> CurrentEnergyBalance { get; init; }
 
         /// <summary>
-        /// Set the Current Energy Balance attribute
+        /// Energy Priorities Attribute
         /// </summary>
-        public async Task SetCurrentEnergyBalance (SecureSession session, byte value) {
-            await SetAttribute(session, 1, value);
-        }
+        public required ReadAttribute<EnergyPriority[]> EnergyPriorities { get; init; }
 
         /// <summary>
-        /// Get the Energy Priorities attribute
+        /// Low Power Mode Sensitivities Attribute
         /// </summary>
-        public async Task<EnergyPriority[]> GetEnergyPriorities(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            EnergyPriority[] list = new EnergyPriority[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (EnergyPriority)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<Balance[]> LowPowerModeSensitivities { get; init; }
 
         /// <summary>
-        /// Get the Low Power Mode Sensitivities attribute
+        /// Current Low Power Mode Sensitivity Attribute
         /// </summary>
-        public async Task<Balance[]> GetLowPowerModeSensitivities(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 3))!);
-            Balance[] list = new Balance[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Balance(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Current Low Power Mode Sensitivity attribute
-        /// </summary>
-        public async Task<byte> GetCurrentLowPowerModeSensitivity(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 4))!;
-        }
-
-        /// <summary>
-        /// Set the Current Low Power Mode Sensitivity attribute
-        /// </summary>
-        public async Task SetCurrentLowPowerModeSensitivity (SecureSession session, byte value) {
-            await SetAttribute(session, 4, value);
-        }
+        public required ReadWriteAttribute<byte> CurrentLowPowerModeSensitivity { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

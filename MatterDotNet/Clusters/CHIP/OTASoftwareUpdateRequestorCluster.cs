@@ -32,9 +32,32 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Provides an interface for downloading and applying OTA software updates
         /// </summary>
-        public OTASoftwareUpdateRequestor(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public OTASoftwareUpdateRequestor(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected OTASoftwareUpdateRequestor(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected OTASoftwareUpdateRequestor(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            DefaultOTAProviders = new ReadWriteAttribute<ProviderLocation[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ProviderLocation[] list = new ProviderLocation[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ProviderLocation(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            UpdatePossible = new ReadAttribute<bool>(cluster, endPoint, 1) {
+                Deserialize = x => (bool?)(dynamic?)x ?? true
+
+            };
+            UpdateState = new ReadAttribute<UpdateStateEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (UpdateStateEnum?)DeserializeEnum(x) ?? UpdateStateEnum.Unknown
+
+            };
+            UpdateStateProgress = new ReadAttribute<byte?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -87,7 +110,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Update State
         /// </summary>
-        public enum UpdateState : byte {
+        public enum UpdateStateEnum : byte {
             /// <summary>
             /// Current state is not yet determined.
             /// </summary>
@@ -222,43 +245,24 @@ namespace MatterDotNet.Clusters.CHIP
 
         #region Attributes
         /// <summary>
-        /// Get the Default OTA Providers attribute
+        /// Default OTA Providers Attribute
         /// </summary>
-        public async Task<ProviderLocation[]> GetDefaultOTAProviders(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            ProviderLocation[] list = new ProviderLocation[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ProviderLocation(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadWriteAttribute<ProviderLocation[]> DefaultOTAProviders { get; init; }
 
         /// <summary>
-        /// Set the Default OTA Providers attribute
+        /// Update Possible Attribute
         /// </summary>
-        public async Task SetDefaultOTAProviders (SecureSession session, ProviderLocation[] value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadAttribute<bool> UpdatePossible { get; init; }
 
         /// <summary>
-        /// Get the Update Possible attribute
+        /// Update State Attribute
         /// </summary>
-        public async Task<bool> GetUpdatePossible(SecureSession session) {
-            return (bool?)(dynamic?)await GetAttribute(session, 1) ?? true;
-        }
+        public required ReadAttribute<UpdateStateEnum> UpdateState { get; init; }
 
         /// <summary>
-        /// Get the Update State attribute
+        /// Update State Progress Attribute
         /// </summary>
-        public async Task<UpdateState> GetUpdateState(SecureSession session) {
-            return (UpdateState?)await GetEnumAttribute(session, 2) ?? UpdateState.Unknown;
-        }
-
-        /// <summary>
-        /// Get the Update State Progress attribute
-        /// </summary>
-        public async Task<byte?> GetUpdateStateProgress(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<byte?> UpdateStateProgress { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

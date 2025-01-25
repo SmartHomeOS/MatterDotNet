@@ -16,6 +16,7 @@ using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -30,9 +31,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster provides an interface for managing low power mode on a device.
         /// </summary>
-        public LowPower(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public LowPower(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LowPower(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected LowPower(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+        }
 
         #region Payloads
         #endregion Payloads

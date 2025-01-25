@@ -16,14 +16,22 @@ namespace Generator
 {
     public class GeneratorUtil
     {
-        public static string SanitizeName(string name, bool paramName = false)
+        public static string SanitizeName(string name, bool paramName = false, bool trimSuffix = true, string? ensureSuffix = null)
         {
-            if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
-                name = name.Substring(0, name.Length - 6);
-            if (name.EndsWith("enum", StringComparison.InvariantCultureIgnoreCase))
-                name = name.Substring(0, name.Length - 4);
-            if (name.EndsWith("bitmap", StringComparison.InvariantCultureIgnoreCase))
-                name = name.Substring(0, name.Length - 6);
+            if (name == "event")
+                name = "@event";
+            if (trimSuffix)
+            {
+                if (name.EndsWith("struct", StringComparison.InvariantCultureIgnoreCase))
+                    name = name.Substring(0, name.Length - 6);
+                else if (name.EndsWith("enum", StringComparison.InvariantCultureIgnoreCase))
+                    name = name.Substring(0, name.Length - 4);
+                else if (name.EndsWith("bitmap", StringComparison.InvariantCultureIgnoreCase))
+                    name = name.Substring(0, name.Length - 6);
+            }
+            else if (!name.EndsWith(ensureSuffix ?? string.Empty))
+                name += ensureSuffix;
+            
             bool cap = !paramName;
             StringBuilder ret = new StringBuilder(name.Length);
             if (name.Length > 0 && Char.IsNumber(name[0]))

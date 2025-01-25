@@ -175,6 +175,22 @@ namespace MatterDotNet.Clusters
         }
 
         /// <summary>
+        /// Deserialize an enum encapsulated object
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected uint? DeserializeEnum(object? value)
+        {
+            if (value == null)
+                return null;
+            if (value is byte byteVal)
+                return byteVal;
+            if (value is ushort shortVal)
+                return shortVal;
+            return (uint?)value;
+        }
+
+        /// <summary>
         /// Validates a response and throws an exception if it's an error status
         /// </summary>
         /// <param name="resp"></param>

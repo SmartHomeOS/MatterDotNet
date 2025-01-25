@@ -32,9 +32,25 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
         /// </summary>
-        public MediaInput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public MediaInput(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected MediaInput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected MediaInput(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            InputList = new ReadAttribute<InputInfo[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    InputInfo[] list = new InputInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new InputInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentInput = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -225,22 +241,14 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Input List attribute
+        /// Input List Attribute
         /// </summary>
-        public async Task<InputInfo[]> GetInputList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            InputInfo[] list = new InputInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new InputInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<InputInfo[]> InputList { get; init; }
 
         /// <summary>
-        /// Get the Current Input attribute
+        /// Current Input Attribute
         /// </summary>
-        public async Task<byte> GetCurrentInput(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0x00;
-        }
+        public required ReadAttribute<byte> CurrentInput { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

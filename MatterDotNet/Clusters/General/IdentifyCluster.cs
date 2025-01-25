@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,15 +32,25 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for putting a device into Identification mode (e.g. flashing a light).
         /// </summary>
-        public Identify(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Identify(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Identify(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Identify(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            IdentifyTime = new ReadWriteAttribute<ushort>(cluster, endPoint, 0) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0x0
+
+            };
+            IdentifyType = new ReadAttribute<IdentifyTypeEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (IdentifyTypeEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
         /// Identify Type
         /// </summary>
-        public enum IdentifyType : byte {
+        public enum IdentifyTypeEnum : byte {
             /// <summary>
             /// No presentation.
             /// </summary>
@@ -156,25 +167,14 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Identify Time attribute
+        /// Identify Time Attribute
         /// </summary>
-        public async Task<ushort> GetIdentifyTime(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 0) ?? 0x0;
-        }
+        public required ReadWriteAttribute<ushort> IdentifyTime { get; init; }
 
         /// <summary>
-        /// Set the Identify Time attribute
+        /// Identify Type Attribute
         /// </summary>
-        public async Task SetIdentifyTime (SecureSession session, ushort? value = 0x0) {
-            await SetAttribute(session, 0, value);
-        }
-
-        /// <summary>
-        /// Get the Identify Type attribute
-        /// </summary>
-        public async Task<IdentifyType> GetIdentifyType(SecureSession session) {
-            return (IdentifyType)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<IdentifyTypeEnum> IdentifyType { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

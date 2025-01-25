@@ -34,9 +34,238 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// An interface for configuring and controlling the functionality of a thermostat.
         /// </summary>
-        public Thermostat(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Thermostat(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Thermostat(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Thermostat(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            LocalTemperature = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            OutdoorTemperature = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            Occupancy = new ReadAttribute<OccupancyBitmap>(cluster, endPoint, 2) {
+                Deserialize = x => (OccupancyBitmap)DeserializeEnum(x)!
+            };
+            AbsMinHeatSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 3) {
+                Deserialize = x => (short?)(dynamic?)x ?? 700
+
+            };
+            AbsMaxHeatSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 4) {
+                Deserialize = x => (short?)(dynamic?)x ?? 3000
+
+            };
+            AbsMinCoolSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 5) {
+                Deserialize = x => (short?)(dynamic?)x ?? 1600
+
+            };
+            AbsMaxCoolSetpointLimit = new ReadAttribute<short>(cluster, endPoint, 6) {
+                Deserialize = x => (short?)(dynamic?)x ?? 3200
+
+            };
+            PICoolingDemand = new ReadAttribute<byte>(cluster, endPoint, 7) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            PIHeatingDemand = new ReadAttribute<byte>(cluster, endPoint, 8) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            HVACSystemTypeConfiguration = new ReadWriteAttribute<HVACSystemType>(cluster, endPoint, 9) {
+                Deserialize = x => (HVACSystemType)DeserializeEnum(x)!
+            };
+            LocalTemperatureCalibration = new ReadWriteAttribute<sbyte>(cluster, endPoint, 16) {
+                Deserialize = x => (sbyte?)(dynamic?)x ?? 0x00
+
+            };
+            OccupiedCoolingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 17) {
+                Deserialize = x => (short?)(dynamic?)x ?? 2600
+
+            };
+            OccupiedHeatingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 18) {
+                Deserialize = x => (short?)(dynamic?)x ?? 2000
+
+            };
+            UnoccupiedCoolingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 19) {
+                Deserialize = x => (short?)(dynamic?)x ?? 2600
+
+            };
+            UnoccupiedHeatingSetpoint = new ReadWriteAttribute<short>(cluster, endPoint, 20) {
+                Deserialize = x => (short?)(dynamic?)x ?? 2000
+
+            };
+            MinHeatSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 21) {
+                Deserialize = x => (short?)(dynamic?)x ?? 700
+
+            };
+            MaxHeatSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 22) {
+                Deserialize = x => (short?)(dynamic?)x ?? 3000
+
+            };
+            MinCoolSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 23) {
+                Deserialize = x => (short?)(dynamic?)x ?? 1600
+
+            };
+            MaxCoolSetpointLimit = new ReadWriteAttribute<short>(cluster, endPoint, 24) {
+                Deserialize = x => (short?)(dynamic?)x ?? 3200
+
+            };
+            MinSetpointDeadBand = new ReadWriteAttribute<sbyte>(cluster, endPoint, 25) {
+                Deserialize = x => (sbyte?)(dynamic?)x ?? 25
+
+            };
+            RemoteSensing = new ReadWriteAttribute<RemoteSensingBitmap>(cluster, endPoint, 26) {
+                Deserialize = x => (RemoteSensingBitmap)DeserializeEnum(x)!
+            };
+            ControlSequenceOfOperation = new ReadWriteAttribute<ControlSequenceOfOperationEnum>(cluster, endPoint, 27) {
+                Deserialize = x => (ControlSequenceOfOperationEnum)DeserializeEnum(x)!
+            };
+            SystemMode = new ReadWriteAttribute<SystemModeEnum>(cluster, endPoint, 28) {
+                Deserialize = x => (SystemModeEnum)DeserializeEnum(x)!
+            };
+            ThermostatRunningMode = new ReadAttribute<ThermostatRunningModeEnum>(cluster, endPoint, 30) {
+                Deserialize = x => (ThermostatRunningModeEnum)DeserializeEnum(x)!
+            };
+            StartOfWeek = new ReadAttribute<StartOfWeekEnum>(cluster, endPoint, 32) {
+                Deserialize = x => (StartOfWeekEnum)DeserializeEnum(x)!
+            };
+            NumberOfWeeklyTransitions = new ReadAttribute<byte>(cluster, endPoint, 33) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfDailyTransitions = new ReadAttribute<byte>(cluster, endPoint, 34) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            TemperatureSetpointHold = new ReadWriteAttribute<TemperatureSetpointHoldEnum>(cluster, endPoint, 35) {
+                Deserialize = x => (TemperatureSetpointHoldEnum)DeserializeEnum(x)!
+            };
+            TemperatureSetpointHoldDuration = new ReadWriteAttribute<ushort?>(cluster, endPoint, 36, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            ThermostatProgrammingOperationMode = new ReadWriteAttribute<ProgrammingOperationMode>(cluster, endPoint, 37) {
+                Deserialize = x => (ProgrammingOperationMode)DeserializeEnum(x)!
+            };
+            ThermostatRunningState = new ReadAttribute<RelayState>(cluster, endPoint, 41) {
+                Deserialize = x => (RelayState)DeserializeEnum(x)!
+            };
+            SetpointChangeSource = new ReadAttribute<SetpointChangeSourceEnum>(cluster, endPoint, 48) {
+                Deserialize = x => (SetpointChangeSourceEnum)DeserializeEnum(x)!
+            };
+            SetpointChangeAmount = new ReadAttribute<short?>(cluster, endPoint, 49, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            SetpointChangeSourceTimestamp = new ReadAttribute<DateTime>(cluster, endPoint, 50) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x) ?? TimeUtil.EPOCH
+
+            };
+            OccupiedSetback = new ReadWriteAttribute<byte?>(cluster, endPoint, 52, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OccupiedSetbackMin = new ReadAttribute<byte?>(cluster, endPoint, 53, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OccupiedSetbackMax = new ReadAttribute<byte?>(cluster, endPoint, 54, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            UnoccupiedSetback = new ReadWriteAttribute<byte?>(cluster, endPoint, 55, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            UnoccupiedSetbackMin = new ReadAttribute<byte?>(cluster, endPoint, 56, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            UnoccupiedSetbackMax = new ReadAttribute<byte?>(cluster, endPoint, 57, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            EmergencyHeatDelta = new ReadWriteAttribute<byte>(cluster, endPoint, 58) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0xFF
+
+            };
+            ACType = new ReadWriteAttribute<ACTypeEnum>(cluster, endPoint, 64) {
+                Deserialize = x => (ACTypeEnum)DeserializeEnum(x)!
+            };
+            ACCapacity = new ReadWriteAttribute<ushort>(cluster, endPoint, 65) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            ACRefrigerantType = new ReadWriteAttribute<ACRefrigerantTypeEnum>(cluster, endPoint, 66) {
+                Deserialize = x => (ACRefrigerantTypeEnum)DeserializeEnum(x)!
+            };
+            ACCompressorType = new ReadWriteAttribute<ACCompressorTypeEnum>(cluster, endPoint, 67) {
+                Deserialize = x => (ACCompressorTypeEnum)DeserializeEnum(x)!
+            };
+            ACErrorCode = new ReadWriteAttribute<ACErrorCodeBitmap>(cluster, endPoint, 68) {
+                Deserialize = x => (ACErrorCodeBitmap)DeserializeEnum(x)!
+            };
+            ACLouverPosition = new ReadWriteAttribute<ACLouverPositionEnum>(cluster, endPoint, 69) {
+                Deserialize = x => (ACLouverPositionEnum)DeserializeEnum(x)!
+            };
+            ACCoilTemperature = new ReadAttribute<short?>(cluster, endPoint, 70, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            ACCapacityformat = new ReadWriteAttribute<ACCapacityFormat>(cluster, endPoint, 71) {
+                Deserialize = x => (ACCapacityFormat)DeserializeEnum(x)!
+            };
+            PresetTypes = new ReadAttribute<PresetType[]>(cluster, endPoint, 72) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    PresetType[] list = new PresetType[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new PresetType(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ScheduleTypes = new ReadAttribute<ScheduleType[]>(cluster, endPoint, 73) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ScheduleType[] list = new ScheduleType[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ScheduleType(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            NumberOfPresets = new ReadAttribute<byte>(cluster, endPoint, 74) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfSchedules = new ReadAttribute<byte>(cluster, endPoint, 75) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfScheduleTransitions = new ReadAttribute<byte>(cluster, endPoint, 76) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0
+
+            };
+            NumberOfScheduleTransitionPerDay = new ReadAttribute<byte?>(cluster, endPoint, 77, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            ActivePresetHandle = new ReadAttribute<byte[]?>(cluster, endPoint, 78, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            ActiveScheduleHandle = new ReadAttribute<byte[]?>(cluster, endPoint, 79, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            Presets = new ReadWriteAttribute<Preset[]>(cluster, endPoint, 80) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Preset[] list = new Preset[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Preset(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Schedules = new ReadWriteAttribute<Schedule[]>(cluster, endPoint, 81) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Schedule[] list = new Schedule[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Schedule(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SetpointHoldExpiryTimestamp = new ReadAttribute<DateTime?>(cluster, endPoint, 82, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -85,7 +314,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// System Mode
         /// </summary>
-        public enum SystemMode : byte {
+        public enum SystemModeEnum : byte {
             /// <summary>
             /// The Thermostat does not generate demand for Cooling or Heating
             /// </summary>
@@ -127,7 +356,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Thermostat Running Mode
         /// </summary>
-        public enum ThermostatRunningMode : byte {
+        public enum ThermostatRunningModeEnum : byte {
             /// <summary>
             /// The Thermostat does not generate demand for Cooling or Heating
             /// </summary>
@@ -145,7 +374,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Start Of Week
         /// </summary>
-        public enum StartOfWeek : byte {
+        public enum StartOfWeekEnum : byte {
             /// <summary>
             /// 
             /// </summary>
@@ -179,7 +408,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Control Sequence Of Operation
         /// </summary>
-        public enum ControlSequenceOfOperation : byte {
+        public enum ControlSequenceOfOperationEnum : byte {
             /// <summary>
             /// Heat and Emergency are not possible
             /// </summary>
@@ -209,7 +438,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Temperature Setpoint Hold
         /// </summary>
-        public enum TemperatureSetpointHold : byte {
+        public enum TemperatureSetpointHoldEnum : byte {
             /// <summary>
             /// Follow scheduling program
             /// </summary>
@@ -251,7 +480,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// AC Compressor Type
         /// </summary>
-        public enum ACCompressorType : byte {
+        public enum ACCompressorTypeEnum : byte {
             /// <summary>
             /// Unknown compressor type
             /// </summary>
@@ -273,7 +502,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// AC Louver Position
         /// </summary>
-        public enum ACLouverPosition : byte {
+        public enum ACLouverPositionEnum : byte {
             /// <summary>
             /// Fully Closed
             /// </summary>
@@ -299,7 +528,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// AC Refrigerant Type
         /// </summary>
-        public enum ACRefrigerantType : byte {
+        public enum ACRefrigerantTypeEnum : byte {
             /// <summary>
             /// Unknown Refrigerant Type
             /// </summary>
@@ -321,7 +550,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// AC Type
         /// </summary>
-        public enum ACType : byte {
+        public enum ACTypeEnum : byte {
             /// <summary>
             /// Unknown AC Type
             /// </summary>
@@ -347,7 +576,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Setpoint Change Source
         /// </summary>
-        public enum SetpointChangeSource : byte {
+        public enum SetpointChangeSourceEnum : byte {
             /// <summary>
             /// Manual, user-initiated setpoint change via the thermostat
             /// </summary>
@@ -400,7 +629,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// AC Error Code
         /// </summary>
         [Flags]
-        public enum ACErrorCode : uint {
+        public enum ACErrorCodeBitmap : uint {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -436,21 +665,9 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Stage of cooling the HVAC system is using.
-            /// </summary>
             CoolingStage = 0x03,
-            /// <summary>
-            /// Stage of heating the HVAC system is using.
-            /// </summary>
             HeatingStage = 0x0C,
-            /// <summary>
-            /// Is the heating type Heat Pump.
-            /// </summary>
             HeatingIsHeatPump = 0x10,
-            /// <summary>
-            /// Does the HVAC system use fuel.
-            /// </summary>
             HeatingUsesFuel = 0x20,
         }
 
@@ -458,7 +675,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// Occupancy
         /// </summary>
         [Flags]
-        public enum Occupancy : byte {
+        public enum OccupancyBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -478,17 +695,8 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Schedule programming mode. This enables any programmed weekly schedule configurations.
-            /// </summary>
             ScheduleActive = 0x01,
-            /// <summary>
-            /// Auto/recovery mode
-            /// </summary>
             AutoRecovery = 0x02,
-            /// <summary>
-            /// Economy/EnergyStar mode
-            /// </summary>
             Economy = 0x04,
         }
 
@@ -501,21 +709,9 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Supports presets
-            /// </summary>
             SupportsPresets = 0x0001,
-            /// <summary>
-            /// Supports setpoints
-            /// </summary>
             SupportsSetpoints = 0x0002,
-            /// <summary>
-            /// Supports user-provided names
-            /// </summary>
             SupportsNames = 0x0004,
-            /// <summary>
-            /// Supports transitioning to SystemModeOff
-            /// </summary>
             SupportsOff = 0x0008,
         }
 
@@ -528,33 +724,12 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Heat Stage On
-            /// </summary>
             Heat = 0x0001,
-            /// <summary>
-            /// Cool Stage On
-            /// </summary>
             Cool = 0x0002,
-            /// <summary>
-            /// Fan Stage On
-            /// </summary>
             Fan = 0x0004,
-            /// <summary>
-            /// Heat 2 Stage On
-            /// </summary>
             HeatStage2 = 0x0008,
-            /// <summary>
-            /// Cool 2 Stage On
-            /// </summary>
             CoolStage2 = 0x0010,
-            /// <summary>
-            /// Fan 2 Stage On
-            /// </summary>
             FanStage2 = 0x0020,
-            /// <summary>
-            /// Fan 3 Stage On
-            /// </summary>
             FanStage3 = 0x0040,
         }
 
@@ -562,7 +737,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// Remote Sensing
         /// </summary>
         [Flags]
-        public enum RemoteSensing : byte {
+        public enum RemoteSensingBitmap : byte {
             /// <summary>
             /// Nothing Set
             /// </summary>
@@ -590,37 +765,13 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Sunday
-            /// </summary>
             Sunday = 0x01,
-            /// <summary>
-            /// Monday
-            /// </summary>
             Monday = 0x02,
-            /// <summary>
-            /// Tuesday
-            /// </summary>
             Tuesday = 0x04,
-            /// <summary>
-            /// Wednesday
-            /// </summary>
             Wednesday = 0x08,
-            /// <summary>
-            /// Thursday
-            /// </summary>
             Thursday = 0x10,
-            /// <summary>
-            /// Friday
-            /// </summary>
             Friday = 0x20,
-            /// <summary>
-            /// Saturday
-            /// </summary>
             Saturday = 0x40,
-            /// <summary>
-            /// Away or Vacation
-            /// </summary>
             Away = 0x80,
         }
 
@@ -633,13 +784,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Adjust Heat Setpoint
-            /// </summary>
             HeatSetpointPresent = 0x01,
-            /// <summary>
-            /// Adjust Cool Setpoint
-            /// </summary>
             CoolSetpointPresent = 0x02,
         }
 
@@ -652,13 +797,7 @@ namespace MatterDotNet.Clusters.HVAC
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Preset may be automatically activated by the thermostat
-            /// </summary>
             Automatic = 0x0001,
-            /// <summary>
-            /// Preset supports user-provided names
-            /// </summary>
             SupportsNames = 0x0002,
         }
         #endregion Enums
@@ -710,11 +849,11 @@ namespace MatterDotNet.Clusters.HVAC
             [SetsRequiredMembers]
             public ScheduleType(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                SystemMode = (SystemMode)reader.GetUShort(0)!.Value;
+                SystemMode = (SystemModeEnum)reader.GetUShort(0)!.Value;
                 NumberOfSchedules = reader.GetByte(1)!.Value;
                 ScheduleTypeFeatures = (ScheduleTypeFeatures)reader.GetUInt(2)!.Value;
             }
-            public required SystemMode SystemMode { get; set; }
+            public required SystemModeEnum SystemMode { get; set; }
             public required byte NumberOfSchedules { get; set; } = 0;
             public required ScheduleTypeFeatures ScheduleTypeFeatures { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -816,7 +955,7 @@ namespace MatterDotNet.Clusters.HVAC
             public Schedule(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 ScheduleHandle = reader.GetBytes(0, false, 16)!;
-                SystemMode = (SystemMode)reader.GetUShort(1)!.Value;
+                SystemMode = (SystemModeEnum)reader.GetUShort(1)!.Value;
                 Name = reader.GetString(2, true, 64);
                 PresetHandle = reader.GetBytes(3, true, 16);
                 {
@@ -828,7 +967,7 @@ namespace MatterDotNet.Clusters.HVAC
                 BuiltIn = reader.GetBool(5, true);
             }
             public required byte[]? ScheduleHandle { get; set; }
-            public required SystemMode SystemMode { get; set; }
+            public required SystemModeEnum SystemMode { get; set; }
             public string? Name { get; set; }
             public byte[]? PresetHandle { get; set; }
             public required ScheduleTransition[] Transitions { get; set; }
@@ -871,14 +1010,14 @@ namespace MatterDotNet.Clusters.HVAC
                 DayOfWeek = (ScheduleDayOfWeek)reader.GetUInt(0)!.Value;
                 TransitionTime = reader.GetUShort(1)!.Value;
                 PresetHandle = reader.GetBytes(2, true, 16);
-                SystemMode = (SystemMode?)reader.GetUShort(3, true);
+                SystemMode = (SystemModeEnum?)reader.GetUShort(3, true);
                 CoolingSetpoint = reader.GetShort(4, true);
                 HeatingSetpoint = reader.GetShort(5, true);
             }
             public required ScheduleDayOfWeek DayOfWeek { get; set; }
             public required ushort TransitionTime { get; set; }
             public byte[]? PresetHandle { get; set; }
-            public SystemMode? SystemMode { get; set; }
+            public SystemModeEnum? SystemMode { get; set; }
             public short? CoolingSetpoint { get; set; }
             public short? HeatingSetpoint { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -1120,643 +1259,304 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Get the Local Temperature attribute
+        /// Local Temperature Attribute
         /// </summary>
-        public async Task<short?> GetLocalTemperature(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<short?> LocalTemperature { get; init; }
 
         /// <summary>
-        /// Get the Outdoor Temperature attribute
+        /// Outdoor Temperature Attribute
         /// </summary>
-        public async Task<short?> GetOutdoorTemperature(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<short?> OutdoorTemperature { get; init; }
 
         /// <summary>
-        /// Get the Occupancy attribute
+        /// Occupancy Attribute
         /// </summary>
-        public async Task<Occupancy> GetOccupancy(SecureSession session) {
-            return (Occupancy)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<OccupancyBitmap> Occupancy { get; init; }
 
         /// <summary>
-        /// Get the Abs Min Heat Setpoint Limit attribute
+        /// Abs Min Heat Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetAbsMinHeatSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 3) ?? 700;
-        }
+        public required ReadAttribute<short> AbsMinHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the Abs Max Heat Setpoint Limit attribute
+        /// Abs Max Heat Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetAbsMaxHeatSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 4) ?? 3000;
-        }
+        public required ReadAttribute<short> AbsMaxHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the Abs Min Cool Setpoint Limit attribute
+        /// Abs Min Cool Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetAbsMinCoolSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 5) ?? 1600;
-        }
+        public required ReadAttribute<short> AbsMinCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the Abs Max Cool Setpoint Limit attribute
+        /// Abs Max Cool Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetAbsMaxCoolSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 6) ?? 3200;
-        }
+        public required ReadAttribute<short> AbsMaxCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the PI Cooling Demand attribute
+        /// PI Cooling Demand Attribute
         /// </summary>
-        public async Task<byte> GetPICoolingDemand(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 7))!;
-        }
+        public required ReadAttribute<byte> PICoolingDemand { get; init; }
 
         /// <summary>
-        /// Get the PI Heating Demand attribute
+        /// PI Heating Demand Attribute
         /// </summary>
-        public async Task<byte> GetPIHeatingDemand(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 8))!;
-        }
+        public required ReadAttribute<byte> PIHeatingDemand { get; init; }
 
         /// <summary>
-        /// Get the HVAC System Type Configuration attribute
+        /// HVAC System Type Configuration Attribute
         /// </summary>
-        public async Task<HVACSystemType> GetHVACSystemTypeConfiguration(SecureSession session) {
-            return (HVACSystemType)await GetEnumAttribute(session, 9);
-        }
+        public required ReadWriteAttribute<HVACSystemType> HVACSystemTypeConfiguration { get; init; }
 
         /// <summary>
-        /// Set the HVAC System Type Configuration attribute
+        /// Local Temperature Calibration Attribute
         /// </summary>
-        public async Task SetHVACSystemTypeConfiguration (SecureSession session, HVACSystemType value) {
-            await SetAttribute(session, 9, value);
-        }
+        public required ReadWriteAttribute<sbyte> LocalTemperatureCalibration { get; init; }
 
         /// <summary>
-        /// Get the Local Temperature Calibration attribute
+        /// Occupied Cooling Setpoint Attribute
         /// </summary>
-        public async Task<sbyte> GetLocalTemperatureCalibration(SecureSession session) {
-            return (sbyte?)(dynamic?)await GetAttribute(session, 16) ?? 0x00;
-        }
+        public required ReadWriteAttribute<short> OccupiedCoolingSetpoint { get; init; }
 
         /// <summary>
-        /// Set the Local Temperature Calibration attribute
+        /// Occupied Heating Setpoint Attribute
         /// </summary>
-        public async Task SetLocalTemperatureCalibration (SecureSession session, sbyte? value = 0x00) {
-            await SetAttribute(session, 16, value);
-        }
+        public required ReadWriteAttribute<short> OccupiedHeatingSetpoint { get; init; }
 
         /// <summary>
-        /// Get the Occupied Cooling Setpoint attribute
+        /// Unoccupied Cooling Setpoint Attribute
         /// </summary>
-        public async Task<short> GetOccupiedCoolingSetpoint(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 17) ?? 2600;
-        }
+        public required ReadWriteAttribute<short> UnoccupiedCoolingSetpoint { get; init; }
 
         /// <summary>
-        /// Set the Occupied Cooling Setpoint attribute
+        /// Unoccupied Heating Setpoint Attribute
         /// </summary>
-        public async Task SetOccupiedCoolingSetpoint (SecureSession session, short? value = 2600) {
-            await SetAttribute(session, 17, value);
-        }
+        public required ReadWriteAttribute<short> UnoccupiedHeatingSetpoint { get; init; }
 
         /// <summary>
-        /// Get the Occupied Heating Setpoint attribute
+        /// Min Heat Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetOccupiedHeatingSetpoint(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 18) ?? 2000;
-        }
+        public required ReadWriteAttribute<short> MinHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Set the Occupied Heating Setpoint attribute
+        /// Max Heat Setpoint Limit Attribute
         /// </summary>
-        public async Task SetOccupiedHeatingSetpoint (SecureSession session, short? value = 2000) {
-            await SetAttribute(session, 18, value);
-        }
+        public required ReadWriteAttribute<short> MaxHeatSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the Unoccupied Cooling Setpoint attribute
+        /// Min Cool Setpoint Limit Attribute
         /// </summary>
-        public async Task<short> GetUnoccupiedCoolingSetpoint(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 19) ?? 2600;
-        }
+        public required ReadWriteAttribute<short> MinCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Set the Unoccupied Cooling Setpoint attribute
+        /// Max Cool Setpoint Limit Attribute
         /// </summary>
-        public async Task SetUnoccupiedCoolingSetpoint (SecureSession session, short? value = 2600) {
-            await SetAttribute(session, 19, value);
-        }
+        public required ReadWriteAttribute<short> MaxCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// Get the Unoccupied Heating Setpoint attribute
+        /// Min Setpoint Dead Band Attribute
         /// </summary>
-        public async Task<short> GetUnoccupiedHeatingSetpoint(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 20) ?? 2000;
-        }
+        public required ReadWriteAttribute<sbyte> MinSetpointDeadBand { get; init; }
 
         /// <summary>
-        /// Set the Unoccupied Heating Setpoint attribute
+        /// Remote Sensing Attribute
         /// </summary>
-        public async Task SetUnoccupiedHeatingSetpoint (SecureSession session, short? value = 2000) {
-            await SetAttribute(session, 20, value);
-        }
+        public required ReadWriteAttribute<RemoteSensingBitmap> RemoteSensing { get; init; }
 
         /// <summary>
-        /// Get the Min Heat Setpoint Limit attribute
+        /// Control Sequence Of Operation Attribute
         /// </summary>
-        public async Task<short> GetMinHeatSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 21) ?? 700;
-        }
+        public required ReadWriteAttribute<ControlSequenceOfOperationEnum> ControlSequenceOfOperation { get; init; }
 
         /// <summary>
-        /// Set the Min Heat Setpoint Limit attribute
+        /// System Mode Attribute
         /// </summary>
-        public async Task SetMinHeatSetpointLimit (SecureSession session, short? value = 700) {
-            await SetAttribute(session, 21, value);
-        }
+        public required ReadWriteAttribute<SystemModeEnum> SystemMode { get; init; }
 
         /// <summary>
-        /// Get the Max Heat Setpoint Limit attribute
+        /// Thermostat Running Mode Attribute
         /// </summary>
-        public async Task<short> GetMaxHeatSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 22) ?? 3000;
-        }
+        public required ReadAttribute<ThermostatRunningModeEnum> ThermostatRunningMode { get; init; }
 
         /// <summary>
-        /// Set the Max Heat Setpoint Limit attribute
+        /// Start Of Week Attribute
         /// </summary>
-        public async Task SetMaxHeatSetpointLimit (SecureSession session, short? value = 3000) {
-            await SetAttribute(session, 22, value);
-        }
+        public required ReadAttribute<StartOfWeekEnum> StartOfWeek { get; init; }
 
         /// <summary>
-        /// Get the Min Cool Setpoint Limit attribute
+        /// Number Of Weekly Transitions Attribute
         /// </summary>
-        public async Task<short> GetMinCoolSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 23) ?? 1600;
-        }
+        public required ReadAttribute<byte> NumberOfWeeklyTransitions { get; init; }
 
         /// <summary>
-        /// Set the Min Cool Setpoint Limit attribute
+        /// Number Of Daily Transitions Attribute
         /// </summary>
-        public async Task SetMinCoolSetpointLimit (SecureSession session, short? value = 1600) {
-            await SetAttribute(session, 23, value);
-        }
+        public required ReadAttribute<byte> NumberOfDailyTransitions { get; init; }
 
         /// <summary>
-        /// Get the Max Cool Setpoint Limit attribute
+        /// Temperature Setpoint Hold Attribute
         /// </summary>
-        public async Task<short> GetMaxCoolSetpointLimit(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 24) ?? 3200;
-        }
+        public required ReadWriteAttribute<TemperatureSetpointHoldEnum> TemperatureSetpointHold { get; init; }
 
         /// <summary>
-        /// Set the Max Cool Setpoint Limit attribute
+        /// Temperature Setpoint Hold Duration Attribute
         /// </summary>
-        public async Task SetMaxCoolSetpointLimit (SecureSession session, short? value = 3200) {
-            await SetAttribute(session, 24, value);
-        }
+        public required ReadWriteAttribute<ushort?> TemperatureSetpointHoldDuration { get; init; }
 
         /// <summary>
-        /// Get the Min Setpoint Dead Band attribute
+        /// Thermostat Programming Operation Mode Attribute
         /// </summary>
-        public async Task<sbyte> GetMinSetpointDeadBand(SecureSession session) {
-            return (sbyte?)(dynamic?)await GetAttribute(session, 25) ?? 25;
-        }
+        public required ReadWriteAttribute<ProgrammingOperationMode> ThermostatProgrammingOperationMode { get; init; }
 
         /// <summary>
-        /// Set the Min Setpoint Dead Band attribute
+        /// Thermostat Running State Attribute
         /// </summary>
-        public async Task SetMinSetpointDeadBand (SecureSession session, sbyte? value = 25) {
-            await SetAttribute(session, 25, value);
-        }
+        public required ReadAttribute<RelayState> ThermostatRunningState { get; init; }
 
         /// <summary>
-        /// Get the Remote Sensing attribute
+        /// Setpoint Change Source Attribute
         /// </summary>
-        public async Task<RemoteSensing> GetRemoteSensing(SecureSession session) {
-            return (RemoteSensing)await GetEnumAttribute(session, 26);
-        }
+        public required ReadAttribute<SetpointChangeSourceEnum> SetpointChangeSource { get; init; }
 
         /// <summary>
-        /// Set the Remote Sensing attribute
+        /// Setpoint Change Amount Attribute
         /// </summary>
-        public async Task SetRemoteSensing (SecureSession session, RemoteSensing value) {
-            await SetAttribute(session, 26, value);
-        }
+        public required ReadAttribute<short?> SetpointChangeAmount { get; init; }
 
         /// <summary>
-        /// Get the Control Sequence Of Operation attribute
+        /// Setpoint Change Source Timestamp Attribute
         /// </summary>
-        public async Task<ControlSequenceOfOperation> GetControlSequenceOfOperation(SecureSession session) {
-            return (ControlSequenceOfOperation)await GetEnumAttribute(session, 27);
-        }
+        public required ReadAttribute<DateTime> SetpointChangeSourceTimestamp { get; init; }
 
         /// <summary>
-        /// Set the Control Sequence Of Operation attribute
+        /// Occupied Setback Attribute
         /// </summary>
-        public async Task SetControlSequenceOfOperation (SecureSession session, ControlSequenceOfOperation value) {
-            await SetAttribute(session, 27, value);
-        }
+        public required ReadWriteAttribute<byte?> OccupiedSetback { get; init; }
 
         /// <summary>
-        /// Get the System Mode attribute
+        /// Occupied Setback Min Attribute
         /// </summary>
-        public async Task<SystemMode> GetSystemMode(SecureSession session) {
-            return (SystemMode)await GetEnumAttribute(session, 28);
-        }
+        public required ReadAttribute<byte?> OccupiedSetbackMin { get; init; }
 
         /// <summary>
-        /// Set the System Mode attribute
+        /// Occupied Setback Max Attribute
         /// </summary>
-        public async Task SetSystemMode (SecureSession session, SystemMode value) {
-            await SetAttribute(session, 28, value);
-        }
+        public required ReadAttribute<byte?> OccupiedSetbackMax { get; init; }
 
         /// <summary>
-        /// Get the Thermostat Running Mode attribute
+        /// Unoccupied Setback Attribute
         /// </summary>
-        public async Task<ThermostatRunningMode> GetThermostatRunningMode(SecureSession session) {
-            return (ThermostatRunningMode)await GetEnumAttribute(session, 30);
-        }
+        public required ReadWriteAttribute<byte?> UnoccupiedSetback { get; init; }
 
         /// <summary>
-        /// Get the Start Of Week attribute
+        /// Unoccupied Setback Min Attribute
         /// </summary>
-        public async Task<StartOfWeek> GetStartOfWeek(SecureSession session) {
-            return (StartOfWeek)await GetEnumAttribute(session, 32);
-        }
+        public required ReadAttribute<byte?> UnoccupiedSetbackMin { get; init; }
 
         /// <summary>
-        /// Get the Number Of Weekly Transitions attribute
+        /// Unoccupied Setback Max Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfWeeklyTransitions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 33) ?? 0;
-        }
+        public required ReadAttribute<byte?> UnoccupiedSetbackMax { get; init; }
 
         /// <summary>
-        /// Get the Number Of Daily Transitions attribute
+        /// Emergency Heat Delta Attribute
         /// </summary>
-        public async Task<byte> GetNumberOfDailyTransitions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 34) ?? 0;
-        }
+        public required ReadWriteAttribute<byte> EmergencyHeatDelta { get; init; }
 
         /// <summary>
-        /// Get the Temperature Setpoint Hold attribute
+        /// AC Type Attribute
         /// </summary>
-        public async Task<TemperatureSetpointHold> GetTemperatureSetpointHold(SecureSession session) {
-            return (TemperatureSetpointHold)await GetEnumAttribute(session, 35);
-        }
+        public required ReadWriteAttribute<ACTypeEnum> ACType { get; init; }
 
         /// <summary>
-        /// Set the Temperature Setpoint Hold attribute
+        /// AC Capacity Attribute
         /// </summary>
-        public async Task SetTemperatureSetpointHold (SecureSession session, TemperatureSetpointHold value) {
-            await SetAttribute(session, 35, value);
-        }
+        public required ReadWriteAttribute<ushort> ACCapacity { get; init; }
 
         /// <summary>
-        /// Get the Temperature Setpoint Hold Duration attribute
+        /// AC Refrigerant Type Attribute
         /// </summary>
-        public async Task<ushort?> GetTemperatureSetpointHoldDuration(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 36, true);
-        }
+        public required ReadWriteAttribute<ACRefrigerantTypeEnum> ACRefrigerantType { get; init; }
 
         /// <summary>
-        /// Set the Temperature Setpoint Hold Duration attribute
+        /// AC Compressor Type Attribute
         /// </summary>
-        public async Task SetTemperatureSetpointHoldDuration (SecureSession session, ushort? value) {
-            await SetAttribute(session, 36, value, true);
-        }
+        public required ReadWriteAttribute<ACCompressorTypeEnum> ACCompressorType { get; init; }
 
         /// <summary>
-        /// Get the Thermostat Programming Operation Mode attribute
+        /// AC Error Code Attribute
         /// </summary>
-        public async Task<ProgrammingOperationMode> GetThermostatProgrammingOperationMode(SecureSession session) {
-            return (ProgrammingOperationMode)await GetEnumAttribute(session, 37);
-        }
+        public required ReadWriteAttribute<ACErrorCodeBitmap> ACErrorCode { get; init; }
 
         /// <summary>
-        /// Set the Thermostat Programming Operation Mode attribute
+        /// AC Louver Position Attribute
         /// </summary>
-        public async Task SetThermostatProgrammingOperationMode (SecureSession session, ProgrammingOperationMode value) {
-            await SetAttribute(session, 37, value);
-        }
+        public required ReadWriteAttribute<ACLouverPositionEnum> ACLouverPosition { get; init; }
 
         /// <summary>
-        /// Get the Thermostat Running State attribute
+        /// AC Coil Temperature Attribute
         /// </summary>
-        public async Task<RelayState> GetThermostatRunningState(SecureSession session) {
-            return (RelayState)await GetEnumAttribute(session, 41);
-        }
+        public required ReadAttribute<short?> ACCoilTemperature { get; init; }
 
         /// <summary>
-        /// Get the Setpoint Change Source attribute
+        /// AC Capacityformat Attribute
         /// </summary>
-        public async Task<SetpointChangeSource> GetSetpointChangeSource(SecureSession session) {
-            return (SetpointChangeSource)await GetEnumAttribute(session, 48);
-        }
+        public required ReadWriteAttribute<ACCapacityFormat> ACCapacityformat { get; init; }
 
         /// <summary>
-        /// Get the Setpoint Change Amount attribute
+        /// Preset Types Attribute
         /// </summary>
-        public async Task<short?> GetSetpointChangeAmount(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 49, true);
-        }
+        public required ReadAttribute<PresetType[]> PresetTypes { get; init; }
 
         /// <summary>
-        /// Get the Setpoint Change Source Timestamp attribute
+        /// Schedule Types Attribute
         /// </summary>
-        public async Task<DateTime> GetSetpointChangeSourceTimestamp(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 50)) ?? TimeUtil.EPOCH;
-        }
+        public required ReadAttribute<ScheduleType[]> ScheduleTypes { get; init; }
 
         /// <summary>
-        /// Get the Occupied Setback attribute
+        /// Number Of Presets Attribute
         /// </summary>
-        public async Task<byte?> GetOccupiedSetback(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 52, true);
-        }
+        public required ReadAttribute<byte> NumberOfPresets { get; init; }
 
         /// <summary>
-        /// Set the Occupied Setback attribute
+        /// Number Of Schedules Attribute
         /// </summary>
-        public async Task SetOccupiedSetback (SecureSession session, byte? value) {
-            await SetAttribute(session, 52, value, true);
-        }
+        public required ReadAttribute<byte> NumberOfSchedules { get; init; }
 
         /// <summary>
-        /// Get the Occupied Setback Min attribute
+        /// Number Of Schedule Transitions Attribute
         /// </summary>
-        public async Task<byte?> GetOccupiedSetbackMin(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 53, true);
-        }
+        public required ReadAttribute<byte> NumberOfScheduleTransitions { get; init; }
 
         /// <summary>
-        /// Get the Occupied Setback Max attribute
+        /// Number Of Schedule Transition Per Day Attribute
         /// </summary>
-        public async Task<byte?> GetOccupiedSetbackMax(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 54, true);
-        }
+        public required ReadAttribute<byte?> NumberOfScheduleTransitionPerDay { get; init; }
 
         /// <summary>
-        /// Get the Unoccupied Setback attribute
+        /// Active Preset Handle Attribute
         /// </summary>
-        public async Task<byte?> GetUnoccupiedSetback(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 55, true);
-        }
+        public required ReadAttribute<byte[]?> ActivePresetHandle { get; init; }
 
         /// <summary>
-        /// Set the Unoccupied Setback attribute
+        /// Active Schedule Handle Attribute
         /// </summary>
-        public async Task SetUnoccupiedSetback (SecureSession session, byte? value) {
-            await SetAttribute(session, 55, value, true);
-        }
+        public required ReadAttribute<byte[]?> ActiveScheduleHandle { get; init; }
 
         /// <summary>
-        /// Get the Unoccupied Setback Min attribute
+        /// Presets Attribute
         /// </summary>
-        public async Task<byte?> GetUnoccupiedSetbackMin(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 56, true);
-        }
+        public required ReadWriteAttribute<Preset[]> Presets { get; init; }
 
         /// <summary>
-        /// Get the Unoccupied Setback Max attribute
+        /// Schedules Attribute
         /// </summary>
-        public async Task<byte?> GetUnoccupiedSetbackMax(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 57, true);
-        }
+        public required ReadWriteAttribute<Schedule[]> Schedules { get; init; }
 
         /// <summary>
-        /// Get the Emergency Heat Delta attribute
+        /// Setpoint Hold Expiry Timestamp Attribute
         /// </summary>
-        public async Task<byte> GetEmergencyHeatDelta(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 58) ?? 0xFF;
-        }
-
-        /// <summary>
-        /// Set the Emergency Heat Delta attribute
-        /// </summary>
-        public async Task SetEmergencyHeatDelta (SecureSession session, byte? value = 0xFF) {
-            await SetAttribute(session, 58, value);
-        }
-
-        /// <summary>
-        /// Get the AC Type attribute
-        /// </summary>
-        public async Task<ACType> GetACType(SecureSession session) {
-            return (ACType)await GetEnumAttribute(session, 64);
-        }
-
-        /// <summary>
-        /// Set the AC Type attribute
-        /// </summary>
-        public async Task SetACType (SecureSession session, ACType value) {
-            await SetAttribute(session, 64, value);
-        }
-
-        /// <summary>
-        /// Get the AC Capacity attribute
-        /// </summary>
-        public async Task<ushort> GetACCapacity(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 65) ?? 0;
-        }
-
-        /// <summary>
-        /// Set the AC Capacity attribute
-        /// </summary>
-        public async Task SetACCapacity (SecureSession session, ushort? value = 0) {
-            await SetAttribute(session, 65, value);
-        }
-
-        /// <summary>
-        /// Get the AC Refrigerant Type attribute
-        /// </summary>
-        public async Task<ACRefrigerantType> GetACRefrigerantType(SecureSession session) {
-            return (ACRefrigerantType)await GetEnumAttribute(session, 66);
-        }
-
-        /// <summary>
-        /// Set the AC Refrigerant Type attribute
-        /// </summary>
-        public async Task SetACRefrigerantType (SecureSession session, ACRefrigerantType value) {
-            await SetAttribute(session, 66, value);
-        }
-
-        /// <summary>
-        /// Get the AC Compressor Type attribute
-        /// </summary>
-        public async Task<ACCompressorType> GetACCompressorType(SecureSession session) {
-            return (ACCompressorType)await GetEnumAttribute(session, 67);
-        }
-
-        /// <summary>
-        /// Set the AC Compressor Type attribute
-        /// </summary>
-        public async Task SetACCompressorType (SecureSession session, ACCompressorType value) {
-            await SetAttribute(session, 67, value);
-        }
-
-        /// <summary>
-        /// Get the AC Error Code attribute
-        /// </summary>
-        public async Task<ACErrorCode> GetACErrorCode(SecureSession session) {
-            return (ACErrorCode)await GetEnumAttribute(session, 68);
-        }
-
-        /// <summary>
-        /// Set the AC Error Code attribute
-        /// </summary>
-        public async Task SetACErrorCode (SecureSession session, ACErrorCode value) {
-            await SetAttribute(session, 68, value);
-        }
-
-        /// <summary>
-        /// Get the AC Louver Position attribute
-        /// </summary>
-        public async Task<ACLouverPosition> GetACLouverPosition(SecureSession session) {
-            return (ACLouverPosition)await GetEnumAttribute(session, 69);
-        }
-
-        /// <summary>
-        /// Set the AC Louver Position attribute
-        /// </summary>
-        public async Task SetACLouverPosition (SecureSession session, ACLouverPosition value) {
-            await SetAttribute(session, 69, value);
-        }
-
-        /// <summary>
-        /// Get the AC Coil Temperature attribute
-        /// </summary>
-        public async Task<short?> GetACCoilTemperature(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 70, true);
-        }
-
-        /// <summary>
-        /// Get the AC Capacityformat attribute
-        /// </summary>
-        public async Task<ACCapacityFormat> GetACCapacityformat(SecureSession session) {
-            return (ACCapacityFormat)await GetEnumAttribute(session, 71);
-        }
-
-        /// <summary>
-        /// Set the AC Capacityformat attribute
-        /// </summary>
-        public async Task SetACCapacityformat (SecureSession session, ACCapacityFormat value) {
-            await SetAttribute(session, 71, value);
-        }
-
-        /// <summary>
-        /// Get the Preset Types attribute
-        /// </summary>
-        public async Task<PresetType[]> GetPresetTypes(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 72))!);
-            PresetType[] list = new PresetType[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new PresetType(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Schedule Types attribute
-        /// </summary>
-        public async Task<ScheduleType[]> GetScheduleTypes(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 73))!);
-            ScheduleType[] list = new ScheduleType[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ScheduleType(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the Number Of Presets attribute
-        /// </summary>
-        public async Task<byte> GetNumberOfPresets(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 74) ?? 0;
-        }
-
-        /// <summary>
-        /// Get the Number Of Schedules attribute
-        /// </summary>
-        public async Task<byte> GetNumberOfSchedules(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 75) ?? 0;
-        }
-
-        /// <summary>
-        /// Get the Number Of Schedule Transitions attribute
-        /// </summary>
-        public async Task<byte> GetNumberOfScheduleTransitions(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 76) ?? 0;
-        }
-
-        /// <summary>
-        /// Get the Number Of Schedule Transition Per Day attribute
-        /// </summary>
-        public async Task<byte?> GetNumberOfScheduleTransitionPerDay(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 77, true);
-        }
-
-        /// <summary>
-        /// Get the Active Preset Handle attribute
-        /// </summary>
-        public async Task<byte[]?> GetActivePresetHandle(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 78, true);
-        }
-
-        /// <summary>
-        /// Get the Active Schedule Handle attribute
-        /// </summary>
-        public async Task<byte[]?> GetActiveScheduleHandle(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 79, true);
-        }
-
-        /// <summary>
-        /// Get the Presets attribute
-        /// </summary>
-        public async Task<Preset[]> GetPresets(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 80))!);
-            Preset[] list = new Preset[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Preset(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Set the Presets attribute
-        /// </summary>
-        public async Task SetPresets (SecureSession session, Preset[] value) {
-            await SetAttribute(session, 80, value);
-        }
-
-        /// <summary>
-        /// Get the Schedules attribute
-        /// </summary>
-        public async Task<Schedule[]> GetSchedules(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 81))!);
-            Schedule[] list = new Schedule[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Schedule(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Set the Schedules attribute
-        /// </summary>
-        public async Task SetSchedules (SecureSession session, Schedule[] value) {
-            await SetAttribute(session, 81, value);
-        }
-
-        /// <summary>
-        /// Get the Setpoint Hold Expiry Timestamp attribute
-        /// </summary>
-        public async Task<DateTime?> GetSetpointHoldExpiryTimestamp(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 82));
-        }
+        public required ReadAttribute<DateTime?> SetpointHoldExpiryTimestamp { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

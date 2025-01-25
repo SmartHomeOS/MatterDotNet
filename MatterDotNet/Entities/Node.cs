@@ -140,12 +140,12 @@ namespace MatterDotNet.Entities
 
         internal static async Task Populate(SecureSession session, Node node)
         {
-            ushort[] eps = await node.Root.GetCluster<Descriptor>().GetPartsList(session);
+            ushort[] eps = await node.Root.GetCluster<Descriptor>().PartsList.Get(session);
             foreach (ushort index in eps)
                 node.Root.AddChild(new EndPoint(index, node));
             foreach (EndPoint child in node.Root.Children)
             {
-                ushort[] childEps = await child.GetCluster<Descriptor>().GetPartsList(session);
+                ushort[] childEps = await child.GetCluster<Descriptor>().PartsList.Get(session);
                 foreach (ushort childEp in childEps)
                 {
                     child.AddChild(node.Root.RemoveChild(childEp)!);

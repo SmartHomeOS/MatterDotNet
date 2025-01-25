@@ -32,9 +32,25 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for controlling the Output on a media device such as a TV.
         /// </summary>
-        public AudioOutput(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public AudioOutput(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AudioOutput(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected AudioOutput(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            OutputList = new ReadAttribute<OutputInfo[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    OutputInfo[] list = new OutputInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new OutputInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentOutput = new ReadAttribute<byte>(cluster, endPoint, 1) {
+                Deserialize = x => (byte?)(dynamic?)x ?? 0x00
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -182,22 +198,14 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Get the Output List attribute
+        /// Output List Attribute
         /// </summary>
-        public async Task<OutputInfo[]> GetOutputList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            OutputInfo[] list = new OutputInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new OutputInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<OutputInfo[]> OutputList { get; init; }
 
         /// <summary>
-        /// Get the Current Output attribute
+        /// Current Output Attribute
         /// </summary>
-        public async Task<byte> GetCurrentOutput(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 1) ?? 0x00;
-        }
+        public required ReadAttribute<byte> CurrentOutput { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -31,9 +31,30 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Provides extended device information for all the logical devices represented by a Bridged Node.
         /// </summary>
-        public EcosystemInformation(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public EcosystemInformation(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected EcosystemInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected EcosystemInformation(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            DeviceDirectory = new ReadAttribute<EcosystemDevice[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    EcosystemDevice[] list = new EcosystemDevice[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new EcosystemDevice(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            LocationDirectory = new ReadAttribute<EcosystemLocation[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    EcosystemLocation[] list = new EcosystemLocation[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new EcosystemLocation(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Records
         /// <summary>
@@ -138,26 +159,14 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Device Directory attribute
+        /// Device Directory Attribute
         /// </summary>
-        public async Task<EcosystemDevice[]> GetDeviceDirectory(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            EcosystemDevice[] list = new EcosystemDevice[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new EcosystemDevice(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<EcosystemDevice[]> DeviceDirectory { get; init; }
 
         /// <summary>
-        /// Get the Location Directory attribute
+        /// Location Directory Attribute
         /// </summary>
-        public async Task<EcosystemLocation[]> GetLocationDirectory(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            EcosystemLocation[] list = new EcosystemLocation[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new EcosystemLocation(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<EcosystemLocation[]> LocationDirectory { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

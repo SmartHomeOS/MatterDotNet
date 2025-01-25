@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,17 +29,21 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster provides an interface to a boolean state called StateValue.
         /// </summary>
-        public BooleanState(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public BooleanState(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected BooleanState(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected BooleanState(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            StateValue = new ReadAttribute<bool>(cluster, endPoint, 0) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the State Value attribute
+        /// State Value Attribute
         /// </summary>
-        public async Task<bool> GetStateValue(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<bool> StateValue { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

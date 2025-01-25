@@ -32,9 +32,33 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
         /// </summary>
-        public Actions(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public Actions(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected Actions(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected Actions(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ActionList = new ReadAttribute<Action[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Action[] list = new Action[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Action(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            EndpointLists = new ReadAttribute<EndpointList[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    EndpointList[] list = new EndpointList[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new EndpointList(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SetupURL = new ReadAttribute<string>(cluster, endPoint, 2) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -582,33 +606,19 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Action List attribute
+        /// Action List Attribute
         /// </summary>
-        public async Task<Action[]> GetActionList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Action[] list = new Action[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Action(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Action[]> ActionList { get; init; }
 
         /// <summary>
-        /// Get the Endpoint Lists attribute
+        /// Endpoint Lists Attribute
         /// </summary>
-        public async Task<EndpointList[]> GetEndpointLists(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            EndpointList[] list = new EndpointList[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new EndpointList(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<EndpointList[]> EndpointLists { get; init; }
 
         /// <summary>
-        /// Get the Setup URL attribute
+        /// Setup URL Attribute
         /// </summary>
-        public async Task<string> GetSetupURL(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<string> SetupURL { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

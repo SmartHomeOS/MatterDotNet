@@ -33,9 +33,57 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Functionality to configure, enable, disable network credentials and access on a Matter device.
         /// </summary>
-        public NetworkCommissioning(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public NetworkCommissioning(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected NetworkCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected NetworkCommissioning(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MaxNetworks = new ReadAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            Networks = new ReadAttribute<NetworkInfo[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    NetworkInfo[] list = new NetworkInfo[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new NetworkInfo(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ScanMaxTimeSeconds = new ReadAttribute<byte>(cluster, endPoint, 2) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            ConnectMaxTimeSeconds = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            InterfaceEnabled = new ReadWriteAttribute<bool>(cluster, endPoint, 4) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            LastNetworkingStatus = new ReadAttribute<NetworkCommissioningStatus?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (NetworkCommissioningStatus?)DeserializeEnum(x)
+            };
+            LastNetworkID = new ReadAttribute<byte[]?>(cluster, endPoint, 6, true) {
+                Deserialize = x => (byte[]?)(dynamic?)x
+            };
+            LastConnectErrorValue = new ReadAttribute<int?>(cluster, endPoint, 7, true) {
+                Deserialize = x => (int?)(dynamic?)x
+            };
+            SupportedWiFiBands = new ReadAttribute<WiFiBand[]>(cluster, endPoint, 8) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    WiFiBand[] list = new WiFiBand[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (WiFiBand)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            SupportedThreadFeatures = new ReadAttribute<ThreadCapabilities>(cluster, endPoint, 9) {
+                Deserialize = x => (ThreadCapabilities)DeserializeEnum(x)!
+            };
+            ThreadVersion = new ReadAttribute<ushort>(cluster, endPoint, 10) {
+                Deserialize = x => (ushort)(dynamic?)x!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -78,11 +126,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// </summary>
             BoundsExceeded = 0x2,
             /// <summary>
-            /// <see cref="NetworkIDNotFound"/> The NetworkID is not among the collection of added networks
+            /// <see cref="NetworkIdNotFound"/> The NetworkID is not among the collection of added networks
             /// </summary>
             NetworkIDNotFound = 0x3,
             /// <summary>
-            /// <see cref="DuplicateNetworkID"/> The NetworkID is already among the collection of added networks
+            /// <see cref="DuplicateNetworkId"/> The NetworkID is already among the collection of added networks
             /// </summary>
             DuplicateNetworkID = 0x4,
             /// <summary>
@@ -106,11 +154,11 @@ namespace MatterDotNet.Clusters.CHIP
             /// </summary>
             OtherConnectionFailure = 0x9,
             /// <summary>
-            /// <see cref="IPV6Failed"/> Failure to generate an IPv6 address
+            /// <see cref="Ipv6Failed"/> Failure to generate an IPv6 address
             /// </summary>
             IPV6Failed = 0xA,
             /// <summary>
-            /// <see cref="IPBindFailed"/> Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces
+            /// <see cref="IpBindFailed"/> Failure to bind Wi-Fi +<->+ IP interfaces
             /// </summary>
             IPBindFailed = 0xB,
             /// <summary>
@@ -158,25 +206,10 @@ namespace MatterDotNet.Clusters.CHIP
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Supports unencrypted Wi-Fi
-            /// </summary>
             Unencrypted = 0x01,
-            /// <summary>
-            /// Supports Wi-Fi using WEP security
-            /// </summary>
             WEP = 0x02,
-            /// <summary>
-            /// Supports Wi-Fi using WPA-Personal security
-            /// </summary>
             WPAPERSONAL = 0x04,
-            /// <summary>
-            /// Supports Wi-Fi using WPA2-Personal security
-            /// </summary>
             WPA2PERSONAL = 0x08,
-            /// <summary>
-            /// Supports Wi-Fi using WPA3-Personal security
-            /// </summary>
             WPA3PERSONAL = 0x10,
             WPA3MatterPDC = 0x20,
         }
@@ -190,25 +223,10 @@ namespace MatterDotNet.Clusters.CHIP
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Thread Border Router functionality is present
-            /// </summary>
             IsBorderRouterCapable = 0x0001,
-            /// <summary>
-            /// Router mode is supported (interface could be in router or REED mode)
-            /// </summary>
             IsRouterCapable = 0x0002,
-            /// <summary>
-            /// Sleepy end-device mode is supported
-            /// </summary>
             IsSleepyEndDeviceCapable = 0x0004,
-            /// <summary>
-            /// Device is a full Thread device (opposite of Minimal Thread Device)
-            /// </summary>
             IsFullThreadDevice = 0x0008,
-            /// <summary>
-            /// Synchronized sleepy end-device mode is supported
-            /// </summary>
             IsSynchronizedSleepyEndDeviceCapable = 0x0010,
         }
         #endregion Enums
@@ -240,13 +258,7 @@ namespace MatterDotNet.Clusters.CHIP
             public required byte[] SSID { get; set; }
             public required byte[] BSSID { get; set; }
             public required ushort Channel { get; set; }
-            /// <summary>
-            /// This field, if present, MAY be used to differentiate overlapping channel number values across different Wi-Fi frequency bands.
-            /// </summary>
             public required WiFiBand WiFiBand { get; set; }
-            /// <summary>
-            /// This field, if present, SHALL denote the signal strength in dBm of the associated scan result.
-            /// </summary>
             public required sbyte RSSI { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
@@ -289,9 +301,6 @@ namespace MatterDotNet.Clusters.CHIP
             public required string NetworkName { get; set; }
             public required ushort Channel { get; set; }
             public required byte Version { get; set; }
-            /// <summary>
-            /// ExtendedAddress stands for an IEEE 802.15.4 Extended Address.
-            /// </summary>
             public required PhysicalAddress ExtendedAddress { get; set; }
             public required sbyte RSSI { get; set; }
             public required byte LQI { get; set; }
@@ -648,96 +657,59 @@ namespace MatterDotNet.Clusters.CHIP
         }
 
         /// <summary>
-        /// Get the Max Networks attribute
+        /// Max Networks Attribute
         /// </summary>
-        public async Task<byte> GetMaxNetworks(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<byte> MaxNetworks { get; init; }
 
         /// <summary>
-        /// Get the Networks attribute
+        /// Networks Attribute
         /// </summary>
-        public async Task<NetworkInfo[]> GetNetworks(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            NetworkInfo[] list = new NetworkInfo[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new NetworkInfo(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<NetworkInfo[]> Networks { get; init; }
 
         /// <summary>
-        /// Get the Scan Max Time Seconds attribute
+        /// Scan Max Time Seconds Attribute
         /// </summary>
-        public async Task<byte> GetScanMaxTimeSeconds(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 2))!;
-        }
+        public required ReadAttribute<byte> ScanMaxTimeSeconds { get; init; }
 
         /// <summary>
-        /// Get the Connect Max Time Seconds attribute
+        /// Connect Max Time Seconds Attribute
         /// </summary>
-        public async Task<byte> GetConnectMaxTimeSeconds(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<byte> ConnectMaxTimeSeconds { get; init; }
 
         /// <summary>
-        /// Get the Interface Enabled attribute
+        /// Interface Enabled Attribute
         /// </summary>
-        public async Task<bool> GetInterfaceEnabled(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 4))!;
-        }
+        public required ReadWriteAttribute<bool> InterfaceEnabled { get; init; }
 
         /// <summary>
-        /// Set the Interface Enabled attribute
+        /// Last Networking Status Attribute
         /// </summary>
-        public async Task SetInterfaceEnabled (SecureSession session, bool value) {
-            await SetAttribute(session, 4, value);
-        }
+        public required ReadAttribute<NetworkCommissioningStatus?> LastNetworkingStatus { get; init; }
 
         /// <summary>
-        /// Get the Last Networking Status attribute
+        /// Last Network ID Attribute
         /// </summary>
-        public async Task<NetworkCommissioningStatus?> GetLastNetworkingStatus(SecureSession session) {
-            return (NetworkCommissioningStatus?)await GetEnumAttribute(session, 5, true);
-        }
+        public required ReadAttribute<byte[]?> LastNetworkID { get; init; }
 
         /// <summary>
-        /// Get the Last Network ID attribute
+        /// Last Connect Error Value Attribute
         /// </summary>
-        public async Task<byte[]?> GetLastNetworkID(SecureSession session) {
-            return (byte[]?)(dynamic?)await GetAttribute(session, 6, true);
-        }
+        public required ReadAttribute<int?> LastConnectErrorValue { get; init; }
 
         /// <summary>
-        /// Get the Last Connect Error Value attribute
+        /// Supported WiFi Bands Attribute
         /// </summary>
-        public async Task<int?> GetLastConnectErrorValue(SecureSession session) {
-            return (int?)(dynamic?)await GetAttribute(session, 7, true);
-        }
+        public required ReadAttribute<WiFiBand[]> SupportedWiFiBands { get; init; }
 
         /// <summary>
-        /// Get the Supported WiFi Bands attribute
+        /// Supported Thread Features Attribute
         /// </summary>
-        public async Task<WiFiBand[]> GetSupportedWiFiBands(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 8))!);
-            WiFiBand[] list = new WiFiBand[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (WiFiBand)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<ThreadCapabilities> SupportedThreadFeatures { get; init; }
 
         /// <summary>
-        /// Get the Supported Thread Features attribute
+        /// Thread Version Attribute
         /// </summary>
-        public async Task<ThreadCapabilities> GetSupportedThreadFeatures(SecureSession session) {
-            return (ThreadCapabilities)await GetEnumAttribute(session, 9);
-        }
-
-        /// <summary>
-        /// Get the Thread Version attribute
-        /// </summary>
-        public async Task<ushort> GetThreadVersion(SecureSession session) {
-            return (ushort)(dynamic?)(await GetAttribute(session, 10))!;
-        }
+        public required ReadAttribute<ushort> ThreadVersion { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

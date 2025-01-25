@@ -12,6 +12,7 @@
 
 using Generator.Schema;
 using MatterDotNet;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.Metrics;
@@ -103,7 +104,7 @@ namespace Generator
                                                 firstEnum = false;
                                             else
                                                 writer.WriteLine();
-                                            WriteEnum(enumType, writer, null);
+                                            WriteEnum(enumType, writer, config, null);
                                         }
                                     }
 
@@ -120,7 +121,7 @@ namespace Generator
                                                 firstEnum = false;
                                             else
                                                 writer.WriteLine();
-                                            WriteBitfield(bitmapType, writer, null);
+                                            WriteBitfield(bitmapType, writer, config, null);
                                         }
                                     }
 
@@ -140,7 +141,7 @@ namespace Generator
                                                 firstRecord = false;
                                             else
                                                 writer.WriteLine();
-                                            WriteRecord(structType, config, writer);
+                                            WriteRecord(structType, config, null, writer);
                                         }
                                     }
 
@@ -184,6 +185,7 @@ namespace Generator
         {
             includes.Add("MatterDotNet.Protocol.Parsers");
             includes.Add("MatterDotNet.Protocol.Sessions");
+            includes.Add("System.Diagnostics.CodeAnalysis");
             writer.WriteLine();
             writer.WriteLine($"namespace MatterDotNet.Clusters.{GeneratorUtil.SanitizeClassName(string.IsNullOrEmpty(cluster.domain) ? "Misc" : cluster.domain)}\n{{");
             writer.WriteLine("    /// <summary>");
@@ -201,9 +203,18 @@ namespace Generator
             writer.WriteLine("        /// <summary>");
             writer.WriteLine($"        /// {GeneratorUtil.SanitizeComment(cluster.description) ?? GeneratorUtil.FieldNameToComment(cluster.name)}");
             writer.WriteLine("        /// </summary>");
-            writer.WriteLine("        public " + GeneratorUtil.SanitizeClassName(cluster.name) + "(ushort endPoint) : base(CLUSTER_ID, endPoint) { }");
-            //if (string.IsNullOrEmpty(cluster.classification.baseCluster) && !string.IsNullOrEmpty(clusterConfig.cluster.code))
-            writer.WriteLine($"        /// <inheritdoc />\n        protected {GeneratorUtil.SanitizeClassName(cluster.name)}(uint cluster, ushort endPoint) : base(cluster, endPoint) {{ }}");
+            writer.WriteLine("        [SetsRequiredMembers]");
+            writer.WriteLine("        public " + GeneratorUtil.SanitizeClassName(cluster.name) + "(ushort endPoint) : this(CLUSTER_ID, endPoint) { }");
+            writer.WriteLine($"        /// <inheritdoc />\n        [SetsRequiredMembers]\n        protected {GeneratorUtil.SanitizeClassName(cluster.name)}(uint cluster, ushort endPoint) : base(cluster, endPoint) {{");
+            if (cluster.attribute != null && cluster.attribute.Length > 0)
+            {
+                foreach (var attribute in cluster.attribute)
+                {
+                    if (attribute.type != null && attribute?.mandatoryConform?.condition?.name != "Zigbee" && attribute?.side == "server")
+                        DefineAttribute(clusterConfig, cluster, attribute, writer);
+                }
+            }
+            writer.WriteLine("        }");
             writer.WriteLine();
             if (clusterConfig.@enum != null || clusterConfig.bitmap != null || (cluster.features != null && cluster.features.feature.Length > 0))
             {
@@ -224,7 +235,7 @@ namespace Generator
                             firstEnum = false;
                         else
                             writer.WriteLine();
-                        WriteEnum(enumType, writer, cluster.code);
+                        WriteEnum(enumType, writer, clusterConfig, cluster);
                     }
                 }
                 if (clusterConfig.bitmap != null)
@@ -237,7 +248,7 @@ namespace Generator
                             firstEnum = false;
                         else
                             writer.WriteLine();
-                        WriteBitfield(bitmapType, writer, cluster.code);
+                        WriteBitfield(bitmapType, writer, clusterConfig, cluster);
                     }
                 }
                 writer.WriteLine("        #endregion Enums");
@@ -245,7 +256,6 @@ namespace Generator
             }
             if (clusterConfig.@struct != null)
             {
-                includes.Add("System.Diagnostics.CodeAnalysis");
                 includes.Add("MatterDotNet.Protocol.Payloads");
                 writer.WriteLine("        #region Records");
                 bool firstRecord = true;
@@ -257,7 +267,7 @@ namespace Generator
                         firstRecord = false;
                     else
                         writer.WriteLine();
-                    WriteRecord(structType, clusterConfig, writer);
+                    WriteRecord(structType, clusterConfig, cluster, writer);
                 }
                 writer.WriteLine("        #endregion Records");
                 writer.WriteLine();
@@ -277,7 +287,7 @@ namespace Generator
                         firstPayload = false;
                     else
                         writer.WriteLine();
-                    WriteStruct(command, command.source == "client", writer, clusterConfig);
+                    WriteStruct(command, cluster, command.source == "client", writer, clusterConfig);
                 }
                 writer.WriteLine("        #endregion Payloads");
                 writer.WriteLine();
@@ -303,7 +313,7 @@ namespace Generator
                                 firstAttribute = false;
                             else
                                 writer.WriteLine();
-                            WriteAttribute(clusterConfig, attribute, writer);
+                            WriteAttribute(clusterConfig, attribute, cluster, writer);
                         }
                     }
                 }
@@ -320,7 +330,7 @@ namespace Generator
             writer.WriteLine("        /// <summary>\n        /// Features supported by this cluster\n        /// </summary>\n        /// <param name=\"session\"></param>\n        /// <returns></returns>\n        public async Task<Feature> GetSupportedFeatures(SecureSession session)\n        {\n            return (Feature)(byte)(await GetAttribute(session, 0xFFFC))!;\n        }\n\n        /// <summary>\n        /// Returns true when the feature is supported by the cluster\n        /// </summary>\n        /// <param name=\"session\"></param>\n        /// <param name=\"feature\"></param>\n        /// <returns></returns>\n        public async Task<bool> Supports(SecureSession session, Feature feature)\n        {\n            return ((feature & await GetSupportedFeatures(session)) != 0);\n        }");
         }
 
-        private static void WriteStruct(rootConfiguratorClusterCommand command, bool toServer, TextWriter writer, configurator clusterConfig)
+        private static void WriteStruct(rootConfiguratorClusterCommand command, rootConfiguratorCluster cluster, bool toServer, TextWriter writer, configurator clusterConfig)
         {
             if (!toServer)
                 writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(command.name)} - Reply from server\n        /// </summary>");
@@ -336,7 +346,7 @@ namespace Generator
                     bool optional = field.optional;
                     if (!optional)
                         writer.Write("required ");
-                    WriteType(field.array, field.type, writer, field.name);
+                    WriteType(field.array, field.type, writer, field.name, clusterConfig, cluster);
                     if (optional || field.isNullable == true)
                         writer.Write("?");
                     if (field.name == GeneratorUtil.SanitizeName(command.name))
@@ -693,7 +703,7 @@ namespace Generator
                 writer.WriteLine(");");
         }
 
-        private static void WriteFieldReader(bool optional, bool nullable, bool array, string type, string id, long? from, long? to, string name, string structName, configurator clusterConfig, TextWriter writer)
+        private static void WriteFieldReader(bool optional, bool nullable, bool array, string type, string id, long? from, long? to, string name, string structName, configurator clusterConfig, rootConfiguratorCluster cluster, TextWriter writer)
         {
             string totalIndent = "                ";
             
@@ -701,11 +711,11 @@ namespace Generator
             {
                 writer.WriteLine($"{totalIndent}{{");
                 writer.Write($"{totalIndent}    {name} = new ");
-                WriteType(false, type, writer, name);
+                WriteType(false, type, writer, name, clusterConfig, cluster);
                 writer.WriteLine($"[reader.GetStruct({id})!.Length];");
                 writer.WriteLine($"{totalIndent}    for (int n = 0; n < {name}.Length; n++) {{");
                 writer.Write($"{totalIndent}        {name}[n] = ");
-                WriteFieldReader(false, false, false, type!, "n", null, null, $"fields[{id}]", structName, clusterConfig, writer);
+                WriteFieldReader(false, false, false, type!, "n", null, null, $"fields[{id}]", structName, clusterConfig, cluster, writer);
                 writer.WriteLine($"{totalIndent}    }}");
                 writer.WriteLine($"{totalIndent}}}");
                 return;
@@ -906,7 +916,7 @@ namespace Generator
                     }
                     else {
                         writer.Write($"new ");
-                        WriteType(false, type, writer, name);
+                        WriteType(false, type, writer, name, clusterConfig, cluster);
                         if (id == "i")
                             writer.WriteLine("(reader.GetStruct(i)!);");
                         else if (id == "n")
@@ -1004,6 +1014,20 @@ namespace Generator
             return false;
         }
 
+        private static bool HasAttribute(rootConfiguratorCluster? cluster, string name)
+        {
+            if (cluster == null || cluster.attribute == null)
+                return false;
+            foreach (rootConfiguratorClusterAttribute attribute in cluster.attribute)
+            {
+                if (attribute.description != null && GeneratorUtil.SanitizeName(name) == GeneratorUtil.SanitizeName(attribute.description))
+                    return true;
+                else if (attribute.text != null && GeneratorUtil.SanitizeName(name) == GeneratorUtil.SanitizeName(attribute.text))
+                    return true;
+            }
+            return false;
+        }
+
         private static void WriteCommands(configurator clusterConfig, rootConfiguratorCluster cluster, TextWriter writer)
         {
             writer.WriteLine("        #region Commands");
@@ -1040,7 +1064,7 @@ namespace Generator
                                 continue;
                             field.type = CorrectFieldType(field.name, field.type);
                             writer.Write(", ");
-                            WriteType(field.array, field.type, writer, field.name);
+                            WriteType(field.array, field.type, writer, field.name, clusterConfig, cluster);
                             if (field.optional || field.isNullable)
                                 writer.Write('?');
                             writer.Write(" " + GeneratorUtil.SanitizeName(field.name, true));
@@ -1099,7 +1123,7 @@ namespace Generator
                                     writer.Write("GetOptionalArrayField<");
                                 else
                                     writer.Write("GetArrayField<");
-                                WriteType(false, field.type, writer, field.name);
+                                WriteType(false, field.type, writer, field.name, clusterConfig, cluster);
                                 writer.WriteLine($">(resp, {fieldIdx}),");
                             }
                             else
@@ -1109,7 +1133,7 @@ namespace Generator
                                     writer.Write($"GetField(resp, {fieldIdx}) != null ? ");
                                 else
                                     writer.Write('(');
-                                WriteType(field.array, field.type!, writer, field.name);
+                                WriteType(field.array, field.type!, writer, field.name, clusterConfig, cluster);
                                 if (field.optional)
                                 {
                                     if (HasEnum(clusterConfig, field.type!) || HasBitmap(clusterConfig, field.type!))
@@ -1163,15 +1187,15 @@ namespace Generator
             return null;
         }
 
-        private static void WriteRecord(rootConfiguratorStruct structType, configurator clusterConfig, TextWriter writer)
+        private static void WriteRecord(rootConfiguratorStruct structType, configurator clusterConfig, rootConfiguratorCluster cluster, TextWriter writer)
         {
             writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(structType.name)}\n        /// </summary>");
-            writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name) + " : TLVPayload {");
+            writer.WriteLine("        public record " + GeneratorUtil.SanitizeName(structType.name, false, !HasAttribute(cluster, structType.name), "Struct") + " : TLVPayload {");
             writer.WriteLine($"            /// <summary>\n            /// {GeneratorUtil.FieldNameToComment(structType.name)}\n            /// </summary>");
-            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}() {{ }}\n");
+            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name, false, !HasAttribute(cluster, structType.name), "Struct")}() {{ }}\n");
             writer.WriteLine($"            /// <summary>\n            /// {GeneratorUtil.FieldNameToComment(structType.name)}\n            /// </summary>");
             writer.WriteLine($"            [SetsRequiredMembers]");
-            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name)}(object[] fields) {{");
+            writer.WriteLine($"            public {GeneratorUtil.SanitizeName(structType.name, false, !HasAttribute(cluster, structType.name), "Struct")}(object[] fields) {{");
             writer.WriteLine("                FieldReader reader = new FieldReader(fields);");
             int fieldIdx = 0;
             foreach (rootConfiguratorStructItem field in structType.item)
@@ -1188,7 +1212,7 @@ namespace Generator
                 if (field.length != 0)
                     to = field.length;
 
-                WriteFieldReader(field.optional, field.isNullable, field.array, field.type, field.fieldId == null ? fieldIdx.ToString() : field.fieldId, from, to, (GeneratorUtil.SanitizeName(field.name) == GeneratorUtil.SanitizeName(structType.name) ? GeneratorUtil.SanitizeName(field.name + "Field") : GeneratorUtil.SanitizeName(field.name)), structType.name, clusterConfig, writer);
+                WriteFieldReader(field.optional, field.isNullable, field.array, field.type, field.fieldId == null ? fieldIdx.ToString() : field.fieldId, from, to, (GeneratorUtil.SanitizeName(field.name) == GeneratorUtil.SanitizeName(structType.name) ? GeneratorUtil.SanitizeName(field.name + "Field") : GeneratorUtil.SanitizeName(field.name)), structType.name, clusterConfig, cluster, writer);
                 fieldIdx++;
             }
             writer.WriteLine("            }");
@@ -1204,7 +1228,7 @@ namespace Generator
                 writer.Write("            public ");
                 if (!field.optional)
                     writer.Write("required ");
-                WriteType(field.array, field.type, writer, field.name);
+                WriteType(field.array, field.type, writer, field.name, clusterConfig, cluster);
                 if (field.optional || field.isNullable)
                     writer.Write("?");
                 if (field.name == GeneratorUtil.SanitizeName(structType.name))
@@ -1214,9 +1238,9 @@ namespace Generator
                 if (hasDefault)
                 {
                     if (HasEnum(clusterConfig, field.type) || HasBitmap(clusterConfig, field.type))
-                        writer.WriteLine(" = " + GeneratorUtil.SanitizeName(field.type) + "." + field.@default + ";");
+                        writer.WriteLine(" = " + GeneratorUtil.SanitizeName(field.type, false, !HasAttribute(cluster, field.type), HasEnum(clusterConfig, field.type) ? "Enum" : "Bitmap") + "." + field.@default + ";");
                     else
-                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, field.array ? "array" : field.type, field.type) + ";");
+                        writer.WriteLine(" = " + SanitizeDefault(field.@default!, field.array ? "array" : field.type, field.type, clusterConfig, cluster) + ";");
                 }
                 else
                     writer.WriteLine();
@@ -1245,13 +1269,13 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteEnum(rootConfiguratorEnum enumType, TextWriter writer, string? clusterId)
+        private static void WriteEnum(rootConfiguratorEnum enumType, TextWriter writer, configurator clusterConfig, rootConfiguratorCluster? cluster)
         {
             writer.WriteLine("        /// <summary>");
             writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(enumType.name));
             writer.WriteLine("        /// </summary>");
-            writer.Write("        public enum " + GeneratorUtil.SanitizeName(enumType.name) + " : ");
-            WriteType(false, enumType.type, writer, enumType.name);
+            writer.Write("        public enum " + GeneratorUtil.SanitizeName(enumType.name, false, !HasAttribute(cluster, enumType.name), "Enum") + " : ");
+            WriteType(false, enumType.type, writer, enumType.name, clusterConfig, cluster);
             writer.WriteLine(" {");
             string max = enumType.item.Last().value;
             foreach (rootConfiguratorEnumItem item in enumType.item)
@@ -1265,7 +1289,7 @@ namespace Generator
                         if (value == string.Empty)
                             value = "0";
                     }
-                    string key = GeneratorUtil.EnsureHex(clusterId) + "." + GeneratorUtil.SanitizeName(enumType.name);
+                    string key = GeneratorUtil.EnsureHex(cluster?.code) + "." + GeneratorUtil.SanitizeName(enumType.name);
                     if (item.summary != null)
                         writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                     else if (enumComments.ContainsKey(key) && enumComments[key].ContainsKey(GeneratorUtil.EnsureHex(value, 4)))
@@ -1278,20 +1302,20 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteBitfield(rootConfiguratorBitmap bitmapType, TextWriter writer, string? clusterId)
+        private static void WriteBitfield(rootConfiguratorBitmap bitmapType, TextWriter writer, configurator clusterConfig, rootConfiguratorCluster? cluster)
         {
             writer.WriteLine("        /// <summary>");
             writer.WriteLine("        /// " + GeneratorUtil.FieldNameToComment(bitmapType.name));
             writer.WriteLine("        /// </summary>");
             writer.WriteLine("        [Flags]");
-            writer.Write("        public enum " + GeneratorUtil.SanitizeName(bitmapType.name) + " : ");
-            WriteType(false, bitmapType.type, writer, bitmapType.name);
+            writer.Write("        public enum " + GeneratorUtil.SanitizeName(bitmapType.name, false, !HasAttribute(cluster, bitmapType.name), "Bitmap") + " : ");
+            WriteType(false, bitmapType.type, writer, bitmapType.name, clusterConfig, cluster);
             writer.WriteLine(" {");
             writer.WriteLine("            /// <summary>\n            /// Nothing Set\n            /// </summary>");
             writer.WriteLine("            None = 0,");
             foreach (rootConfiguratorBitmapField item in bitmapType.field)
             {
-                string key = GeneratorUtil.EnsureHex(clusterId) + "." + GeneratorUtil.SanitizeName(bitmapType.name);
+                string key = GeneratorUtil.EnsureHex(cluster?.code) + "." + GeneratorUtil.SanitizeName(bitmapType.name, false, HasAttribute(cluster, bitmapType.name));
                 if (item.summary != null)
                     writer.WriteLine("            /// <summary>\n            /// " + GeneratorUtil.SanitizeComment(item.summary) + "\n            /// </summary>");
                 else if (bitmapComments.ContainsKey(key) && bitmapComments[key].ContainsKey(GeneratorUtil.EnsureHex(item.mask, 4)))
@@ -1324,125 +1348,113 @@ namespace Generator
             writer.WriteLine("        }");
         }
 
-        private static void WriteAttribute(configurator clusterConfig, rootConfiguratorClusterAttribute attribute, TextWriter writer)
+        private static void DefineAttribute(configurator clusterConfig, rootConfiguratorCluster cluster, rootConfiguratorClusterAttribute attribute, TextWriter writer)
         {
             bool hasDefault = attribute.@default != null && DefaultValid(attribute.@default);
             if (hasDefault && HasEnum(clusterConfig, attribute.type) && !HasEnumValue(clusterConfig, attribute.type, attribute.@default!))
                 hasDefault = false;
             if (hasDefault && HasBitmap(clusterConfig, attribute.type) && !HasBitmapValue(clusterConfig, attribute.type, attribute.@default!))
                 hasDefault = false;
-            //TODO - Verify no write only properties
-            //if (attribute. == true)
-            {
-                writer.WriteLine($"        /// <summary>\n        /// Get the {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} attribute\n        /// </summary>");
-                writer.Write("        public async Task<");
-                bool array = "array".Equals(attribute.type, StringComparison.InvariantCultureIgnoreCase);
-                WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text);
-                if (attribute.isNullable == true)
-                    writer.Write('?');
-                writer.WriteLine("> Get" + (attribute.description ?? attribute.text) + "(SecureSession session) {");
-                if (!array)
-                    writer.Write("            return ");
-                if (HasStruct(clusterConfig, attribute.type))
-                    writer.Write($"new {GeneratorUtil.SanitizeName(attribute.type)}((object[])(await GetAttribute(session, " + Convert.ToUInt32(attribute.code, 16) + "))!)");
-                else if (array)
-                {
-                    writer.WriteLine($"            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, {Convert.ToUInt32(attribute.code, 16)}))!);");
-                    writer.Write("            ");
-                    WriteType(false, attribute.entryType, writer, attribute.description ?? attribute.text);
-                    writer.Write("[] list = new ");
-                    if (WriteType(false, attribute.entryType, writer, attribute.description ?? attribute.text, true))
-                        writer.WriteLine("reader.Count][];");
-                    else
-                        writer.WriteLine("[reader.Count];");
-                    writer.WriteLine("            for (int i = 0; i < reader.Count; i++)");
-                    writer.Write("                list[i] = ");
-                    long? from = null;
-                    long? to = null;
-                    if (attribute.min != null && long.TryParse(attribute.min, out long fromVal))
-                        from = fromVal;
-                    if (attribute.max != null && long.TryParse(attribute.max, out long toVal))
-                        to = toVal;
-                    if (attribute.lengthSpecified)
-                        to = attribute.length;
-                    WriteFieldReader(false, false, false, attribute.entryType, "i", from, to, "", "", clusterConfig, writer);
-                    writer.Write("            return list");
-                    hasDefault = false;
-                }
-                else
-                {
-                    if (attribute.type == "epoch_s")
-                        writer.Write("TimeUtil.FromEpochSeconds((uint");
-                    else
-                    {
-                        writer.Write('(');
-                        WriteType(false, attribute.type, writer, attribute.description ?? attribute.text);
-                        if (attribute.isNullable == true || hasDefault)
-                            writer.Write('?');
-                    }
-                    if (HasEnum(clusterConfig, attribute.type) || HasBitmap(clusterConfig, attribute.type))
-                        writer.Write(")await GetEnumAttribute(session, " + Convert.ToUInt32(attribute.code, 16));
-                    else
-                    {
-                        writer.Write(")(dynamic?)");
-                        if (attribute.isNullable != true && !hasDefault)
-                            writer.Write('(');
-                        writer.Write("await GetAttribute(session, " + Convert.ToUInt32(attribute.code, 16));
-                    }
-                    if (attribute.type == "epoch_s")
-                        writer.Write(')');
-                    else if (attribute.isNullable == true)
-                        writer.Write(", true");
-                    writer.Write(')');
-                    if (!HasEnum(clusterConfig, attribute.type) && !HasBitmap(clusterConfig, attribute.type) && (attribute.isNullable != true && !hasDefault))
-                        writer.Write(")!");
-                }
+            bool array = "array".Equals(attribute.type, StringComparison.InvariantCultureIgnoreCase);
 
-                if (hasDefault)
-                {
-                    if (HasEnum(clusterConfig, attribute.type) || HasBitmap(clusterConfig, attribute.type))
-                        writer.WriteLine(" ?? " + GeneratorUtil.SanitizeName(attribute.type) + "." + attribute.@default + ";");
-                    else
-                        writer.WriteLine(" ?? " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entryType) + ";");
-                }
-                else
-                    writer.WriteLine(";");
-                writer.WriteLine("        }");
-            }
+            
+            writer.Write("            " + GeneratorUtil.SanitizeName(attribute.description ?? attribute.text) + " = new ");
             if (attribute.writable)
+                writer.Write("ReadWriteAttribute<");
+            else
+                writer.Write("ReadAttribute<");
+            WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
+            if (attribute.isNullable == true)
+                writer.Write('?');
+            if (attribute.isNullable)
+                writer.WriteLine($">(cluster, endPoint, {Convert.ToUInt32(attribute.code, 16)}, true) {{");
+            else
+                writer.WriteLine($">(cluster, endPoint, {Convert.ToUInt32(attribute.code, 16)}) {{");
+            writer.Write("                Deserialize = x => ");
+            if (HasStruct(clusterConfig, attribute.type))
+                writer.Write($"new {GeneratorUtil.SanitizeName(attribute.type, false, !HasAttribute(cluster, attribute.type), "Struct")}((object[])x!)");
+            else if (array)
             {
-                //if (attribute.access.read) //Uncomment if read is optional
-                writer.WriteLine();
-                writer.WriteLine($"        /// <summary>\n        /// Set the {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text)} attribute\n        /// </summary>");
-                writer.Write("        public async Task Set" + (attribute.description ?? attribute.text) + " (SecureSession session, ");
-                bool array = "array".Equals(attribute.type, StringComparison.InvariantCultureIgnoreCase);
-                WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text);
-                if (attribute.isNullable == true || hasDefault)
-                    writer.Write('?');
-                writer.Write(" value");
-                if (hasDefault)
-                {
-                    if (HasEnum(clusterConfig, attribute.type) || HasBitmap(clusterConfig, attribute.type))
-                        writer.Write(" = " + attribute.type + "." + attribute.@default);
-                    else if (!array)
-                        writer.Write(" = " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entryType));
-                }
-                writer.WriteLine(") {");
-                writer.Write("            await SetAttribute(session, " + Convert.ToUInt32(attribute.code, 16) + ", value");
-                if (hasDefault && array)
-                    writer.Write(" ?? " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entryType));
-                if (attribute.isNullable == true)
-                    writer.Write(", true");
-                writer.WriteLine(");");
-                writer.WriteLine("        }");
+                writer.WriteLine($"{{\n                    FieldReader reader = new FieldReader((IList<object>)x!);");
+                writer.Write("                    ");
+                WriteType(false, attribute.entryType, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
+                writer.Write("[] list = new ");
+                if (WriteType(false, attribute.entryType, writer, attribute.description ?? attribute.text, clusterConfig, cluster, true))
+                    writer.WriteLine("reader.Count][];");
+                else
+                    writer.WriteLine("[reader.Count];");
+                writer.WriteLine("                    for (int i = 0; i < reader.Count; i++)");
+                writer.Write("                        list[i] = ");
+                long? from = null;
+                long? to = null;
+                if (attribute.min != null && long.TryParse(attribute.min, out long fromVal))
+                    from = fromVal;
+                if (attribute.max != null && long.TryParse(attribute.max, out long toVal))
+                    to = toVal;
+                if (attribute.lengthSpecified)
+                    to = attribute.length;
+                WriteFieldReader(false, false, false, attribute.entryType, "i", from, to, "", "", clusterConfig, cluster, writer);
+                writer.WriteLine("                    return list;");
+                hasDefault = false;
             }
+            else
+            {
+                if (attribute.type == "epoch_s")
+                    writer.Write("TimeUtil.FromEpochSeconds((uint");
+                else
+                {
+                    writer.Write('(');
+                    WriteType(false, attribute.type, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
+                    if (attribute.isNullable == true || hasDefault)
+                        writer.Write('?');
+                }
+                if (HasEnum(clusterConfig, attribute.type) || HasBitmap(clusterConfig, attribute.type))
+                    writer.Write(")DeserializeEnum(x)");
+                else
+                {
+                    writer.Write(")(dynamic?)");
+                    //if (attribute.isNullable != true && !hasDefault)
+                    //    writer.Write('(');
+                    writer.Write("x");
+                }
+                if (attribute.type == "epoch_s")
+                    writer.Write(')');
+                if (attribute.isNullable != true && !hasDefault)
+                    writer.Write("!");
+            }
+
+            if (hasDefault)
+            {
+                if (HasEnum(clusterConfig, attribute.type) || HasBitmap(clusterConfig, attribute.type))
+                    writer.WriteLine(" ?? " + GeneratorUtil.SanitizeName(attribute.type, false, !HasAttribute(cluster, attribute.type), HasEnum(clusterConfig, attribute.type) ? "Enum" : "Bitmap") + "." + attribute.@default);
+                else
+                    writer.WriteLine(" ?? " + SanitizeDefault(attribute.@default!, attribute.type, attribute.entryType, clusterConfig, cluster));
+            }
+
+            if (array)
+                writer.Write("                }");
+            writer.WriteLine("\n            };");
         }
 
-        private static bool WriteType(bool array, string type, TextWriter writer, string name, bool openIndex = false)
+        private static void WriteAttribute(configurator clusterConfig, rootConfiguratorClusterAttribute attribute, rootConfiguratorCluster cluster, TextWriter writer)
+        {
+            writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} Attribute\n        /// </summary>");
+            if (attribute.writable)
+                writer.Write("        public required ReadWriteAttribute<");
+            else
+                writer.Write("        public required ReadAttribute<");
+            bool array = "array".Equals(attribute.type, StringComparison.InvariantCultureIgnoreCase);
+            WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
+            if (attribute.isNullable == true)
+                writer.Write('?');
+            writer.WriteLine("> " + GeneratorUtil.SanitizeName(attribute.description ?? attribute.text) + " { get; init; }");
+        }
+
+        private static bool WriteType(bool array, string type, TextWriter writer, string name, configurator clusterConfig, rootConfiguratorCluster? cluster, bool openIndex = false)
         {
             if (array)
             {
-                WriteType(false, type!, writer, name);
+                WriteType(false, type!, writer, name, clusterConfig, cluster);
                 if (openIndex)
                     writer.Write("[");
                 else
@@ -1587,13 +1599,13 @@ namespace Generator
                     writer.Write("IMStatusCode");
                     break;
                 default:
-                    writer.Write(GeneratorUtil.SanitizeName(type));
+                    writer.Write(GeneratorUtil.SanitizeName(type, false, !HasAttribute(cluster, type), HasEnum(clusterConfig, type) ? "Enum" : (HasBitmap(clusterConfig, type) ? "Bitmap" : "Struct")));
                     break;
             }
             return false;
         }
 
-        private static string SanitizeDefault(string value, string? type, string? arrayType)
+        private static string SanitizeDefault(string value, string? type, string? arrayType, configurator clusterConfig, rootConfiguratorCluster cluster)
         {
             if (value == "\"")
                 return "\"\"";
@@ -1604,7 +1616,7 @@ namespace Generator
                     StringBuilder sb = new StringBuilder();
                     StringWriter sw = new StringWriter(sb);
                     sw.Write("Array.Empty<");
-                    WriteType(false, arrayType!, sw, string.Empty);
+                    WriteType(false, arrayType!, sw, string.Empty, clusterConfig, cluster);
                     sw.Write(">()");
                     return sb.ToString();
                 }
@@ -1612,14 +1624,16 @@ namespace Generator
                     return "\"\"";
                 return "[]";
             }
+            if (type == "int16s" && value == "0x8000")
+                return "short.MinValue";
+            if ((value == "0" || value == "0x0") && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
+                return "TimeUtil.EPOCH";
+            if (value == "0xFFFFFFFFFFFFFFFF" && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
+                return "DateTime.MinValue";
             if (value.StartsWith("0x"))
                 return value.Split(' ')[0];
             if (value.StartsWith('"'))
                 return value;
-            if (value == "0" && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
-                return "TimeUtil.EPOCH";
-            if (value == "0xFFFFFFFFFFFFFFFF" && (type == "epoch_s" || type == "epoch_us" || type == "utc"))
-                return "DateTime.MinValue";
             if (type == "elapsed_s")
             {
                 if (value == "null")
@@ -1632,8 +1646,6 @@ namespace Generator
                 return (value == "1" || value.Equals("true", StringComparison.InvariantCultureIgnoreCase)) ? "true" : "false";
             if (type == "status" && value == "SUCCESS")
                 return "IMStatusCode.SUCCESS";
-            if (type == "int16s" && value == "0x8000")
-                return "short.MinValue";
             if (type == "TemperatureDifference" || type == "SignedTemperature" || type == "UnsignedTemperature" || type == "temperature")
             {
                 if (value == "null")

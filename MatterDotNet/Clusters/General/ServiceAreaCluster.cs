@@ -33,9 +33,54 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.
         /// </summary>
-        public ServiceArea(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ServiceArea(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ServiceArea(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ServiceArea(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SupportedAreas = new ReadAttribute<Area[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Area[] list = new Area[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Area(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SupportedMaps = new ReadAttribute<Map[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    Map[] list = new Map[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new Map(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SelectedAreas = new ReadAttribute<uint[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    uint[] list = new uint[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetUInt(i)!.Value;
+                    return list;
+                }
+            };
+            CurrentArea = new ReadAttribute<uint?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (uint?)(dynamic?)x
+            };
+            EstimatedEndTime = new ReadAttribute<DateTime?>(cluster, endPoint, 4, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)
+            };
+            Progress = new ReadAttribute<ProgressStruct[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ProgressStruct[] list = new ProgressStruct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ProgressStruct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -225,17 +270,17 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Progress
         /// </summary>
-        public record Progress : TLVPayload {
+        public record ProgressStruct : TLVPayload {
             /// <summary>
             /// Progress
             /// </summary>
-            public Progress() { }
+            public ProgressStruct() { }
 
             /// <summary>
             /// Progress
             /// </summary>
             [SetsRequiredMembers]
-            public Progress(object[] fields) {
+            public ProgressStruct(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
                 AreaID = reader.GetUInt(0)!.Value;
                 Status = (OperationalStatus)reader.GetUShort(1)!.Value;
@@ -358,62 +403,34 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Supported Areas attribute
+        /// Supported Areas Attribute
         /// </summary>
-        public async Task<Area[]> GetSupportedAreas(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            Area[] list = new Area[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Area(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Area[]> SupportedAreas { get; init; }
 
         /// <summary>
-        /// Get the Supported Maps attribute
+        /// Supported Maps Attribute
         /// </summary>
-        public async Task<Map[]> GetSupportedMaps(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            Map[] list = new Map[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Map(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<Map[]> SupportedMaps { get; init; }
 
         /// <summary>
-        /// Get the Selected Areas attribute
+        /// Selected Areas Attribute
         /// </summary>
-        public async Task<uint[]> GetSelectedAreas(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            uint[] list = new uint[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetUInt(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<uint[]> SelectedAreas { get; init; }
 
         /// <summary>
-        /// Get the Current Area attribute
+        /// Current Area Attribute
         /// </summary>
-        public async Task<uint?> GetCurrentArea(SecureSession session) {
-            return (uint?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<uint?> CurrentArea { get; init; }
 
         /// <summary>
-        /// Get the Estimated End Time attribute
+        /// Estimated End Time Attribute
         /// </summary>
-        public async Task<DateTime?> GetEstimatedEndTime(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4));
-        }
+        public required ReadAttribute<DateTime?> EstimatedEndTime { get; init; }
 
         /// <summary>
-        /// Get the Progress attribute
+        /// Progress Attribute
         /// </summary>
-        public async Task<Progress[]> GetProgress(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            Progress[] list = new Progress[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new Progress(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ProgressStruct[]> Progress { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

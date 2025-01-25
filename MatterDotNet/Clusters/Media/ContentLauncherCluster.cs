@@ -32,9 +32,24 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
         /// </summary>
-        public ContentLauncher(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ContentLauncher(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ContentLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ContentLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            AcceptHeader = new ReadAttribute<string[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    string[] list = new string[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = reader.GetString(i, false, 254)!;
+                    return list;
+                }
+            };
+            SupportedStreamingProtocols = new ReadAttribute<SupportedProtocols>(cluster, endPoint, 1) {
+                Deserialize = x => (SupportedProtocols)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -48,13 +63,13 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Dimensions defined as a percentage
             /// </summary>
-            Percentage = 0x01,
+            Percentage = 1,
         }
 
         /// <summary>
         /// Parameter
         /// </summary>
-        public enum ParameterType : byte {
+        public enum ParameterEnum : byte {
             /// <summary>
             /// Actor represents an actor credited in video media content; for example, “Gaby Hoffman”
             /// </summary>
@@ -98,11 +113,8 @@ namespace MatterDotNet.Clusters.Media
             /// <summary>
             /// Sport represents the categorical information of a sport; for example, football
             /// </summary>
-            Sport = 0x0A,
-            /// <summary>
-            /// SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;
-            /// </summary>
-            SportsTeam = 0x0B,
+            Sport = 0xA,
+            SportsTeam = 0xB,
             /// <summary>
             /// The type of content requested. Supported types are "Movie", "MovieSeries", "TVSeries", "TVSeason", "TVEpisode", "Trailer", "SportsEvent", "LiveEvent", and "Video"
             /// </summary>
@@ -184,13 +196,7 @@ namespace MatterDotNet.Clusters.Media
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Device supports Dynamic Adaptive Streaming over HTTP (DASH)
-            /// </summary>
             DASH = 0x0001,
-            /// <summary>
-            /// Device supports HTTP Live Streaming (HLS)
-            /// </summary>
             HLS = 0x0002,
         }
 
@@ -401,7 +407,7 @@ namespace MatterDotNet.Clusters.Media
             [SetsRequiredMembers]
             public Parameter(object[] fields) {
                 FieldReader reader = new FieldReader(fields);
-                Type = (ParameterType)reader.GetUShort(0)!.Value;
+                Type = (ParameterEnum)reader.GetUShort(0)!.Value;
                 Value = reader.GetString(1, false, 1024)!;
                 {
                     ExternalIDList = new AdditionalInfo[reader.GetStruct(2)!.Length];
@@ -410,7 +416,7 @@ namespace MatterDotNet.Clusters.Media
                     }
                 }
             }
-            public required ParameterType Type { get; set; }
+            public required ParameterEnum Type { get; set; }
             public required string Value { get; set; }
             public AdditionalInfo[]? ExternalIDList { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
@@ -603,22 +609,14 @@ namespace MatterDotNet.Clusters.Media
 
         #region Attributes
         /// <summary>
-        /// Get the Accept Header attribute
+        /// Accept Header Attribute
         /// </summary>
-        public async Task<string[]> GetAcceptHeader(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            string[] list = new string[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = reader.GetString(i, false, 254)!;
-            return list;
-        }
+        public required ReadAttribute<string[]> AcceptHeader { get; init; }
 
         /// <summary>
-        /// Get the Supported Streaming Protocols attribute
+        /// Supported Streaming Protocols Attribute
         /// </summary>
-        public async Task<SupportedProtocols> GetSupportedStreamingProtocols(SecureSession session) {
-            return (SupportedProtocols)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<SupportedProtocols> SupportedStreamingProtocols { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

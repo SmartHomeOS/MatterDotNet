@@ -33,9 +33,36 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes and commands for monitoring HEPA filters in a device
         /// </summary>
-        public HEPAFilterMonitoring(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public HEPAFilterMonitoring(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected HEPAFilterMonitoring(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected HEPAFilterMonitoring(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Condition = new ReadAttribute<byte>(cluster, endPoint, 0) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            DegradationDirection = new ReadAttribute<DegradationDirectionEnum>(cluster, endPoint, 1) {
+                Deserialize = x => (DegradationDirectionEnum)DeserializeEnum(x)!
+            };
+            ChangeIndication = new ReadAttribute<ChangeIndicationEnum>(cluster, endPoint, 2) {
+                Deserialize = x => (ChangeIndicationEnum)DeserializeEnum(x)!
+            };
+            InPlaceIndicator = new ReadAttribute<bool>(cluster, endPoint, 3) {
+                Deserialize = x => (bool)(dynamic?)x!
+            };
+            LastChangedTime = new ReadWriteAttribute<DateTime?>(cluster, endPoint, 4, true) {
+                Deserialize = x => TimeUtil.FromEpochSeconds((uint)(dynamic?)x)
+            };
+            ReplacementProductList = new ReadAttribute<ReplacementProduct[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ReplacementProduct[] list = new ReplacementProduct[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ReplacementProduct(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -60,7 +87,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Degradation Direction
         /// </summary>
-        public enum DegradationDirection : byte {
+        public enum DegradationDirectionEnum : byte {
             /// <summary>
             /// The degradation of the resource is indicated by an upwards moving/increasing value
             /// </summary>
@@ -74,7 +101,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Change Indication
         /// </summary>
-        public enum ChangeIndication : byte {
+        public enum ChangeIndicationEnum : byte {
             /// <summary>
             /// Resource is in good condition, no intervention required
             /// </summary>
@@ -182,57 +209,34 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Condition [%] attribute
+        /// Condition [%] Attribute
         /// </summary>
-        public async Task<byte> GetCondition(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<byte> Condition { get; init; }
 
         /// <summary>
-        /// Get the Degradation Direction attribute
+        /// Degradation Direction Attribute
         /// </summary>
-        public async Task<DegradationDirection> GetDegradationDirection(SecureSession session) {
-            return (DegradationDirection)await GetEnumAttribute(session, 1);
-        }
+        public required ReadAttribute<DegradationDirectionEnum> DegradationDirection { get; init; }
 
         /// <summary>
-        /// Get the Change Indication attribute
+        /// Change Indication Attribute
         /// </summary>
-        public async Task<ChangeIndication> GetChangeIndication(SecureSession session) {
-            return (ChangeIndication)await GetEnumAttribute(session, 2);
-        }
+        public required ReadAttribute<ChangeIndicationEnum> ChangeIndication { get; init; }
 
         /// <summary>
-        /// Get the In Place Indicator attribute
+        /// In Place Indicator Attribute
         /// </summary>
-        public async Task<bool> GetInPlaceIndicator(SecureSession session) {
-            return (bool)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<bool> InPlaceIndicator { get; init; }
 
         /// <summary>
-        /// Get the Last Changed Time attribute
+        /// Last Changed Time Attribute
         /// </summary>
-        public async Task<DateTime?> GetLastChangedTime(SecureSession session) {
-            return TimeUtil.FromEpochSeconds((uint)(dynamic?)await GetAttribute(session, 4));
-        }
+        public required ReadWriteAttribute<DateTime?> LastChangedTime { get; init; }
 
         /// <summary>
-        /// Set the Last Changed Time attribute
+        /// Replacement Product List Attribute
         /// </summary>
-        public async Task SetLastChangedTime (SecureSession session, DateTime? value) {
-            await SetAttribute(session, 4, value, true);
-        }
-
-        /// <summary>
-        /// Get the Replacement Product List attribute
-        /// </summary>
-        public async Task<ReplacementProduct[]> GetReplacementProductList(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            ReplacementProduct[] list = new ReplacementProduct[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ReplacementProduct(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ReplacementProduct[]> ReplacementProductList { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

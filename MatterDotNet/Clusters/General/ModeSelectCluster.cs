@@ -32,9 +32,36 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attributes and commands for selecting a mode from a list of supported options.
         /// </summary>
-        public ModeSelect(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public ModeSelect(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected ModeSelect(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected ModeSelect(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            Description = new ReadAttribute<string>(cluster, endPoint, 0) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            StandardNamespace = new ReadAttribute<ushort?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (ushort?)(dynamic?)x
+            };
+            SupportedModes = new ReadAttribute<ModeOption[]>(cluster, endPoint, 2) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    ModeOption[] list = new ModeOption[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new ModeOption(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            CurrentMode = new ReadAttribute<byte>(cluster, endPoint, 3) {
+                Deserialize = x => (byte)(dynamic?)x!
+            };
+            StartUpMode = new ReadWriteAttribute<byte?>(cluster, endPoint, 4, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+            OnMode = new ReadWriteAttribute<byte?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (byte?)(dynamic?)x
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -169,64 +196,34 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the Description attribute
+        /// Description Attribute
         /// </summary>
-        public async Task<string> GetDescription(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<string> Description { get; init; }
 
         /// <summary>
-        /// Get the Standard Namespace attribute
+        /// Standard Namespace Attribute
         /// </summary>
-        public async Task<ushort?> GetStandardNamespace(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<ushort?> StandardNamespace { get; init; }
 
         /// <summary>
-        /// Get the Supported Modes attribute
+        /// Supported Modes Attribute
         /// </summary>
-        public async Task<ModeOption[]> GetSupportedModes(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 2))!);
-            ModeOption[] list = new ModeOption[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new ModeOption(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ModeOption[]> SupportedModes { get; init; }
 
         /// <summary>
-        /// Get the Current Mode attribute
+        /// Current Mode Attribute
         /// </summary>
-        public async Task<byte> GetCurrentMode(SecureSession session) {
-            return (byte)(dynamic?)(await GetAttribute(session, 3))!;
-        }
+        public required ReadAttribute<byte> CurrentMode { get; init; }
 
         /// <summary>
-        /// Get the Start Up Mode attribute
+        /// Start Up Mode Attribute
         /// </summary>
-        public async Task<byte?> GetStartUpMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 4, true);
-        }
+        public required ReadWriteAttribute<byte?> StartUpMode { get; init; }
 
         /// <summary>
-        /// Set the Start Up Mode attribute
+        /// On Mode Attribute
         /// </summary>
-        public async Task SetStartUpMode (SecureSession session, byte? value) {
-            await SetAttribute(session, 4, value, true);
-        }
-
-        /// <summary>
-        /// Get the On Mode attribute
-        /// </summary>
-        public async Task<byte?> GetOnMode(SecureSession session) {
-            return (byte?)(dynamic?)await GetAttribute(session, 5, true);
-        }
-
-        /// <summary>
-        /// Set the On Mode attribute
-        /// </summary>
-        public async Task SetOnMode (SecureSession session, byte? value) {
-            await SetAttribute(session, 5, value, true);
-        }
+        public required ReadWriteAttribute<byte?> OnMode { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

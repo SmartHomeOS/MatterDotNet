@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,9 +29,45 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
         /// </summary>
-        public PressureMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PressureMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PressureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PressureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MinMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            MaxMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (short?)(dynamic?)x
+            };
+            Tolerance = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            ScaledValue = new ReadAttribute<short?>(cluster, endPoint, 16, true) {
+                Deserialize = x => (short?)(dynamic?)x ?? 0
+
+            };
+            MinScaledValue = new ReadAttribute<short?>(cluster, endPoint, 17, true) {
+                Deserialize = x => (short?)(dynamic?)x ?? 0
+
+            };
+            MaxScaledValue = new ReadAttribute<short?>(cluster, endPoint, 18, true) {
+                Deserialize = x => (short?)(dynamic?)x ?? 0
+
+            };
+            ScaledTolerance = new ReadAttribute<ushort>(cluster, endPoint, 19) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 0
+
+            };
+            Scale = new ReadAttribute<sbyte>(cluster, endPoint, 20) {
+                Deserialize = x => (sbyte?)(dynamic?)x ?? 0
+
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -68,67 +105,49 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Measured Value attribute
+        /// Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<short?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Min Measured Value attribute
+        /// Min Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMinMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<short?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Max Measured Value attribute
+        /// Max Measured Value Attribute
         /// </summary>
-        public async Task<short?> GetMaxMeasuredValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<short?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Tolerance attribute
+        /// Tolerance Attribute
         /// </summary>
-        public async Task<ushort> GetTolerance(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 0;
-        }
+        public required ReadAttribute<ushort> Tolerance { get; init; }
 
         /// <summary>
-        /// Get the Scaled Value attribute
+        /// Scaled Value Attribute
         /// </summary>
-        public async Task<short?> GetScaledValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 16, true) ?? 0;
-        }
+        public required ReadAttribute<short?> ScaledValue { get; init; }
 
         /// <summary>
-        /// Get the Min Scaled Value attribute
+        /// Min Scaled Value Attribute
         /// </summary>
-        public async Task<short?> GetMinScaledValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 17, true) ?? 0;
-        }
+        public required ReadAttribute<short?> MinScaledValue { get; init; }
 
         /// <summary>
-        /// Get the Max Scaled Value attribute
+        /// Max Scaled Value Attribute
         /// </summary>
-        public async Task<short?> GetMaxScaledValue(SecureSession session) {
-            return (short?)(dynamic?)await GetAttribute(session, 18, true) ?? 0;
-        }
+        public required ReadAttribute<short?> MaxScaledValue { get; init; }
 
         /// <summary>
-        /// Get the Scaled Tolerance attribute
+        /// Scaled Tolerance Attribute
         /// </summary>
-        public async Task<ushort> GetScaledTolerance(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 19) ?? 0;
-        }
+        public required ReadAttribute<ushort> ScaledTolerance { get; init; }
 
         /// <summary>
-        /// Get the Scale attribute
+        /// Scale Attribute
         /// </summary>
-        public async Task<sbyte> GetScale(SecureSession session) {
-            return (sbyte?)(dynamic?)await GetAttribute(session, 20) ?? 0;
-        }
+        public required ReadAttribute<sbyte> Scale { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

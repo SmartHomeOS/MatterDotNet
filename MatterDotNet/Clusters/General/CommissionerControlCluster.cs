@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -31,9 +32,15 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto.
         /// </summary>
-        public CommissionerControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public CommissionerControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected CommissionerControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected CommissionerControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SupportedDeviceCategories = new ReadAttribute<SupportedDeviceCategory>(cluster, endPoint, 0) {
+                Deserialize = x => (SupportedDeviceCategory)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -45,9 +52,6 @@ namespace MatterDotNet.Clusters.General
             /// Nothing Set
             /// </summary>
             None = 0,
-            /// <summary>
-            /// Aggregators which support Fabric Synchronization may be commissioned.
-            /// </summary>
             FabricSynchronization = 0x0001,
         }
         #endregion Enums
@@ -130,11 +134,9 @@ namespace MatterDotNet.Clusters.General
 
         #region Attributes
         /// <summary>
-        /// Get the Supported Device Categories attribute
+        /// Supported Device Categories Attribute
         /// </summary>
-        public async Task<SupportedDeviceCategory> GetSupportedDeviceCategories(SecureSession session) {
-            return (SupportedDeviceCategory)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<SupportedDeviceCategory> SupportedDeviceCategories { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -149,7 +149,7 @@ namespace MatterDotNet.Entities
                 
                 // Get Basic Commissioning Info
                 GeneralCommissioning commissioning = new GeneralCommissioning(0);
-                GeneralCommissioning.BasicCommissioningInfo basicInfo = await commissioning.GetBasicCommissioningInfo(paseSecureSession);
+                GeneralCommissioning.BasicCommissioningInfoStruct basicInfo = await commissioning.BasicCommissioningInfo.Get(paseSecureSession);
                 ushort expiration = Math.Min(Math.Max((ushort)180, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
                 
                 // Arm Fail Safe
@@ -188,18 +188,18 @@ namespace MatterDotNet.Entities
                     if (root.HasCluster<TimeSynchronization>())
                     {
                         TimeSynchronization timeSync = root.GetCluster<TimeSynchronization>();
-                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronization.Granularity.MillisecondsGranularity, TimeSynchronization.TimeSource.NonMatterNTP);
+                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronization.GranularityEnum.MillisecondsGranularity, TimeSynchronization.TimeSourceEnum.NonMatterNTP);
                         if (!success)
                             Console.WriteLine("Failed to set UTC Time");
                         if (await timeSync.Supports(paseSecureSession, TimeSynchronization.Feature.TimeZone))
                         {
                             var rules = TimeZoneInfo.Local.GetAdjustmentRules();
-                            List<TimeSynchronization.TimeZone> zones = new List<TimeSynchronization.TimeZone>();
+                            List<TimeSynchronization.TimeZoneStruct> zones = new List<TimeSynchronization.TimeZoneStruct>();
                             foreach (var rule in rules)
                             {
                                 if (rule.DateEnd > DateTime.Now)
                                 {
-                                    zones.Add(new TimeSynchronization.TimeZone()
+                                    zones.Add(new TimeSynchronization.TimeZoneStruct()
                                     {
                                         Offset = (int)(rule.BaseUtcOffsetDelta + TimeZoneInfo.Local.BaseUtcOffset).TotalSeconds,
                                         ValidAt = TimeUtil.Max(rule.DateStart, TimeUtil.EPOCH),
@@ -282,7 +282,7 @@ namespace MatterDotNet.Entities
 
                 if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
                 {
-                    NetworkCommissioning.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioning>().GetNetworks(paseSecureSession);
+                    NetworkCommissioning.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioning>().Networks.Get(paseSecureSession);
                     foreach (NetworkCommissioning.NetworkInfo info in networks)
                     {
                         if (info.Connected)
@@ -496,7 +496,7 @@ namespace MatterDotNet.Entities
         {
             SecureSession session = await node.GetCASESession();
             OperationalCredentials ops = node.Root.GetCluster<OperationalCredentials>();
-            byte index = await ops.GetCurrentFabricIndex(session);
+            byte index = await ops.CurrentFabricIndex.Get(session);
             var response = await ops.RemoveFabric(session, index);
             bool success = response.Value.StatusCode == OperationalCredentials.NodeOperationalCertStatus.OK;
             if (success)
@@ -508,6 +508,16 @@ namespace MatterDotNet.Entities
         /// The collection of nodes in this fabric
         /// </summary>
         public IReadOnlyCollection<Node> Nodes { get { return nodes.Values; } }
+
+        /// <summary>
+        /// Get a node by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Node this[ulong id]
+        {
+            get { return nodes[id]; }
+        }
 
         /// <summary>
         /// Get a node by ID

@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,9 +29,15 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes for reporting air quality classification
         /// </summary>
-        public AirQuality(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public AirQuality(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AirQuality(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected AirQuality(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            AirQualityAttribute = new ReadAttribute<AirQualityEnum>(cluster, endPoint, 0) {
+                Deserialize = x => (AirQualityEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -114,11 +121,9 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Air Quality attribute
+        /// Air Quality Attribute
         /// </summary>
-        public async Task<AirQualityEnum> GetAirQuality(SecureSession session) {
-            return (AirQualityEnum)await GetEnumAttribute(session, 0);
-        }
+        public required ReadAttribute<AirQualityEnum> AirQualityAttribute { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

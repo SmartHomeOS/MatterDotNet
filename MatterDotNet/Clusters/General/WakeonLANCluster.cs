@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General
 {
@@ -28,24 +29,29 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
         /// </summary>
-        public WakeonLAN(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public WakeonLAN(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected WakeonLAN(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected WakeonLAN(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MACAddress = new ReadAttribute<string>(cluster, endPoint, 0) {
+                Deserialize = x => (string)(dynamic?)x!
+            };
+            LinkLocalAddress = new ReadAttribute<byte[]>(cluster, endPoint, 1) {
+                Deserialize = x => (byte[])(dynamic?)x!
+            };
+        }
 
         #region Attributes
         /// <summary>
-        /// Get the MAC Address attribute
+        /// MAC Address Attribute
         /// </summary>
-        public async Task<string> GetMACAddress(SecureSession session) {
-            return (string)(dynamic?)(await GetAttribute(session, 0))!;
-        }
+        public required ReadAttribute<string> MACAddress { get; init; }
 
         /// <summary>
-        /// Get the Link Local Address attribute
+        /// Link Local Address Attribute
         /// </summary>
-        public async Task<byte[]> GetLinkLocalAddress(SecureSession session) {
-            return (byte[])(dynamic?)(await GetAttribute(session, 1))!;
-        }
+        public required ReadAttribute<byte[]> LinkLocalAddress { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

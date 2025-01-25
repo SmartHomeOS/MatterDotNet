@@ -32,9 +32,60 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances.
         /// </summary>
-        public AccessControl(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public AccessControl(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected AccessControl(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected AccessControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            ACL = new ReadWriteAttribute<AccessControlEntry[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    AccessControlEntry[] list = new AccessControlEntry[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new AccessControlEntry(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            Extension = new ReadWriteAttribute<AccessControlExtension[]>(cluster, endPoint, 1) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    AccessControlExtension[] list = new AccessControlExtension[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new AccessControlExtension(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            SubjectsPerAccessControlEntry = new ReadAttribute<ushort>(cluster, endPoint, 2) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 4
+
+            };
+            TargetsPerAccessControlEntry = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 3
+
+            };
+            AccessControlEntriesPerFabric = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+                Deserialize = x => (ushort?)(dynamic?)x ?? 4
+
+            };
+            CommissioningARL = new ReadAttribute<CommissioningAccessRestrictionEntry[]>(cluster, endPoint, 5) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    CommissioningAccessRestrictionEntry[] list = new CommissioningAccessRestrictionEntry[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new CommissioningAccessRestrictionEntry(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+            ARL = new ReadAttribute<AccessRestrictionEntry[]>(cluster, endPoint, 6) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    AccessRestrictionEntry[] list = new AccessRestrictionEntry[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = new AccessRestrictionEntry(reader.GetStruct(i)!);
+                    return list;
+                }
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -433,83 +484,39 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// Get the ACL attribute
+        /// ACL Attribute
         /// </summary>
-        public async Task<AccessControlEntry[]> GetACL(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            AccessControlEntry[] list = new AccessControlEntry[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new AccessControlEntry(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadWriteAttribute<AccessControlEntry[]> ACL { get; init; }
 
         /// <summary>
-        /// Set the ACL attribute
+        /// Extension Attribute
         /// </summary>
-        public async Task SetACL (SecureSession session, AccessControlEntry[] value) {
-            await SetAttribute(session, 0, value);
-        }
+        public required ReadWriteAttribute<AccessControlExtension[]> Extension { get; init; }
 
         /// <summary>
-        /// Get the Extension attribute
+        /// Subjects Per Access Control Entry Attribute
         /// </summary>
-        public async Task<AccessControlExtension[]> GetExtension(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 1))!);
-            AccessControlExtension[] list = new AccessControlExtension[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new AccessControlExtension(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<ushort> SubjectsPerAccessControlEntry { get; init; }
 
         /// <summary>
-        /// Set the Extension attribute
+        /// Targets Per Access Control Entry Attribute
         /// </summary>
-        public async Task SetExtension (SecureSession session, AccessControlExtension[] value) {
-            await SetAttribute(session, 1, value);
-        }
+        public required ReadAttribute<ushort> TargetsPerAccessControlEntry { get; init; }
 
         /// <summary>
-        /// Get the Subjects Per Access Control Entry attribute
+        /// Access Control Entries Per Fabric Attribute
         /// </summary>
-        public async Task<ushort> GetSubjectsPerAccessControlEntry(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 2) ?? 4;
-        }
+        public required ReadAttribute<ushort> AccessControlEntriesPerFabric { get; init; }
 
         /// <summary>
-        /// Get the Targets Per Access Control Entry attribute
+        /// Commissioning ARL Attribute
         /// </summary>
-        public async Task<ushort> GetTargetsPerAccessControlEntry(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 3) ?? 3;
-        }
+        public required ReadAttribute<CommissioningAccessRestrictionEntry[]> CommissioningARL { get; init; }
 
         /// <summary>
-        /// Get the Access Control Entries Per Fabric attribute
+        /// ARL Attribute
         /// </summary>
-        public async Task<ushort> GetAccessControlEntriesPerFabric(SecureSession session) {
-            return (ushort?)(dynamic?)await GetAttribute(session, 4) ?? 4;
-        }
-
-        /// <summary>
-        /// Get the Commissioning ARL attribute
-        /// </summary>
-        public async Task<CommissioningAccessRestrictionEntry[]> GetCommissioningARL(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 5))!);
-            CommissioningAccessRestrictionEntry[] list = new CommissioningAccessRestrictionEntry[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new CommissioningAccessRestrictionEntry(reader.GetStruct(i)!);
-            return list;
-        }
-
-        /// <summary>
-        /// Get the ARL attribute
-        /// </summary>
-        public async Task<AccessRestrictionEntry[]> GetARL(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 6))!);
-            AccessRestrictionEntry[] list = new AccessRestrictionEntry[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = new AccessRestrictionEntry(reader.GetStruct(i)!);
-            return list;
-        }
+        public required ReadAttribute<AccessRestrictionEntry[]> ARL { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

@@ -131,12 +131,12 @@ namespace MatterDotNet.Entities
 
         internal async Task EnumerateClusters(SecureSession session)
         {
-            uint[] clusterIds = await GetCluster<Descriptor>().GetServerList(session);
+            uint[] clusterIds = await GetCluster<Descriptor>().ServerList.Get(session);
             foreach (var clusterId in clusterIds) {
                 if (clusterId != Descriptor.CLUSTER_ID)
                     AddCluster(ClusterBase.Create(clusterId, index));
             }
-            Descriptor.DeviceType[] devices = await GetCluster<Descriptor>().GetDeviceTypeList(session);
+            Descriptor.DeviceType[] devices = await GetCluster<Descriptor>().DeviceTypeList.Get(session);
             DeviceTypes = devices.Select(t => t.DeviceTypeField).ToArray();
 
             foreach (EndPoint ep in children.Values)

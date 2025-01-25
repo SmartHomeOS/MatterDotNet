@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.Appliances
 {
@@ -28,9 +29,24 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// This cluster provides a way to access options associated with the operation of a laundry dryer device type.
         /// </summary>
-        public LaundryDryerControls(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public LaundryDryerControls(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected LaundryDryerControls(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected LaundryDryerControls(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            SupportedDrynessLevels = new ReadAttribute<DrynessLevel[]>(cluster, endPoint, 0) {
+                Deserialize = x => {
+                    FieldReader reader = new FieldReader((IList<object>)x!);
+                    DrynessLevel[] list = new DrynessLevel[reader.Count];
+                    for (int i = 0; i < reader.Count; i++)
+                        list[i] = (DrynessLevel)reader.GetUShort(i)!.Value;
+                    return list;
+                }
+            };
+            SelectedDrynessLevel = new ReadWriteAttribute<DrynessLevel?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (DrynessLevel?)DeserializeEnum(x)
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -58,29 +74,14 @@ namespace MatterDotNet.Clusters.Appliances
 
         #region Attributes
         /// <summary>
-        /// Get the Supported Dryness Levels attribute
+        /// Supported Dryness Levels Attribute
         /// </summary>
-        public async Task<DrynessLevel[]> GetSupportedDrynessLevels(SecureSession session) {
-            FieldReader reader = new FieldReader((IList<object>)(await GetAttribute(session, 0))!);
-            DrynessLevel[] list = new DrynessLevel[reader.Count];
-            for (int i = 0; i < reader.Count; i++)
-                list[i] = (DrynessLevel)reader.GetUShort(i)!.Value;
-            return list;
-        }
+        public required ReadAttribute<DrynessLevel[]> SupportedDrynessLevels { get; init; }
 
         /// <summary>
-        /// Get the Selected Dryness Level attribute
+        /// Selected Dryness Level Attribute
         /// </summary>
-        public async Task<DrynessLevel?> GetSelectedDrynessLevel(SecureSession session) {
-            return (DrynessLevel?)await GetEnumAttribute(session, 1, true);
-        }
-
-        /// <summary>
-        /// Set the Selected Dryness Level attribute
-        /// </summary>
-        public async Task SetSelectedDrynessLevel (SecureSession session, DrynessLevel? value) {
-            await SetAttribute(session, 1, value, true);
-        }
+        public required ReadWriteAttribute<DrynessLevel?> SelectedDrynessLevel { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

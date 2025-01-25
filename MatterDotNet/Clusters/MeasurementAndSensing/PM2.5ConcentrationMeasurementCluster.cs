@@ -14,6 +14,7 @@
 
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.MeasurementAndSensing
 {
@@ -28,9 +29,48 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Attributes for reporting PM2.5 concentration measurements
         /// </summary>
-        public PM2_5ConcentrationMeasurement(ushort endPoint) : base(CLUSTER_ID, endPoint) { }
+        [SetsRequiredMembers]
+        public PM2_5ConcentrationMeasurement(ushort endPoint) : this(CLUSTER_ID, endPoint) { }
         /// <inheritdoc />
-        protected PM2_5ConcentrationMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) { }
+        [SetsRequiredMembers]
+        protected PM2_5ConcentrationMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
+            MeasuredValue = new ReadAttribute<float?>(cluster, endPoint, 0, true) {
+                Deserialize = x => (float?)(dynamic?)x
+            };
+            MinMeasuredValue = new ReadAttribute<float?>(cluster, endPoint, 1, true) {
+                Deserialize = x => (float?)(dynamic?)x
+            };
+            MaxMeasuredValue = new ReadAttribute<float?>(cluster, endPoint, 2, true) {
+                Deserialize = x => (float?)(dynamic?)x
+            };
+            PeakMeasuredValue = new ReadAttribute<float?>(cluster, endPoint, 3, true) {
+                Deserialize = x => (float?)(dynamic?)x
+            };
+            PeakMeasuredValueWindow = new ReadAttribute<TimeSpan>(cluster, endPoint, 4) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x ?? TimeSpan.FromSeconds(1)
+
+            };
+            AverageMeasuredValue = new ReadAttribute<float?>(cluster, endPoint, 5, true) {
+                Deserialize = x => (float?)(dynamic?)x
+            };
+            AverageMeasuredValueWindow = new ReadAttribute<TimeSpan>(cluster, endPoint, 6) {
+                Deserialize = x => (TimeSpan?)(dynamic?)x ?? TimeSpan.FromSeconds(1)
+
+            };
+            Uncertainty = new ReadAttribute<float>(cluster, endPoint, 7) {
+                Deserialize = x => (float?)(dynamic?)x ?? 0
+
+            };
+            MeasurementUnit = new ReadAttribute<MeasurementUnitEnum>(cluster, endPoint, 8) {
+                Deserialize = x => (MeasurementUnitEnum)DeserializeEnum(x)!
+            };
+            MeasurementMedium = new ReadAttribute<MeasurementMediumEnum>(cluster, endPoint, 9) {
+                Deserialize = x => (MeasurementMediumEnum)DeserializeEnum(x)!
+            };
+            LevelValue = new ReadAttribute<LevelValueEnum>(cluster, endPoint, 10) {
+                Deserialize = x => (LevelValueEnum)DeserializeEnum(x)!
+            };
+        }
 
         #region Enums
         /// <summary>
@@ -67,7 +107,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Level Value
         /// </summary>
-        public enum LevelValue : byte {
+        public enum LevelValueEnum : byte {
             Unknown = 0,
             Low = 1,
             Medium = 2,
@@ -78,7 +118,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Measurement Unit
         /// </summary>
-        public enum MeasurementUnit : byte {
+        public enum MeasurementUnitEnum : byte {
             PPM = 0,
             PPB = 1,
             PPT = 2,
@@ -92,7 +132,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Measurement Medium
         /// </summary>
-        public enum MeasurementMedium : byte {
+        public enum MeasurementMediumEnum : byte {
             Air = 0,
             Water = 1,
             Soil = 2,
@@ -122,81 +162,59 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Get the Measured Value attribute
+        /// Measured Value Attribute
         /// </summary>
-        public async Task<float?> GetMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 0, true);
-        }
+        public required ReadAttribute<float?> MeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Min Measured Value attribute
+        /// Min Measured Value Attribute
         /// </summary>
-        public async Task<float?> GetMinMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 1, true);
-        }
+        public required ReadAttribute<float?> MinMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Max Measured Value attribute
+        /// Max Measured Value Attribute
         /// </summary>
-        public async Task<float?> GetMaxMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 2, true);
-        }
+        public required ReadAttribute<float?> MaxMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Peak Measured Value attribute
+        /// Peak Measured Value Attribute
         /// </summary>
-        public async Task<float?> GetPeakMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 3, true);
-        }
+        public required ReadAttribute<float?> PeakMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Peak Measured Value Window attribute
+        /// Peak Measured Value Window Attribute
         /// </summary>
-        public async Task<TimeSpan> GetPeakMeasuredValueWindow(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 4) ?? TimeSpan.FromSeconds(1);
-        }
+        public required ReadAttribute<TimeSpan> PeakMeasuredValueWindow { get; init; }
 
         /// <summary>
-        /// Get the Average Measured Value attribute
+        /// Average Measured Value Attribute
         /// </summary>
-        public async Task<float?> GetAverageMeasuredValue(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 5, true);
-        }
+        public required ReadAttribute<float?> AverageMeasuredValue { get; init; }
 
         /// <summary>
-        /// Get the Average Measured Value Window attribute
+        /// Average Measured Value Window Attribute
         /// </summary>
-        public async Task<TimeSpan> GetAverageMeasuredValueWindow(SecureSession session) {
-            return (TimeSpan?)(dynamic?)await GetAttribute(session, 6) ?? TimeSpan.FromSeconds(1);
-        }
+        public required ReadAttribute<TimeSpan> AverageMeasuredValueWindow { get; init; }
 
         /// <summary>
-        /// Get the Uncertainty attribute
+        /// Uncertainty Attribute
         /// </summary>
-        public async Task<float> GetUncertainty(SecureSession session) {
-            return (float?)(dynamic?)await GetAttribute(session, 7) ?? 0;
-        }
+        public required ReadAttribute<float> Uncertainty { get; init; }
 
         /// <summary>
-        /// Get the Measurement Unit attribute
+        /// Measurement Unit Attribute
         /// </summary>
-        public async Task<MeasurementUnit> GetMeasurementUnit(SecureSession session) {
-            return (MeasurementUnit)await GetEnumAttribute(session, 8);
-        }
+        public required ReadAttribute<MeasurementUnitEnum> MeasurementUnit { get; init; }
 
         /// <summary>
-        /// Get the Measurement Medium attribute
+        /// Measurement Medium Attribute
         /// </summary>
-        public async Task<MeasurementMedium> GetMeasurementMedium(SecureSession session) {
-            return (MeasurementMedium)await GetEnumAttribute(session, 9);
-        }
+        public required ReadAttribute<MeasurementMediumEnum> MeasurementMedium { get; init; }
 
         /// <summary>
-        /// Get the Level Value attribute
+        /// Level Value Attribute
         /// </summary>
-        public async Task<LevelValue> GetLevelValue(SecureSession session) {
-            return (LevelValue)await GetEnumAttribute(session, 10);
-        }
+        public required ReadAttribute<LevelValueEnum> LevelValue { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

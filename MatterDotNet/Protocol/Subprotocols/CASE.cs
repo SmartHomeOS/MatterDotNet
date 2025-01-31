@@ -60,7 +60,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 Sigma1 Msg1 = new Sigma1()
                 {
                     InitiatorRandom = initiatorRandom,
-                    InitiatorSessionId = SessionManager.GetAvailableSessionID(),
+                    InitiatorSessionId = SessionManager.GetAvailableSessionID(unsecureSession.Connection.EndPoint),
                     DestinationId = fabric.ComputeDestinationID(initiatorRandom, noc.NodeID!.Value),
                     InitiatorEphPubKey = ephKeys.Public,
                     InitiatorSessionParams = SessionManager.GetDefaultSessionParams()
@@ -204,7 +204,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 Sigma1 Msg1 = new Sigma1()
                 {
                     InitiatorRandom = initiatorRandom,
-                    InitiatorSessionId = SessionManager.GetAvailableSessionID(),
+                    InitiatorSessionId = SessionManager.GetAvailableSessionID(unsecureSession.Connection.EndPoint),
                     DestinationId = fabric.ComputeDestinationID(initiatorRandom, noc.NodeID!.Value),
                     InitiatorEphPubKey = ephKeys.Public,
                     InitiatorSessionParams = SessionManager.GetDefaultSessionParams(),
@@ -233,16 +233,20 @@ namespace MatterDotNet.Protocol.Subprotocols
                     await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
                     return null;
                 }
-                StatusPayload sigmaFinished = new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.SESSION_ESTABLISHMENT_SUCCESS);
-                await exchange.SendFrame(new Frame(sigmaFinished, (byte)SecureOpCodes.StatusReport));
 
-                byte[] sessionKeys = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, Resume2Msg.ResumptionId), RSEKeys_Info, 3 * Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+                // Resumption Complete
+                Frame sigmaFinished = new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.SESSION_ESTABLISHMENT_SUCCESS), (byte)SecureOpCodes.StatusReport);
+                sigmaFinished.Flags |= MessageFlags.SourceNodeID;
+                await exchange.SendFrame(sigmaFinished);
+                Console.WriteLine("Resumed CASE session");
+
+                //NOTE: Matter documentation is wrong here. Actual implementation appears to match below but documentation indicates new resumptionId should be used
+                byte[] sessionKeys = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, resumptionId), RSEKeys_Info, 3 * Crypto.SYMMETRIC_KEY_LENGTH_BITS);
+                attestationChallenge = sessionKeys.AsSpan(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(); 
                 uint activeInterval = Resume2Msg.ResponderSessionParams?.SessionActiveInterval ?? SessionManager.GetDefaultSessionParams().SessionActiveInterval!.Value;
                 uint activeThreshold = Resume2Msg.ResponderSessionParams?.SessionActiveThreshold ?? SessionManager.GetDefaultSessionParams().SessionActiveThreshold!.Value;
                 uint idleInterval = Resume2Msg.ResponderSessionParams?.SessionIdleInterval ?? SessionManager.GetDefaultSessionParams().SessionIdleInterval!.Value;
-                attestationChallenge = sessionKeys.AsSpan(2 * Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray();
 
-                Console.WriteLine("Resumed CASE session");
                 return SessionManager.CreateSession(unsecureSession.Connection, false, true, Msg1.InitiatorSessionId, Resume2Msg.ResponderSessionId,
                                                     sessionKeys.AsSpan(0, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),
                                                     sessionKeys.AsSpan(Crypto.SYMMETRIC_KEY_LENGTH_BYTES, Crypto.SYMMETRIC_KEY_LENGTH_BYTES).ToArray(),

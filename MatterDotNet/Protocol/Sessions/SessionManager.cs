@@ -65,7 +65,7 @@ namespace MatterDotNet.Protocol.Sessions
                 return secure;
 
             SecureSession ctx = new SecureSession(connection, PASE, initiator, initiator ? initiatorSessionId : responderSessionId, initiator ? responderSessionId : initiatorSessionId, i2r, r2i, sharedSecret, resumptionId, 0, new MessageState(), localNodeId, peerNodeId, idleInterval, activeInterval, activeThreshold);
-            Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID);
+            Console.WriteLine("Secure Session Created: " + ctx.LocalSessionID + "/" + ctx.RemoteSessionID);
             existing.TryAdd(ctx.LocalSessionID, ctx);
             return ctx;
         }
@@ -88,9 +88,20 @@ namespace MatterDotNet.Protocol.Sessions
             existing.TryRemove(sessionId, out _);
         }
 
-        internal static ushort GetAvailableSessionID()
+        internal static ushort GetAvailableSessionID(EndPoint endPoint)
         {
-            return (ushort)Random.Shared.Next(1, ushort.MaxValue);
+            ushort sessionId = (ushort)Random.Shared.Next(1, ushort.MaxValue);
+            ConcurrentDictionary<ushort, SessionContext>? sessionCollection;
+
+            if (!sessions.TryGetValue(endPoint, out sessionCollection))
+                return sessionId;
+            for (ushort i = 0; i < ushort.MaxValue; i++)
+            {
+                if (!sessionCollection.ContainsKey(sessionId))
+                    return sessionId;
+                sessionId++;
+            }
+            throw new InvalidOperationException("Too many open sessions");
         }
 
         public static uint GlobalUnencryptedCounter
@@ -134,7 +145,7 @@ namespace MatterDotNet.Protocol.Sessions
             param.SessionIdleInterval = 300;
             param.MaxPathsPerInvoke = 1;
             param.DataModelRevision = 17;
-            param.InteractionModelRevision = Constants.MATTER_13_REVISION;
+            param.InteractionModelRevision = Constants.MATTER_14_REVISION;
             param.SpecificationVersion = 0x01030000;
             return param;
         }

@@ -68,6 +68,51 @@ namespace MatterDotNet.Entities
             SetNode(node);
         }
 
+        /// <summary>
+        /// Returns true if this EndPoint is the provided DeviceType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool IsType(DeviceTypeEnum type)
+        {
+            return DeviceTypes.Contains(type);
+        }
+
+        /// <summary>
+        /// Returns true if the EndPoint or any of it's children are the provided DeviceType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool HasType(DeviceTypeEnum type)
+        {
+            if (IsType(type))
+                return true;
+            foreach (var child in children.Values)
+            {
+                if (child.HasType(type))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Find the EndPoint with the given type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EndPoint? Find(DeviceTypeEnum type)
+        {
+            if (IsType(type))
+                return this;
+            foreach (var child in children.Values)
+            {
+                EndPoint? result = child.Find(type);
+                if (result != null)
+                    return result;
+            }
+            return null;
+        }
+
         internal void SetNode(Node? node)
         {
             this.node = node;

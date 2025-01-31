@@ -32,6 +32,8 @@ namespace MatterDotNet.Entities
         private EndPoint root;
         private OperationalCertificate noc;
         ODNode connection;
+        private byte[]? resumptionId = null;
+        private byte[]? sharedSecret = null;
 
         private Node(ODNode connection, Fabric fabric, OperationalCertificate noc)
         {
@@ -99,6 +101,26 @@ namespace MatterDotNet.Entities
         }
 
         /// <summary>
+        /// Returns true if any of the Nodes EndPoints are of the provided type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool HasType(DeviceTypeEnum type)
+        {
+            return root.HasType(type);
+        }
+
+        /// <summary>
+        /// Find the first EndPoint of the given type or return null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EndPoint? FirstEndPoint(DeviceTypeEnum type)
+        {
+            return root.Find(type);
+        }
+
+        /// <summary>
         /// Get a secure session for the node
         /// </summary>
         /// <returns></returns>
@@ -107,9 +129,15 @@ namespace MatterDotNet.Entities
         {
             CASE caseProtocol = new CASE(session);
             //TODO - Use OD session params
-            SecureSession? caseSession = await caseProtocol.EstablishSecureSession(fabric, noc);
+            SecureSession? caseSession;
+            if (sharedSecret != null && resumptionId != null)
+                caseSession = await caseProtocol.ResumeSecureSession(fabric, noc, resumptionId, sharedSecret);
+            else
+                caseSession = await caseProtocol.EstablishSecureSession(fabric, noc);
             if (caseSession == null)
                 throw new IOException("CASE pairing failed");
+            resumptionId = caseSession.ResumptionID;
+            sharedSecret = caseSession.SharedSecret;
             return caseSession;
         }
 

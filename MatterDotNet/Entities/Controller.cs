@@ -531,6 +531,22 @@ namespace MatterDotNet.Entities
             return null;
         }
 
+        /// <summary>
+        /// Find all Nodes with the given DeviceType available on any EndPoint
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Node[] FindNodes(DeviceTypeEnum type)
+        {
+            List<Node> ret = new List<Node>();
+            foreach (var node in nodes.Values)
+            {
+                if (node.HasType(type))
+                    ret.Add(node);
+            }
+            return ret.ToArray();
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {

@@ -17,6 +17,7 @@ using MatterDotNet.Protocol.Payloads.Flags;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
+using System.Net;
 using System.Security.Cryptography;
 
 namespace MatterDotNet.Protocol.Subprotocols
@@ -30,7 +31,7 @@ namespace MatterDotNet.Protocol.Subprotocols
         {
             Frame? resp = null;
             Exchange exchange = unsecureSession.CreateExchange();
-            Frame paramReq = GenerateParamRequest();
+            Frame paramReq = GenerateParamRequest(unsecureSession.Connection.EndPoint);
             await exchange.SendFrame(paramReq);
             resp = await exchange.Read();
             if (resp.Message.Payload is StatusPayload error)
@@ -91,12 +92,12 @@ namespace MatterDotNet.Protocol.Subprotocols
             return frame;
         }
 
-        private Frame GenerateParamRequest(bool hasOnboardingPayload = false)
+        private Frame GenerateParamRequest(EndPoint endPoint, bool hasOnboardingPayload = false)
         {
             PBKDFParamReq req = new PBKDFParamReq()
             {
                 InitiatorRandom = RandomNumberGenerator.GetBytes(32),
-                InitiatorSessionId = SessionManager.GetAvailableSessionID(),
+                InitiatorSessionId = SessionManager.GetAvailableSessionID(endPoint),
                 PasscodeId = 0,
                 HasPBKDFParameters = hasOnboardingPayload
             };

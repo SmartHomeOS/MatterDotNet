@@ -10,7 +10,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using MatterDotNet.Clusters;
 using MatterDotNet.Clusters.CHIP;
 using MatterDotNet.Clusters.General;
 using MatterDotNet.DCL;
@@ -25,8 +24,6 @@ using MatterDotNet.Security;
 using MatterDotNet.Util;
 using System.Globalization;
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;

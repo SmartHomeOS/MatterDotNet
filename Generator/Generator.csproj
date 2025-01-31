@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MatterDotNet\MatterDotNet.csproj" />
+    <PackageReference Include="MatterDotNet" Version="0.5.0" />
   </ItemGroup>
 
 </Project>

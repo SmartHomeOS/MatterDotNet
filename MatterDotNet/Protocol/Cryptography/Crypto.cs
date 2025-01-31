@@ -151,10 +151,10 @@ namespace MatterDotNet.Protocol.Cryptography
         /// <returns></returns>
         public static byte[] KDF(Span<byte> inputKey, Span<byte> salt, Span<byte> info, int len)
         {
-            Span<byte> tmp = stackalloc byte[32];
-            HKDF.Extract(HashAlgorithmName.SHA256, inputKey, salt, tmp);
+            Span<byte> prk = stackalloc byte[HMACSHA256.HashSizeInBytes];
+            HKDF.Extract(HashAlgorithmName.SHA256, inputKey, salt, prk);
             byte[] result = new byte[len / 8];
-            HKDF.Expand(HashAlgorithmName.SHA256, tmp, result, info);
+            HKDF.Expand(HashAlgorithmName.SHA256, prk, result, info);
             return result;
         }
 

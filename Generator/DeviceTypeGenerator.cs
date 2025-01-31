@@ -11,9 +11,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Generator.Schema;
-using System.Collections.Immutable;
-using System.Collections.Specialized;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace Generator

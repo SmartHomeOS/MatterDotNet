@@ -144,9 +144,9 @@ namespace MatterDotNet.Protocol.Sessions
             param.SessionActiveInterval = 500;
             param.SessionIdleInterval = 300;
             param.MaxPathsPerInvoke = 1;
-            param.DataModelRevision = 17;
-            param.InteractionModelRevision = Constants.MATTER_14_REVISION;
-            param.SpecificationVersion = 0x01030000;
+            param.DataModelRevision = 18;
+            param.InteractionModelRevision = Constants.MATTER_13_REVISION;
+            param.SpecificationVersion = 0x01040000;
             return param;
         }
     }

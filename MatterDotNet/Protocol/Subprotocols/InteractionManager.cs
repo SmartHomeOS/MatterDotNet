@@ -34,7 +34,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                     paths[i] = new AttributePathIB() { Endpoint = endpoint, Cluster = cluster, Attribute = attributes[i] };
                 ReadRequestMessage read = new ReadRequestMessage()
                 {
-                    InteractionModelRevision = Constants.MATTER_14_REVISION,
+                    InteractionModelRevision = Constants.MATTER_13_REVISION,
                     FabricFiltered = false,
                     AttributeRequests = paths,
                     EventRequests = [],
@@ -71,7 +71,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 ReadRequestMessage read = new ReadRequestMessage()
                 {
-                    InteractionModelRevision = Constants.MATTER_14_REVISION,
+                    InteractionModelRevision = Constants.MATTER_13_REVISION,
                     FabricFiltered = true,
                     AttributeRequests = [new AttributePathIB() { Endpoint = endpoint, Cluster = cluster, Attribute = attribute }]
                 };
@@ -149,7 +149,7 @@ namespace MatterDotNet.Protocol.Subprotocols
         {
             StatusResponseMessage statusResponse = new StatusResponseMessage()
             {
-                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                InteractionModelRevision = Constants.MATTER_13_REVISION,
                 Status = (byte)status
             };
             Frame readFrame = new Frame(statusResponse, (byte)IMOpCodes.StatusResponse);
@@ -171,7 +171,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 SuppressResponse = false,
                 TimedRequest = timed,
-                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                InteractionModelRevision = Constants.MATTER_13_REVISION,
                 InvokeRequests = [new CommandDataIB() { CommandFields = payload, CommandRef = refNum, CommandPath = new CommandPathIB() { Endpoint = endpoint, Cluster = cluster, Command = command } }]
             };
             Frame invokeFrame = new Frame(run, (byte)IMOpCodes.InvokeRequest);
@@ -189,7 +189,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                 KeepSubscriptions = true,
                 MaxIntervalCeiling = (ulong)Math.Ceiling(maxReporting.TotalSeconds),
                 MinIntervalFloor = (ulong)minReporting.TotalSeconds,
-                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                InteractionModelRevision = Constants.MATTER_13_REVISION,
                 AttributeRequests = [new AttributePathIB() { Endpoint = attribute.EndPoint, Cluster = attribute.ClusterId, Attribute = attribute.AttributeId }]
             };
             Frame invokeFrame = new Frame(subscribe, (byte)IMOpCodes.SubscribeRequest);
@@ -234,7 +234,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             TimedRequestMessage time = new TimedRequestMessage()
             {
                 Timeout = timeout,
-                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                InteractionModelRevision = Constants.MATTER_13_REVISION,
             };
             Frame invokeFrame = new Frame(time, (byte)IMOpCodes.TimedRequest);
             invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
@@ -299,7 +299,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 WriteRequestMessage write = new WriteRequestMessage()
                 {
-                    InteractionModelRevision = Constants.MATTER_14_REVISION,
+                    InteractionModelRevision = Constants.MATTER_13_REVISION,
                     WriteRequests = [ new AttributeDataIB() {
                                         Path = new AttributePathIB() { Node = session.ResponderNodeID, Endpoint = endPoint, Cluster = cluster, Attribute = attribute },
                                         Data = value

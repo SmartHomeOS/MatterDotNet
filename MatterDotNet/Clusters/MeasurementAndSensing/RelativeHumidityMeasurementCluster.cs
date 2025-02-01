@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
@@ -34,7 +35,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected RelativeHumidityMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            MeasuredValue = new ReadAttribute<ushort?>(cluster, endPoint, 0, true) {
+            MeasuredValue = new ReportAttribute<ushort?>(cluster, endPoint, 0, true) {
                 Deserialize = x => (ushort?)(dynamic?)x
             };
             MinMeasuredValue = new ReadAttribute<ushort?>(cluster, endPoint, 1, true) {
@@ -50,9 +51,9 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
 
         #region Attributes
         /// <summary>
-        /// Measured Value Attribute [Read Only]
+        /// Measured Value Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort?> MeasuredValue { get; init; }
+        public required ReportAttribute<ushort?> MeasuredValue { get; init; }
 
         /// <summary>
         /// Min Measured Value Attribute [Read Only]

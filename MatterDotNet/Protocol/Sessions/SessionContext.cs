@@ -14,6 +14,7 @@ using MatterDotNet.Protocol.Connection;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
+using MatterDotNet.Protocol.Subprotocols;
 using System.Collections.Concurrent;
 
 namespace MatterDotNet.Protocol.Sessions
@@ -50,6 +51,16 @@ namespace MatterDotNet.Protocol.Sessions
         internal virtual uint GetSessionCounter()
         {
             return SessionManager.GlobalUnencryptedCounter;
+        }
+
+        internal Exchange CreateExchange(ushort id)
+        {
+            if (exchanges.TryGetValue(id, out Exchange? exchange))
+                return exchange;
+            Exchange newExchange = new Exchange(this, id);
+            if (!exchanges.TryAdd(id, newExchange))
+                return CreateExchange(id);
+            return newExchange;
         }
 
         internal Exchange CreateExchange()
@@ -115,7 +126,7 @@ namespace MatterDotNet.Protocol.Sessions
             if (exchanges.TryGetValue(frame.Message.ExchangeID, out Exchange? exchange))
                 exchange.Messages.Writer.TryWrite(frame);
             else
-                Console.WriteLine("Unknown Exchange " + frame.Message.ExchangeID);
+                Task.Factory.StartNew(async() => { await InteractionManager.HandleUnsolicited(this, frame); });
             return true;
         }
 

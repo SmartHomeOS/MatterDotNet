@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -39,7 +40,7 @@ namespace MatterDotNet.Clusters.HVAC
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected Thermostat(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            LocalTemperature = new ReadAttribute<decimal?>(cluster, endPoint, 0, true) {
+            LocalTemperature = new ReportAttribute<decimal?>(cluster, endPoint, 0, true) {
                 Deserialize = x => (decimal?)(dynamic?)x
             };
             OutdoorTemperature = new ReadAttribute<decimal?>(cluster, endPoint, 1, true) {
@@ -64,10 +65,10 @@ namespace MatterDotNet.Clusters.HVAC
                 Deserialize = x => (decimal?)(dynamic?)x ?? 32.00M
 
             };
-            PICoolingDemand = new ReadAttribute<byte>(cluster, endPoint, 7) {
+            PICoolingDemand = new ReportAttribute<byte>(cluster, endPoint, 7) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
-            PIHeatingDemand = new ReadAttribute<byte>(cluster, endPoint, 8) {
+            PIHeatingDemand = new ReportAttribute<byte>(cluster, endPoint, 8) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
             HVACSystemTypeConfiguration = new ReadWriteAttribute<HVACSystemType>(cluster, endPoint, 9) {
@@ -142,7 +143,7 @@ namespace MatterDotNet.Clusters.HVAC
             TemperatureSetpointHoldDuration = new ReadWriteAttribute<ushort?>(cluster, endPoint, 36, true) {
                 Deserialize = x => (ushort?)(dynamic?)x
             };
-            ThermostatProgrammingOperationMode = new ReadWriteAttribute<ProgrammingOperationMode>(cluster, endPoint, 37) {
+            ThermostatProgrammingOperationMode = new AllAttribute<ProgrammingOperationMode>(cluster, endPoint, 37) {
                 Deserialize = x => (ProgrammingOperationMode)DeserializeEnum(x)!
             };
             ThermostatRunningState = new ReadAttribute<RelayState>(cluster, endPoint, 41) {
@@ -1349,9 +1350,9 @@ namespace MatterDotNet.Clusters.HVAC
         }
 
         /// <summary>
-        /// Local Temperature [°C] Attribute [Read Only]
+        /// Local Temperature [°C] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<decimal?> LocalTemperature { get; init; }
+        public required ReportAttribute<decimal?> LocalTemperature { get; init; }
 
         /// <summary>
         /// Outdoor Temperature [°C] Attribute [Read Only]
@@ -1384,14 +1385,14 @@ namespace MatterDotNet.Clusters.HVAC
         public required ReadAttribute<decimal> AbsMaxCoolSetpointLimit { get; init; }
 
         /// <summary>
-        /// PI Cooling Demand Attribute [Read Only]
+        /// PI Cooling Demand Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> PICoolingDemand { get; init; }
+        public required ReportAttribute<byte> PICoolingDemand { get; init; }
 
         /// <summary>
-        /// PI Heating Demand Attribute [Read Only]
+        /// PI Heating Demand Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> PIHeatingDemand { get; init; }
+        public required ReportAttribute<byte> PIHeatingDemand { get; init; }
 
         /// <summary>
         /// HVAC System Type Configuration Attribute [Read/Write]
@@ -1494,9 +1495,9 @@ namespace MatterDotNet.Clusters.HVAC
         public required ReadWriteAttribute<ushort?> TemperatureSetpointHoldDuration { get; init; }
 
         /// <summary>
-        /// Thermostat Programming Operation Mode Attribute [Read/Write]
+        /// Thermostat Programming Operation Mode Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<ProgrammingOperationMode> ThermostatProgrammingOperationMode { get; init; }
+        public required AllAttribute<ProgrammingOperationMode> ThermostatProgrammingOperationMode { get; init; }
 
         /// <summary>
         /// Thermostat Running State Attribute [Read Only]

@@ -203,6 +203,7 @@ namespace Generator
             writer.WriteLine($"        /// <inheritdoc />\n        [SetsRequiredMembers]\n        protected {GeneratorUtil.SanitizeClassName(cluster.name)}(uint cluster, ushort endPoint) : base(cluster, endPoint) {{");
             if (cluster.attribute != null && cluster.attribute.Length > 0)
             {
+                includes.Add("MatterDotNet.Attributes");
                 foreach (var attribute in cluster.attribute)
                 {
                     if (attribute.type != null && attribute?.mandatoryConform?.condition?.name != "Zigbee" && attribute?.side == "server")
@@ -1364,9 +1365,19 @@ namespace Generator
             
             writer.Write("            " + GeneratorUtil.SanitizeName(attribute.description ?? attribute.text) + " = new ");
             if (attribute.writable)
-                writer.Write("ReadWriteAttribute<");
+            {
+                if (attribute.reportable)
+                    writer.Write("AllAttribute<");
+                else
+                    writer.Write("ReadWriteAttribute<");
+            }
             else
-                writer.Write("ReadAttribute<");
+            {
+                if (attribute.reportable)
+                    writer.Write("ReportAttribute<");
+                else
+                    writer.Write("ReadAttribute<");
+            }
             WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
             if (attribute.isNullable == true)
                 writer.Write('?');
@@ -1442,16 +1453,44 @@ namespace Generator
 
         private static void WriteAttribute(configurator clusterConfig, rootConfiguratorClusterAttribute attribute, rootConfiguratorCluster cluster, TextWriter writer)
         {
-            writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} Attribute [{(attribute.writable ? "Read/Write" : "Read Only")}]\n        /// </summary>");
+            writer.WriteLine($"        /// <summary>\n        /// {GeneratorUtil.FieldNameToComment(attribute.description ?? attribute.text, attribute.type)} Attribute [{GetAttributeType(attribute)}]\n        /// </summary>");
             if (attribute.writable)
-                writer.Write("        public required ReadWriteAttribute<");
+            {
+                if (attribute.reportable)
+                    writer.Write("        public required AllAttribute<");
+                else
+                    writer.Write("        public required ReadWriteAttribute<");
+            }
             else
-                writer.Write("        public required ReadAttribute<");
+            {
+                if (attribute.reportable)
+                    writer.Write("        public required ReportAttribute<");
+                else
+                    writer.Write("        public required ReadAttribute<");
+            }
             bool array = "array".Equals(attribute.type, StringComparison.InvariantCultureIgnoreCase);
             WriteType(array, array ? attribute.entryType : attribute.type, writer, attribute.description ?? attribute.text, clusterConfig, cluster);
             if (attribute.isNullable == true)
                 writer.Write('?');
             writer.WriteLine("> " + GeneratorUtil.SanitizeName(attribute.description ?? attribute.text) + " { get; init; }");
+        }
+
+        private static string GetAttributeType(rootConfiguratorClusterAttribute attribute)
+        {
+            if (attribute.writable)
+            {
+                if (attribute.reportable)
+                    return "Read/Write/Event";
+                else
+                    return "Read/Write";
+            }
+            else
+            {
+                if (attribute.reportable)
+                    return "Read/Event";
+                else
+                    return "Read Only";
+            }
         }
 
         private static bool WriteType(bool array, string type, TextWriter writer, string name, configurator clusterConfig, rootConfiguratorCluster? cluster, bool openIndex = false)

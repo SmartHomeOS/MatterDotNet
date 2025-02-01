@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -37,11 +38,11 @@ namespace MatterDotNet.Clusters.Lighting
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected ColorControl(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            CurrentHue = new ReadAttribute<byte>(cluster, endPoint, 0) {
+            CurrentHue = new ReportAttribute<byte>(cluster, endPoint, 0) {
                 Deserialize = x => (byte?)(dynamic?)x ?? 0x00
 
             };
-            CurrentSaturation = new ReadAttribute<byte>(cluster, endPoint, 1) {
+            CurrentSaturation = new ReportAttribute<byte>(cluster, endPoint, 1) {
                 Deserialize = x => (byte?)(dynamic?)x ?? 0x00
 
             };
@@ -49,11 +50,11 @@ namespace MatterDotNet.Clusters.Lighting
                 Deserialize = x => (ushort?)(dynamic?)x ?? 0x0000
 
             };
-            CurrentX = new ReadAttribute<ushort>(cluster, endPoint, 3) {
+            CurrentX = new ReportAttribute<ushort>(cluster, endPoint, 3) {
                 Deserialize = x => (ushort?)(dynamic?)x ?? 0x616B
 
             };
-            CurrentY = new ReadAttribute<ushort>(cluster, endPoint, 4) {
+            CurrentY = new ReportAttribute<ushort>(cluster, endPoint, 4) {
                 Deserialize = x => (ushort?)(dynamic?)x ?? 0x607D
 
             };
@@ -63,7 +64,7 @@ namespace MatterDotNet.Clusters.Lighting
             CompensationText = new ReadAttribute<string>(cluster, endPoint, 6) {
                 Deserialize = x => (string)(dynamic?)x!
             };
-            ColorTemperatureMireds = new ReadAttribute<ushort>(cluster, endPoint, 7) {
+            ColorTemperatureMireds = new ReportAttribute<ushort>(cluster, endPoint, 7) {
                 Deserialize = x => (ushort?)(dynamic?)x ?? 0x00FA
 
             };
@@ -789,14 +790,14 @@ namespace MatterDotNet.Clusters.Lighting
         }
 
         /// <summary>
-        /// Current Hue Attribute [Read Only]
+        /// Current Hue Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> CurrentHue { get; init; }
+        public required ReportAttribute<byte> CurrentHue { get; init; }
 
         /// <summary>
-        /// Current Saturation Attribute [Read Only]
+        /// Current Saturation Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> CurrentSaturation { get; init; }
+        public required ReportAttribute<byte> CurrentSaturation { get; init; }
 
         /// <summary>
         /// Remaining Time Attribute [Read Only]
@@ -804,14 +805,14 @@ namespace MatterDotNet.Clusters.Lighting
         public required ReadAttribute<ushort> RemainingTime { get; init; }
 
         /// <summary>
-        /// CurrentX Attribute [Read Only]
+        /// CurrentX Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort> CurrentX { get; init; }
+        public required ReportAttribute<ushort> CurrentX { get; init; }
 
         /// <summary>
-        /// CurrentY Attribute [Read Only]
+        /// CurrentY Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort> CurrentY { get; init; }
+        public required ReportAttribute<ushort> CurrentY { get; init; }
 
         /// <summary>
         /// Drift Compensation Attribute [Read Only]
@@ -824,9 +825,9 @@ namespace MatterDotNet.Clusters.Lighting
         public required ReadAttribute<string> CompensationText { get; init; }
 
         /// <summary>
-        /// Color Temperature Mireds Attribute [Read Only]
+        /// Color Temperature Mireds Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort> ColorTemperatureMireds { get; init; }
+        public required ReportAttribute<ushort> ColorTemperatureMireds { get; init; }
 
         /// <summary>
         /// Color Mode Attribute [Read Only]

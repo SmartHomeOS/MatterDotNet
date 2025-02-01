@@ -35,7 +35,7 @@
 		EventRequests [4, optional] : ARRAY [ length 0.. ] OF EventPathIB
 		EventFilters [5, optional] : ARRAY [ length 0.. ] OF EventFilterIB
 		FabricFiltered [7] : BOOLEAN
-		DataVersionFilters [8] : ARRAY [ length 0.. ] OF DataVersionFilterIB
+		DataVersionFilters [8, optional] : ARRAY [ length 0.. ] OF DataVersionFilterIB
 		InteractionModelRevision [255] : UNSIGNED INTEGER [ range 8-bits ]
 	}
 

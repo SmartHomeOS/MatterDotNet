@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
@@ -73,7 +74,7 @@ namespace MatterDotNet.Clusters.HVAC
             MaxConstTemp = new ReadAttribute<short?>(cluster, endPoint, 12, true) {
                 Deserialize = x => (short?)(dynamic?)x
             };
-            PumpStatus = new ReadAttribute<PumpStatusBitmap>(cluster, endPoint, 16) {
+            PumpStatus = new ReportAttribute<PumpStatusBitmap>(cluster, endPoint, 16) {
                 Deserialize = x => (PumpStatusBitmap)DeserializeEnum(x)!
             };
             EffectiveOperationMode = new ReadAttribute<OperationModeEnum>(cluster, endPoint, 17) {
@@ -82,7 +83,7 @@ namespace MatterDotNet.Clusters.HVAC
             EffectiveControlMode = new ReadAttribute<ControlModeEnum>(cluster, endPoint, 18) {
                 Deserialize = x => (ControlModeEnum)DeserializeEnum(x)!
             };
-            Capacity = new ReadAttribute<short?>(cluster, endPoint, 19, true) {
+            Capacity = new ReportAttribute<short?>(cluster, endPoint, 19, true) {
                 Deserialize = x => (short?)(dynamic?)x
             };
             Speed = new ReadAttribute<ushort?>(cluster, endPoint, 20, true) {
@@ -328,9 +329,9 @@ namespace MatterDotNet.Clusters.HVAC
         public required ReadAttribute<short?> MaxConstTemp { get; init; }
 
         /// <summary>
-        /// Pump Status Attribute [Read Only]
+        /// Pump Status Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<PumpStatusBitmap> PumpStatus { get; init; }
+        public required ReportAttribute<PumpStatusBitmap> PumpStatus { get; init; }
 
         /// <summary>
         /// Effective Operation Mode Attribute [Read Only]
@@ -343,9 +344,9 @@ namespace MatterDotNet.Clusters.HVAC
         public required ReadAttribute<ControlModeEnum> EffectiveControlMode { get; init; }
 
         /// <summary>
-        /// Capacity Attribute [Read Only]
+        /// Capacity Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<short?> Capacity { get; init; }
+        public required ReportAttribute<short?> Capacity { get; init; }
 
         /// <summary>
         /// Speed Attribute [Read Only]

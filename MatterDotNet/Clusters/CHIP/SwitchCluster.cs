@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
@@ -38,7 +39,7 @@ namespace MatterDotNet.Clusters.CHIP
                 Deserialize = x => (byte?)(dynamic?)x ?? 2
 
             };
-            CurrentPosition = new ReadAttribute<byte>(cluster, endPoint, 1) {
+            CurrentPosition = new ReportAttribute<byte>(cluster, endPoint, 1) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
             MultiPressMax = new ReadAttribute<byte>(cluster, endPoint, 2) {
@@ -108,9 +109,9 @@ namespace MatterDotNet.Clusters.CHIP
         public required ReadAttribute<byte> NumberOfPositions { get; init; }
 
         /// <summary>
-        /// Current Position Attribute [Read Only]
+        /// Current Position Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> CurrentPosition { get; init; }
+        public required ReportAttribute<byte> CurrentPosition { get; init; }
 
         /// <summary>
         /// Multi Press Max Attribute [Read Only]

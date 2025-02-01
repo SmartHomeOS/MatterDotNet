@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
@@ -34,16 +35,16 @@ namespace MatterDotNet.Clusters.General
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected BooleanState(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            StateValue = new ReadAttribute<bool>(cluster, endPoint, 0) {
+            StateValue = new ReportAttribute<bool>(cluster, endPoint, 0) {
                 Deserialize = x => (bool)(dynamic?)x!
             };
         }
 
         #region Attributes
         /// <summary>
-        /// State Value Attribute [Read Only]
+        /// State Value Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<bool> StateValue { get; init; }
+        public required ReportAttribute<bool> StateValue { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

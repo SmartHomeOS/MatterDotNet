@@ -12,8 +12,8 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
-using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MatterDotNet.Clusters.General

@@ -14,7 +14,7 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Data;
 
-namespace MatterDotNet
+namespace MatterDotNet.Attributes
 {
     /// <summary>
     /// Create a read-only attribute
@@ -29,15 +29,15 @@ namespace MatterDotNet
         /// <summary>
         /// Cluster ID
         /// </summary>
-        internal uint ClusterId { get; init; }
+        public uint ClusterId { get; init; }
         /// <summary>
         /// End Point Number
         /// </summary>
-        internal ushort EndPoint { get; init; }
+        public ushort EndPoint { get; init; }
         /// <summary>
         /// Attribute ID
         /// </summary>
-        internal ushort AttributeId { get; init; }
+        public ushort AttributeId { get; init; }
         /// <summary>
         /// Is null allowed
         /// </summary>

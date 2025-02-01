@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -52,7 +53,7 @@ namespace MatterDotNet.Clusters.General
                     return list;
                 }
             };
-            CurrentMode = new ReadAttribute<byte>(cluster, endPoint, 3) {
+            CurrentMode = new ReportAttribute<byte>(cluster, endPoint, 3) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
             StartUpMode = new ReadWriteAttribute<byte?>(cluster, endPoint, 4, true) {
@@ -211,9 +212,9 @@ namespace MatterDotNet.Clusters.General
         public required ReadAttribute<ModeOption[]> SupportedModes { get; init; }
 
         /// <summary>
-        /// Current Mode Attribute [Read Only]
+        /// Current Mode Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte> CurrentMode { get; init; }
+        public required ReportAttribute<byte> CurrentMode { get; init; }
 
         /// <summary>
         /// Start Up Mode Attribute [Read/Write]

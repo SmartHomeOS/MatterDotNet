@@ -34,7 +34,7 @@ namespace MatterDotNet.Messages.InteractionModel
         public EventPathIB[]? EventRequests { get; set; }
         public EventFilterIB[]? EventFilters { get; set; }
         public required bool FabricFiltered { get; set; }
-        public required DataVersionFilterIB[] DataVersionFilters { get; set; }
+        public DataVersionFilterIB[]? DataVersionFilters { get; set; }
         public required byte InteractionModelRevision { get; set; }
 
         [SetsRequiredMembers]
@@ -74,6 +74,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 EventFilters = items.ToArray();
             }
             FabricFiltered = reader.GetBool(7)!.Value;
+            if (reader.IsTag(8))
             {
                 reader.StartArray(8);
                 List<DataVersionFilterIB> items = new();
@@ -117,6 +118,7 @@ namespace MatterDotNet.Messages.InteractionModel
                 writer.EndContainer();
             }
             writer.WriteBool(7, FabricFiltered);
+            if (DataVersionFilters != null)
             {
                 writer.StartArray(8);
                 foreach (var item in DataVersionFilters) {

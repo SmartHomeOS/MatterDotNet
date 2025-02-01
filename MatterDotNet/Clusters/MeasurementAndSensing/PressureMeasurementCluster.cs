@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Sessions;
 using System.Diagnostics.CodeAnalysis;
@@ -34,7 +35,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected PressureMeasurement(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            MeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 0, true) {
+            MeasuredValue = new ReportAttribute<short?>(cluster, endPoint, 0, true) {
                 Deserialize = x => (short?)(dynamic?)x
             };
             MinMeasuredValue = new ReadAttribute<short?>(cluster, endPoint, 1, true) {
@@ -59,7 +60,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
                 Deserialize = x => (short?)(dynamic?)x ?? 0
 
             };
-            ScaledTolerance = new ReadAttribute<ushort>(cluster, endPoint, 19) {
+            ScaledTolerance = new ReportAttribute<ushort>(cluster, endPoint, 19) {
                 Deserialize = x => (ushort?)(dynamic?)x ?? 0
 
             };
@@ -105,9 +106,9 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Measured Value Attribute [Read Only]
+        /// Measured Value Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<short?> MeasuredValue { get; init; }
+        public required ReportAttribute<short?> MeasuredValue { get; init; }
 
         /// <summary>
         /// Min Measured Value Attribute [Read Only]
@@ -140,9 +141,9 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         public required ReadAttribute<short?> MaxScaledValue { get; init; }
 
         /// <summary>
-        /// Scaled Tolerance Attribute [Read Only]
+        /// Scaled Tolerance Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort> ScaledTolerance { get; init; }
+        public required ReportAttribute<ushort> ScaledTolerance { get; init; }
 
         /// <summary>
         /// Scale Attribute [Read Only]

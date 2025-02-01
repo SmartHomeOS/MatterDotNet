@@ -10,17 +10,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Payloads.OpCodes;
 using MatterDotNet.Protocol.Payloads.Status;
 using MatterDotNet.Protocol.Sessions;
+using System.Collections.Concurrent;
 using System.Data;
 
 namespace MatterDotNet.Protocol.Subprotocols
 {
     internal class InteractionManager
     {
+        private static ConcurrentDictionary<ulong, IReportAttribute> subscriptions = new ConcurrentDictionary<ulong, IReportAttribute>();
+
         public static async Task<List<AttributeReportIB>> GetAttributes(SecureSession session, ushort endpoint, uint cluster, CancellationToken token, params uint[] attributes)
         {
             using (Exchange secExchange = session.CreateExchange())
@@ -86,7 +90,11 @@ namespace MatterDotNet.Protocol.Subprotocols
                         if (msg.MoreChunkedMessages.HasValue && msg.MoreChunkedMessages.Value == true)
                             return GetData(await HandleChunked(msg, secExchange, endpoint, token));
                         if (msg.AttributeReports != null)
+                        {
+                            if (!msg.SuppressResponse.HasValue || msg.SuppressResponse.Value == false)
+                                await SendStatusResponse(IMStatusCode.SUCCESS, secExchange, token);
                             return GetData(msg.AttributeReports);
+                        }
                     }
                     else if (response.Message.Payload is StatusResponseMessage status)
                         throw new IOException("Error: " + (IMStatusCode)status.Status);
@@ -109,7 +117,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             return result;
         }
 
-        private static async Task<List<AttributeReportIB>> HandleChunked(ReportDataMessage first, Exchange secExchange, ushort endpoint, CancellationToken token)
+        private static async Task<List<AttributeReportIB>> HandleChunked(ReportDataMessage first, Exchange secExchange, ushort endpoint, CancellationToken token = default)
         {
             List<AttributeReportIB> attributes = new List<AttributeReportIB>();
             attributes.AddRange(first.AttributeReports!);
@@ -125,11 +133,11 @@ namespace MatterDotNet.Protocol.Subprotocols
                     if (!msg.MoreChunkedMessages.HasValue || msg.MoreChunkedMessages.Value == false)
                     {
                         if (!msg.SuppressResponse.HasValue || msg.SuppressResponse.Value == false)
-                            await SendStatus(IMStatusCode.SUCCESS, secExchange, token);
+                            await SendStatusResponse(IMStatusCode.SUCCESS, secExchange, token);
                         break;
                     }
-                    else
-                        await SendStatus(IMStatusCode.SUCCESS, secExchange, token);
+                    else if (!msg.SuppressResponse.HasValue || msg.SuppressResponse.Value == false)
+                        await SendStatusResponse(IMStatusCode.SUCCESS, secExchange, token);
                 }
                 else if (response.Message.Payload is StatusResponseMessage status)
                     throw new IOException("Error: " + (IMStatusCode)status.Status);
@@ -137,9 +145,18 @@ namespace MatterDotNet.Protocol.Subprotocols
             return attributes;
         }
 
-        private static async Task SendStatus(IMStatusCode status, Exchange exchange, CancellationToken token)
+        private static async Task SendStatusResponse(IMStatusCode status, Exchange exchange, CancellationToken token = default)
         {
-            await exchange.SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)status), (byte)SecureOpCodes.StatusReport), true, token);
+            StatusResponseMessage statusResponse = new StatusResponseMessage()
+            {
+                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                Status = (byte)status
+            };
+            Frame readFrame = new Frame(statusResponse, (byte)IMOpCodes.StatusResponse);
+            readFrame.Message.Protocol = ProtocolType.InteractionModel;
+            readFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
+            readFrame.DestinationID = exchange.Session.ResponderNodeID;
+            await exchange.SendFrame(readFrame, true, token);
         }
 
         public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, bool timed, TLVPayload? payload = null, CancellationToken token = default)
@@ -162,6 +179,54 @@ namespace MatterDotNet.Protocol.Subprotocols
             invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
             invokeFrame.DestinationID = exchange.Session.ResponderNodeID;
             await exchange.SendFrame(invokeFrame, true, token);
+        }
+
+        public static async Task Subscribe(Exchange exchange, IReportAttribute attribute, TimeSpan minReporting, TimeSpan maxReporting, CancellationToken token = default)
+        {
+            SubscribeRequestMessage subscribe = new SubscribeRequestMessage()
+            {
+                FabricFiltered = true,
+                KeepSubscriptions = true,
+                MaxIntervalCeiling = (ulong)Math.Ceiling(maxReporting.TotalSeconds),
+                MinIntervalFloor = (ulong)minReporting.TotalSeconds,
+                InteractionModelRevision = Constants.MATTER_14_REVISION,
+                AttributeRequests = [new AttributePathIB() { Endpoint = attribute.EndPoint, Cluster = attribute.ClusterId, Attribute = attribute.AttributeId }]
+            };
+            Frame invokeFrame = new Frame(subscribe, (byte)IMOpCodes.SubscribeRequest);
+            invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
+            invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
+            invokeFrame.DestinationID = exchange.Session.ResponderNodeID;
+            await exchange.SendFrame(invokeFrame, true, token);
+            while (!token.IsCancellationRequested)
+            {
+                Frame response = await exchange.Read(token);
+                if (response.Message.Payload is ReportDataMessage msg)
+                {
+                    if (msg.AttributeReports != null && !ValidateResponse(msg.AttributeReports[0], attribute.EndPoint))
+                        throw new IOException("Failed to query attribute: " + (IMStatusCode?)msg.AttributeReports[0].AttributeStatus?.Status.Status);
+                    if (msg.MoreChunkedMessages.HasValue && msg.MoreChunkedMessages.Value == true)
+                    {
+                        ((IReportAttribute)attribute).Notify(GetData(await HandleChunked(msg, exchange, attribute.EndPoint, token)));
+                        continue;
+                    }
+                    if (msg.AttributeReports != null)
+                    {
+                        ((IReportAttribute)attribute).Notify(GetData(msg.AttributeReports));
+                        if (!msg.SuppressResponse.HasValue || msg.SuppressResponse.Value == false)
+                            await SendStatusResponse(IMStatusCode.SUCCESS, exchange, token);
+                        continue;
+                    }
+                }
+                else if (response.Message.Payload is StatusResponseMessage status)
+                    throw new IOException("Error: " + (IMStatusCode)status.Status);
+                else if (response.Message.Payload is SubscribeResponseMessage subscribeResponse)
+                {
+                    Console.WriteLine("Subscription Interval: " + subscribeResponse.MaxInterval);
+                    subscriptions.TryAdd(subscribeResponse.SubscriptionID, attribute);
+                    return;
+                }
+            }
+            throw new OperationCanceledException();
         }
 
         public static async Task StartTimed(Exchange exchange, ushort timeout, CancellationToken token)
@@ -351,6 +416,41 @@ namespace MatterDotNet.Protocol.Subprotocols
                     throw new InvalidOperationException("The received request cannot be handled due to the current operational state of the device");
                 default:
                     return false;
+            }
+        }
+
+        internal static async Task HandleUnsolicited(SessionContext session, Frame frame)
+        {
+            if (frame.Message.Payload is ReportDataMessage msg)
+            {
+                Exchange exchange = session.CreateExchange(frame.Message.ExchangeID);
+                try
+                {
+                    if (subscriptions.TryGetValue(msg.SubscriptionID!.Value, out IReportAttribute? attribute))
+                    {
+                        if (msg.AttributeReports != null && !ValidateResponse(msg.AttributeReports[0], attribute.EndPoint))
+                            return;
+
+                        if (msg.MoreChunkedMessages.HasValue && msg.MoreChunkedMessages.Value == true)
+                            attribute.Notify(GetData(await HandleChunked(msg, exchange, attribute.EndPoint)));
+                        else
+                        {
+                            if (msg.AttributeReports != null)
+                                attribute.Notify(GetData(msg.AttributeReports));
+                            await SendStatusResponse(IMStatusCode.SUCCESS, exchange);
+                        }
+                    }
+                    else
+                        await SendStatusResponse(IMStatusCode.INVALID_SUBSCRIPTION, exchange);
+                }
+                catch (Exception)
+                {
+                    await SendStatusResponse(IMStatusCode.FAILURE, exchange);
+                }
+                finally
+                {
+                    exchange.Dispose();
+                }
             }
         }
     }

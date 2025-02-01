@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -37,7 +38,7 @@ namespace MatterDotNet.Clusters.General
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected On_Off(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            OnOff = new ReadAttribute<bool>(cluster, endPoint, 0) {
+            OnOff = new ReportAttribute<bool>(cluster, endPoint, 0) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
@@ -262,9 +263,9 @@ namespace MatterDotNet.Clusters.General
         }
 
         /// <summary>
-        /// On Off Attribute [Read Only]
+        /// On Off Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<bool> OnOff { get; init; }
+        public required ReportAttribute<bool> OnOff { get; init; }
 
         /// <summary>
         /// Global Scene Control Attribute [Read Only]

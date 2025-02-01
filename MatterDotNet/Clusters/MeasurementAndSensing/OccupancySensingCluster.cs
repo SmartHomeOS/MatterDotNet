@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
@@ -35,7 +36,7 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected OccupancySensing(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            Occupancy = new ReadAttribute<OccupancyBitmap>(cluster, endPoint, 0) {
+            Occupancy = new ReportAttribute<OccupancyBitmap>(cluster, endPoint, 0) {
                 Deserialize = x => (OccupancyBitmap)DeserializeEnum(x)!
             };
             OccupancySensorType = new ReadAttribute<OccupancySensorTypeEnum>(cluster, endPoint, 1) {
@@ -245,9 +246,9 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
 
         /// <summary>
-        /// Occupancy Attribute [Read Only]
+        /// Occupancy Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<OccupancyBitmap> Occupancy { get; init; }
+        public required ReportAttribute<OccupancyBitmap> Occupancy { get; init; }
 
         /// <summary>
         /// Occupancy Sensor Type Attribute [Read Only]

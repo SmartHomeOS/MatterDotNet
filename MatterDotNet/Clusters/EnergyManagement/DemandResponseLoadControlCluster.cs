@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -593,9 +594,9 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Add Load Control Event Request
         /// </summary>
-        public async Task<bool> AddLoadControlEventRequest(SecureSession session, LoadControlEvent @event, CancellationToken token = default) {
+        public async Task<bool> AddLoadControlEventRequest(SecureSession session, LoadControlEvent @Event, CancellationToken token = default) {
             AddLoadControlEventRequestPayload requestFields = new AddLoadControlEventRequestPayload() {
-                @Event = @event,
+                @Event = @Event,
             };
             InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);

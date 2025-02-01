@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -65,28 +66,28 @@ namespace MatterDotNet.Clusters.Closures
             ConfigStatus = new ReadAttribute<ConfigStatusBitmap>(cluster, endPoint, 7) {
                 Deserialize = x => (ConfigStatusBitmap)DeserializeEnum(x)!
             };
-            CurrentPositionLiftPercentage = new ReadAttribute<byte?>(cluster, endPoint, 8, true) {
+            CurrentPositionLiftPercentage = new ReportAttribute<byte?>(cluster, endPoint, 8, true) {
                 Deserialize = x => (byte?)(dynamic?)x
             };
-            CurrentPositionTiltPercentage = new ReadAttribute<byte?>(cluster, endPoint, 9, true) {
+            CurrentPositionTiltPercentage = new ReportAttribute<byte?>(cluster, endPoint, 9, true) {
                 Deserialize = x => (byte?)(dynamic?)x
             };
-            OperationalStatus = new ReadAttribute<OperationalStatusBitmap>(cluster, endPoint, 10) {
+            OperationalStatus = new ReportAttribute<OperationalStatusBitmap>(cluster, endPoint, 10) {
                 Deserialize = x => (OperationalStatusBitmap)DeserializeEnum(x)!
             };
-            TargetPositionLiftPercent = new ReadAttribute<decimal?>(cluster, endPoint, 11, true) {
+            TargetPositionLiftPercent = new ReportAttribute<decimal?>(cluster, endPoint, 11, true) {
                 Deserialize = x => (decimal?)(dynamic?)x
             };
-            TargetPositionTiltPercent = new ReadAttribute<decimal?>(cluster, endPoint, 12, true) {
+            TargetPositionTiltPercent = new ReportAttribute<decimal?>(cluster, endPoint, 12, true) {
                 Deserialize = x => (decimal?)(dynamic?)x
             };
             EndProductType = new ReadAttribute<EndProductTypeEnum>(cluster, endPoint, 13) {
                 Deserialize = x => (EndProductTypeEnum)DeserializeEnum(x)!
             };
-            CurrentPositionLiftPercent = new ReadAttribute<decimal?>(cluster, endPoint, 14, true) {
+            CurrentPositionLiftPercent = new ReportAttribute<decimal?>(cluster, endPoint, 14, true) {
                 Deserialize = x => (decimal?)(dynamic?)x
             };
-            CurrentPositionTiltPercent = new ReadAttribute<decimal?>(cluster, endPoint, 15, true) {
+            CurrentPositionTiltPercent = new ReportAttribute<decimal?>(cluster, endPoint, 15, true) {
                 Deserialize = x => (decimal?)(dynamic?)x
             };
             InstalledOpenLimitLift = new ReadAttribute<ushort>(cluster, endPoint, 16) {
@@ -108,7 +109,7 @@ namespace MatterDotNet.Clusters.Closures
             Mode = new ReadWriteAttribute<ModeBitmap>(cluster, endPoint, 23) {
                 Deserialize = x => (ModeBitmap)DeserializeEnum(x)!
             };
-            SafetyStatus = new ReadAttribute<SafetyStatusBitmap>(cluster, endPoint, 26) {
+            SafetyStatus = new ReportAttribute<SafetyStatusBitmap>(cluster, endPoint, 26) {
                 Deserialize = x => (SafetyStatusBitmap)DeserializeEnum(x)!
             };
         }
@@ -617,29 +618,29 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadAttribute<ConfigStatusBitmap> ConfigStatus { get; init; }
 
         /// <summary>
-        /// Current Position Lift Percentage [%] Attribute [Read Only]
+        /// Current Position Lift Percentage [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte?> CurrentPositionLiftPercentage { get; init; }
+        public required ReportAttribute<byte?> CurrentPositionLiftPercentage { get; init; }
 
         /// <summary>
-        /// Current Position Tilt Percentage [%] Attribute [Read Only]
+        /// Current Position Tilt Percentage [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<byte?> CurrentPositionTiltPercentage { get; init; }
+        public required ReportAttribute<byte?> CurrentPositionTiltPercentage { get; init; }
 
         /// <summary>
-        /// Operational Status Attribute [Read Only]
+        /// Operational Status Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<OperationalStatusBitmap> OperationalStatus { get; init; }
+        public required ReportAttribute<OperationalStatusBitmap> OperationalStatus { get; init; }
 
         /// <summary>
-        /// Target Position Lift Percent100ths [%] Attribute [Read Only]
+        /// Target Position Lift Percent100ths [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<decimal?> TargetPositionLiftPercent { get; init; }
+        public required ReportAttribute<decimal?> TargetPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Target Position Tilt Percent100ths [%] Attribute [Read Only]
+        /// Target Position Tilt Percent100ths [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<decimal?> TargetPositionTiltPercent { get; init; }
+        public required ReportAttribute<decimal?> TargetPositionTiltPercent { get; init; }
 
         /// <summary>
         /// End Product Type Attribute [Read Only]
@@ -647,14 +648,14 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadAttribute<EndProductTypeEnum> EndProductType { get; init; }
 
         /// <summary>
-        /// Current Position Lift Percent100ths [%] Attribute [Read Only]
+        /// Current Position Lift Percent100ths [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<decimal?> CurrentPositionLiftPercent { get; init; }
+        public required ReportAttribute<decimal?> CurrentPositionLiftPercent { get; init; }
 
         /// <summary>
-        /// Current Position Tilt Percent100ths [%] Attribute [Read Only]
+        /// Current Position Tilt Percent100ths [%] Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<decimal?> CurrentPositionTiltPercent { get; init; }
+        public required ReportAttribute<decimal?> CurrentPositionTiltPercent { get; init; }
 
         /// <summary>
         /// Installed Open Limit Lift Attribute [Read Only]
@@ -682,9 +683,9 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadWriteAttribute<ModeBitmap> Mode { get; init; }
 
         /// <summary>
-        /// Safety Status Attribute [Read Only]
+        /// Safety Status Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<SafetyStatusBitmap> SafetyStatus { get; init; }
+        public required ReportAttribute<SafetyStatusBitmap> SafetyStatus { get; init; }
         #endregion Attributes
 
         /// <inheritdoc />

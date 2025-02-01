@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -37,7 +38,7 @@ namespace MatterDotNet.Clusters.Media
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected ApplicationLauncher(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            CatalogList = new ReadAttribute<ushort[]>(cluster, endPoint, 0) {
+            CatalogList = new ReportAttribute<ushort[]>(cluster, endPoint, 0) {
                 Deserialize = x => {
                     FieldReader reader = new FieldReader((IList<object>)x!);
                     ushort[] list = new ushort[reader.Count];
@@ -270,9 +271,9 @@ namespace MatterDotNet.Clusters.Media
         }
 
         /// <summary>
-        /// Catalog List Attribute [Read Only]
+        /// Catalog List Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<ushort[]> CatalogList { get; init; }
+        public required ReportAttribute<ushort[]> CatalogList { get; init; }
 
         /// <summary>
         /// Current App Attribute [Read Only]

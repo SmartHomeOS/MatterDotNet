@@ -14,15 +14,11 @@ using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
 using System.Data;
 
-namespace MatterDotNet
+namespace MatterDotNet.Attributes
 {
-    /// <summary>
-    /// Create a Readable and Writable Attribute
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ReadWriteAttribute<T> : ReadAttribute<T>
+    public class AllAttribute<T> : ReportAttribute<T>, IWriteAttribute<T>
     {
-        internal ReadWriteAttribute(uint clusterId, ushort endPoint, ushort attributeId, bool nullable = false) : base(clusterId, endPoint, attributeId, nullable){ }
+        internal AllAttribute(uint clusterId, ushort endPoint, ushort attributeId, bool nullable = false) : base(clusterId, endPoint, attributeId, nullable) { }
 
         /// <summary>
         /// Set the attribute to the provided value

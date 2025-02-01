@@ -12,6 +12,7 @@
 //
 // WARNING: This file was auto-generated. Do not edit.
 
+using MatterDotNet.Attributes;
 using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Parsers;
 using MatterDotNet.Protocol.Payloads;
@@ -38,7 +39,7 @@ namespace MatterDotNet.Clusters.Closures
         /// <inheritdoc />
         [SetsRequiredMembers]
         protected DoorLock(uint cluster, ushort endPoint) : base(cluster, endPoint) {
-            LockState = new ReadAttribute<LockStateEnum?>(cluster, endPoint, 0, true) {
+            LockState = new ReportAttribute<LockStateEnum?>(cluster, endPoint, 0, true) {
                 Deserialize = x => (LockStateEnum?)DeserializeEnum(x)
             };
             LockType = new ReadAttribute<LockTypeEnum>(cluster, endPoint, 1) {
@@ -47,7 +48,7 @@ namespace MatterDotNet.Clusters.Closures
             ActuatorEnabled = new ReadAttribute<bool>(cluster, endPoint, 2) {
                 Deserialize = x => (bool)(dynamic?)x!
             };
-            DoorState = new ReadAttribute<DoorStateEnum?>(cluster, endPoint, 3, true) {
+            DoorState = new ReportAttribute<DoorStateEnum?>(cluster, endPoint, 3, true) {
                 Deserialize = x => (DoorStateEnum?)DeserializeEnum(x)
             };
             DoorOpenEvents = new ReadWriteAttribute<uint>(cluster, endPoint, 4) {
@@ -102,63 +103,63 @@ namespace MatterDotNet.Clusters.Closures
                 Deserialize = x => (byte?)(dynamic?)x ?? 0
 
             };
-            Language = new ReadWriteAttribute<string>(cluster, endPoint, 51) {
+            Language = new AllAttribute<string>(cluster, endPoint, 51) {
                 Deserialize = x => (string)(dynamic?)x!
             };
-            LEDSettings = new ReadWriteAttribute<byte>(cluster, endPoint, 52) {
+            LEDSettings = new AllAttribute<byte>(cluster, endPoint, 52) {
                 Deserialize = x => (byte?)(dynamic?)x ?? 0
 
             };
-            AutoRelockTime = new ReadWriteAttribute<uint>(cluster, endPoint, 53) {
+            AutoRelockTime = new AllAttribute<uint>(cluster, endPoint, 53) {
                 Deserialize = x => (uint)(dynamic?)x!
             };
-            SoundVolume = new ReadWriteAttribute<byte>(cluster, endPoint, 54) {
+            SoundVolume = new AllAttribute<byte>(cluster, endPoint, 54) {
                 Deserialize = x => (byte?)(dynamic?)x ?? 0
 
             };
-            OperatingMode = new ReadWriteAttribute<OperatingModeEnum>(cluster, endPoint, 55) {
+            OperatingMode = new AllAttribute<OperatingModeEnum>(cluster, endPoint, 55) {
                 Deserialize = x => (OperatingModeEnum)DeserializeEnum(x)!
             };
             SupportedOperatingModes = new ReadAttribute<SupportedOperatingModesBitmap>(cluster, endPoint, 56) {
                 Deserialize = x => (SupportedOperatingModesBitmap)DeserializeEnum(x)!
             };
-            DefaultConfigurationRegister = new ReadAttribute<DefaultConfigurationRegisterBitmap>(cluster, endPoint, 57) {
+            DefaultConfigurationRegister = new ReportAttribute<DefaultConfigurationRegisterBitmap>(cluster, endPoint, 57) {
                 Deserialize = x => (DefaultConfigurationRegisterBitmap)DeserializeEnum(x)!
             };
-            EnableLocalProgramming = new ReadWriteAttribute<bool>(cluster, endPoint, 64) {
+            EnableLocalProgramming = new AllAttribute<bool>(cluster, endPoint, 64) {
                 Deserialize = x => (bool?)(dynamic?)x ?? true
 
             };
-            EnableOneTouchLocking = new ReadWriteAttribute<bool>(cluster, endPoint, 65) {
+            EnableOneTouchLocking = new AllAttribute<bool>(cluster, endPoint, 65) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
-            EnableInsideStatusLED = new ReadWriteAttribute<bool>(cluster, endPoint, 66) {
+            EnableInsideStatusLED = new AllAttribute<bool>(cluster, endPoint, 66) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
-            EnablePrivacyModeButton = new ReadWriteAttribute<bool>(cluster, endPoint, 67) {
+            EnablePrivacyModeButton = new AllAttribute<bool>(cluster, endPoint, 67) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
-            LocalProgrammingFeatures = new ReadWriteAttribute<LocalProgrammingFeaturesBitmap>(cluster, endPoint, 68) {
+            LocalProgrammingFeatures = new AllAttribute<LocalProgrammingFeaturesBitmap>(cluster, endPoint, 68) {
                 Deserialize = x => (LocalProgrammingFeaturesBitmap)DeserializeEnum(x)!
             };
-            WrongCodeEntryLimit = new ReadWriteAttribute<byte>(cluster, endPoint, 72) {
+            WrongCodeEntryLimit = new AllAttribute<byte>(cluster, endPoint, 72) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
-            UserCodeTemporaryDisableTime = new ReadWriteAttribute<byte>(cluster, endPoint, 73) {
+            UserCodeTemporaryDisableTime = new AllAttribute<byte>(cluster, endPoint, 73) {
                 Deserialize = x => (byte)(dynamic?)x!
             };
-            SendPINOverTheAir = new ReadWriteAttribute<bool>(cluster, endPoint, 80) {
+            SendPINOverTheAir = new AllAttribute<bool>(cluster, endPoint, 80) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
-            RequirePINforRemoteOperation = new ReadWriteAttribute<bool>(cluster, endPoint, 81) {
+            RequirePINforRemoteOperation = new AllAttribute<bool>(cluster, endPoint, 81) {
                 Deserialize = x => (bool?)(dynamic?)x ?? false
 
             };
-            ExpiringUserTimeout = new ReadWriteAttribute<ushort>(cluster, endPoint, 83) {
+            ExpiringUserTimeout = new AllAttribute<ushort>(cluster, endPoint, 83) {
                 Deserialize = x => (ushort)(dynamic?)x!
             };
             AliroReaderVerificationKey = new ReadAttribute<byte[]?>(cluster, endPoint, 296, true) {
@@ -1862,9 +1863,9 @@ namespace MatterDotNet.Clusters.Closures
         }
 
         /// <summary>
-        /// Lock State Attribute [Read Only]
+        /// Lock State Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<LockStateEnum?> LockState { get; init; }
+        public required ReportAttribute<LockStateEnum?> LockState { get; init; }
 
         /// <summary>
         /// Lock Type Attribute [Read Only]
@@ -1877,9 +1878,9 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadAttribute<bool> ActuatorEnabled { get; init; }
 
         /// <summary>
-        /// Door State Attribute [Read Only]
+        /// Door State Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<DoorStateEnum?> DoorState { get; init; }
+        public required ReportAttribute<DoorStateEnum?> DoorState { get; init; }
 
         /// <summary>
         /// Door Open Events Attribute [Read/Write]
@@ -1957,29 +1958,29 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadAttribute<byte> NumberOfCredentialsSupportedPerUser { get; init; }
 
         /// <summary>
-        /// Language Attribute [Read/Write]
+        /// Language Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<string> Language { get; init; }
+        public required AllAttribute<string> Language { get; init; }
 
         /// <summary>
-        /// LED Settings Attribute [Read/Write]
+        /// LED Settings Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<byte> LEDSettings { get; init; }
+        public required AllAttribute<byte> LEDSettings { get; init; }
 
         /// <summary>
-        /// Auto Relock Time Attribute [Read/Write]
+        /// Auto Relock Time Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<uint> AutoRelockTime { get; init; }
+        public required AllAttribute<uint> AutoRelockTime { get; init; }
 
         /// <summary>
-        /// Sound Volume Attribute [Read/Write]
+        /// Sound Volume Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<byte> SoundVolume { get; init; }
+        public required AllAttribute<byte> SoundVolume { get; init; }
 
         /// <summary>
-        /// Operating Mode Attribute [Read/Write]
+        /// Operating Mode Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<OperatingModeEnum> OperatingMode { get; init; }
+        public required AllAttribute<OperatingModeEnum> OperatingMode { get; init; }
 
         /// <summary>
         /// Supported Operating Modes Attribute [Read Only]
@@ -1987,59 +1988,59 @@ namespace MatterDotNet.Clusters.Closures
         public required ReadAttribute<SupportedOperatingModesBitmap> SupportedOperatingModes { get; init; }
 
         /// <summary>
-        /// Default Configuration Register Attribute [Read Only]
+        /// Default Configuration Register Attribute [Read/Event]
         /// </summary>
-        public required ReadAttribute<DefaultConfigurationRegisterBitmap> DefaultConfigurationRegister { get; init; }
+        public required ReportAttribute<DefaultConfigurationRegisterBitmap> DefaultConfigurationRegister { get; init; }
 
         /// <summary>
-        /// Enable Local Programming Attribute [Read/Write]
+        /// Enable Local Programming Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> EnableLocalProgramming { get; init; }
+        public required AllAttribute<bool> EnableLocalProgramming { get; init; }
 
         /// <summary>
-        /// Enable One Touch Locking Attribute [Read/Write]
+        /// Enable One Touch Locking Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> EnableOneTouchLocking { get; init; }
+        public required AllAttribute<bool> EnableOneTouchLocking { get; init; }
 
         /// <summary>
-        /// Enable Inside Status LED Attribute [Read/Write]
+        /// Enable Inside Status LED Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> EnableInsideStatusLED { get; init; }
+        public required AllAttribute<bool> EnableInsideStatusLED { get; init; }
 
         /// <summary>
-        /// Enable Privacy Mode Button Attribute [Read/Write]
+        /// Enable Privacy Mode Button Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> EnablePrivacyModeButton { get; init; }
+        public required AllAttribute<bool> EnablePrivacyModeButton { get; init; }
 
         /// <summary>
-        /// Local Programming Features Attribute [Read/Write]
+        /// Local Programming Features Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<LocalProgrammingFeaturesBitmap> LocalProgrammingFeatures { get; init; }
+        public required AllAttribute<LocalProgrammingFeaturesBitmap> LocalProgrammingFeatures { get; init; }
 
         /// <summary>
-        /// Wrong Code Entry Limit Attribute [Read/Write]
+        /// Wrong Code Entry Limit Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<byte> WrongCodeEntryLimit { get; init; }
+        public required AllAttribute<byte> WrongCodeEntryLimit { get; init; }
 
         /// <summary>
-        /// User Code Temporary Disable Time Attribute [Read/Write]
+        /// User Code Temporary Disable Time Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<byte> UserCodeTemporaryDisableTime { get; init; }
+        public required AllAttribute<byte> UserCodeTemporaryDisableTime { get; init; }
 
         /// <summary>
-        /// Send PIN Over The Air Attribute [Read/Write]
+        /// Send PIN Over The Air Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> SendPINOverTheAir { get; init; }
+        public required AllAttribute<bool> SendPINOverTheAir { get; init; }
 
         /// <summary>
-        /// Require PI Nfor Remote Operation Attribute [Read/Write]
+        /// Require PI Nfor Remote Operation Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<bool> RequirePINforRemoteOperation { get; init; }
+        public required AllAttribute<bool> RequirePINforRemoteOperation { get; init; }
 
         /// <summary>
-        /// Expiring User Timeout Attribute [Read/Write]
+        /// Expiring User Timeout Attribute [Read/Write/Event]
         /// </summary>
-        public required ReadWriteAttribute<ushort> ExpiringUserTimeout { get; init; }
+        public required AllAttribute<ushort> ExpiringUserTimeout { get; init; }
 
         /// <summary>
         /// Aliro Reader Verification Key Attribute [Read Only]

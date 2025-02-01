@@ -91,10 +91,10 @@ namespace MatterDotNet.Protocol.Cryptography
         {
             ECPoint p = new ECPoint();
             byte[] x = new byte[32];
-            X.TryWriteBytes(x, out _, true, true);
+            X.TryWriteBytes(x.AsSpan(32 - X.GetByteCount(true)), out _, true, true);
             p.X = x;
             byte[] y = new byte[32];
-            Y.TryWriteBytes(y, out _, true, true);
+            Y.TryWriteBytes(y.AsSpan(32 - Y.GetByteCount(true)), out _, true, true);
             p.Y = y;
             return p;
         }

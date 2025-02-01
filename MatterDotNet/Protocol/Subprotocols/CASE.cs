@@ -48,9 +48,10 @@ namespace MatterDotNet.Protocol.Subprotocols
         /// </summary>
         /// <param name="fabric"></param>
         /// <param name="noc"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession?> EstablishSecureSession(Fabric fabric, OperationalCertificate noc)
+        public async Task<SecureSession?> EstablishSecureSession(Fabric fabric, OperationalCertificate noc, CancellationToken token = default)
         {
             Frame? resp = null;
             using (Exchange exchange = unsecureSession.CreateExchange())
@@ -68,17 +69,17 @@ namespace MatterDotNet.Protocol.Subprotocols
 
                 Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
                 sigma1.Flags |= MessageFlags.SourceNodeID;
-                await exchange.SendFrame(sigma1);
-                resp = await exchange.Read();
+                await exchange.SendFrame(sigma1, true, token);
+                resp = await exchange.Read(token);
                 if (resp.Message.Payload is StatusPayload error)
                 {
                     throw new IOException("Failed to establish CASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
                 }
-                return await ProcessSigma2(Msg1, (Sigma2)resp.Message.Payload!, fabric, noc, ephKeys, exchange);
+                return await ProcessSigma2(Msg1, (Sigma2)resp.Message.Payload!, fabric, noc, ephKeys, exchange, token);
             }
         }
 
-        private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, OperationalCertificate noc, (byte[] Public, byte[] Private) ephKeys, Exchange exchange)
+        private async Task<SecureSession?> ProcessSigma2(Sigma1 Msg1, Sigma2 Msg2, Fabric fabric, OperationalCertificate noc, (byte[] Public, byte[] Private) ephKeys, Exchange exchange, CancellationToken token)
         {
             PayloadWriter Msg2Bytes = new PayloadWriter(1024);
             Msg2.Serialize(Msg2Bytes);
@@ -93,7 +94,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 Console.WriteLine("Sigma2 decryption failed");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
-                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport), true, token);
                 return null;
             }
             Memory<byte> decrypted = Msg2.Encrypted2.AsMemory(0, Msg2.Encrypted2.Length - Crypto.AEAD_MIC_LENGTH_BYTES);
@@ -103,14 +104,14 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 Console.WriteLine("Sigma2 wrong cert");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
-                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport), true, token);
                 return null;
             }
             if (!responderNOC.EcPubKey.SequenceEqual(noc.PublicKey))
             {
                 Console.WriteLine("Sigma2 invalid certificate");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
-                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport), true, token);
                 return null;
             }
             Sigma2Tbsdata signature = new Sigma2Tbsdata()
@@ -125,7 +126,7 @@ namespace MatterDotNet.Protocol.Subprotocols
             {
                 Console.WriteLine("Sigma2 invalid signature");
                 StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
-                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport), true, token);
                 return null;
             }
 
@@ -161,8 +162,8 @@ namespace MatterDotNet.Protocol.Subprotocols
 
             Frame sigma3 = new Frame(Msg3, (byte)SecureOpCodes.CASESigma3);
             sigma3.Flags |= MessageFlags.SourceNodeID;
-            await exchange.SendFrame(sigma3);
-            Frame? resp = await exchange.Read();
+            await exchange.SendFrame(sigma3, true, token);
+            Frame? resp = await exchange.Read(token);
 
             StatusPayload s3resp = (StatusPayload)resp.Message.Payload!;
             if (s3resp.GeneralCode != GeneralCode.SUCCESS)
@@ -193,7 +194,7 @@ namespace MatterDotNet.Protocol.Subprotocols
         /// <param name="sharedSecret"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession?> ResumeSecureSession(Fabric fabric, OperationalCertificate noc, byte[] resumptionId, byte[] sharedSecret)
+        public async Task<SecureSession?> ResumeSecureSession(Fabric fabric, OperationalCertificate noc, byte[] resumptionId, byte[] sharedSecret, CancellationToken token = default)
         {
             Frame? resp = null;
             using (Exchange exchange = unsecureSession.CreateExchange())
@@ -214,15 +215,15 @@ namespace MatterDotNet.Protocol.Subprotocols
 
                 Frame sigma1 = new Frame(Msg1, (byte)SecureOpCodes.CASESigma1);
                 sigma1.Flags |= MessageFlags.SourceNodeID;
-                await exchange.SendFrame(sigma1);
-                resp = await exchange.Read();
+                await exchange.SendFrame(sigma1, true, token);
+                resp = await exchange.Read(token);
 
                 if (resp.Message.Payload is StatusPayload error)
                     throw new IOException("Failed to establish CASE session. Remote Node returned " + error.GeneralCode + ": " + (SecureStatusCodes)error.ProtocolCode);
                 if (resp.Message.Payload is Sigma2 sigma2)
                 {
                     Console.WriteLine("Failed to establish CASE session. Peer falling back to full establishment");
-                    return await ProcessSigma2(Msg1, sigma2, fabric, noc, ephKeys, exchange);
+                    return await ProcessSigma2(Msg1, sigma2, fabric, noc, ephKeys, exchange, token);
                 }
                 Sigma2Resume Resume2Msg = (Sigma2Resume)resp.Message.Payload!;
                 byte[] S2RK = Crypto.KDF(sharedSecret, SpanUtil.Combine(initiatorRandom, Resume2Msg.ResumptionId), S2RK_Info, Crypto.SYMMETRIC_KEY_LENGTH_BITS);
@@ -230,14 +231,14 @@ namespace MatterDotNet.Protocol.Subprotocols
                 {
                     Console.WriteLine("Sigma2 resume invalid signature");
                     StatusPayload status = new StatusPayload(GeneralCode.FAILURE, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.INVALID_PARAMETER);
-                    await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport));
+                    await exchange.SendFrame(new Frame(status, (byte)SecureOpCodes.StatusReport), true, token);
                     return null;
                 }
 
                 // Resumption Complete
                 Frame sigmaFinished = new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)SecureStatusCodes.SESSION_ESTABLISHMENT_SUCCESS), (byte)SecureOpCodes.StatusReport);
                 sigmaFinished.Flags |= MessageFlags.SourceNodeID;
-                await exchange.SendFrame(sigmaFinished);
+                await exchange.SendFrame(sigmaFinished, true, token);
                 Console.WriteLine("Resumed CASE session");
 
                 //NOTE: Matter documentation is wrong here. Actual implementation appears to match below but documentation indicates new resumptionId should be used

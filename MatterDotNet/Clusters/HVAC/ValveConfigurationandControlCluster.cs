@@ -170,20 +170,20 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Open
         /// </summary>
-        public async Task<bool> Open(SecureSession session, TimeSpan? openDuration, byte? targetLevel) {
+        public async Task<bool> Open(SecureSession session, TimeSpan? openDuration, byte? targetLevel, CancellationToken token = default) {
             OpenPayload requestFields = new OpenPayload() {
                 OpenDuration = openDuration,
                 TargetLevel = targetLevel,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Close
         /// </summary>
-        public async Task<bool> Close(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> Close(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -240,12 +240,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Arm Fail Safe
         /// </summary>
-        public async Task<ArmFailSafeResponse?> ArmFailSafe(SecureSession session, ushort expiryLengthSeconds, ulong breadcrumb) {
+        public async Task<ArmFailSafeResponse?> ArmFailSafe(SecureSession session, ushort expiryLengthSeconds, ulong breadcrumb, CancellationToken token = default) {
             ArmFailSafePayload requestFields = new ArmFailSafePayload() {
                 ExpiryLengthSeconds = expiryLengthSeconds,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ArmFailSafeResponse() {
@@ -257,13 +257,13 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set Regulatory Config
         /// </summary>
-        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig(SecureSession session, RegulatoryLocationType newRegulatoryConfig, string countryCode, ulong breadcrumb) {
+        public async Task<SetRegulatoryConfigResponse?> SetRegulatoryConfig(SecureSession session, RegulatoryLocationType newRegulatoryConfig, string countryCode, ulong breadcrumb, CancellationToken token = default) {
             SetRegulatoryConfigPayload requestFields = new SetRegulatoryConfigPayload() {
                 NewRegulatoryConfig = newRegulatoryConfig,
                 CountryCode = countryCode,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SetRegulatoryConfigResponse() {
@@ -275,8 +275,8 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Commissioning Complete
         /// </summary>
-        public async Task<CommissioningCompleteResponse?> CommissioningComplete(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<CommissioningCompleteResponse?> CommissioningComplete(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new CommissioningCompleteResponse() {
@@ -288,12 +288,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set TC Acknowledgements
         /// </summary>
-        public async Task<SetTCAcknowledgementsResponse?> SetTCAcknowledgements(SecureSession session, ushort tCVersion, ushort tCUserResponse) {
+        public async Task<SetTCAcknowledgementsResponse?> SetTCAcknowledgements(SecureSession session, ushort tCVersion, ushort tCUserResponse, CancellationToken token = default) {
             SetTCAcknowledgementsPayload requestFields = new SetTCAcknowledgementsPayload() {
                 TCVersion = tCVersion,
                 TCUserResponse = tCUserResponse,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SetTCAcknowledgementsResponse() {

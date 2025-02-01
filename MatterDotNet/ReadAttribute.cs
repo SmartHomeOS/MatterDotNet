@@ -62,11 +62,12 @@ namespace MatterDotNet
         /// Read the attribute from the Node
         /// </summary>
         /// <param name="session"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ConstraintException"></exception>
-        public async Task<T> Get(SecureSession session)
+        public async Task<T> Get(SecureSession session, CancellationToken token = default)
         {
-            object? data = await InteractionManager.GetAttribute(session, EndPoint, ClusterId, AttributeId);
+            object? data = await InteractionManager.GetAttribute(session, EndPoint, ClusterId, AttributeId, token);
             if (data == null)
             {
                 if (!nullable)

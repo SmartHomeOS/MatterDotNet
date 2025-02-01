@@ -23,20 +23,21 @@ namespace MatterDotNet
     public class ReadWriteAttribute<T> : ReadAttribute<T>
     {
         internal ReadWriteAttribute(uint clusterId, ushort endPoint, ushort attributeId, bool nullable = false) : base(clusterId, endPoint, attributeId, nullable){ }
-        
+
         /// <summary>
         /// Set the attribute to the provided value
         /// </summary>
         /// <param name="session"></param>
         /// <param name="value"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ConstraintException"></exception>
-        public async Task Set(SecureSession session, T value)
+        public async Task Set(SecureSession session, T value, CancellationToken token = default)
         {
             if (!nullable && value == null)
                 throw new ConstraintException("Attribute " + AttributeId + " was null");
             Value = value;
-            await InteractionManager.SetAttribute(session, EndPoint, ClusterId, AttributeId, Value);
+            await InteractionManager.SetAttribute(session, EndPoint, ClusterId, AttributeId, Value, token);
         }
     }
 }

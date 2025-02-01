@@ -130,33 +130,33 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Add Network
         /// </summary>
-        public async Task<bool> AddNetwork(SecureSession session, ushort commandTimeoutMS, byte[] operationalDataset) {
+        public async Task<bool> AddNetwork(SecureSession session, ushort commandTimeoutMS, byte[] operationalDataset, CancellationToken token = default) {
             AddNetworkPayload requestFields = new AddNetworkPayload() {
                 OperationalDataset = operationalDataset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Remove Network
         /// </summary>
-        public async Task<bool> RemoveNetwork(SecureSession session, ushort commandTimeoutMS, byte[] extendedPanID) {
+        public async Task<bool> RemoveNetwork(SecureSession session, ushort commandTimeoutMS, byte[] extendedPanID, CancellationToken token = default) {
             RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
                 ExtendedPanID = extendedPanID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Operational Dataset
         /// </summary>
-        public async Task<OperationalDatasetResponse?> GetOperationalDataset(SecureSession session, byte[] extendedPanID) {
+        public async Task<OperationalDatasetResponse?> GetOperationalDataset(SecureSession session, byte[] extendedPanID, CancellationToken token = default) {
             GetOperationalDatasetPayload requestFields = new GetOperationalDatasetPayload() {
                 ExtendedPanID = extendedPanID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalDatasetResponse() {

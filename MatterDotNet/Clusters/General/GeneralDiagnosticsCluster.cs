@@ -389,20 +389,20 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Test Event Trigger
         /// </summary>
-        public async Task<bool> TestEventTrigger(SecureSession session, byte[] enableKey, ulong eventTrigger) {
+        public async Task<bool> TestEventTrigger(SecureSession session, byte[] enableKey, ulong eventTrigger, CancellationToken token = default) {
             TestEventTriggerPayload requestFields = new TestEventTriggerPayload() {
                 EnableKey = enableKey,
                 EventTrigger = eventTrigger,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Time Snapshot
         /// </summary>
-        public async Task<TimeSnapshotResponse?> TimeSnapshot(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<TimeSnapshotResponse?> TimeSnapshot(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new TimeSnapshotResponse() {
@@ -414,13 +414,13 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Payload Test Request
         /// </summary>
-        public async Task<PayloadTestResponse?> PayloadTestRequest(SecureSession session, byte[] enableKey, byte value, ushort count) {
+        public async Task<PayloadTestResponse?> PayloadTestRequest(SecureSession session, byte[] enableKey, byte value, ushort count, CancellationToken token = default) {
             PayloadTestRequestPayload requestFields = new PayloadTestRequestPayload() {
                 EnableKey = enableKey,
                 Value = value,
                 Count = count,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PayloadTestResponse() {

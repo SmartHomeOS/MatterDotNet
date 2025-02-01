@@ -58,8 +58,8 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Network Passphrase Request
         /// </summary>
-        public async Task<NetworkPassphraseResponse?> NetworkPassphraseRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<NetworkPassphraseResponse?> NetworkPassphraseRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkPassphraseResponse() {

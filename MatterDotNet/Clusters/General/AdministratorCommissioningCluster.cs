@@ -120,7 +120,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Open Commissioning Window
         /// </summary>
-        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout, byte[] pAKEPasscodeVerifier, ushort discriminator, uint iterations, byte[] salt) {
+        public async Task<bool> OpenCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout, byte[] pAKEPasscodeVerifier, ushort discriminator, uint iterations, byte[] salt, CancellationToken token = default) {
             OpenCommissioningWindowPayload requestFields = new OpenCommissioningWindowPayload() {
                 CommissioningTimeout = commissioningTimeout,
                 PAKEPasscodeVerifier = pAKEPasscodeVerifier,
@@ -128,26 +128,26 @@ namespace MatterDotNet.Clusters.General
                 Iterations = iterations,
                 Salt = salt,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Open Basic Commissioning Window
         /// </summary>
-        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout) {
+        public async Task<bool> OpenBasicCommissioningWindow(SecureSession session, ushort commandTimeoutMS, ushort commissioningTimeout, CancellationToken token = default) {
             OpenBasicCommissioningWindowPayload requestFields = new OpenBasicCommissioningWindowPayload() {
                 CommissioningTimeout = commissioningTimeout,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Revoke Commissioning
         /// </summary>
-        public async Task<bool> RevokeCommissioning(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS);
+        public async Task<bool> RevokeCommissioning(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

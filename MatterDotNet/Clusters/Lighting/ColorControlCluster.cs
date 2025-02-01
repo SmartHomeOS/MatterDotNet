@@ -608,7 +608,7 @@ namespace MatterDotNet.Clusters.Lighting
         /// <summary>
         /// Move To Hue
         /// </summary>
-        public async Task<bool> MoveToHue(SecureSession session, byte hue, Direction direction, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToHue(SecureSession session, byte hue, Direction direction, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToHuePayload requestFields = new MoveToHuePayload() {
                 Hue = hue,
                 Direction = direction,
@@ -616,28 +616,28 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move Hue
         /// </summary>
-        public async Task<bool> MoveHue(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveHue(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveHuePayload requestFields = new MoveHuePayload() {
                 MoveMode = moveMode,
                 Rate = rate,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Step Hue
         /// </summary>
-        public async Task<bool> StepHue(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> StepHue(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StepHuePayload requestFields = new StepHuePayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -645,42 +645,42 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Saturation
         /// </summary>
-        public async Task<bool> MoveToSaturation(SecureSession session, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToSaturation(SecureSession session, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToSaturationPayload requestFields = new MoveToSaturationPayload() {
                 Saturation = saturation,
                 TransitionTime = transitionTime,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move Saturation
         /// </summary>
-        public async Task<bool> MoveSaturation(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveSaturation(SecureSession session, MoveMode moveMode, byte rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveSaturationPayload requestFields = new MoveSaturationPayload() {
                 MoveMode = moveMode,
                 Rate = rate,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Step Saturation
         /// </summary>
-        public async Task<bool> StepSaturation(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> StepSaturation(SecureSession session, StepMode stepMode, byte stepSize, byte transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StepSaturationPayload requestFields = new StepSaturationPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -688,14 +688,14 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Hue And Saturation
         /// </summary>
-        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte hue, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToHueAndSaturation(SecureSession session, byte hue, byte saturation, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToHueAndSaturationPayload requestFields = new MoveToHueAndSaturationPayload() {
                 Hue = hue,
                 Saturation = saturation,
@@ -703,14 +703,14 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Color
         /// </summary>
-        public async Task<bool> MoveToColor(SecureSession session, ushort colorX, ushort colorY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToColor(SecureSession session, ushort colorX, ushort colorY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToColorPayload requestFields = new MoveToColorPayload() {
                 ColorX = colorX,
                 ColorY = colorY,
@@ -718,28 +718,28 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move Color
         /// </summary>
-        public async Task<bool> MoveColor(SecureSession session, short rateX, short rateY, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveColor(SecureSession session, short rateX, short rateY, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveColorPayload requestFields = new MoveColorPayload() {
                 RateX = rateX,
                 RateY = rateY,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Step Color
         /// </summary>
-        public async Task<bool> StepColor(SecureSession session, short stepX, short stepY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> StepColor(SecureSession session, short stepX, short stepY, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StepColorPayload requestFields = new StepColorPayload() {
                 StepX = stepX,
                 StepY = stepY,
@@ -747,21 +747,21 @@ namespace MatterDotNet.Clusters.Lighting
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Color Temperature
         /// </summary>
-        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort colorTemperatureMireds, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToColorTemperature(SecureSession session, ushort colorTemperatureMireds, ushort transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToColorTemperaturePayload requestFields = new MoveToColorTemperaturePayload() {
                 ColorTemperatureMireds = colorTemperatureMireds,
                 TransitionTime = transitionTime,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

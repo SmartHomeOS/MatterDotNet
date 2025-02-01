@@ -350,11 +350,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Select Areas
         /// </summary>
-        public async Task<SelectAreasResponse?> SelectAreas(SecureSession session, uint[] newAreas) {
+        public async Task<SelectAreasResponse?> SelectAreas(SecureSession session, uint[] newAreas, CancellationToken token = default) {
             SelectAreasPayload requestFields = new SelectAreasPayload() {
                 NewAreas = newAreas,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SelectAreasResponse() {
@@ -366,11 +366,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Skip Area
         /// </summary>
-        public async Task<SkipAreaResponse?> SkipArea(SecureSession session, uint skippedArea) {
+        public async Task<SkipAreaResponse?> SkipArea(SecureSession session, uint skippedArea, CancellationToken token = default) {
             SkipAreaPayload requestFields = new SkipAreaPayload() {
                 SkippedArea = skippedArea,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SkipAreaResponse() {

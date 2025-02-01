@@ -418,8 +418,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Play
         /// </summary>
-        public async Task<PlaybackResponse?> Play(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<PlaybackResponse?> Play(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -431,8 +431,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Pause
         /// </summary>
-        public async Task<PlaybackResponse?> Pause(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<PlaybackResponse?> Pause(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -444,8 +444,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Stop
         /// </summary>
-        public async Task<PlaybackResponse?> Stop(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
+        public async Task<PlaybackResponse?> Stop(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -457,8 +457,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Start Over
         /// </summary>
-        public async Task<PlaybackResponse?> StartOver(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+        public async Task<PlaybackResponse?> StartOver(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -470,8 +470,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Previous
         /// </summary>
-        public async Task<PlaybackResponse?> Previous(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<PlaybackResponse?> Previous(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -483,8 +483,8 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Next
         /// </summary>
-        public async Task<PlaybackResponse?> Next(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05);
+        public async Task<PlaybackResponse?> Next(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -496,11 +496,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Rewind
         /// </summary>
-        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool? audioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> Rewind(SecureSession session, bool? audioAdvanceUnmuted, CancellationToken token = default) {
             RewindPayload requestFields = new RewindPayload() {
                 AudioAdvanceUnmuted = audioAdvanceUnmuted,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -512,11 +512,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Fast Forward
         /// </summary>
-        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool? audioAdvanceUnmuted) {
+        public async Task<PlaybackResponse?> FastForward(SecureSession session, bool? audioAdvanceUnmuted, CancellationToken token = default) {
             FastForwardPayload requestFields = new FastForwardPayload() {
                 AudioAdvanceUnmuted = audioAdvanceUnmuted,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -528,11 +528,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Skip Forward
         /// </summary>
-        public async Task<PlaybackResponse?> SkipForward(SecureSession session, ulong deltaPositionMilliseconds) {
+        public async Task<PlaybackResponse?> SkipForward(SecureSession session, ulong deltaPositionMilliseconds, CancellationToken token = default) {
             SkipForwardPayload requestFields = new SkipForwardPayload() {
                 DeltaPositionMilliseconds = deltaPositionMilliseconds,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -544,11 +544,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Skip Backward
         /// </summary>
-        public async Task<PlaybackResponse?> SkipBackward(SecureSession session, ulong deltaPositionMilliseconds) {
+        public async Task<PlaybackResponse?> SkipBackward(SecureSession session, ulong deltaPositionMilliseconds, CancellationToken token = default) {
             SkipBackwardPayload requestFields = new SkipBackwardPayload() {
                 DeltaPositionMilliseconds = deltaPositionMilliseconds,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -560,11 +560,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Seek
         /// </summary>
-        public async Task<PlaybackResponse?> Seek(SecureSession session, ulong position) {
+        public async Task<PlaybackResponse?> Seek(SecureSession session, ulong position, CancellationToken token = default) {
             SeekPayload requestFields = new SeekPayload() {
                 Position = position,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new PlaybackResponse() {
@@ -576,31 +576,31 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Activate Audio Track
         /// </summary>
-        public async Task<bool> ActivateAudioTrack(SecureSession session, string trackID, byte audioOutputIndex) {
+        public async Task<bool> ActivateAudioTrack(SecureSession session, string trackID, byte audioOutputIndex, CancellationToken token = default) {
             ActivateAudioTrackPayload requestFields = new ActivateAudioTrackPayload() {
                 TrackID = trackID,
                 AudioOutputIndex = audioOutputIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0C, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0C, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Activate Text Track
         /// </summary>
-        public async Task<bool> ActivateTextTrack(SecureSession session, string trackID) {
+        public async Task<bool> ActivateTextTrack(SecureSession session, string trackID, CancellationToken token = default) {
             ActivateTextTrackPayload requestFields = new ActivateTextTrackPayload() {
                 TrackID = trackID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0D, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0D, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Deactivate Text Track
         /// </summary>
-        public async Task<bool> DeactivateTextTrack(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0E);
+        public async Task<bool> DeactivateTextTrack(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0E, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

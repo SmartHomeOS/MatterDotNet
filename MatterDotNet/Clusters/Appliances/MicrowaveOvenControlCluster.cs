@@ -135,7 +135,7 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Set Cooking Parameters
         /// </summary>
-        public async Task<bool> SetCookingParameters(SecureSession session, byte? cookMode, TimeSpan? cookTime, byte? powerSetting, byte? wattSettingIndex, bool? startAfterSetting) {
+        public async Task<bool> SetCookingParameters(SecureSession session, byte? cookMode, TimeSpan? cookTime, byte? powerSetting, byte? wattSettingIndex, bool? startAfterSetting, CancellationToken token = default) {
             SetCookingParametersPayload requestFields = new SetCookingParametersPayload() {
                 CookMode = cookMode,
                 CookTime = cookTime,
@@ -143,18 +143,18 @@ namespace MatterDotNet.Clusters.Appliances
                 WattSettingIndex = wattSettingIndex,
                 StartAfterSetting = startAfterSetting,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add More Time
         /// </summary>
-        public async Task<bool> AddMoreTime(SecureSession session, TimeSpan timeToAdd) {
+        public async Task<bool> AddMoreTime(SecureSession session, TimeSpan timeToAdd, CancellationToken token = default) {
             AddMoreTimePayload requestFields = new AddMoreTimePayload() {
                 TimeToAdd = timeToAdd,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

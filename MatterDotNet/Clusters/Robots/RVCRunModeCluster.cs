@@ -160,11 +160,11 @@ namespace MatterDotNet.Clusters.Robots
         /// <summary>
         /// Change To Mode
         /// </summary>
-        public async Task<ChangeToModeResponse?> ChangeToMode(SecureSession session, byte newMode) {
+        public async Task<ChangeToModeResponse?> ChangeToMode(SecureSession session, byte newMode, CancellationToken token = default) {
             ChangeToModePayload requestFields = new ChangeToModePayload() {
                 NewMode = newMode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ChangeToModeResponse() {

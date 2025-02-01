@@ -273,12 +273,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Keep Active
         /// </summary>
-        public async Task<bool> KeepActive(SecureSession session, uint stayActiveDuration, uint timeoutMs) {
+        public async Task<bool> KeepActive(SecureSession session, uint stayActiveDuration, uint timeoutMs, CancellationToken token = default) {
             KeepActivePayload requestFields = new KeepActivePayload() {
                 StayActiveDuration = stayActiveDuration,
                 TimeoutMs = timeoutMs,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

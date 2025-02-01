@@ -200,12 +200,12 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Launch App
         /// </summary>
-        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application? application, byte[]? data) {
+        public async Task<LauncherResponse?> LaunchApp(SecureSession session, Application? application, byte[]? data, CancellationToken token = default) {
             LaunchAppPayload requestFields = new LaunchAppPayload() {
                 Application = application,
                 Data = data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
@@ -217,11 +217,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Stop App
         /// </summary>
-        public async Task<LauncherResponse?> StopApp(SecureSession session, Application? application) {
+        public async Task<LauncherResponse?> StopApp(SecureSession session, Application? application, CancellationToken token = default) {
             StopAppPayload requestFields = new StopAppPayload() {
                 Application = application,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
@@ -233,11 +233,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Hide App
         /// </summary>
-        public async Task<LauncherResponse?> HideApp(SecureSession session, Application? application) {
+        public async Task<LauncherResponse?> HideApp(SecureSession session, Application? application, CancellationToken token = default) {
             HideAppPayload requestFields = new HideAppPayload() {
                 Application = application,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {

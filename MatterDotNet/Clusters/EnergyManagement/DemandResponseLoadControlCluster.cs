@@ -547,10 +547,10 @@ namespace MatterDotNet.Clusters.EnergyManagement
         }
 
         private record AddLoadControlEventRequestPayload : TLVPayload {
-            public required LoadControlEvent Event { get; set; }
+            public required LoadControlEvent @Event { get; set; }
             internal override void Serialize(TLVWriter writer, long structNumber = -1) {
                 writer.StartStructure(structNumber);
-                Event.Serialize(writer, 0);
+                @Event.Serialize(writer, 0);
                 writer.EndContainer();
             }
         }
@@ -571,53 +571,53 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Register Load Control Program Request
         /// </summary>
-        public async Task<bool> RegisterLoadControlProgramRequest(SecureSession session, LoadControlProgram loadControlProgram) {
+        public async Task<bool> RegisterLoadControlProgramRequest(SecureSession session, LoadControlProgram loadControlProgram, CancellationToken token = default) {
             RegisterLoadControlProgramRequestPayload requestFields = new RegisterLoadControlProgramRequestPayload() {
                 LoadControlProgram = loadControlProgram,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unregister Load Control Program Request
         /// </summary>
-        public async Task<bool> UnregisterLoadControlProgramRequest(SecureSession session, byte[] loadControlProgramID) {
+        public async Task<bool> UnregisterLoadControlProgramRequest(SecureSession session, byte[] loadControlProgramID, CancellationToken token = default) {
             UnregisterLoadControlProgramRequestPayload requestFields = new UnregisterLoadControlProgramRequestPayload() {
                 LoadControlProgramID = loadControlProgramID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add Load Control Event Request
         /// </summary>
-        public async Task<bool> AddLoadControlEventRequest(SecureSession session, LoadControlEvent @event) {
+        public async Task<bool> AddLoadControlEventRequest(SecureSession session, LoadControlEvent @event, CancellationToken token = default) {
             AddLoadControlEventRequestPayload requestFields = new AddLoadControlEventRequestPayload() {
-                Event = @event,
+                @Event = @event,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Remove Load Control Event Request
         /// </summary>
-        public async Task<bool> RemoveLoadControlEventRequest(SecureSession session, byte[] eventID, CancelControl cancelControl) {
+        public async Task<bool> RemoveLoadControlEventRequest(SecureSession session, byte[] eventID, CancelControl cancelControl, CancellationToken token = default) {
             RemoveLoadControlEventRequestPayload requestFields = new RemoveLoadControlEventRequestPayload() {
                 EventID = eventID,
                 CancelControl = cancelControl,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Clear Load Control Events Request
         /// </summary>
-        public async Task<bool> ClearLoadControlEventsRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<bool> ClearLoadControlEventsRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

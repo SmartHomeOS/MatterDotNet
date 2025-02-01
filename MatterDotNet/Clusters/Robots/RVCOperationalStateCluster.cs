@@ -172,8 +172,8 @@ namespace MatterDotNet.Clusters.Robots
         /// <summary>
         /// Pause
         /// </summary>
-        public async Task<OperationalCommandResponse?> Pause(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<OperationalCommandResponse?> Pause(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {
@@ -184,8 +184,8 @@ namespace MatterDotNet.Clusters.Robots
         /// <summary>
         /// Resume
         /// </summary>
-        public async Task<OperationalCommandResponse?> Resume(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+        public async Task<OperationalCommandResponse?> Resume(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {
@@ -196,8 +196,8 @@ namespace MatterDotNet.Clusters.Robots
         /// <summary>
         /// Go Home
         /// </summary>
-        public async Task<OperationalCommandResponse?> GoHome(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80);
+        public async Task<OperationalCommandResponse?> GoHome(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x80, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new OperationalCommandResponse() {

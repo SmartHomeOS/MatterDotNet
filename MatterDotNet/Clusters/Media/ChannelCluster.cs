@@ -704,11 +704,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Change Channel
         /// </summary>
-        public async Task<ChangeChannelResponse?> ChangeChannel(SecureSession session, string match) {
+        public async Task<ChangeChannelResponse?> ChangeChannel(SecureSession session, string match, CancellationToken token = default) {
             ChangeChannelPayload requestFields = new ChangeChannelPayload() {
                 Match = match,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ChangeChannelResponse() {
@@ -720,30 +720,30 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Change Channel By Number
         /// </summary>
-        public async Task<bool> ChangeChannelByNumber(SecureSession session, ushort majorNumber, ushort minorNumber) {
+        public async Task<bool> ChangeChannelByNumber(SecureSession session, ushort majorNumber, ushort minorNumber, CancellationToken token = default) {
             ChangeChannelByNumberPayload requestFields = new ChangeChannelByNumberPayload() {
                 MajorNumber = majorNumber,
                 MinorNumber = minorNumber,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Skip Channel
         /// </summary>
-        public async Task<bool> SkipChannel(SecureSession session, short count) {
+        public async Task<bool> SkipChannel(SecureSession session, short count, CancellationToken token = default) {
             SkipChannelPayload requestFields = new SkipChannelPayload() {
                 Count = count,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Program Guide
         /// </summary>
-        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime? startTime, DateTime? endTime, ChannelInfo[]? channelList, PageToken? pageToken, RecordingFlag? recordingFlag, AdditionalInfo[]? externalIDList, byte[]? data) {
+        public async Task<ProgramGuideResponse?> GetProgramGuide(SecureSession session, DateTime? startTime, DateTime? endTime, ChannelInfo[]? channelList, PageToken? pageToken, RecordingFlag? recordingFlag, AdditionalInfo[]? externalIDList, byte[]? data, CancellationToken token = default) {
             GetProgramGuidePayload requestFields = new GetProgramGuidePayload() {
                 StartTime = startTime,
                 EndTime = endTime,
@@ -753,7 +753,7 @@ namespace MatterDotNet.Clusters.Media
                 ExternalIDList = externalIDList,
                 Data = data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ProgramGuideResponse() {
@@ -765,28 +765,28 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Record Program
         /// </summary>
-        public async Task<bool> RecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data) {
+        public async Task<bool> RecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data, CancellationToken token = default) {
             RecordProgramPayload requestFields = new RecordProgramPayload() {
                 ProgramIdentifier = programIdentifier,
                 ShouldRecordSeries = shouldRecordSeries,
                 ExternalIDList = externalIDList,
                 Data = data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Cancel Record Program
         /// </summary>
-        public async Task<bool> CancelRecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data) {
+        public async Task<bool> CancelRecordProgram(SecureSession session, string programIdentifier, bool shouldRecordSeries, AdditionalInfo[] externalIDList, byte[] data, CancellationToken token = default) {
             CancelRecordProgramPayload requestFields = new CancelRecordProgramPayload() {
                 ProgramIdentifier = programIdentifier,
                 ShouldRecordSeries = shouldRecordSeries,
                 ExternalIDList = externalIDList,
                 Data = data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

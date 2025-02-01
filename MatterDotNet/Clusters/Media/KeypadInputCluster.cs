@@ -192,11 +192,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Send Key
         /// </summary>
-        public async Task<SendKeyResponse?> SendKey(SecureSession session, CECKeyCode keyCode) {
+        public async Task<SendKeyResponse?> SendKey(SecureSession session, CECKeyCode keyCode, CancellationToken token = default) {
             SendKeyPayload requestFields = new SendKeyPayload() {
                 KeyCode = keyCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SendKeyResponse() {

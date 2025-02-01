@@ -174,18 +174,18 @@ namespace MatterDotNet.Entities
             return (new UnknownCluster(0, index) as T)!;
         }
 
-        internal async Task EnumerateClusters(SecureSession session)
+        internal async Task EnumerateClusters(SecureSession session, CancellationToken token = default)
         {
-            uint[] clusterIds = await GetCluster<Descriptor>().ServerList.Get(session);
+            uint[] clusterIds = await GetCluster<Descriptor>().ServerList.Get(session, token);
             foreach (var clusterId in clusterIds) {
                 if (clusterId != Descriptor.CLUSTER_ID)
                     AddCluster(ClusterBase.Create(clusterId, index));
             }
-            Descriptor.DeviceType[] devices = await GetCluster<Descriptor>().DeviceTypeList.Get(session);
+            Descriptor.DeviceType[] devices = await GetCluster<Descriptor>().DeviceTypeList.Get(session, token);
             DeviceTypes = devices.Select(t => t.DeviceTypeField).ToArray();
 
             foreach (EndPoint ep in children.Values)
-                await ep.EnumerateClusters(session);
+                await ep.EnumerateClusters(session, token);
         }
 
         /// <inheritdoc />

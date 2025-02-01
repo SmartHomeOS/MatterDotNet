@@ -146,22 +146,22 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Suppress Alarm
         /// </summary>
-        public async Task<bool> SuppressAlarm(SecureSession session, AlarmMode alarmsToSuppress) {
+        public async Task<bool> SuppressAlarm(SecureSession session, AlarmMode alarmsToSuppress, CancellationToken token = default) {
             SuppressAlarmPayload requestFields = new SuppressAlarmPayload() {
                 AlarmsToSuppress = alarmsToSuppress,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Enable Disable Alarm
         /// </summary>
-        public async Task<bool> EnableDisableAlarm(SecureSession session, AlarmMode alarmsToEnableDisable) {
+        public async Task<bool> EnableDisableAlarm(SecureSession session, AlarmMode alarmsToEnableDisable, CancellationToken token = default) {
             EnableDisableAlarmPayload requestFields = new EnableDisableAlarmPayload() {
                 AlarmsToEnableDisable = alarmsToEnableDisable,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

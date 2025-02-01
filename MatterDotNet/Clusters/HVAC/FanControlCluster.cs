@@ -268,13 +268,13 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Step
         /// </summary>
-        public async Task<bool> Step(SecureSession session, StepDirection direction, bool? wrap, bool? lowestOff) {
+        public async Task<bool> Step(SecureSession session, StepDirection direction, bool? wrap, bool? lowestOff, CancellationToken token = default) {
             StepPayload requestFields = new StepPayload() {
                 Direction = direction,
                 Wrap = wrap,
                 LowestOff = lowestOff,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

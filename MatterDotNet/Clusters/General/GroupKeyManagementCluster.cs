@@ -266,22 +266,22 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Key Set Write
         /// </summary>
-        public async Task<bool> KeySetWrite(SecureSession session, GroupKeySet groupKeySet) {
+        public async Task<bool> KeySetWrite(SecureSession session, GroupKeySet groupKeySet, CancellationToken token = default) {
             KeySetWritePayload requestFields = new KeySetWritePayload() {
                 GroupKeySet = groupKeySet,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Key Set Read
         /// </summary>
-        public async Task<KeySetReadResponse?> KeySetRead(SecureSession session, ushort groupKeySetID) {
+        public async Task<KeySetReadResponse?> KeySetRead(SecureSession session, ushort groupKeySetID, CancellationToken token = default) {
             KeySetReadPayload requestFields = new KeySetReadPayload() {
                 GroupKeySetID = groupKeySetID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadResponse() {
@@ -292,19 +292,19 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Key Set Remove
         /// </summary>
-        public async Task<bool> KeySetRemove(SecureSession session, ushort groupKeySetID) {
+        public async Task<bool> KeySetRemove(SecureSession session, ushort groupKeySetID, CancellationToken token = default) {
             KeySetRemovePayload requestFields = new KeySetRemovePayload() {
                 GroupKeySetID = groupKeySetID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Key Set Read All Indices
         /// </summary>
-        public async Task<KeySetReadAllIndicesResponse?> KeySetReadAllIndices(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<KeySetReadAllIndicesResponse?> KeySetReadAllIndices(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new KeySetReadAllIndicesResponse() {

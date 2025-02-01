@@ -488,68 +488,68 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Up Or Open
         /// </summary>
-        public async Task<bool> UpOrOpen(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> UpOrOpen(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Down Or Close
         /// </summary>
-        public async Task<bool> DownOrClose(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> DownOrClose(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Stop Motion
         /// </summary>
-        public async Task<bool> StopMotion(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
+        public async Task<bool> StopMotion(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Go To Lift Value
         /// </summary>
-        public async Task<bool> GoToLiftValue(SecureSession session, ushort liftValue) {
+        public async Task<bool> GoToLiftValue(SecureSession session, ushort liftValue, CancellationToken token = default) {
             GoToLiftValuePayload requestFields = new GoToLiftValuePayload() {
                 LiftValue = liftValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Go To Lift Percentage
         /// </summary>
-        public async Task<bool> GoToLiftPercentage(SecureSession session, decimal liftPercentValue) {
+        public async Task<bool> GoToLiftPercentage(SecureSession session, decimal liftPercentValue, CancellationToken token = default) {
             GoToLiftPercentagePayload requestFields = new GoToLiftPercentagePayload() {
                 LiftPercentValue = liftPercentValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Go To Tilt Value
         /// </summary>
-        public async Task<bool> GoToTiltValue(SecureSession session, ushort tiltValue) {
+        public async Task<bool> GoToTiltValue(SecureSession session, ushort tiltValue, CancellationToken token = default) {
             GoToTiltValuePayload requestFields = new GoToTiltValuePayload() {
                 TiltValue = tiltValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Go To Tilt Percentage
         /// </summary>
-        public async Task<bool> GoToTiltPercentage(SecureSession session, decimal tiltPercentValue) {
+        public async Task<bool> GoToTiltPercentage(SecureSession session, decimal tiltPercentValue, CancellationToken token = default) {
             GoToTiltPercentagePayload requestFields = new GoToTiltPercentagePayload() {
                 TiltPercentValue = tiltPercentValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

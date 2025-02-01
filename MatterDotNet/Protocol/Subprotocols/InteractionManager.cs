@@ -21,7 +21,7 @@ namespace MatterDotNet.Protocol.Subprotocols
 {
     internal class InteractionManager
     {
-        public static async Task<List<AttributeReportIB>> GetAttributes(SecureSession session, ushort endpoint, uint cluster, params uint[] attributes)
+        public static async Task<List<AttributeReportIB>> GetAttributes(SecureSession session, ushort endpoint, uint cluster, CancellationToken token, params uint[] attributes)
         {
             using (Exchange secExchange = session.CreateExchange())
             {
@@ -30,7 +30,7 @@ namespace MatterDotNet.Protocol.Subprotocols
                     paths[i] = new AttributePathIB() { Endpoint = endpoint, Cluster = cluster, Attribute = attributes[i] };
                 ReadRequestMessage read = new ReadRequestMessage()
                 {
-                    InteractionModelRevision = Constants.MATTER_13_REVISION,
+                    InteractionModelRevision = Constants.MATTER_14_REVISION,
                     FabricFiltered = false,
                     AttributeRequests = paths,
                     EventRequests = [],
@@ -40,46 +40,9 @@ namespace MatterDotNet.Protocol.Subprotocols
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
                 readFrame.SourceNodeID = session.InitiatorNodeID;
                 readFrame.DestinationID = session.ResponderNodeID;
-                await secExchange.SendFrame(readFrame);
+                await secExchange.SendFrame(readFrame, true, token);
                 List<AttributeReportIB> results = new List<AttributeReportIB>();
-                bool more = false;
-                do
-                {
-                    Frame response = await secExchange.Read();
-                    if (response.Message.Payload is ReportDataMessage msg)
-                    {
-                        more = msg.MoreChunkedMessages == true;
-                        if (msg.AttributeReports != null)
-                            results.AddRange(msg.AttributeReports);
-                        if (more)
-                        {
-                            var status = new StatusResponseMessage() { InteractionModelRevision = Constants.MATTER_13_REVISION, Status = (byte)IMStatusCode.SUCCESS };
-                            Frame statusFrame = new Frame(status, (byte)IMOpCodes.StatusResponse);
-                            readFrame.Message.Protocol = ProtocolType.InteractionModel;
-                            await secExchange.SendFrame(statusFrame);
-                        }
-                    }
-                } while (more);
-                return results;
-            }
-        }
-
-        public static async Task<object?> GetAttribute(SecureSession session, ushort endpoint, uint cluster, uint attribute)
-        {
-            using (Exchange secExchange = session.CreateExchange())
-            {
-                ReadRequestMessage read = new ReadRequestMessage()
-                {
-                    InteractionModelRevision = Constants.MATTER_13_REVISION,
-                    FabricFiltered = true,
-                    AttributeRequests = [new AttributePathIB() { Endpoint = endpoint, Cluster = cluster, Attribute = attribute }]
-                };
-                Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
-                readFrame.Message.Protocol = ProtocolType.InteractionModel;
-                readFrame.SourceNodeID = session.InitiatorNodeID;
-                readFrame.DestinationID = session.ResponderNodeID;
-                await secExchange.SendFrame(readFrame);
-                while (true)
+                while (!token.IsCancellationRequested)
                 {
                     Frame response = await secExchange.Read();
                     if (response.Message.Payload is ReportDataMessage msg)
@@ -87,13 +50,48 @@ namespace MatterDotNet.Protocol.Subprotocols
                         if (msg.AttributeReports != null && !ValidateResponse(msg.AttributeReports[0], endpoint))
                             throw new IOException("Failed to query attribute: " + (IMStatusCode?)msg.AttributeReports[0].AttributeStatus?.Status.Status);
                         if (msg.MoreChunkedMessages.HasValue && msg.MoreChunkedMessages.Value == true)
-                            return await HandleChunked(msg, secExchange, endpoint);
+                            return await HandleChunked(msg, secExchange, endpoint, token);
+                        if (msg.AttributeReports != null)
+                            return msg.AttributeReports.ToList();
+                    }
+                    else if (response.Message.Payload is StatusResponseMessage status)
+                        throw new IOException("Error: " + (IMStatusCode)status.Status);
+                }
+                throw new OperationCanceledException();
+            }
+        }
+
+        public static async Task<object?> GetAttribute(SecureSession session, ushort endpoint, uint cluster, uint attribute, CancellationToken token)
+        {
+            using (Exchange secExchange = session.CreateExchange())
+            {
+                ReadRequestMessage read = new ReadRequestMessage()
+                {
+                    InteractionModelRevision = Constants.MATTER_14_REVISION,
+                    FabricFiltered = true,
+                    AttributeRequests = [new AttributePathIB() { Endpoint = endpoint, Cluster = cluster, Attribute = attribute }]
+                };
+                Frame readFrame = new Frame(read, (byte)IMOpCodes.ReadRequest);
+                readFrame.Message.Protocol = ProtocolType.InteractionModel;
+                readFrame.SourceNodeID = session.InitiatorNodeID;
+                readFrame.DestinationID = session.ResponderNodeID;
+                await secExchange.SendFrame(readFrame, true, token);
+                while (!token.IsCancellationRequested)
+                {
+                    Frame response = await secExchange.Read(token);
+                    if (response.Message.Payload is ReportDataMessage msg)
+                    {
+                        if (msg.AttributeReports != null && !ValidateResponse(msg.AttributeReports[0], endpoint))
+                            throw new IOException("Failed to query attribute: " + (IMStatusCode?)msg.AttributeReports[0].AttributeStatus?.Status.Status);
+                        if (msg.MoreChunkedMessages.HasValue && msg.MoreChunkedMessages.Value == true)
+                            return GetData(await HandleChunked(msg, secExchange, endpoint, token));
                         if (msg.AttributeReports != null)
                             return GetData(msg.AttributeReports);
                     }
                     else if (response.Message.Payload is StatusResponseMessage status)
                         throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
+                throw new OperationCanceledException();
             }
         }
 
@@ -111,13 +109,13 @@ namespace MatterDotNet.Protocol.Subprotocols
             return result;
         }
 
-        private static async Task<object?> HandleChunked(ReportDataMessage first, Exchange secExchange, ushort endpoint)
+        private static async Task<List<AttributeReportIB>> HandleChunked(ReportDataMessage first, Exchange secExchange, ushort endpoint, CancellationToken token)
         {
             List<AttributeReportIB> attributes = new List<AttributeReportIB>();
             attributes.AddRange(first.AttributeReports!);
             for (int i = 0; i < 1024; i++) //Infinite loop protection
             {
-                Frame response = await secExchange.Read();
+                Frame response = await secExchange.Read(token);
                 if (response.Message.Payload is ReportDataMessage msg)
                 {
                     if (msg.AttributeReports != null && !ValidateResponse(msg.AttributeReports[0], endpoint))
@@ -127,60 +125,60 @@ namespace MatterDotNet.Protocol.Subprotocols
                     if (!msg.MoreChunkedMessages.HasValue || msg.MoreChunkedMessages.Value == false)
                     {
                         if (!msg.SuppressResponse.HasValue || msg.SuppressResponse.Value == false)
-                            await SendStatus(IMStatusCode.SUCCESS, secExchange);
+                            await SendStatus(IMStatusCode.SUCCESS, secExchange, token);
                         break;
                     }
                     else
-                        await SendStatus(IMStatusCode.SUCCESS, secExchange);
+                        await SendStatus(IMStatusCode.SUCCESS, secExchange, token);
                 }
                 else if (response.Message.Payload is StatusResponseMessage status)
                     throw new IOException("Error: " + (IMStatusCode)status.Status);
             }
-            return GetData(attributes);
+            return attributes;
         }
 
-        private static async Task SendStatus(IMStatusCode status, Exchange exchange)
+        private static async Task SendStatus(IMStatusCode status, Exchange exchange, CancellationToken token)
         {
-            await exchange.SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)status), (byte)SecureOpCodes.StatusReport));
+            await exchange.SendFrame(new Frame(new StatusPayload(GeneralCode.SUCCESS, 0, ProtocolType.SecureChannel, (ushort)status), (byte)SecureOpCodes.StatusReport), true, token);
         }
 
-        public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, bool timed, TLVPayload? payload = null)
+        public static Task SendCommand(SecureSession session, ushort endpoint, uint cluster, uint command, bool timed, TLVPayload? payload = null, CancellationToken token = default)
         {
             using (Exchange exchange = session.CreateExchange())
-                return SendCommand(exchange, endpoint, cluster, command, timed, null, payload);
+                return SendCommand(exchange, endpoint, cluster, command, timed, null, payload, token);
         }
 
-        public static async Task SendCommand(Exchange exchange, ushort endpoint, uint cluster, uint command, bool timed, ushort? refNum, TLVPayload? payload = null)
+        public static async Task SendCommand(Exchange exchange, ushort endpoint, uint cluster, uint command, bool timed, ushort? refNum, TLVPayload? payload = null, CancellationToken token = default)
         {
             InvokeRequestMessage run = new InvokeRequestMessage()
             {
                 SuppressResponse = false,
                 TimedRequest = timed,
-                InteractionModelRevision = Constants.MATTER_13_REVISION,
+                InteractionModelRevision = Constants.MATTER_14_REVISION,
                 InvokeRequests = [new CommandDataIB() { CommandFields = payload, CommandRef = refNum, CommandPath = new CommandPathIB() { Endpoint = endpoint, Cluster = cluster, Command = command } }]
             };
             Frame invokeFrame = new Frame(run, (byte)IMOpCodes.InvokeRequest);
             invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
             invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
             invokeFrame.DestinationID = exchange.Session.ResponderNodeID;
-            await exchange.SendFrame(invokeFrame);
+            await exchange.SendFrame(invokeFrame, true, token);
         }
 
-        public static async Task StartTimed(Exchange exchange, ushort timeout)
+        public static async Task StartTimed(Exchange exchange, ushort timeout, CancellationToken token)
         {
             TimedRequestMessage time = new TimedRequestMessage()
             {
                 Timeout = timeout,
-                InteractionModelRevision = Constants.MATTER_13_REVISION,
+                InteractionModelRevision = Constants.MATTER_14_REVISION,
             };
             Frame invokeFrame = new Frame(time, (byte)IMOpCodes.TimedRequest);
             invokeFrame.Message.Protocol = ProtocolType.InteractionModel;
             invokeFrame.SourceNodeID = exchange.Session.InitiatorNodeID;
             invokeFrame.DestinationID = exchange.Session.ResponderNodeID;
-            await exchange.SendFrame(invokeFrame);
-            while (true)
+            await exchange.SendFrame(invokeFrame, true, token);
+            while (!token.IsCancellationRequested)
             {
-                Frame response = await exchange.Read();
+                Frame response = await exchange.Read(token);
                 if (response.Message.Payload is StatusResponseMessage status)
                 {
                     if ((IMStatusCode)status.Status == IMStatusCode.SUCCESS)
@@ -188,17 +186,18 @@ namespace MatterDotNet.Protocol.Subprotocols
                     throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
             }
+            throw new OperationCanceledException();
         }
 
-        public static async Task<InvokeResponseIB> ExecCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null)
+        public static async Task<InvokeResponseIB> ExecCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, TLVPayload? payload = null, CancellationToken token = default)
         {
             using (Exchange exchange = secSession.CreateExchange())
             {
                 ushort refNum = (ushort)Random.Shared.Next();
-                await SendCommand(exchange, endpoint, cluster, command, false, refNum, payload);
-                while (true)
+                await SendCommand(exchange, endpoint, cluster, command, false, refNum, payload, token);
+                while (!token.IsCancellationRequested)
                 {
-                    Frame response = await exchange.Read();
+                    Frame response = await exchange.Read(token);
                     if (response.Message.Payload is InvokeResponseMessage msg)
                     {
                         if (msg.InvokeResponses[0].Status == null || !msg.InvokeResponses[0].Status!.CommandRef.HasValue || msg.InvokeResponses[0].Status!.CommandRef!.Value == refNum)
@@ -207,33 +206,35 @@ namespace MatterDotNet.Protocol.Subprotocols
                     else if (response.Message.Payload is StatusResponseMessage status)
                         throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
+                throw new OperationCanceledException();
             }
         }
 
-        public static async Task<InvokeResponseIB> ExecTimedCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, ushort timeoutMS, TLVPayload? payload = null)
+        public static async Task<InvokeResponseIB> ExecTimedCommand(SecureSession secSession, ushort endpoint, uint cluster, uint command, ushort timeoutMS, TLVPayload? payload = null, CancellationToken token = default)
         {
             using (Exchange exchange = secSession.CreateExchange())
             {
-                await StartTimed(exchange, timeoutMS);
-                await SendCommand(exchange, endpoint, cluster, command, true, null, payload);
-                while (true)
+                await StartTimed(exchange, timeoutMS, token);
+                await SendCommand(exchange, endpoint, cluster, command, true, null, payload, token);
+                while (!token.IsCancellationRequested)
                 {
-                    Frame response = await exchange.Read();
+                    Frame response = await exchange.Read(token);
                     if (response.Message.Payload is InvokeResponseMessage msg)
                         return msg.InvokeResponses[0];
                     else if (response.Message.Payload is StatusResponseMessage status)
                         throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
+                throw new OperationCanceledException();
             }
         }
 
-        internal static async Task SetAttribute(SecureSession session, ushort endPoint, uint cluster, ushort attribute, object? value)
+        internal static async Task SetAttribute(SecureSession session, ushort endPoint, uint cluster, ushort attribute, object? value, CancellationToken token)
         {
             using (Exchange secExchange = session.CreateExchange())
             {
                 WriteRequestMessage write = new WriteRequestMessage()
                 {
-                    InteractionModelRevision = Constants.MATTER_13_REVISION,
+                    InteractionModelRevision = Constants.MATTER_14_REVISION,
                     WriteRequests = [ new AttributeDataIB() {
                                         Path = new AttributePathIB() { Node = session.ResponderNodeID, Endpoint = endPoint, Cluster = cluster, Attribute = attribute },
                                         Data = value
@@ -246,18 +247,20 @@ namespace MatterDotNet.Protocol.Subprotocols
                 readFrame.Message.Protocol = ProtocolType.InteractionModel;
                 readFrame.SourceNodeID = session.InitiatorNodeID;
                 readFrame.DestinationID = session.ResponderNodeID;
-                await secExchange.SendFrame(readFrame);
-                while (true)
+                await secExchange.SendFrame(readFrame, true, token);
+                while (!token.IsCancellationRequested)
                 {
-                    Frame response = await secExchange.Read();
+                    Frame response = await secExchange.Read(token);
                     if (response.Message.Payload is WriteResponseMessage msg)
                     {
                         if (msg.WriteResponses != null && !ValidateResponse(msg.WriteResponses[0], endPoint))
-                                throw new IOException($"Failed to set attribute {attribute} on cluster {cluster}@{endPoint}");
+                            throw new IOException($"Failed to set attribute {attribute} on cluster {cluster}@{endPoint}");
+                        return;
                     }
                     else if (response.Message.Payload is StatusResponseMessage status)
                         throw new IOException("Error: " + (IMStatusCode)status.Status);
                 }
+                throw new OperationCanceledException();
             }
         }
 

@@ -27,12 +27,12 @@ namespace MatterDotNet.Protocol.Subprotocols
         SPAKE2Plus spake = new SPAKE2Plus();
         (byte[] cA, byte[] cB, byte[] I2RKey, byte[] R2IKey, byte[] AttestationChallenge) SessionKeys;
 
-        public async Task<SecureSession?> EstablishSecureSession(uint passcode)
+        public async Task<SecureSession?> EstablishSecureSession(uint passcode, CancellationToken token = default)
         {
             Frame? resp = null;
             Exchange exchange = unsecureSession.CreateExchange();
             Frame paramReq = GenerateParamRequest(unsecureSession.Connection.EndPoint);
-            await exchange.SendFrame(paramReq);
+            await exchange.SendFrame(paramReq, true, token);
             resp = await exchange.Read();
             if (resp.Message.Payload is StatusPayload error)
             {
@@ -40,12 +40,12 @@ namespace MatterDotNet.Protocol.Subprotocols
             }
             PBKDFParamResp paramResp = (PBKDFParamResp)resp.Message.Payload!;
             Frame pake1 = GeneratePake1(paramResp, passcode);
-            await exchange.SendFrame(pake1);
-            resp = await exchange.Read();
+            await exchange.SendFrame(pake1, true, token);
+            resp = await exchange.Read(token);
             Pake2 pake2 = (Pake2)resp.Message.Payload!;
             Frame pake3 = GeneratePake3((Pake1)pake1.Message.Payload!, pake2, (PBKDFParamReq)paramReq.Message.Payload!, paramResp);
-            await exchange.SendFrame(pake3);
-            resp = await exchange.Read();
+            await exchange.SendFrame(pake3, true, token);
+            resp = await exchange.Read(token);
             StatusPayload status = (StatusPayload)resp.Message.Payload!;
             if (status.GeneralCode != GeneralCode.SUCCESS)
                 throw new IOException("PASE failed with status: " + (SecureStatusCodes)status.ProtocolCode);

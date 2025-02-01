@@ -475,60 +475,60 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Disable
         /// </summary>
-        public async Task<bool> Disable(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS);
+        public async Task<bool> Disable(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x01, commandTimeoutMS, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Enable Charging
         /// </summary>
-        public async Task<bool> EnableCharging(SecureSession session, ushort commandTimeoutMS, DateTime? chargingEnabledUntil, long minimumChargeCurrent, long maximumChargeCurrent) {
+        public async Task<bool> EnableCharging(SecureSession session, ushort commandTimeoutMS, DateTime? chargingEnabledUntil, long minimumChargeCurrent, long maximumChargeCurrent, CancellationToken token = default) {
             EnableChargingPayload requestFields = new EnableChargingPayload() {
                 ChargingEnabledUntil = chargingEnabledUntil,
                 MinimumChargeCurrent = minimumChargeCurrent,
                 MaximumChargeCurrent = maximumChargeCurrent,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Enable Discharging
         /// </summary>
-        public async Task<bool> EnableDischarging(SecureSession session, ushort commandTimeoutMS, DateTime? dischargingEnabledUntil, long maximumDischargeCurrent) {
+        public async Task<bool> EnableDischarging(SecureSession session, ushort commandTimeoutMS, DateTime? dischargingEnabledUntil, long maximumDischargeCurrent, CancellationToken token = default) {
             EnableDischargingPayload requestFields = new EnableDischargingPayload() {
                 DischargingEnabledUntil = dischargingEnabledUntil,
                 MaximumDischargeCurrent = maximumDischargeCurrent,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Start Diagnostics
         /// </summary>
-        public async Task<bool> StartDiagnostics(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS);
+        public async Task<bool> StartDiagnostics(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x04, commandTimeoutMS, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Targets
         /// </summary>
-        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, ChargingTargetSchedule[] chargingTargetSchedules) {
+        public async Task<bool> SetTargets(SecureSession session, ushort commandTimeoutMS, ChargingTargetSchedule[] chargingTargetSchedules, CancellationToken token = default) {
             SetTargetsPayload requestFields = new SetTargetsPayload() {
                 ChargingTargetSchedules = chargingTargetSchedules,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x05, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Targets
         /// </summary>
-        public async Task<GetTargetsResponse?> GetTargets(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x06, commandTimeoutMS);
+        public async Task<GetTargetsResponse?> GetTargets(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x06, commandTimeoutMS, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetTargetsResponse() {
@@ -539,8 +539,8 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Clear Targets
         /// </summary>
-        public async Task<bool> ClearTargets(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x07, commandTimeoutMS);
+        public async Task<bool> ClearTargets(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x07, commandTimeoutMS, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

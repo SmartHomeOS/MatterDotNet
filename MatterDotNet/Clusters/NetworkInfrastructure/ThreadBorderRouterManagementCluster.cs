@@ -106,8 +106,8 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Get Active Dataset Request
         /// </summary>
-        public async Task<DatasetResponse?> GetActiveDatasetRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<DatasetResponse?> GetActiveDatasetRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new DatasetResponse() {
@@ -118,8 +118,8 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Get Pending Dataset Request
         /// </summary>
-        public async Task<DatasetResponse?> GetPendingDatasetRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<DatasetResponse?> GetPendingDatasetRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new DatasetResponse() {
@@ -130,23 +130,23 @@ namespace MatterDotNet.Clusters.NetworkInfrastructure
         /// <summary>
         /// Set Active Dataset Request
         /// </summary>
-        public async Task<bool> SetActiveDatasetRequest(SecureSession session, byte[] activeDataset, ulong? breadcrumb) {
+        public async Task<bool> SetActiveDatasetRequest(SecureSession session, byte[] activeDataset, ulong? breadcrumb, CancellationToken token = default) {
             SetActiveDatasetRequestPayload requestFields = new SetActiveDatasetRequestPayload() {
                 ActiveDataset = activeDataset,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Pending Dataset Request
         /// </summary>
-        public async Task<bool> SetPendingDatasetRequest(SecureSession session, byte[] pendingDataset) {
+        public async Task<bool> SetPendingDatasetRequest(SecureSession session, byte[] pendingDataset, CancellationToken token = default) {
             SetPendingDatasetRequestPayload requestFields = new SetPendingDatasetRequestPayload() {
                 PendingDataset = pendingDataset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

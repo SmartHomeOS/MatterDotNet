@@ -130,13 +130,13 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Retrieve Logs Request
         /// </summary>
-        public async Task<RetrieveLogsResponse?> RetrieveLogsRequest(SecureSession session, Intent intent, TransferProtocol requestedProtocol, string? transferFileDesignator) {
+        public async Task<RetrieveLogsResponse?> RetrieveLogsRequest(SecureSession session, Intent intent, TransferProtocol requestedProtocol, string? transferFileDesignator, CancellationToken token = default) {
             RetrieveLogsRequestPayload requestFields = new RetrieveLogsRequestPayload() {
                 Intent = intent,
                 RequestedProtocol = requestedProtocol,
                 TransferFileDesignator = transferFileDesignator,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new RetrieveLogsResponse() {

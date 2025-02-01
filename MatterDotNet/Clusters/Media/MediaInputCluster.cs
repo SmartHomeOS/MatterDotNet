@@ -181,39 +181,39 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Select Input
         /// </summary>
-        public async Task<bool> SelectInput(SecureSession session, byte index) {
+        public async Task<bool> SelectInput(SecureSession session, byte index, CancellationToken token = default) {
             SelectInputPayload requestFields = new SelectInputPayload() {
                 Index = index,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Show Input Status
         /// </summary>
-        public async Task<bool> ShowInputStatus(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> ShowInputStatus(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Hide Input Status
         /// </summary>
-        public async Task<bool> HideInputStatus(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
+        public async Task<bool> HideInputStatus(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Rename Input
         /// </summary>
-        public async Task<bool> RenameInput(SecureSession session, byte index, string name) {
+        public async Task<bool> RenameInput(SecureSession session, byte index, string name, CancellationToken token = default) {
             RenameInputPayload requestFields = new RenameInputPayload() {
                 Index = index,
                 Name = name,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

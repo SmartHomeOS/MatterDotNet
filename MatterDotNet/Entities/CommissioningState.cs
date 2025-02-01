@@ -63,7 +63,7 @@ namespace MatterDotNet.Entities
         /// Add the provided network to the list of connected networks
         /// </summary>
         /// <param name="network"></param>
-        internal void Upgrade(string network)
+        internal void Connect(string network)
         {
             string[] ret = new string[ConnectedNetworks.Length + 1];
             ret[0] = network;

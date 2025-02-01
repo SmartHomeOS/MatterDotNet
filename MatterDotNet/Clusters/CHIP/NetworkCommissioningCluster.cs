@@ -527,12 +527,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Scan Networks
         /// </summary>
-        public async Task<ScanNetworksResponse?> ScanNetworks(SecureSession session, byte[]? sSID, ulong? breadcrumb) {
+        public async Task<ScanNetworksResponse?> ScanNetworks(SecureSession session, byte[]? sSID, ulong? breadcrumb, CancellationToken token = default) {
             ScanNetworksPayload requestFields = new ScanNetworksPayload() {
                 SSID = sSID,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ScanNetworksResponse() {
@@ -546,7 +546,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Add Or Update WiFi Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> AddOrUpdateWiFiNetwork(SecureSession session, byte[] sSID, byte[] credentials, ulong? breadcrumb, byte[]? networkIdentity, byte[]? clientIdentifier, byte[]? possessionNonce) {
+        public async Task<NetworkConfigResponse?> AddOrUpdateWiFiNetwork(SecureSession session, byte[] sSID, byte[] credentials, ulong? breadcrumb, byte[]? networkIdentity, byte[]? clientIdentifier, byte[]? possessionNonce, CancellationToken token = default) {
             AddOrUpdateWiFiNetworkPayload requestFields = new AddOrUpdateWiFiNetworkPayload() {
                 SSID = sSID,
                 Credentials = credentials,
@@ -555,7 +555,7 @@ namespace MatterDotNet.Clusters.CHIP
                 ClientIdentifier = clientIdentifier,
                 PossessionNonce = possessionNonce,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -570,12 +570,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Add Or Update Thread Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> AddOrUpdateThreadNetwork(SecureSession session, byte[] operationalDataset, ulong? breadcrumb) {
+        public async Task<NetworkConfigResponse?> AddOrUpdateThreadNetwork(SecureSession session, byte[] operationalDataset, ulong? breadcrumb, CancellationToken token = default) {
             AddOrUpdateThreadNetworkPayload requestFields = new AddOrUpdateThreadNetworkPayload() {
                 OperationalDataset = operationalDataset,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -590,12 +590,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Remove Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> RemoveNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb) {
+        public async Task<NetworkConfigResponse?> RemoveNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb, CancellationToken token = default) {
             RemoveNetworkPayload requestFields = new RemoveNetworkPayload() {
                 NetworkID = networkID,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -610,12 +610,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Connect Network
         /// </summary>
-        public async Task<ConnectNetworkResponse?> ConnectNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb) {
+        public async Task<ConnectNetworkResponse?> ConnectNetwork(SecureSession session, byte[] networkID, ulong? breadcrumb, CancellationToken token = default) {
             ConnectNetworkPayload requestFields = new ConnectNetworkPayload() {
                 NetworkID = networkID,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ConnectNetworkResponse() {
@@ -628,13 +628,13 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Reorder Network
         /// </summary>
-        public async Task<NetworkConfigResponse?> ReorderNetwork(SecureSession session, byte[] networkID, byte networkIndex, ulong? breadcrumb) {
+        public async Task<NetworkConfigResponse?> ReorderNetwork(SecureSession session, byte[] networkID, byte networkIndex, ulong? breadcrumb, CancellationToken token = default) {
             ReorderNetworkPayload requestFields = new ReorderNetworkPayload() {
                 NetworkID = networkID,
                 NetworkIndex = networkIndex,
                 Breadcrumb = breadcrumb,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NetworkConfigResponse() {
@@ -649,12 +649,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Query Identity
         /// </summary>
-        public async Task<QueryIdentityResponse?> QueryIdentity(SecureSession session, byte[] keyIdentifier, byte[]? possessionNonce) {
+        public async Task<QueryIdentityResponse?> QueryIdentity(SecureSession session, byte[] keyIdentifier, byte[]? possessionNonce, CancellationToken token = default) {
             QueryIdentityPayload requestFields = new QueryIdentityPayload() {
                 KeyIdentifier = keyIdentifier,
                 PossessionNonce = possessionNonce,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new QueryIdentityResponse() {

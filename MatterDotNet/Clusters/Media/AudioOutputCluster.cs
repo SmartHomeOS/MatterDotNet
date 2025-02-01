@@ -154,23 +154,23 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Select Output
         /// </summary>
-        public async Task<bool> SelectOutput(SecureSession session, byte index) {
+        public async Task<bool> SelectOutput(SecureSession session, byte index, CancellationToken token = default) {
             SelectOutputPayload requestFields = new SelectOutputPayload() {
                 Index = index,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Rename Output
         /// </summary>
-        public async Task<bool> RenameOutput(SecureSession session, byte index, string name) {
+        public async Task<bool> RenameOutput(SecureSession session, byte index, string name, CancellationToken token = default) {
             RenameOutputPayload requestFields = new RenameOutputPayload() {
                 Index = index,
                 Name = name,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

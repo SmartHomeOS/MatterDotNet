@@ -457,149 +457,149 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Instant Action
         /// </summary>
-        public async Task<bool> InstantAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> InstantAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             InstantActionPayload requestFields = new InstantActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Instant Action With Transition
         /// </summary>
-        public async Task<bool> InstantActionWithTransition(SecureSession session, ushort actionID, uint? invokeID, ushort transitionTime) {
+        public async Task<bool> InstantActionWithTransition(SecureSession session, ushort actionID, uint? invokeID, ushort transitionTime, CancellationToken token = default) {
             InstantActionWithTransitionPayload requestFields = new InstantActionWithTransitionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
                 TransitionTime = transitionTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Start Action
         /// </summary>
-        public async Task<bool> StartAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> StartAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             StartActionPayload requestFields = new StartActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Start Action With Duration
         /// </summary>
-        public async Task<bool> StartActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
+        public async Task<bool> StartActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration, CancellationToken token = default) {
             StartActionWithDurationPayload requestFields = new StartActionWithDurationPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
                 Duration = duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Stop Action
         /// </summary>
-        public async Task<bool> StopAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> StopAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             StopActionPayload requestFields = new StopActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Pause Action
         /// </summary>
-        public async Task<bool> PauseAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> PauseAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             PauseActionPayload requestFields = new PauseActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Pause Action With Duration
         /// </summary>
-        public async Task<bool> PauseActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
+        public async Task<bool> PauseActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration, CancellationToken token = default) {
             PauseActionWithDurationPayload requestFields = new PauseActionWithDurationPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
                 Duration = duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Resume Action
         /// </summary>
-        public async Task<bool> ResumeAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> ResumeAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             ResumeActionPayload requestFields = new ResumeActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Enable Action
         /// </summary>
-        public async Task<bool> EnableAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> EnableAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             EnableActionPayload requestFields = new EnableActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Enable Action With Duration
         /// </summary>
-        public async Task<bool> EnableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
+        public async Task<bool> EnableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration, CancellationToken token = default) {
             EnableActionWithDurationPayload requestFields = new EnableActionWithDurationPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
                 Duration = duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Disable Action
         /// </summary>
-        public async Task<bool> DisableAction(SecureSession session, ushort actionID, uint? invokeID) {
+        public async Task<bool> DisableAction(SecureSession session, ushort actionID, uint? invokeID, CancellationToken token = default) {
             DisableActionPayload requestFields = new DisableActionPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Disable Action With Duration
         /// </summary>
-        public async Task<bool> DisableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration) {
+        public async Task<bool> DisableActionWithDuration(SecureSession session, ushort actionID, uint? invokeID, uint duration, CancellationToken token = default) {
             DisableActionWithDurationPayload requestFields = new DisableActionWithDurationPayload() {
                 ActionID = actionID,
                 InvokeID = invokeID,
                 Duration = duration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0B, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

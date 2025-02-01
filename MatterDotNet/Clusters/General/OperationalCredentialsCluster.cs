@@ -329,11 +329,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Attestation Request
         /// </summary>
-        public async Task<AttestationResponse?> AttestationRequest(SecureSession session, byte[] attestationNonce) {
+        public async Task<AttestationResponse?> AttestationRequest(SecureSession session, byte[] attestationNonce, CancellationToken token = default) {
             AttestationRequestPayload requestFields = new AttestationRequestPayload() {
                 AttestationNonce = attestationNonce,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new AttestationResponse() {
@@ -345,11 +345,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Certificate Chain Request
         /// </summary>
-        public async Task<CertificateChainResponse?> CertificateChainRequest(SecureSession session, CertificateChainType certificateType) {
+        public async Task<CertificateChainResponse?> CertificateChainRequest(SecureSession session, CertificateChainType certificateType, CancellationToken token = default) {
             CertificateChainRequestPayload requestFields = new CertificateChainRequestPayload() {
                 CertificateType = certificateType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new CertificateChainResponse() {
@@ -360,12 +360,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// CSR Request
         /// </summary>
-        public async Task<CSRResponse?> CSRRequest(SecureSession session, byte[] cSRNonce, bool? isForUpdateNOC) {
+        public async Task<CSRResponse?> CSRRequest(SecureSession session, byte[] cSRNonce, bool? isForUpdateNOC, CancellationToken token = default) {
             CSRRequestPayload requestFields = new CSRRequestPayload() {
                 CSRNonce = cSRNonce,
                 IsForUpdateNOC = isForUpdateNOC,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new CSRResponse() {
@@ -377,7 +377,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Add NOC
         /// </summary>
-        public async Task<NOCResponse?> AddNOC(SecureSession session, byte[] nOCValue, byte[]? iCACValue, byte[] iPKValue, ulong caseAdminSubject, ushort adminVendorId) {
+        public async Task<NOCResponse?> AddNOC(SecureSession session, byte[] nOCValue, byte[]? iCACValue, byte[] iPKValue, ulong caseAdminSubject, ushort adminVendorId, CancellationToken token = default) {
             AddNOCPayload requestFields = new AddNOCPayload() {
                 NOCValue = nOCValue,
                 ICACValue = iCACValue,
@@ -385,7 +385,7 @@ namespace MatterDotNet.Clusters.General
                 CaseAdminSubject = caseAdminSubject,
                 AdminVendorId = adminVendorId,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -398,12 +398,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Update NOC
         /// </summary>
-        public async Task<NOCResponse?> UpdateNOC(SecureSession session, byte[] nOCValue, byte[]? iCACValue) {
+        public async Task<NOCResponse?> UpdateNOC(SecureSession session, byte[] nOCValue, byte[]? iCACValue, CancellationToken token = default) {
             UpdateNOCPayload requestFields = new UpdateNOCPayload() {
                 NOCValue = nOCValue,
                 ICACValue = iCACValue,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -416,11 +416,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Update Fabric Label
         /// </summary>
-        public async Task<NOCResponse?> UpdateFabricLabel(SecureSession session, string label) {
+        public async Task<NOCResponse?> UpdateFabricLabel(SecureSession session, string label, CancellationToken token = default) {
             UpdateFabricLabelPayload requestFields = new UpdateFabricLabelPayload() {
                 Label = label,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -433,11 +433,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Remove Fabric
         /// </summary>
-        public async Task<NOCResponse?> RemoveFabric(SecureSession session, byte fabricIndex) {
+        public async Task<NOCResponse?> RemoveFabric(SecureSession session, byte fabricIndex, CancellationToken token = default) {
             RemoveFabricPayload requestFields = new RemoveFabricPayload() {
                 FabricIndex = fabricIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0a, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0a, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NOCResponse() {
@@ -450,11 +450,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Add Trusted Root Certificate
         /// </summary>
-        public async Task<bool> AddTrustedRootCertificate(SecureSession session, byte[] rootCACertificate) {
+        public async Task<bool> AddTrustedRootCertificate(SecureSession session, byte[] rootCACertificate, CancellationToken token = default) {
             AddTrustedRootCertificatePayload requestFields = new AddTrustedRootCertificatePayload() {
                 RootCACertificate = rootCACertificate,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0b, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0b, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

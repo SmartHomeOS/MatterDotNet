@@ -57,24 +57,25 @@ namespace MatterDotNet.Entities
         /// <summary>
         /// Get a secure session for the node
         /// </summary>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        public async Task<SecureSession> GetCASESession()
+        public async Task<SecureSession> GetCASESession(CancellationToken token = default)
         {
             if (connection.IP4Address != null)
             {
                 using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IP4Address!, connection.Port), true))
-                    return await GetCASESession(session);
+                    return await GetCASESession(session, token);
             }
             else if (connection.IP6Address != null)
             {
                 using (SessionContext session = SessionManager.GetUnsecureSession(new IPEndPoint(connection.IP6Address!, connection.Port), true))
-                    return await GetCASESession(session);
+                    return await GetCASESession(session, token);
             }
             else
             {
                 using (SessionContext session = SessionManager.GetUnsecureSession(new BLEEndPoint(connection.BTAddress!), true))
-                    return await GetCASESession(session);
+                    return await GetCASESession(session, token);
             }
         }
 
@@ -125,15 +126,15 @@ namespace MatterDotNet.Entities
         /// </summary>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
-        internal async Task<SecureSession> GetCASESession(SessionContext session)
+        internal async Task<SecureSession> GetCASESession(SessionContext session, CancellationToken token = default)
         {
             CASE caseProtocol = new CASE(session);
             //TODO - Use OD session params
             SecureSession? caseSession;
             if (sharedSecret != null && resumptionId != null)
-                caseSession = await caseProtocol.ResumeSecureSession(fabric, noc, resumptionId, sharedSecret);
+                caseSession = await caseProtocol.ResumeSecureSession(fabric, noc, resumptionId, sharedSecret, token);
             else
-                caseSession = await caseProtocol.EstablishSecureSession(fabric, noc);
+                caseSession = await caseProtocol.EstablishSecureSession(fabric, noc, token);
             if (caseSession == null)
                 throw new IOException("CASE pairing failed");
             resumptionId = caseSession.ResumptionID;

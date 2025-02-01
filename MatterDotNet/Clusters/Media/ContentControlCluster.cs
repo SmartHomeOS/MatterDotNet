@@ -200,20 +200,20 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Update PIN
         /// </summary>
-        public async Task<bool> UpdatePIN(SecureSession session, string? oldPIN, string newPIN) {
+        public async Task<bool> UpdatePIN(SecureSession session, string? oldPIN, string newPIN, CancellationToken token = default) {
             UpdatePINPayload requestFields = new UpdatePINPayload() {
                 OldPIN = oldPIN,
                 NewPIN = newPIN,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Reset PIN
         /// </summary>
-        public async Task<ResetPINResponse?> ResetPIN(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<ResetPINResponse?> ResetPIN(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ResetPINResponse() {
@@ -224,77 +224,77 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Enable
         /// </summary>
-        public async Task<bool> Enable(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+        public async Task<bool> Enable(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Disable
         /// </summary>
-        public async Task<bool> Disable(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<bool> Disable(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add Bonus Time
         /// </summary>
-        public async Task<bool> AddBonusTime(SecureSession session, string? pINCode, TimeSpan? bonusTime) {
+        public async Task<bool> AddBonusTime(SecureSession session, string? pINCode, TimeSpan? bonusTime, CancellationToken token = default) {
             AddBonusTimePayload requestFields = new AddBonusTimePayload() {
                 PINCode = pINCode,
                 BonusTime = bonusTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Screen Daily Time
         /// </summary>
-        public async Task<bool> SetScreenDailyTime(SecureSession session, TimeSpan screenTime) {
+        public async Task<bool> SetScreenDailyTime(SecureSession session, TimeSpan screenTime, CancellationToken token = default) {
             SetScreenDailyTimePayload requestFields = new SetScreenDailyTimePayload() {
                 ScreenTime = screenTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Block Unrated Content
         /// </summary>
-        public async Task<bool> BlockUnratedContent(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07);
+        public async Task<bool> BlockUnratedContent(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unblock Unrated Content
         /// </summary>
-        public async Task<bool> UnblockUnratedContent(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08);
+        public async Task<bool> UnblockUnratedContent(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set On Demand Rating Threshold
         /// </summary>
-        public async Task<bool> SetOnDemandRatingThreshold(SecureSession session, string rating) {
+        public async Task<bool> SetOnDemandRatingThreshold(SecureSession session, string rating, CancellationToken token = default) {
             SetOnDemandRatingThresholdPayload requestFields = new SetOnDemandRatingThresholdPayload() {
                 Rating = rating,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x09, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Scheduled Content Rating Threshold
         /// </summary>
-        public async Task<bool> SetScheduledContentRatingThreshold(SecureSession session, string rating) {
+        public async Task<bool> SetScheduledContentRatingThreshold(SecureSession session, string rating, CancellationToken token = default) {
             SetScheduledContentRatingThresholdPayload requestFields = new SetScheduledContentRatingThresholdPayload() {
                 Rating = rating,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x0A, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

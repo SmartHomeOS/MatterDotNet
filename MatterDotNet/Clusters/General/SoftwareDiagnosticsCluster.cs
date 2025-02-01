@@ -123,8 +123,8 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Reset Watermarks
         /// </summary>
-        public async Task<bool> ResetWatermarks(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> ResetWatermarks(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

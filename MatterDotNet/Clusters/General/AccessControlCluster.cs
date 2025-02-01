@@ -448,11 +448,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Review Fabric Restrictions
         /// </summary>
-        public async Task<ReviewFabricRestrictionsResponse?> ReviewFabricRestrictions(SecureSession session, CommissioningAccessRestrictionEntry[] aRL) {
+        public async Task<ReviewFabricRestrictionsResponse?> ReviewFabricRestrictions(SecureSession session, CommissioningAccessRestrictionEntry[] aRL, CancellationToken token = default) {
             ReviewFabricRestrictionsPayload requestFields = new ReviewFabricRestrictionsPayload() {
                 ARL = aRL,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ReviewFabricRestrictionsResponse() {

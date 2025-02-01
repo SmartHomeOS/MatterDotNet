@@ -11,12 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Generator.Schema;
-using MatterDotNet;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.Metrics;
-using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -907,7 +902,7 @@ namespace Generator
                         if (type == "status")
                             writer.Write($"(IMStatusCode)reader.GetByte({id}");
                         else
-                            writer.Write($"({GeneratorUtil.SanitizeName(type)}");
+                            writer.Write($"({GeneratorUtil.SanitizeName(type, false, !HasAttribute(cluster, type), HasEnum(clusterConfig, type) ? "Enum" : "Bitmap")}");
                         if (optional)
                             writer.Write('?');
                         if (type != "status")
@@ -1078,6 +1073,7 @@ namespace Generator
                             writer.Write(" " + GeneratorUtil.SanitizeName(field.name, true));
                         }
                     }
+                    writer.Write(", CancellationToken token = default");
                     writer.WriteLine(") {");
                     if (cmd.arg != null)
                     {
@@ -1090,25 +1086,25 @@ namespace Generator
                         }
                         writer.WriteLine("            };");
                         if (cmd.mustUseTimedInvoke)
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS, requestFields);");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS, requestFields, token);");
                         else
-                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.code + ", requestFields);");
+                            writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.code + ", requestFields, token);");
                     }
                     else
                     {
                         if (cmd.response == "N")
                         {
                             if (cmd.mustUseTimedInvoke)
-                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS);");
+                                writer.WriteLine("            await InteractionManager.SendTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS, null, token);");
                             else
-                                writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, cluster, " + cmd.code + ");");
+                                writer.WriteLine("            await InteractionManager.SendCommand(session, endPoint, cluster, " + cmd.code + ", null, token);");
                         }
                         else
                         {
                             if (cmd.mustUseTimedInvoke)
-                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS);");
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, " + cmd.code + ", commandTimeoutMS, null, token);");
                             else
-                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.code + ");");
+                                writer.WriteLine("            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, " + cmd.code + ", null, token);");
                         }
                     }
                     if (response == null || response.arg == null)

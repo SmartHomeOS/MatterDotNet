@@ -294,7 +294,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Present Messages Request
         /// </summary>
-        public async Task<bool> PresentMessagesRequest(SecureSession session, Guid messageID, MessagePriority priority, MessageControl messageControl, DateTime? startTime, ulong? duration, string messageText, MessageResponseOption[]? responses) {
+        public async Task<bool> PresentMessagesRequest(SecureSession session, Guid messageID, MessagePriority priority, MessageControl messageControl, DateTime? startTime, ulong? duration, string messageText, MessageResponseOption[]? responses, CancellationToken token = default) {
             PresentMessagesRequestPayload requestFields = new PresentMessagesRequestPayload() {
                 MessageID = messageID,
                 Priority = priority,
@@ -304,18 +304,18 @@ namespace MatterDotNet.Clusters.General
                 MessageText = messageText,
                 Responses = responses,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Cancel Messages Request
         /// </summary>
-        public async Task<bool> CancelMessagesRequest(SecureSession session, byte[][] messageIDs) {
+        public async Task<bool> CancelMessagesRequest(SecureSession session, byte[][] messageIDs, CancellationToken token = default) {
             CancelMessagesRequestPayload requestFields = new CancelMessagesRequestPayload() {
                 MessageIDs = messageIDs,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

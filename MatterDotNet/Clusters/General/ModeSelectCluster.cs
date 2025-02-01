@@ -164,11 +164,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Change To Mode
         /// </summary>
-        public async Task<bool> ChangeToMode(SecureSession session, byte newMode) {
+        public async Task<bool> ChangeToMode(SecureSession session, byte newMode, CancellationToken token = default) {
             ChangeToModePayload requestFields = new ChangeToModePayload() {
                 NewMode = newMode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -144,23 +144,23 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Identify Command
         /// </summary>
-        public async Task<bool> IdentifyCommand(SecureSession session, ushort identifyTime) {
+        public async Task<bool> IdentifyCommand(SecureSession session, ushort identifyTime, CancellationToken token = default) {
             IdentifyCommandPayload requestFields = new IdentifyCommandPayload() {
                 IdentifyTime = identifyTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Trigger Effect
         /// </summary>
-        public async Task<bool> TriggerEffect(SecureSession session, EffectIdentifier effectIdentifier, EffectVariant effectVariant) {
+        public async Task<bool> TriggerEffect(SecureSession session, EffectIdentifier effectIdentifier, EffectVariant effectVariant, CancellationToken token = default) {
             TriggerEffectPayload requestFields = new TriggerEffectPayload() {
                 EffectIdentifier = effectIdentifier,
                 EffectVariant = effectVariant,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

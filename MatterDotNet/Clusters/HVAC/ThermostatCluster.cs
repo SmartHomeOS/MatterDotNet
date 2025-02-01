@@ -1234,38 +1234,38 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Setpoint Raise Lower
         /// </summary>
-        public async Task<bool> SetpointRaiseLower(SecureSession session, SetpointRaiseLowerMode mode, sbyte amount) {
+        public async Task<bool> SetpointRaiseLower(SecureSession session, SetpointRaiseLowerMode mode, sbyte amount, CancellationToken token = default) {
             SetpointRaiseLowerPayload requestFields = new SetpointRaiseLowerPayload() {
                 Mode = mode,
                 Amount = amount,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Weekly Schedule
         /// </summary>
-        public async Task<bool> SetWeeklySchedule(SecureSession session, byte numberOfTransitionsForSequence, ScheduleDayOfWeek dayOfWeekForSequence, ScheduleMode modeForSequence, WeeklyScheduleTransition[] transitions) {
+        public async Task<bool> SetWeeklySchedule(SecureSession session, byte numberOfTransitionsForSequence, ScheduleDayOfWeek dayOfWeekForSequence, ScheduleMode modeForSequence, WeeklyScheduleTransition[] transitions, CancellationToken token = default) {
             SetWeeklySchedulePayload requestFields = new SetWeeklySchedulePayload() {
                 NumberOfTransitionsForSequence = numberOfTransitionsForSequence,
                 DayOfWeekForSequence = dayOfWeekForSequence,
                 ModeForSequence = modeForSequence,
                 Transitions = transitions,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Weekly Schedule
         /// </summary>
-        public async Task<GetWeeklyScheduleResponse?> GetWeeklySchedule(SecureSession session, ScheduleDayOfWeek daysToReturn, ScheduleMode modeToReturn) {
+        public async Task<GetWeeklyScheduleResponse?> GetWeeklySchedule(SecureSession session, ScheduleDayOfWeek daysToReturn, ScheduleMode modeToReturn, CancellationToken token = default) {
             GetWeeklySchedulePayload requestFields = new GetWeeklySchedulePayload() {
                 DaysToReturn = daysToReturn,
                 ModeToReturn = modeToReturn,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetWeeklyScheduleResponse() {
@@ -1279,43 +1279,43 @@ namespace MatterDotNet.Clusters.HVAC
         /// <summary>
         /// Clear Weekly Schedule
         /// </summary>
-        public async Task<bool> ClearWeeklySchedule(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03);
+        public async Task<bool> ClearWeeklySchedule(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Active Schedule Request
         /// </summary>
-        public async Task<bool> SetActiveScheduleRequest(SecureSession session, byte[] scheduleHandle) {
+        public async Task<bool> SetActiveScheduleRequest(SecureSession session, byte[] scheduleHandle, CancellationToken token = default) {
             SetActiveScheduleRequestPayload requestFields = new SetActiveScheduleRequestPayload() {
                 ScheduleHandle = scheduleHandle,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Active Preset Request
         /// </summary>
-        public async Task<bool> SetActivePresetRequest(SecureSession session, byte[]? presetHandle) {
+        public async Task<bool> SetActivePresetRequest(SecureSession session, byte[]? presetHandle, CancellationToken token = default) {
             SetActivePresetRequestPayload requestFields = new SetActivePresetRequestPayload() {
                 PresetHandle = presetHandle,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Atomic Request
         /// </summary>
-        public async Task<AtomicResponse?> AtomicRequest(SecureSession session, AtomicRequestType requestType, uint[] attributeRequests, ushort? timeout) {
+        public async Task<AtomicResponse?> AtomicRequest(SecureSession session, AtomicRequestType requestType, uint[] attributeRequests, ushort? timeout, CancellationToken token = default) {
             AtomicRequestPayload requestFields = new AtomicRequestPayload() {
                 RequestType = requestType,
                 AttributeRequests = attributeRequests,
                 Timeout = timeout,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0xFE, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0xFE, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new AtomicResponse() {

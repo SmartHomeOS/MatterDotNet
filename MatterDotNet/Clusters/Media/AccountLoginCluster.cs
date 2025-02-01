@@ -85,11 +85,11 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Get Setup PIN
         /// </summary>
-        public async Task<GetSetupPINResponse?> GetSetupPIN(SecureSession session, ushort commandTimeoutMS, string tempAccountIdentifier) {
+        public async Task<GetSetupPINResponse?> GetSetupPIN(SecureSession session, ushort commandTimeoutMS, string tempAccountIdentifier, CancellationToken token = default) {
             GetSetupPINPayload requestFields = new GetSetupPINPayload() {
                 TempAccountIdentifier = tempAccountIdentifier,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x00, commandTimeoutMS, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetSetupPINResponse() {
@@ -100,24 +100,24 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Login
         /// </summary>
-        public async Task<bool> Login(SecureSession session, ushort commandTimeoutMS, string tempAccountIdentifier, string setupPIN, ulong? node) {
+        public async Task<bool> Login(SecureSession session, ushort commandTimeoutMS, string tempAccountIdentifier, string setupPIN, ulong? node, CancellationToken token = default) {
             LoginPayload requestFields = new LoginPayload() {
                 TempAccountIdentifier = tempAccountIdentifier,
                 SetupPIN = setupPIN,
                 Node = node,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x02, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Logout
         /// </summary>
-        public async Task<bool> Logout(SecureSession session, ushort commandTimeoutMS, ulong? node) {
+        public async Task<bool> Logout(SecureSession session, ushort commandTimeoutMS, ulong? node, CancellationToken token = default) {
             LogoutPayload requestFields = new LogoutPayload() {
                 Node = node,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0x03, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

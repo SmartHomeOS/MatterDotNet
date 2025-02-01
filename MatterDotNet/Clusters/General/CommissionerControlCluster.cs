@@ -103,26 +103,26 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Request Commissioning Approval
         /// </summary>
-        public async Task<bool> RequestCommissioningApproval(SecureSession session, ulong requestID, ushort vendorID, ushort productID, string? label) {
+        public async Task<bool> RequestCommissioningApproval(SecureSession session, ulong requestID, ushort vendorID, ushort productID, string? label, CancellationToken token = default) {
             RequestCommissioningApprovalPayload requestFields = new RequestCommissioningApprovalPayload() {
                 RequestID = requestID,
                 VendorID = vendorID,
                 ProductID = productID,
                 Label = label,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Commission Node
         /// </summary>
-        public async Task<ReverseOpenCommissioningWindow?> CommissionNode(SecureSession session, ulong requestID, ushort responseTimeoutSeconds) {
+        public async Task<ReverseOpenCommissioningWindow?> CommissionNode(SecureSession session, ulong requestID, ushort responseTimeoutSeconds, CancellationToken token = default) {
             CommissionNodePayload requestFields = new CommissionNodePayload() {
                 RequestID = requestID,
                 ResponseTimeoutSeconds = responseTimeoutSeconds,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ReverseOpenCommissioningWindow() {

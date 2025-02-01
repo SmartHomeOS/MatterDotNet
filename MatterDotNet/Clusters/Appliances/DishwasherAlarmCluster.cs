@@ -123,22 +123,22 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Reset
         /// </summary>
-        public async Task<bool> Reset(SecureSession session, Alarm alarms) {
+        public async Task<bool> Reset(SecureSession session, Alarm alarms, CancellationToken token = default) {
             ResetPayload requestFields = new ResetPayload() {
                 Alarms = alarms,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Modify Enabled Alarms
         /// </summary>
-        public async Task<bool> ModifyEnabledAlarms(SecureSession session, Alarm mask) {
+        public async Task<bool> ModifyEnabledAlarms(SecureSession session, Alarm mask, CancellationToken token = default) {
             ModifyEnabledAlarmsPayload requestFields = new ModifyEnabledAlarmsPayload() {
                 Mask = mask,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

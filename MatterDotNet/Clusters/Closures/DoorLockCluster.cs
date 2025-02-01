@@ -1527,41 +1527,41 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Lock Door
         /// </summary>
-        public async Task<bool> LockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
+        public async Task<bool> LockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode, CancellationToken token = default) {
             LockDoorPayload requestFields = new LockDoorPayload() {
                 PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 0, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unlock Door
         /// </summary>
-        public async Task<bool> UnlockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
+        public async Task<bool> UnlockDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode, CancellationToken token = default) {
             UnlockDoorPayload requestFields = new UnlockDoorPayload() {
                 PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 1, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 1, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unlock With Timeout
         /// </summary>
-        public async Task<bool> UnlockWithTimeout(SecureSession session, ushort commandTimeoutMS, ushort timeout, byte[]? pINCode) {
+        public async Task<bool> UnlockWithTimeout(SecureSession session, ushort commandTimeoutMS, ushort timeout, byte[]? pINCode, CancellationToken token = default) {
             UnlockWithTimeoutPayload requestFields = new UnlockWithTimeoutPayload() {
                 Timeout = timeout,
                 PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 3, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 3, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Week Day Schedule
         /// </summary>
-        public async Task<bool> SetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex, DaysMaskMap daysMask, byte startHour, byte startMinute, byte endHour, byte endMinute) {
+        public async Task<bool> SetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex, DaysMaskMap daysMask, byte startHour, byte startMinute, byte endHour, byte endMinute, CancellationToken token = default) {
             SetWeekDaySchedulePayload requestFields = new SetWeekDaySchedulePayload() {
                 WeekDayIndex = weekDayIndex,
                 UserIndex = userIndex,
@@ -1571,19 +1571,19 @@ namespace MatterDotNet.Clusters.Closures
                 EndHour = endHour,
                 EndMinute = endMinute,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 11, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 11, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Week Day Schedule
         /// </summary>
-        public async Task<GetWeekDayScheduleResponse?> GetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex) {
+        public async Task<GetWeekDayScheduleResponse?> GetWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex, CancellationToken token = default) {
             GetWeekDaySchedulePayload requestFields = new GetWeekDaySchedulePayload() {
                 WeekDayIndex = weekDayIndex,
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 12, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 12, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetWeekDayScheduleResponse() {
@@ -1601,38 +1601,38 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Clear Week Day Schedule
         /// </summary>
-        public async Task<bool> ClearWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex) {
+        public async Task<bool> ClearWeekDaySchedule(SecureSession session, byte weekDayIndex, ushort userIndex, CancellationToken token = default) {
             ClearWeekDaySchedulePayload requestFields = new ClearWeekDaySchedulePayload() {
                 WeekDayIndex = weekDayIndex,
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 13, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 13, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Year Day Schedule
         /// </summary>
-        public async Task<bool> SetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex, DateTime localStartTime, DateTime localEndTime) {
+        public async Task<bool> SetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex, DateTime localStartTime, DateTime localEndTime, CancellationToken token = default) {
             SetYearDaySchedulePayload requestFields = new SetYearDaySchedulePayload() {
                 YearDayIndex = yearDayIndex,
                 UserIndex = userIndex,
                 LocalStartTime = localStartTime,
                 LocalEndTime = localEndTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 14, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 14, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Year Day Schedule
         /// </summary>
-        public async Task<GetYearDayScheduleResponse?> GetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex) {
+        public async Task<GetYearDayScheduleResponse?> GetYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex, CancellationToken token = default) {
             GetYearDaySchedulePayload requestFields = new GetYearDaySchedulePayload() {
                 YearDayIndex = yearDayIndex,
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 15, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 15, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetYearDayScheduleResponse() {
@@ -1647,37 +1647,37 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Clear Year Day Schedule
         /// </summary>
-        public async Task<bool> ClearYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex) {
+        public async Task<bool> ClearYearDaySchedule(SecureSession session, byte yearDayIndex, ushort userIndex, CancellationToken token = default) {
             ClearYearDaySchedulePayload requestFields = new ClearYearDaySchedulePayload() {
                 YearDayIndex = yearDayIndex,
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 16, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 16, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Holiday Schedule
         /// </summary>
-        public async Task<bool> SetHolidaySchedule(SecureSession session, byte holidayIndex, DateTime localStartTime, DateTime localEndTime, OperatingModeEnum operatingMode) {
+        public async Task<bool> SetHolidaySchedule(SecureSession session, byte holidayIndex, DateTime localStartTime, DateTime localEndTime, OperatingModeEnum operatingMode, CancellationToken token = default) {
             SetHolidaySchedulePayload requestFields = new SetHolidaySchedulePayload() {
                 HolidayIndex = holidayIndex,
                 LocalStartTime = localStartTime,
                 LocalEndTime = localEndTime,
                 OperatingMode = operatingMode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 17, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 17, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Holiday Schedule
         /// </summary>
-        public async Task<GetHolidayScheduleResponse?> GetHolidaySchedule(SecureSession session, byte holidayIndex) {
+        public async Task<GetHolidayScheduleResponse?> GetHolidaySchedule(SecureSession session, byte holidayIndex, CancellationToken token = default) {
             GetHolidaySchedulePayload requestFields = new GetHolidaySchedulePayload() {
                 HolidayIndex = holidayIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 18, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 18, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetHolidayScheduleResponse() {
@@ -1692,18 +1692,18 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Clear Holiday Schedule
         /// </summary>
-        public async Task<bool> ClearHolidaySchedule(SecureSession session, byte holidayIndex) {
+        public async Task<bool> ClearHolidaySchedule(SecureSession session, byte holidayIndex, CancellationToken token = default) {
             ClearHolidaySchedulePayload requestFields = new ClearHolidaySchedulePayload() {
                 HolidayIndex = holidayIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 19, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 19, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set User
         /// </summary>
-        public async Task<bool> SetUser(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, ushort userIndex, string? userName, uint? userUniqueID, UserStatus? userStatus, UserType? userType, CredentialRule? credentialRule) {
+        public async Task<bool> SetUser(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, ushort userIndex, string? userName, uint? userUniqueID, UserStatus? userStatus, UserType? userType, CredentialRule? credentialRule, CancellationToken token = default) {
             SetUserPayload requestFields = new SetUserPayload() {
                 OperationType = operationType,
                 UserIndex = userIndex,
@@ -1713,18 +1713,18 @@ namespace MatterDotNet.Clusters.Closures
                 UserType = userType,
                 CredentialRule = credentialRule,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 26, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 26, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get User
         /// </summary>
-        public async Task<GetUserResponse?> GetUser(SecureSession session, ushort userIndex) {
+        public async Task<GetUserResponse?> GetUser(SecureSession session, ushort userIndex, CancellationToken token = default) {
             GetUserPayload requestFields = new GetUserPayload() {
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 27, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 27, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetUserResponse() {
@@ -1744,18 +1744,18 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Clear User
         /// </summary>
-        public async Task<bool> ClearUser(SecureSession session, ushort commandTimeoutMS, ushort userIndex) {
+        public async Task<bool> ClearUser(SecureSession session, ushort commandTimeoutMS, ushort userIndex, CancellationToken token = default) {
             ClearUserPayload requestFields = new ClearUserPayload() {
                 UserIndex = userIndex,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 29, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 29, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Credential
         /// </summary>
-        public async Task<SetCredentialResponse?> SetCredential(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, Credential credential, byte[] credentialData, ushort? userIndex, UserStatus? userStatus, UserType? userType) {
+        public async Task<SetCredentialResponse?> SetCredential(SecureSession session, ushort commandTimeoutMS, DataOperationType operationType, Credential credential, byte[] credentialData, ushort? userIndex, UserStatus? userStatus, UserType? userType, CancellationToken token = default) {
             SetCredentialPayload requestFields = new SetCredentialPayload() {
                 OperationType = operationType,
                 Credential = credential,
@@ -1764,7 +1764,7 @@ namespace MatterDotNet.Clusters.Closures
                 UserStatus = userStatus,
                 UserType = userType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 34, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 34, commandTimeoutMS, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SetCredentialResponse() {
@@ -1777,11 +1777,11 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Get Credential Status
         /// </summary>
-        public async Task<GetCredentialStatusResponse?> GetCredentialStatus(SecureSession session, Credential credential) {
+        public async Task<GetCredentialStatusResponse?> GetCredentialStatus(SecureSession session, Credential credential, CancellationToken token = default) {
             GetCredentialStatusPayload requestFields = new GetCredentialStatusPayload() {
                 Credential = credential,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 36, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 36, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetCredentialStatusResponse() {
@@ -1797,44 +1797,44 @@ namespace MatterDotNet.Clusters.Closures
         /// <summary>
         /// Clear Credential
         /// </summary>
-        public async Task<bool> ClearCredential(SecureSession session, ushort commandTimeoutMS, Credential? credential) {
+        public async Task<bool> ClearCredential(SecureSession session, ushort commandTimeoutMS, Credential? credential, CancellationToken token = default) {
             ClearCredentialPayload requestFields = new ClearCredentialPayload() {
                 Credential = credential,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 38, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 38, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Unbolt Door
         /// </summary>
-        public async Task<bool> UnboltDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode) {
+        public async Task<bool> UnboltDoor(SecureSession session, ushort commandTimeoutMS, byte[]? pINCode, CancellationToken token = default) {
             UnboltDoorPayload requestFields = new UnboltDoorPayload() {
                 PINCode = pINCode,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 39, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 39, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Aliro Reader Config
         /// </summary>
-        public async Task<bool> SetAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, byte[] signingKey, byte[] verificationKey, byte[] groupIdentifier, byte[]? groupResolvingKey) {
+        public async Task<bool> SetAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, byte[] signingKey, byte[] verificationKey, byte[] groupIdentifier, byte[]? groupResolvingKey, CancellationToken token = default) {
             SetAliroReaderConfigPayload requestFields = new SetAliroReaderConfigPayload() {
                 SigningKey = signingKey,
                 VerificationKey = verificationKey,
                 GroupIdentifier = groupIdentifier,
                 GroupResolvingKey = groupResolvingKey,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 40, commandTimeoutMS, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 40, commandTimeoutMS, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Clear Aliro Reader Config
         /// </summary>
-        public async Task<bool> ClearAliroReaderConfig(SecureSession session, ushort commandTimeoutMS) {
-            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 41, commandTimeoutMS);
+        public async Task<bool> ClearAliroReaderConfig(SecureSession session, ushort commandTimeoutMS, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecTimedCommand(session, endPoint, cluster, 41, commandTimeoutMS, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

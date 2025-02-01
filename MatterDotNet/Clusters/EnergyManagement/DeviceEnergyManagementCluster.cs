@@ -745,86 +745,86 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Power Adjust Request
         /// </summary>
-        public async Task<bool> PowerAdjustRequest(SecureSession session, long power, TimeSpan duration, AdjustmentCause cause) {
+        public async Task<bool> PowerAdjustRequest(SecureSession session, long power, TimeSpan duration, AdjustmentCause cause, CancellationToken token = default) {
             PowerAdjustRequestPayload requestFields = new PowerAdjustRequestPayload() {
                 Power = power,
                 Duration = duration,
                 Cause = cause,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Cancel Power Adjust Request
         /// </summary>
-        public async Task<bool> CancelPowerAdjustRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> CancelPowerAdjustRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Start Time Adjust Request
         /// </summary>
-        public async Task<bool> StartTimeAdjustRequest(SecureSession session, DateTime requestedStartTime, AdjustmentCause cause) {
+        public async Task<bool> StartTimeAdjustRequest(SecureSession session, DateTime requestedStartTime, AdjustmentCause cause, CancellationToken token = default) {
             StartTimeAdjustRequestPayload requestFields = new StartTimeAdjustRequestPayload() {
                 RequestedStartTime = requestedStartTime,
                 Cause = cause,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Pause Request
         /// </summary>
-        public async Task<bool> PauseRequest(SecureSession session, TimeSpan duration, AdjustmentCause cause) {
+        public async Task<bool> PauseRequest(SecureSession session, TimeSpan duration, AdjustmentCause cause, CancellationToken token = default) {
             PauseRequestPayload requestFields = new PauseRequestPayload() {
                 Duration = duration,
                 Cause = cause,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Resume Request
         /// </summary>
-        public async Task<bool> ResumeRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<bool> ResumeRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Modify Forecast Request
         /// </summary>
-        public async Task<bool> ModifyForecastRequest(SecureSession session, uint forecastID, SlotAdjustment[] slotAdjustments, AdjustmentCause cause) {
+        public async Task<bool> ModifyForecastRequest(SecureSession session, uint forecastID, SlotAdjustment[] slotAdjustments, AdjustmentCause cause, CancellationToken token = default) {
             ModifyForecastRequestPayload requestFields = new ModifyForecastRequestPayload() {
                 ForecastID = forecastID,
                 SlotAdjustments = slotAdjustments,
                 Cause = cause,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Request Constraint Based Forecast
         /// </summary>
-        public async Task<bool> RequestConstraintBasedForecast(SecureSession session, Constraints[] constraints, AdjustmentCause cause) {
+        public async Task<bool> RequestConstraintBasedForecast(SecureSession session, Constraints[] constraints, AdjustmentCause cause, CancellationToken token = default) {
             RequestConstraintBasedForecastPayload requestFields = new RequestConstraintBasedForecastPayload() {
                 Constraints = constraints,
                 Cause = cause,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Cancel Request
         /// </summary>
-        public async Task<bool> CancelRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07);
+        public async Task<bool> CancelRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

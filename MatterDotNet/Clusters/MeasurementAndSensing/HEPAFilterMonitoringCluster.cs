@@ -173,15 +173,12 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         }
         #endregion Records
 
-        #region Payloads
-        #endregion Payloads
-
         #region Commands
         /// <summary>
         /// Reset Condition
         /// </summary>
-        public async Task<bool> ResetCondition(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> ResetCondition(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -44,7 +44,7 @@ namespace MatterDotNet.Protocol.Connection
             Task.Factory.StartNew(Run);
         }
 
-        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable)
+        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable, CancellationToken token)
         {
             if (reliable)
                 frame.Message!.Flags |= ExchangeFlags.Reliability;
@@ -65,13 +65,13 @@ namespace MatterDotNet.Protocol.Connection
                     {
                         if (!Retransmissions.TryGetValue((exchange.Session.LocalSessionID, frame.Message.ExchangeID), out rt))
                             continue;
-                        rt.Ack.Wait();
+                        rt.Ack.Wait(token);
                         rt = null;
                     }
                 }
             }
             Console.WriteLine("MRP SENT: " + frame.ToString());
-            await client.SendAsync(writer.GetPayload());
+            await client.SendAsync(writer.GetPayload(), token);
             exchange.Session.Timestamp = DateTime.Now;
             while (reliable)
             {
@@ -87,18 +87,18 @@ namespace MatterDotNet.Protocol.Connection
                     if (exchange.Session is SecureSession secureSession)
                         retryInterval = secureSession.PeerActive ? secureSession.ActiveInterval : secureSession.IdleInterval;
                     double mrpBackoffTime = (retryInterval * MRP_BACKOFF_MARGIN) * Math.Pow(MRP_BACKOFF_BASE, (Math.Max(0, rt.SendCount - MRP_BACKOFF_THRESHOLD))) * (1.0 + Random.Shared.NextDouble() * MRP_BACKOFF_JITTER);
-                    if (await rt.Ack.WaitAsync((int)mrpBackoffTime))
+                    if (await rt.Ack.WaitAsync((int)mrpBackoffTime, token))
                         return;
                     else
                     {
-                        await client.SendAsync(rt.data.GetPayload());
-                        Console.WriteLine("RT #" + rt.SendCount);
+                        await client.SendAsync(rt.data.GetPayload(), token);
+                        Console.WriteLine("RT #" + rt.SendCount + ": " + frame.ToString());
                     }
                 }
                 catch (OperationCanceledException)
                 {
-                    await client.SendAsync(rt!.data.GetPayload());
-                    Console.WriteLine("RT #" + rt.SendCount);
+                    await client.SendAsync(rt!.data.GetPayload(), token);
+                    Console.WriteLine("RT #" + rt.SendCount + ": " + frame.ToString());
                 }
             }
         }

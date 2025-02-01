@@ -103,12 +103,12 @@ namespace MatterDotNet.Clusters.Appliances
         /// <summary>
         /// Set Temperature
         /// </summary>
-        public async Task<bool> SetTemperature(SecureSession session, decimal? targetTemperature, byte? targetTemperatureLevel) {
+        public async Task<bool> SetTemperature(SecureSession session, decimal? targetTemperature, byte? targetTemperatureLevel, CancellationToken token = default) {
             SetTemperaturePayload requestFields = new SetTemperaturePayload() {
                 TargetTemperature = targetTemperature,
                 TargetTemperatureLevel = targetTemperatureLevel,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -165,12 +165,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Add Group
         /// </summary>
-        public async Task<AddGroupResponse?> AddGroup(SecureSession session, ushort groupID, string groupName) {
+        public async Task<AddGroupResponse?> AddGroup(SecureSession session, ushort groupID, string groupName, CancellationToken token = default) {
             AddGroupPayload requestFields = new AddGroupPayload() {
                 GroupID = groupID,
                 GroupName = groupName,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new AddGroupResponse() {
@@ -182,11 +182,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// View Group
         /// </summary>
-        public async Task<ViewGroupResponse?> ViewGroup(SecureSession session, ushort groupID) {
+        public async Task<ViewGroupResponse?> ViewGroup(SecureSession session, ushort groupID, CancellationToken token = default) {
             ViewGroupPayload requestFields = new ViewGroupPayload() {
                 GroupID = groupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ViewGroupResponse() {
@@ -199,11 +199,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Get Group Membership
         /// </summary>
-        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, ushort[] groupList) {
+        public async Task<GetGroupMembershipResponse?> GetGroupMembership(SecureSession session, ushort[] groupList, CancellationToken token = default) {
             GetGroupMembershipPayload requestFields = new GetGroupMembershipPayload() {
                 GroupList = groupList,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetGroupMembershipResponse() {
@@ -215,11 +215,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Remove Group
         /// </summary>
-        public async Task<RemoveGroupResponse?> RemoveGroup(SecureSession session, ushort groupID) {
+        public async Task<RemoveGroupResponse?> RemoveGroup(SecureSession session, ushort groupID, CancellationToken token = default) {
             RemoveGroupPayload requestFields = new RemoveGroupPayload() {
                 GroupID = groupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveGroupResponse() {
@@ -231,20 +231,20 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Remove All Groups
         /// </summary>
-        public async Task<bool> RemoveAllGroups(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04);
+        public async Task<bool> RemoveAllGroups(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add Group If Identifying
         /// </summary>
-        public async Task<bool> AddGroupIfIdentifying(SecureSession session, ushort groupID, string groupName) {
+        public async Task<bool> AddGroupIfIdentifying(SecureSession session, ushort groupID, string groupName, CancellationToken token = default) {
             AddGroupIfIdentifyingPayload requestFields = new AddGroupIfIdentifyingPayload() {
                 GroupID = groupID,
                 GroupName = groupName,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -449,35 +449,35 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set UTC Time
         /// </summary>
-        public async Task<bool> SetUTCTime(SecureSession session, DateTime uTCTime, GranularityEnum granularity, TimeSourceEnum? timeSource) {
+        public async Task<bool> SetUTCTime(SecureSession session, DateTime uTCTime, GranularityEnum granularity, TimeSourceEnum? timeSource, CancellationToken token = default) {
             SetUTCTimePayload requestFields = new SetUTCTimePayload() {
                 UTCTime = uTCTime,
                 Granularity = granularity,
                 TimeSource = timeSource,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Trusted Time Source
         /// </summary>
-        public async Task<bool> SetTrustedTimeSource(SecureSession session, FabricScopedTrustedTimeSource? trustedTimeSource) {
+        public async Task<bool> SetTrustedTimeSource(SecureSession session, FabricScopedTrustedTimeSource? trustedTimeSource, CancellationToken token = default) {
             SetTrustedTimeSourcePayload requestFields = new SetTrustedTimeSourcePayload() {
                 TrustedTimeSource = trustedTimeSource,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Time Zone
         /// </summary>
-        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZoneStruct[] timeZone) {
+        public async Task<SetTimeZoneResponse?> SetTimeZone(SecureSession session, TimeZoneStruct[] timeZone, CancellationToken token = default) {
             SetTimeZonePayload requestFields = new SetTimeZonePayload() {
                 TimeZone = timeZone,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SetTimeZoneResponse() {
@@ -488,22 +488,22 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set DST Offset
         /// </summary>
-        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffsetStruct[] dSTOffset) {
+        public async Task<bool> SetDSTOffset(SecureSession session, DSTOffsetStruct[] dSTOffset, CancellationToken token = default) {
             SetDSTOffsetPayload requestFields = new SetDSTOffsetPayload() {
                 DSTOffset = dSTOffset,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Set Default NTP
         /// </summary>
-        public async Task<bool> SetDefaultNTP(SecureSession session, string? defaultNTP) {
+        public async Task<bool> SetDefaultNTP(SecureSession session, string? defaultNTP, CancellationToken token = default) {
             SetDefaultNTPPayload requestFields = new SetDefaultNTPPayload() {
                 DefaultNTP = defaultNTP,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

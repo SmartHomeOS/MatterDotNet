@@ -396,7 +396,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Add Scene
         /// </summary>
-        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort groupID, byte sceneID, uint transitionTime, string sceneName, ExtensionFieldSet[] extensionFieldSets) {
+        public async Task<AddSceneResponse?> AddScene(SecureSession session, ushort groupID, byte sceneID, uint transitionTime, string sceneName, ExtensionFieldSet[] extensionFieldSets, CancellationToken token = default) {
             AddScenePayload requestFields = new AddScenePayload() {
                 GroupID = groupID,
                 SceneID = sceneID,
@@ -404,7 +404,7 @@ namespace MatterDotNet.Clusters.General
                 SceneName = sceneName,
                 ExtensionFieldSets = extensionFieldSets,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new AddSceneResponse() {
@@ -417,12 +417,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// View Scene
         /// </summary>
-        public async Task<ViewSceneResponse?> ViewScene(SecureSession session, ushort groupID, byte sceneID) {
+        public async Task<ViewSceneResponse?> ViewScene(SecureSession session, ushort groupID, byte sceneID, CancellationToken token = default) {
             ViewScenePayload requestFields = new ViewScenePayload() {
                 GroupID = groupID,
                 SceneID = sceneID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ViewSceneResponse() {
@@ -438,12 +438,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Remove Scene
         /// </summary>
-        public async Task<RemoveSceneResponse?> RemoveScene(SecureSession session, ushort groupID, byte sceneID) {
+        public async Task<RemoveSceneResponse?> RemoveScene(SecureSession session, ushort groupID, byte sceneID, CancellationToken token = default) {
             RemoveScenePayload requestFields = new RemoveScenePayload() {
                 GroupID = groupID,
                 SceneID = sceneID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveSceneResponse() {
@@ -456,11 +456,11 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Remove All Scenes
         /// </summary>
-        public async Task<RemoveAllScenesResponse?> RemoveAllScenes(SecureSession session, ushort groupID) {
+        public async Task<RemoveAllScenesResponse?> RemoveAllScenes(SecureSession session, ushort groupID, CancellationToken token = default) {
             RemoveAllScenesPayload requestFields = new RemoveAllScenesPayload() {
                 GroupID = groupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new RemoveAllScenesResponse() {
@@ -472,12 +472,12 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Store Scene
         /// </summary>
-        public async Task<StoreSceneResponse?> StoreScene(SecureSession session, ushort groupID, byte sceneID) {
+        public async Task<StoreSceneResponse?> StoreScene(SecureSession session, ushort groupID, byte sceneID, CancellationToken token = default) {
             StoreScenePayload requestFields = new StoreScenePayload() {
                 GroupID = groupID,
                 SceneID = sceneID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new StoreSceneResponse() {
@@ -490,24 +490,24 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Recall Scene
         /// </summary>
-        public async Task<bool> RecallScene(SecureSession session, ushort groupID, byte sceneID, uint? transitionTime) {
+        public async Task<bool> RecallScene(SecureSession session, ushort groupID, byte sceneID, uint? transitionTime, CancellationToken token = default) {
             RecallScenePayload requestFields = new RecallScenePayload() {
                 GroupID = groupID,
                 SceneID = sceneID,
                 TransitionTime = transitionTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Get Scene Membership
         /// </summary>
-        public async Task<GetSceneMembershipResponse?> GetSceneMembership(SecureSession session, ushort groupID) {
+        public async Task<GetSceneMembershipResponse?> GetSceneMembership(SecureSession session, ushort groupID, CancellationToken token = default) {
             GetSceneMembershipPayload requestFields = new GetSceneMembershipPayload() {
                 GroupID = groupID,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new GetSceneMembershipResponse() {
@@ -521,7 +521,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Copy Scene
         /// </summary>
-        public async Task<CopySceneResponse?> CopyScene(SecureSession session, CopyMode mode, ushort groupIdentifierFrom, byte sceneIdentifierFrom, ushort groupIdentifierTo, byte sceneIdentifierTo) {
+        public async Task<CopySceneResponse?> CopyScene(SecureSession session, CopyMode mode, ushort groupIdentifierFrom, byte sceneIdentifierFrom, ushort groupIdentifierTo, byte sceneIdentifierTo, CancellationToken token = default) {
             CopyScenePayload requestFields = new CopyScenePayload() {
                 Mode = mode,
                 GroupIdentifierFrom = groupIdentifierFrom,
@@ -529,7 +529,7 @@ namespace MatterDotNet.Clusters.General
                 GroupIdentifierTo = groupIdentifierTo,
                 SceneIdentifierTo = sceneIdentifierTo,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new CopySceneResponse() {

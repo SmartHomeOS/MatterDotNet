@@ -634,7 +634,7 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Launch Content
         /// </summary>
-        public async Task<LauncherResponse?> LaunchContent(SecureSession session, ContentSearch search, bool autoPlay, string? data, PlaybackPreferences? playbackPreferences, bool? useCurrentContext) {
+        public async Task<LauncherResponse?> LaunchContent(SecureSession session, ContentSearch search, bool autoPlay, string? data, PlaybackPreferences? playbackPreferences, bool? useCurrentContext, CancellationToken token = default) {
             LaunchContentPayload requestFields = new LaunchContentPayload() {
                 Search = search,
                 AutoPlay = autoPlay,
@@ -642,7 +642,7 @@ namespace MatterDotNet.Clusters.Media
                 PlaybackPreferences = playbackPreferences,
                 UseCurrentContext = useCurrentContext,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {
@@ -654,13 +654,13 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Launch URL
         /// </summary>
-        public async Task<LauncherResponse?> LaunchURL(SecureSession session, string contentURL, string? displayString, BrandingInformation? brandingInformation) {
+        public async Task<LauncherResponse?> LaunchURL(SecureSession session, string contentURL, string? displayString, BrandingInformation? brandingInformation, CancellationToken token = default) {
             LaunchURLPayload requestFields = new LaunchURLPayload() {
                 ContentURL = contentURL,
                 DisplayString = displayString,
                 BrandingInformation = brandingInformation,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new LauncherResponse() {

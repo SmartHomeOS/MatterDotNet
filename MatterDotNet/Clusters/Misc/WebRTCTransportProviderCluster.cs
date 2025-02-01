@@ -305,7 +305,7 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// Solicit Offer
         /// </summary>
-        public async Task<SolicitOfferResponse?> SolicitOffer(SecureSession session, StreamType streamType, ushort? videoStreamID, ushort? audioStreamID, ICEServer[]? iCEServers, string? iCETransportPolicy, WebRTCMetadataOptions? metadataOptions) {
+        public async Task<SolicitOfferResponse?> SolicitOffer(SecureSession session, StreamType streamType, ushort? videoStreamID, ushort? audioStreamID, ICEServer[]? iCEServers, string? iCETransportPolicy, WebRTCMetadataOptions? metadataOptions, CancellationToken token = default) {
             SolicitOfferPayload requestFields = new SolicitOfferPayload() {
                 StreamType = streamType,
                 VideoStreamID = videoStreamID,
@@ -314,7 +314,7 @@ namespace MatterDotNet.Clusters.Misc
                 ICETransportPolicy = iCETransportPolicy,
                 MetadataOptions = metadataOptions,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new SolicitOfferResponse() {
@@ -328,7 +328,7 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// Provide Offer
         /// </summary>
-        public async Task<ProvideOfferResponse?> ProvideOffer(SecureSession session, ushort? webRTCSessionID, string sDP, StreamType streamType, ushort? videoStreamID, ushort? audioStreamID, ICEServer[]? iCEServers, string? iCETransportPolicy, WebRTCMetadataOptions? metadataOptions) {
+        public async Task<ProvideOfferResponse?> ProvideOffer(SecureSession session, ushort? webRTCSessionID, string sDP, StreamType streamType, ushort? videoStreamID, ushort? audioStreamID, ICEServer[]? iCEServers, string? iCETransportPolicy, WebRTCMetadataOptions? metadataOptions, CancellationToken token = default) {
             ProvideOfferPayload requestFields = new ProvideOfferPayload() {
                 WebRTCSessionID = webRTCSessionID,
                 SDP = sDP,
@@ -339,7 +339,7 @@ namespace MatterDotNet.Clusters.Misc
                 ICETransportPolicy = iCETransportPolicy,
                 MetadataOptions = metadataOptions,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ProvideOfferResponse() {
@@ -352,36 +352,36 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// Provide Answer
         /// </summary>
-        public async Task<bool> ProvideAnswer(SecureSession session, ushort webRTCSessionID, string sDP) {
+        public async Task<bool> ProvideAnswer(SecureSession session, ushort webRTCSessionID, string sDP, CancellationToken token = default) {
             ProvideAnswerPayload requestFields = new ProvideAnswerPayload() {
                 WebRTCSessionID = webRTCSessionID,
                 SDP = sDP,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Provide ICE Candidate
         /// </summary>
-        public async Task<bool> ProvideICECandidate(SecureSession session, ushort webRTCSessionID, string iCECandidate) {
+        public async Task<bool> ProvideICECandidate(SecureSession session, ushort webRTCSessionID, string iCECandidate, CancellationToken token = default) {
             ProvideICECandidatePayload requestFields = new ProvideICECandidatePayload() {
                 WebRTCSessionID = webRTCSessionID,
                 ICECandidate = iCECandidate,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// End Session
         /// </summary>
-        public async Task<bool> EndSession(SecureSession session, ushort webRTCSessionID, WebRTCEndReason reason) {
+        public async Task<bool> EndSession(SecureSession session, ushort webRTCSessionID, WebRTCEndReason reason, CancellationToken token = default) {
             EndSessionPayload requestFields = new EndSessionPayload() {
                 WebRTCSessionID = webRTCSessionID,
                 Reason = reason,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

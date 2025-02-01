@@ -155,6 +155,11 @@ namespace Generator
                     ret.Append("&quot;");
                 else if (c != '\n' && c != '\r')
                     ret.Append(c);
+                else if (!space)
+                {
+                    ret.Append(' ');
+                    space = true;
+                }
             }
             return ret.ToString().Replace("[[ref_", "<see cref=\"").Replace("]]", "\"/>");
         }

@@ -93,8 +93,8 @@ namespace MatterDotNet.Clusters.Misc
         /// <summary>
         /// Play Chime Sound
         /// </summary>
-        public async Task<bool> PlayChimeSound(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> PlayChimeSound(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

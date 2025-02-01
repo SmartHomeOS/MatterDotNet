@@ -20,7 +20,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace MatterDotNet.Clusters.General
 {
     /// <summary>
-    /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read onlylabels.
+    /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only labels.
     /// </summary>
     [ClusterRevision(CLUSTER_ID, 1)]
     public class FixedLabel : ClusterBase
@@ -28,7 +28,7 @@ namespace MatterDotNet.Clusters.General
         internal const uint CLUSTER_ID = 0x0040;
 
         /// <summary>
-        /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read onlylabels.
+        /// The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only labels.
         /// </summary>
         [SetsRequiredMembers]
         public FixedLabel(ushort endPoint) : this(CLUSTER_ID, endPoint) { }

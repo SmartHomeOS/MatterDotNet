@@ -82,12 +82,12 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Content App Message
         /// </summary>
-        public async Task<ContentAppMessageResponse?> ContentAppMessage(SecureSession session, string? data, string encodingHint) {
+        public async Task<ContentAppMessageResponse?> ContentAppMessage(SecureSession session, string? data, string encodingHint, CancellationToken token = default) {
             ContentAppMessagePayload requestFields = new ContentAppMessagePayload() {
                 Data = data,
                 EncodingHint = encodingHint,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ContentAppMessageResponse() {

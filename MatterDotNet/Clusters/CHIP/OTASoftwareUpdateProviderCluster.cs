@@ -216,7 +216,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Query Image
         /// </summary>
-        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort vendorID, ushort productID, uint softwareVersion, DownloadProtocol[] protocolsSupported, ushort? hardwareVersion, string? location, bool? requestorCanConsent, byte[]? metadataForProvider) {
+        public async Task<QueryImageResponse?> QueryImage(SecureSession session, ushort vendorID, ushort productID, uint softwareVersion, DownloadProtocol[] protocolsSupported, ushort? hardwareVersion, string? location, bool? requestorCanConsent, byte[]? metadataForProvider, CancellationToken token = default) {
             QueryImagePayload requestFields = new QueryImagePayload() {
                 VendorID = vendorID,
                 ProductID = productID,
@@ -227,7 +227,7 @@ namespace MatterDotNet.Clusters.CHIP
                 RequestorCanConsent = requestorCanConsent,
                 MetadataForProvider = metadataForProvider,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new QueryImageResponse() {
@@ -245,12 +245,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Apply Update Request
         /// </summary>
-        public async Task<ApplyUpdateResponse?> ApplyUpdateRequest(SecureSession session, byte[] updateToken, uint newVersion) {
+        public async Task<ApplyUpdateResponse?> ApplyUpdateRequest(SecureSession session, byte[] updateToken, uint newVersion, CancellationToken token = default) {
             ApplyUpdateRequestPayload requestFields = new ApplyUpdateRequestPayload() {
                 UpdateToken = updateToken,
                 NewVersion = newVersion,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new ApplyUpdateResponse() {
@@ -262,12 +262,12 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Notify Update Applied
         /// </summary>
-        public async Task<bool> NotifyUpdateApplied(SecureSession session, byte[] updateToken, uint softwareVersion) {
+        public async Task<bool> NotifyUpdateApplied(SecureSession session, byte[] updateToken, uint softwareVersion, CancellationToken token = default) {
             NotifyUpdateAppliedPayload requestFields = new NotifyUpdateAppliedPayload() {
                 UpdateToken = updateToken,
                 SoftwareVersion = softwareVersion,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

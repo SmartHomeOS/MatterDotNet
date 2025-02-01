@@ -184,57 +184,57 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Off
         /// </summary>
-        public async Task<bool> Off(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> Off(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// On
         /// </summary>
-        public async Task<bool> On(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> On(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Toggle
         /// </summary>
-        public async Task<bool> Toggle(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02);
+        public async Task<bool> Toggle(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Off With Effect
         /// </summary>
-        public async Task<bool> OffWithEffect(SecureSession session, EffectIdentifier effectIdentifier, byte effectVariant) {
+        public async Task<bool> OffWithEffect(SecureSession session, EffectIdentifier effectIdentifier, byte effectVariant, CancellationToken token = default) {
             OffWithEffectPayload requestFields = new OffWithEffectPayload() {
                 EffectIdentifier = effectIdentifier,
                 EffectVariant = effectVariant,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x40, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// On With Recall Global Scene
         /// </summary>
-        public async Task<bool> OnWithRecallGlobalScene(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x41);
+        public async Task<bool> OnWithRecallGlobalScene(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x41, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// On With Timed Off
         /// </summary>
-        public async Task<bool> OnWithTimedOff(SecureSession session, OnOffControl onOffControl, ushort onTime, ushort offWaitTime) {
+        public async Task<bool> OnWithTimedOff(SecureSession session, OnOffControl onOffControl, ushort onTime, ushort offWaitTime, CancellationToken token = default) {
             OnWithTimedOffPayload requestFields = new OnWithTimedOffPayload() {
                 OnOffControl = onOffControl,
                 OnTime = onTime,
                 OffWaitTime = offWaitTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x42, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x42, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

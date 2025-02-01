@@ -102,12 +102,13 @@ namespace MatterDotNet.Entities
         /// <param name="payload"></param>
         /// <param name="targetSSID"></param>
         /// <param name="verification"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         /// <exception cref="IOException"></exception>
         /// <exception cref="CryptographicException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<CommissioningState> StartCommissioning(CommissioningPayload payload, string? targetSSID = null, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly)
+        public async Task<CommissioningState> StartCommissioning(CommissioningPayload payload, string? targetSSID = null, VerificationLevel verification = VerificationLevel.CertifiedDevicesOnly, CancellationToken token = default)
         {
             SessionContext? unsecureSession = null;
             SecureSession? paseSecureSession = null;
@@ -140,21 +141,21 @@ namespace MatterDotNet.Entities
                 else
                     throw new NotSupportedException("Failed to discover the Node's connection info");
                 PASE pase = new PASE(unsecureSession);
-                paseSecureSession = await pase.EstablishSecureSession(payload.Passcode);
+                paseSecureSession = await pase.EstablishSecureSession(payload.Passcode, token);
                 if (paseSecureSession == null)
                     throw new IOException("PASE pairing failed");
                 
                 // Get Basic Commissioning Info
                 GeneralCommissioning commissioning = new GeneralCommissioning(0);
-                GeneralCommissioning.BasicCommissioningInfoStruct basicInfo = await commissioning.BasicCommissioningInfo.Get(paseSecureSession);
+                GeneralCommissioning.BasicCommissioningInfoStruct basicInfo = await commissioning.BasicCommissioningInfo.Get(paseSecureSession, token);
                 ushort expiration = Math.Min(Math.Max((ushort)180, basicInfo.FailSafeExpiryLengthSeconds), basicInfo.MaxCumulativeFailsafeSeconds);
                 
                 // Arm Fail Safe
-                GeneralCommissioning.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42);
+                GeneralCommissioning.ArmFailSafeResponse? failSafe = await commissioning.ArmFailSafe(paseSecureSession, expiration, 42, token);
 
                 // Discover Root Clusters
                 EndPoint root = new EndPoint(0);
-                await root.EnumerateClusters(paseSecureSession);
+                await root.EnumerateClusters(paseSecureSession, token);
 
                 // Get Network Setup
                 List<string> connected = new List<string>();
@@ -177,7 +178,7 @@ namespace MatterDotNet.Entities
 
                 // Set regulatory information
                 if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
-                    await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioning.RegulatoryLocationType.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42);
+                    await commissioning.SetRegulatoryConfig(paseSecureSession, GeneralCommissioning.RegulatoryLocationType.IndoorOutdoor, RegionInfo.CurrentRegion.TwoLetterISORegionName, 42, token);
 
                 // Configure Date/Time
                 try
@@ -185,7 +186,7 @@ namespace MatterDotNet.Entities
                     if (root.HasCluster<TimeSynchronization>())
                     {
                         TimeSynchronization timeSync = root.GetCluster<TimeSynchronization>();
-                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronization.GranularityEnum.MillisecondsGranularity, TimeSynchronization.TimeSourceEnum.NonMatterNTP);
+                        bool success = await timeSync.SetUTCTime(paseSecureSession, DateTime.UtcNow, TimeSynchronization.GranularityEnum.MillisecondsGranularity, TimeSynchronization.TimeSourceEnum.NonMatterNTP, token);
                         if (!success)
                             Console.WriteLine("Failed to set UTC Time");
                         if (await timeSync.Supports(paseSecureSession, TimeSynchronization.Feature.TimeZone))
@@ -204,7 +205,7 @@ namespace MatterDotNet.Entities
                                     });
                                 }
                             }
-                            TimeSynchronization.SetTimeZoneResponse? tzResp = await timeSync.SetTimeZone(paseSecureSession, zones.ToArray());
+                            TimeSynchronization.SetTimeZoneResponse? tzResp = await timeSync.SetTimeZone(paseSecureSession, zones.ToArray(), token);
                             if (tzResp.HasValue && tzResp.Value.DSTOffsetRequired)
                             {
                                 //TODO - await timeSync.SetDSTOffset()
@@ -218,11 +219,11 @@ namespace MatterDotNet.Entities
 
                 // Validate Device Attestation Certificate (DAC)
                 OperationalCredentials operationalCredentials = new OperationalCredentials(0);
-                OperationalCredentials.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.DACCertificate);
-                OperationalCredentials.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.PAICertificate);
+                OperationalCredentials.CertificateChainResponse? dacResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.DACCertificate, token);
+                OperationalCredentials.CertificateChainResponse? paiResp = await operationalCredentials.CertificateChainRequest(paseSecureSession, OperationalCredentials.CertificateChainType.PAICertificate, token);
                 
                 byte[] nonce = RandomNumberGenerator.GetBytes(32);
-                OperationalCredentials.AttestationResponse? resp = await operationalCredentials.AttestationRequest(paseSecureSession, nonce);
+                OperationalCredentials.AttestationResponse? resp = await operationalCredentials.AttestationRequest(paseSecureSession, nonce, token);
 
                 OperationalCertificate dacMatter = new OperationalCertificate(dacResp.Value.Certificate);
                 if (verification != VerificationLevel.AnyDevice && !dacMatter.VerifyChain(paiResp.Value.Certificate, new DCLClient(), verification))
@@ -243,7 +244,7 @@ namespace MatterDotNet.Entities
 
                 // Request CSR from node
                 nonce = RandomNumberGenerator.GetBytes(32);
-                OperationalCredentials.CSRResponse? csr = await operationalCredentials.CSRRequest(paseSecureSession, nonce, false);
+                OperationalCredentials.CSRResponse? csr = await operationalCredentials.CSRRequest(paseSecureSession, nonce, false, token);
                 NocsrElements nocsr = new NocsrElements(csr.Value.NOCSRElements);
                 CertificateRequest certReq = CertificateRequest.LoadSigningRequest(nocsr.Csr, HashAlgorithmName.SHA256);
 
@@ -257,18 +258,18 @@ namespace MatterDotNet.Entities
                     throw new CryptographicException("Node attempted to change CSR nonce");
 
                 // Load fabric root CA
-                bool certAdded = await operationalCredentials.AddTrustedRootCertificate(paseSecureSession, fabric.GetMatterCertBytes());
+                bool certAdded = await operationalCredentials.AddTrustedRootCertificate(paseSecureSession, fabric.GetMatterCertBytes(), token);
                 if (!certAdded)
                     throw new CryptographicException("Node did not accept root certificate");
 
                 // Issue NOC
                 OperationalCertificate nodeCert = fabric.Sign(certReq);
-                OperationalCredentials.NOCResponse? nocAdded = await operationalCredentials.AddNOC(paseSecureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID!.Value, 0xFFF1);
+                OperationalCredentials.NOCResponse? nocAdded = await operationalCredentials.AddNOC(paseSecureSession, nodeCert.GetMatterCertBytes(), null, fabric.EpochKey, fabric.Commissioner!.NodeID!.Value, 0xFFF1, token);
                 if (nocAdded.Value.StatusCode != OperationalCredentials.NodeOperationalCertStatus.OK)
                     throw new IOException($"Failed to add new Network Operational Certificate: Error ({nocAdded.Value.StatusCode}): {nocAdded.Value.DebugText}");
                 
                 // Set Fabric Label
-                OperationalCredentials.NOCResponse? nocUpdated = await operationalCredentials.UpdateFabricLabel(paseSecureSession, (!string.IsNullOrEmpty(fabric.CommonName) ? fabric.CommonName : "MatterDotNet"));
+                OperationalCredentials.NOCResponse? nocUpdated = await operationalCredentials.UpdateFabricLabel(paseSecureSession, (!string.IsNullOrEmpty(fabric.CommonName) ? fabric.CommonName : "MatterDotNet"), token);
                 if (nocAdded.Value.StatusCode != OperationalCredentials.NodeOperationalCertStatus.OK)
                     Console.WriteLine("Failed to update fabric label");
 
@@ -279,7 +280,7 @@ namespace MatterDotNet.Entities
 
                 if ((SupportedComms & FabricInterface.WiFi) != 0 || (SupportedComms & FabricInterface.Thread) != 0)
                 {
-                    NetworkCommissioning.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioning>().Networks.Get(paseSecureSession);
+                    NetworkCommissioning.NetworkInfo[] networks = await root.GetCluster<NetworkCommissioning>().Networks.Get(paseSecureSession, token);
                     foreach (NetworkCommissioning.NetworkInfo info in networks)
                     {
                         if (info.Connected)
@@ -289,7 +290,7 @@ namespace MatterDotNet.Entities
                     byte[]? ssid = null;
                     if (targetSSID != null)
                         ssid = Encoding.UTF8.GetBytes(targetSSID);
-                    var results = await root.GetCluster<NetworkCommissioning>().ScanNetworks(paseSecureSession, ssid, 42);
+                    var results = await root.GetCluster<NetworkCommissioning>().ScanNetworks(paseSecureSession, ssid, 42, token);
                     if (results.HasValue)
                     {
                         if (results.Value.ThreadScanResults != null)
@@ -314,11 +315,12 @@ namespace MatterDotNet.Entities
         /// <param name="info"></param>
         /// <param name="selectedNetwork"></param>
         /// <param name="password"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, string password)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, string password, CancellationToken token = default)
         {
-            await CompleteCommissioning(info, selectedNetwork, Encoding.UTF8.GetBytes(password));
+            await CompleteCommissioning(info, selectedNetwork, Encoding.UTF8.GetBytes(password), token);
         }
 
         /// <summary>
@@ -327,9 +329,10 @@ namespace MatterDotNet.Entities
         /// <param name="info"></param>
         /// <param name="selectedNetwork"></param>
         /// <param name="password"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, byte[] password)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.WiFiInterfaceScanResult selectedNetwork, byte[] password, CancellationToken token = default)
         {
             ArgumentNullException.ThrowIfNull(info, nameof(info));
             ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
@@ -343,19 +346,19 @@ namespace MatterDotNet.Entities
                     throw new NotSupportedException("The device does not support WiFi");
 
                 NetworkCommissioning network = info.Node!.Root.GetCluster<NetworkCommissioning>();
-                var result = await network.AddOrUpdateWiFiNetwork(info.PASE!, selectedNetwork.SSID, password, 42, null, null, null);
+                var result = await network.AddOrUpdateWiFiNetwork(info.PASE!, selectedNetwork.SSID, password, 42, null, null, null, token);
                 if (!result.HasValue)
                     throw new IOException("Failed to configure network. Unknown Error");
                 else if (result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success && result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.DuplicateNetworkID)
                     throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
 
-                var connect = await network.ConnectNetwork(info.PASE!, selectedNetwork.SSID, 42);
+                var connect = await network.ConnectNetwork(info.PASE!, selectedNetwork.SSID, 42, token);
                 if (!connect.HasValue)
                     throw new IOException("Failed to connect to network. Unknown Error");
                 else if (connect.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success)
                     throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
                 else
-                    info.Upgrade(Encoding.UTF8.GetString(selectedNetwork.SSID));
+                    info.Connect(Encoding.UTF8.GetString(selectedNetwork.SSID));
                 Console.WriteLine("Connected to " + selectedNetwork.SSID);
             }
             catch
@@ -364,7 +367,7 @@ namespace MatterDotNet.Entities
                 throw;
             }
 
-            await CompleteCommissioning(info);
+            await CompleteCommissioning(info, token);
         }
 
         /// <summary>
@@ -373,9 +376,10 @@ namespace MatterDotNet.Entities
         /// <param name="info"></param>
         /// <param name="selectedNetwork"></param>
         /// <param name="operationalDataSet"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.ThreadInterfaceScanResult selectedNetwork, byte[] operationalDataSet)
+        public async Task CompleteCommissioning(CommissioningState info, NetworkCommissioning.ThreadInterfaceScanResult selectedNetwork, byte[] operationalDataSet, CancellationToken token = default)
         {
             ArgumentNullException.ThrowIfNull(info, nameof(info));
             ArgumentNullException.ThrowIfNull(selectedNetwork, nameof(selectedNetwork));
@@ -389,19 +393,19 @@ namespace MatterDotNet.Entities
                     throw new NotSupportedException("The device does not support Thread");
 
                 NetworkCommissioning network = info.Node!.Root.GetCluster<NetworkCommissioning>();
-                var result = await network.AddOrUpdateThreadNetwork(info.PASE!, operationalDataSet, 42);
+                var result = await network.AddOrUpdateThreadNetwork(info.PASE!, operationalDataSet, 42, token);
                 if (!result.HasValue)
                     throw new IOException("Failed to configure network. Unknown Error");
                 else if (result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success && result.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.DuplicateNetworkID)
                     throw new IOException("Failed to configure network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
 
-                var connect = await network.ConnectNetwork(info.PASE!, Encoding.UTF8.GetBytes(selectedNetwork.NetworkName!), 42);
+                var connect = await network.ConnectNetwork(info.PASE!, Encoding.UTF8.GetBytes(selectedNetwork.NetworkName!), 42, token);
                 if (!connect.HasValue)
                     throw new IOException("Failed to connect to network. Unknown Error");
                 else if (connect.Value.NetworkingStatus != NetworkCommissioning.NetworkCommissioningStatus.Success)
                     throw new IOException("Failed to connect to network. Error: " + result.Value.NetworkingStatus + " (" + result.Value.DebugText + ")");
                 else
-                    info.Upgrade(selectedNetwork.NetworkName!);
+                    info.Connect(selectedNetwork.NetworkName!);
                 Console.WriteLine("Connected to " + selectedNetwork.NetworkName);
             }
             catch
@@ -410,18 +414,19 @@ namespace MatterDotNet.Entities
                 throw;
             }
 
-            await CompleteCommissioning(info);
+            await CompleteCommissioning(info, token);
         }
 
         /// <summary>
         /// Complete comissioning for a device that is already on the operational network
         /// </summary>
         /// <param name="info"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NotSupportedException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task CompleteCommissioning(CommissioningState info)
+        public async Task CompleteCommissioning(CommissioningState info, CancellationToken token = default)
         {
             if (!info.CommissioningStarted)
                 throw new ArgumentException("Commissioning was unable to find the device. Completion is not possible.");
@@ -450,7 +455,7 @@ namespace MatterDotNet.Entities
                         else
                             address = ((i % 2) == 0) ? discoveredNode.IP6Address : discoveredNode.IP4Address;
                         unsecureSession = SessionManager.GetUnsecureSession(new IPEndPoint(address!, discoveredNode.Port), true);
-                        caseSecureSession = await info.Node!.GetCASESession(unsecureSession);
+                        caseSecureSession = await info.Node!.GetCASESession(unsecureSession, token);
                         break;
                     }
                     catch (IOException) {
@@ -458,14 +463,14 @@ namespace MatterDotNet.Entities
                         if (i == 5)
                             throw new IOException("Device is not reachable on the new network");
                         //Service is likely still starting
-                        await Task.Delay(750 * i);
+                        await Task.Delay(750 * i, token);
                     }
                 }
 
                 try
                 {
                     // Done
-                    GeneralCommissioning.CommissioningCompleteResponse? complete = await info.Node.Root.GetCluster<GeneralCommissioning>().CommissioningComplete(caseSecureSession!);
+                    GeneralCommissioning.CommissioningCompleteResponse? complete = await info.Node.Root.GetCluster<GeneralCommissioning>().CommissioningComplete(caseSecureSession!, token);
                     if (complete.Value.ErrorCode != GeneralCommissioning.CommissioningError.OK)
                         throw new InvalidOperationException(complete.Value.ErrorCode + ": " + complete.Value.DebugText);
                     nodes.Add(info.Node.ID, info.Node);

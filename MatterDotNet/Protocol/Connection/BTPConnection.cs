@@ -55,17 +55,17 @@ namespace MatterDotNet.Protocol.Connection
                 throw new InvalidOperationException("Failed to initialize characteristics");
         }
 
-        private async Task Connect(string deviceID)
+        private async Task Connect(string deviceID, CancellationToken token = default)
         {
             device = await BluetoothDevice.FromIdAsync(deviceID);
             device.GattServerDisconnected += Device_GattServerDisconnected;
-            await Connect();
+            await Connect(token);
         }
 
-        private async Task Connect()
+        private async Task Connect(CancellationToken token)
         {
             if (!device!.Gatt.IsConnected)
-                await device.Gatt.ConnectAsync();
+                await device.Gatt.ConnectAsync(); //TODO - Use token
             MTU = (ushort)Math.Min(device.Gatt.Mtu, 244);
             GattService service = await device.Gatt.GetPrimaryServiceAsync(MATTER_UUID);
             Write = await service.GetCharacteristicAsync(C1_UUID);
@@ -73,7 +73,7 @@ namespace MatterDotNet.Protocol.Connection
             await Read.StopNotificationsAsync();
 
             await SendHandshake().WaitAsync(CONN_RSP_TIMEOUT);
-            await Task.Factory.StartNew(Run);
+            await Task.Factory.StartNew(Run, token);
         }
 
         private void Device_GattServerDisconnected(object? sender, EventArgs e)
@@ -144,14 +144,14 @@ namespace MatterDotNet.Protocol.Connection
             }
         }
 
-        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable)
+        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable, CancellationToken token)
         {
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE);
             frame.Serialize(writer, exchange.Session);
             if (!connected)
-                await Connect();
-            await WaitForWindow();
-            await WriteLock.WaitAsync();
+                await Connect(token);
+            await WaitForWindow(token);
+            await WriteLock.WaitAsync(token);
             try
             {
                 byte? ack = null;
@@ -164,10 +164,10 @@ namespace MatterDotNet.Protocol.Connection
                 BTPFrame[] segments = BTPFrame.CreateSegments(frame, exchange.Session, MTU, ack);
                 foreach (BTPFrame segment in segments)
                 {
-                    await WaitForWindow();
+                    await WaitForWindow(token);
                     segment.Sequence = txCounter++;
                     Console.WriteLine("Wrote Segment: " + segment);
-                    await Write.WriteValueWithResponseAsync(segment.Serialize(MTU));
+                    await Write.WriteValueWithResponseAsync(segment.Serialize(MTU)); //TODO - Use token
                 }
             }
             finally
@@ -176,10 +176,10 @@ namespace MatterDotNet.Protocol.Connection
             }
         }
 
-        private async Task WaitForWindow()
+        private async Task WaitForWindow(CancellationToken token)
         {
             while (txCounter - txAcknowledged > ServerWindow)
-                await instream.Reader.WaitToReadAsync();
+                await instream.Reader.WaitToReadAsync(token);
         }
 
         public async Task Run()

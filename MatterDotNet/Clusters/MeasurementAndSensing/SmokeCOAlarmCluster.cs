@@ -230,8 +230,8 @@ namespace MatterDotNet.Clusters.MeasurementAndSensing
         /// <summary>
         /// Self Test Request
         /// </summary>
-        public async Task<bool> SelfTestRequest(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00);
+        public async Task<bool> SelfTestRequest(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

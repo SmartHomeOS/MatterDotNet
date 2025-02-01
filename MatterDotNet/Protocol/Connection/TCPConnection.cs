@@ -15,7 +15,6 @@ using MatterDotNet.Protocol.Sessions;
 using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Channels;
 
 namespace MatterDotNet.Protocol.Connection
 {
@@ -34,13 +33,13 @@ namespace MatterDotNet.Protocol.Connection
             Task.Factory.StartNew(Run);
         }
 
-        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable)
+        public async Task SendFrame(Exchange exchange, Frame frame, bool reliable, CancellationToken token)
         {
             PayloadWriter writer = new PayloadWriter(Frame.MAX_SIZE + 4);
             writer.Seek(4);
             frame.Serialize(writer, exchange.Session);
             BinaryPrimitives.WriteUInt32LittleEndian(writer.GetPayload().Slice(0, 4).Span, (uint)writer.Length - 4);
-            await stream.WriteAsync(writer.GetPayload());
+            await stream.WriteAsync(writer.GetPayload(), token);
             exchange.Session.Timestamp = DateTime.Now;
         }
 

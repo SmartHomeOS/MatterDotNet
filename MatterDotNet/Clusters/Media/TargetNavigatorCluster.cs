@@ -128,12 +128,12 @@ namespace MatterDotNet.Clusters.Media
         /// <summary>
         /// Navigate Target
         /// </summary>
-        public async Task<NavigateTargetResponse?> NavigateTarget(SecureSession session, byte target, string? data) {
+        public async Task<NavigateTargetResponse?> NavigateTarget(SecureSession session, byte target, string? data, CancellationToken token = default) {
             NavigateTargetPayload requestFields = new NavigateTargetPayload() {
                 Target = target,
                 Data = data,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new NavigateTargetResponse() {

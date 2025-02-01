@@ -287,7 +287,7 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Register Client
         /// </summary>
-        public async Task<RegisterClientResponse?> RegisterClient(SecureSession session, ulong checkInNodeID, ulong monitoredSubject, byte[] key, byte[]? verificationKey, ClientType clientType) {
+        public async Task<RegisterClientResponse?> RegisterClient(SecureSession session, ulong checkInNodeID, ulong monitoredSubject, byte[] key, byte[]? verificationKey, ClientType clientType, CancellationToken token = default) {
             RegisterClientPayload requestFields = new RegisterClientPayload() {
                 CheckInNodeID = checkInNodeID,
                 MonitoredSubject = monitoredSubject,
@@ -295,7 +295,7 @@ namespace MatterDotNet.Clusters.General
                 VerificationKey = verificationKey,
                 ClientType = clientType,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new RegisterClientResponse() {
@@ -306,23 +306,23 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Unregister Client
         /// </summary>
-        public async Task<bool> UnregisterClient(SecureSession session, ulong checkInNodeID, byte[]? verificationKey) {
+        public async Task<bool> UnregisterClient(SecureSession session, ulong checkInNodeID, byte[]? verificationKey, CancellationToken token = default) {
             UnregisterClientPayload requestFields = new UnregisterClientPayload() {
                 CheckInNodeID = checkInNodeID,
                 VerificationKey = verificationKey,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Stay Active Request
         /// </summary>
-        public async Task<StayActiveResponse?> StayActiveRequest(SecureSession session, uint stayActiveDuration) {
+        public async Task<StayActiveResponse?> StayActiveRequest(SecureSession session, uint stayActiveDuration, CancellationToken token = default) {
             StayActiveRequestPayload requestFields = new StayActiveRequestPayload() {
                 StayActiveDuration = stayActiveDuration,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             if (!ValidateResponse(resp))
                 return null;
             return new StayActiveResponse() {

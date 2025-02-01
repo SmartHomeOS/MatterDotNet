@@ -288,35 +288,35 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Move To Level
         /// </summary>
-        public async Task<bool> MoveToLevel(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToLevel(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToLevelPayload requestFields = new MoveToLevelPayload() {
                 Level = level,
                 TransitionTime = transitionTime,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move
         /// </summary>
-        public async Task<bool> Move(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> Move(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MovePayload requestFields = new MovePayload() {
                 MoveMode = moveMode,
                 Rate = rate,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Step
         /// </summary>
-        public async Task<bool> Step(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> Step(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StepPayload requestFields = new StepPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -324,54 +324,54 @@ namespace MatterDotNet.Clusters.General
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Stop
         /// </summary>
-        public async Task<bool> Stop(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> Stop(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StopPayload requestFields = new StopPayload() {
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Level With On Off
         /// </summary>
-        public async Task<bool> MoveToLevelWithOnOff(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveToLevelWithOnOff(SecureSession session, byte level, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveToLevelWithOnOffPayload requestFields = new MoveToLevelWithOnOffPayload() {
                 Level = level,
                 TransitionTime = transitionTime,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x04, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move With On Off
         /// </summary>
-        public async Task<bool> MoveWithOnOff(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> MoveWithOnOff(SecureSession session, MoveMode moveMode, byte? rate, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             MoveWithOnOffPayload requestFields = new MoveWithOnOffPayload() {
                 MoveMode = moveMode,
                 Rate = rate,
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x05, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Step With On Off
         /// </summary>
-        public async Task<bool> StepWithOnOff(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> StepWithOnOff(SecureSession session, StepMode stepMode, byte stepSize, ushort? transitionTime, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StepWithOnOffPayload requestFields = new StepWithOnOffPayload() {
                 StepMode = stepMode,
                 StepSize = stepSize,
@@ -379,30 +379,30 @@ namespace MatterDotNet.Clusters.General
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x06, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Stop With On Off
         /// </summary>
-        public async Task<bool> StopWithOnOff(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride) {
+        public async Task<bool> StopWithOnOff(SecureSession session, OptionsBitmap optionsMask, OptionsBitmap optionsOverride, CancellationToken token = default) {
             StopWithOnOffPayload requestFields = new StopWithOnOffPayload() {
                 OptionsMask = optionsMask,
                 OptionsOverride = optionsOverride,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x07, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Move To Closest Frequency
         /// </summary>
-        public async Task<bool> MoveToClosestFrequency(SecureSession session, ushort frequency) {
+        public async Task<bool> MoveToClosestFrequency(SecureSession session, ushort frequency, CancellationToken token = default) {
             MoveToClosestFrequencyPayload requestFields = new MoveToClosestFrequencyPayload() {
                 Frequency = frequency,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x08, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

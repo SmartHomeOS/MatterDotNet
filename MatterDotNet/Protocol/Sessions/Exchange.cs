@@ -29,7 +29,7 @@ namespace MatterDotNet.Protocol.Sessions
             Messages = Channel.CreateBounded<Frame>(10);
         }
 
-        public async Task SendFrame(Frame frame, bool reliable = true)
+        public async Task SendFrame(Frame frame, bool reliable = true, CancellationToken token = default)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace MatterDotNet.Protocol.Sessions
                     frame.Message.Flags |= ExchangeFlags.Initiator;
                 frame.Message.ExchangeID = ID;
                 frame.Counter = Session.GetSessionCounter();
-                await Session.Connection.SendFrame(this, frame, reliable);
+                await Session.Connection.SendFrame(this, frame, reliable, token);
             }
             catch(OperationCanceledException e)
             {

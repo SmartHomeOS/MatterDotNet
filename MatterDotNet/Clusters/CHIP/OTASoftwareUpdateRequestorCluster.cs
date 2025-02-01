@@ -230,7 +230,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Announce OTA Provider
         /// </summary>
-        public async Task<bool> AnnounceOTAProvider(SecureSession session, ulong providerNodeID, ushort vendorID, AnnouncementReason announcementReason, byte[]? metadataForNode, ushort endpoint) {
+        public async Task<bool> AnnounceOTAProvider(SecureSession session, ulong providerNodeID, ushort vendorID, AnnouncementReason announcementReason, byte[]? metadataForNode, ushort endpoint, CancellationToken token = default) {
             AnnounceOTAProviderPayload requestFields = new AnnounceOTAProviderPayload() {
                 ProviderNodeID = providerNodeID,
                 VendorID = vendorID,
@@ -238,7 +238,7 @@ namespace MatterDotNet.Clusters.CHIP
                 MetadataForNode = metadataForNode,
                 Endpoint = endpoint,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

@@ -9,9 +9,6 @@
 // See the GNU Affero General Public License for more details.
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
-// WARNING: This file was auto-generated. Do not edit.
-
 
 using MatterDotNet.Clusters.Appliances;
 using MatterDotNet.Clusters.CHIP;
@@ -29,10 +26,7 @@ using MatterDotNet.Messages.InteractionModel;
 using MatterDotNet.Protocol.Payloads;
 using MatterDotNet.Protocol.Sessions;
 using MatterDotNet.Protocol.Subprotocols;
-using Microsoft.VisualBasic;
 using System.Data;
-using System.Diagnostics;
-using System.Threading.Channels;
 
 namespace MatterDotNet.Clusters
 {
@@ -129,49 +123,16 @@ namespace MatterDotNet.Clusters
         /// <param name="session"></param>
         /// <param name="attribute"></param>
         /// <param name="nullable"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
         /// <exception cref="IOException"></exception>
         /// <exception cref="ConstraintException"></exception>
-        protected async Task<object?> GetAttribute(SecureSession session, ushort attribute, bool nullable = false)
+        protected async Task<object?> GetAttribute(SecureSession session, ushort attribute, bool nullable = false, CancellationToken token = default)
         {
-            object? data = await InteractionManager.GetAttribute(session, endPoint, cluster, attribute);
+            object? data = await InteractionManager.GetAttribute(session, endPoint, cluster, attribute, token);
             if (!nullable && data == null)
                 throw new ConstraintException("Attribute " + attribute + " was null");
             return data;
-        }
-
-        /// <summary>
-        /// Sets an attribute with the given ID to the given value
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="attribute"></param>
-        /// <param name="value"></param>
-        /// <param name="nullable"></param>
-        /// <returns></returns>
-        /// <exception cref="ConstraintException"></exception>
-        /// <exception cref="IOException"></exception>
-        protected async Task SetAttribute(SecureSession session, ushort attribute, object? value, bool nullable = false)
-        {
-            if (!nullable && value == null)
-                throw new ConstraintException("Attribute " + attribute + " was null");
-            await InteractionManager.SetAttribute(session, endPoint, cluster, attribute, value);
-        }
-
-        /// <summary>
-        /// Gets an enum attribute with the given ID or throws an appropriate exception
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="attribute"></param>
-        /// <param name="nullable"></param>
-        /// <returns></returns>
-        protected async Task<uint?> GetEnumAttribute(SecureSession session, ushort attribute, bool nullable = false)
-        {
-            object? value = await GetAttribute(session, attribute, nullable);
-            if (value is byte byteVal)
-                return byteVal;
-            if (value is ushort shortVal)
-                return shortVal;
-            return (uint?)value!;
         }
 
         /// <summary>

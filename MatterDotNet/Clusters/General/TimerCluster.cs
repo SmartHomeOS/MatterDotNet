@@ -104,41 +104,41 @@ namespace MatterDotNet.Clusters.General
         /// <summary>
         /// Set Timer
         /// </summary>
-        public async Task<bool> SetTimer(SecureSession session, TimeSpan newTime) {
+        public async Task<bool> SetTimer(SecureSession session, TimeSpan newTime, CancellationToken token = default) {
             SetTimerPayload requestFields = new SetTimerPayload() {
                 NewTime = newTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Reset Timer
         /// </summary>
-        public async Task<bool> ResetTimer(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> ResetTimer(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Add Time
         /// </summary>
-        public async Task<bool> AddTime(SecureSession session, TimeSpan additionalTime) {
+        public async Task<bool> AddTime(SecureSession session, TimeSpan additionalTime, CancellationToken token = default) {
             AddTimePayload requestFields = new AddTimePayload() {
                 AdditionalTime = additionalTime,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x02, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Reduce Time
         /// </summary>
-        public async Task<bool> ReduceTime(SecureSession session, TimeSpan timeReduction) {
+        public async Task<bool> ReduceTime(SecureSession session, TimeSpan timeReduction, CancellationToken token = default) {
             ReduceTimePayload requestFields = new ReduceTimePayload() {
                 TimeReduction = timeReduction,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x03, requestFields, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

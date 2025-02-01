@@ -185,19 +185,19 @@ namespace MatterDotNet.Clusters.EnergyManagement
         /// <summary>
         /// Boost
         /// </summary>
-        public async Task<bool> Boost(SecureSession session, WaterHeaterBoostInfo boostInfo) {
+        public async Task<bool> Boost(SecureSession session, WaterHeaterBoostInfo boostInfo, CancellationToken token = default) {
             BoostPayload requestFields = new BoostPayload() {
                 BoostInfo = boostInfo,
             };
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields);
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x00, requestFields, token);
             return ValidateResponse(resp);
         }
 
         /// <summary>
         /// Cancel Boost
         /// </summary>
-        public async Task<bool> CancelBoost(SecureSession session) {
-            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01);
+        public async Task<bool> CancelBoost(SecureSession session, CancellationToken token = default) {
+            InvokeResponseIB resp = await InteractionManager.ExecCommand(session, endPoint, cluster, 0x01, null, token);
             return ValidateResponse(resp);
         }
         #endregion Commands

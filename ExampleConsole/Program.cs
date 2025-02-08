@@ -11,6 +11,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MatterDotNet.Entities;
+using MatterDotNet.OperationalDiscovery;
 
 namespace ExampleConsole
 {
@@ -18,10 +19,12 @@ namespace ExampleConsole
     {
         static async Task Main(string[] args)
         {
-            Controller controller = Controller.Load("fabric.fabric", "fabric.key");
-            await controller.EnumerateFabric();
-            Console.WriteLine(controller.ToString());
-            
+            Console.WriteLine("Scanning for Devices....");
+            ODNode[] discovered = await BTDiscoveryService.ScanAll();
+            Console.Clear();
+            Console.WriteLine("Devices Discovered: ");
+            foreach (ODNode node in discovered)
+                Console.WriteLine(node.ToString());
             Console.ReadLine();
         }
     }

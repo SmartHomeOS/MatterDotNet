@@ -12,7 +12,7 @@
 
 namespace MatterDotNet.Protocol.Payloads.Status
 {
-    public enum IMStatusCode
+    public enum IMStatusCode : byte
     {
         SUCCESS                  = 0x00,
         FAILURE                  = 0x01,
@@ -40,14 +40,7 @@ namespace MatterDotNet.Protocol.Payloads.Status
         DATA_VERSION_MISMATCH    = 0x92,
         Deprecated93             = 0x93,
         TIMEOUT                  = 0x94,
-        Reserved95               = 0x95,
-        Reserved96               = 0x96,
-        Reserved97               = 0x97,
-        Reserved98               = 0x98,
-        Reserved99               = 0x99,
-        Reserved9a               = 0x9a,
         BUSY                     = 0x9c,
-        Reserved9d               = 0x9d,
         Deprecatedc0             = 0xc0,
         Deprecatedc1             = 0xc1,
         Deprecatedc2             = 0xc2,

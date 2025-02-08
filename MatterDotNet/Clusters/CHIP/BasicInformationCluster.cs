@@ -103,8 +103,8 @@ namespace MatterDotNet.Clusters.CHIP
             ProductAppearance = new ReadAttribute<ProductAppearanceStruct>(cluster, endPoint, 32) {
                 Deserialize = x => new ProductAppearanceStruct((object[])x!)
             };
-            SpecificationVersion = new ReadAttribute<uint>(cluster, endPoint, 33) {
-                Deserialize = x => (uint)(dynamic?)x!
+            SpecificationVersion = new ReadAttribute<Version>(cluster, endPoint, 33) {
+                Deserialize = x => new Version((int)(dynamic?)x! >> 16, 0xFF & ((int)(dynamic?)x! >> 8), 0xFF & (int)(dynamic?)x!)
             };
             MaxPathsPerInvoke = new ReadAttribute<ushort>(cluster, endPoint, 34) {
                 Deserialize = x => (ushort)(dynamic?)x!
@@ -400,7 +400,7 @@ namespace MatterDotNet.Clusters.CHIP
         /// <summary>
         /// Specification Version Attribute [Read Only]
         /// </summary>
-        public required ReadAttribute<uint> SpecificationVersion { get; init; }
+        public required ReadAttribute<Version> SpecificationVersion { get; init; }
 
         /// <summary>
         /// Max Paths Per Invoke Attribute [Read Only]
